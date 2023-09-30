@@ -1,0 +1,15 @@
+* An Add-drop filter subcircuit
+
+.subckt add_drop_filter in drop out add radius_ring=50e-6 k1=0.85 k2=0.85 att_wg=2 neff_wg=2.2 ng_wg=4.3
+
+* Circuit parameters
+.assign length_wg = {pi}*{radius_ring}
+
+* Circuit definition
+coupler1 in ring_bl out ring_br k={k1}
+coupler2 add ring_tr drop ring_tl k={k2}
+
+wg_ring_l ring_tl ring_bl att={att_wg} length={length_wg} neff={neff_wg} ng={ng_wg}
+wg_ring_r ring_br ring_tr att={att_wg} length={length_wg} neff={neff_wg} ng={ng_wg}
+
+.ends

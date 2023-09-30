@@ -1,0 +1,13 @@
+tt, code, kbd, samp {
+    display: inline-block;
+    direction: ltr;
+    color: darkblue;
+}
+
+pre.fragment {
+    color: darkblue;
+}
+
+a {
+    text-decoration: underline;
+}

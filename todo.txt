@@ -1,0 +1,52 @@
+Library:
+- [ ] Finish implementing all elements
+  - [x] phase-shifter
+  - [ ] EO Modulator
+  - [ ] LFSR
+  - [ ] PWL source
+- [ ] Add models for the pcm
+  - [ ] Sequential FDTD/HEAT/...
+  - [ ] Looped MATLAB model
+  - [x] Raphael's LUT model
+- [ ] Rework the photodetector device into:
+  - [x] Single-ended photodetector (with noise)
+  - [ ] Opticall2 type photodetector
+  - [x] Oscilloscope probe
+- [ ] Add a monitor device to keep track of simulation duration
+  - [x] Time
+  - [ ] Energy spent by sources
+  - [ ] Energy left within circuit
+
+Netlist:
+- [ ] Finish parser for all elements (and settings)
+- [ ] Document (keep up to date list of available components and commands)
+- [ ] Implement hierarchy
+- [ ] Implement named components
+
+Simulation features:
+- [ ] Bundle all simulation parameters (timestep, precision)... into a class which can be used by devices
+- [ ] Bundle all material parameters into a table to make it easier to track/replace default parameters ?
+- [ ] Make a cmd line switch to run in CW mode
+- [x] implement runtime monitoring (energy...)
+- [ ] improve signals (use a more general "multidomain signal" class ?)
+- [ ] handle multiple propagation modes
+- [ ] handle bidirectionality in devices
+- [ ] handle arbitrary waveforms
+- [ ] handle non-linear effects
+- [ ] handle GVD as well
+
+Utilities:
+- [ ] Implement frequency sweeps (depends on CW availability for transmission)
+- [ ] Improve plotting capabilities
+  - [x] GTKWave
+  - [ ] Python reading with pyDigitalWaveTools
+- [ ] Link with a GUI for creating the circuits
+  - [ ] xschem
+
+Other:
+- [ ] Write data into a db (e.g. hdf5) instead of within the file-system
+- [ ] Logging features
+- [ ] Refactor once design is established
+- [ ] Implement a parallel job manager
+- [ ] Make some more features available through the command line
+- [ ] Readme and documentation

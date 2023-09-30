@@ -1,0 +1,5 @@
+.assign lambda0 = 1.55e-6 ; m
+.assign neff = 2.3
+.assign ng = 4.3
+.assign att_wg = 2 ; db/cm
+.assign length_2pi = {lambda0}/{neff}

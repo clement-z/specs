@@ -1,0 +1,79 @@
+# Currently using alpine as base
+#image: alpine:latest
+image: alpine:latest
+# TODO: Migrate to another base including all the dependencies
+# in order to avoid fetching and installing everything each time
+
+stages:
+    - build
+    - test
+    - deploy
+
+variables:
+    # Recursive submodule update
+    GIT_SUBMODULE_STRATEGY: recursive
+
+before_script:
+    # Add the testing repo for SystemC
+    - echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories
+    # Install all dependencies
+    - apk update
+    - apk add --no-cache
+      bash findutils
+      build-base bison flex
+      doxygen graphviz
+      systemc-dev
+    - cp .config.gitlab-ci.mk config.local.mk
+
+build:
+    stage: build
+    script:
+      - make -j$(nproc) bin V=1
+      - make -j$(nproc) lib V=1
+    artifacts:
+        paths:
+            - "./specs"
+            - "./libspecs.so"
+
+test:
+    stage: test
+    script:
+        # Only running a few tests manually for now
+        - ./specs -t wg
+        #- ./specs -t dc
+        #- ./specs -t splitter
+        #- ./specs -t merger
+        #- ./specs -t detector
+        #- ./specs -t phaseshifter
+        # TODO: add other tests (both from -t and the circuit test files)
+    dependencies:
+        - build
+    artifacts:
+        paths:
+            - "traces/*.vcd"
+
+doc:
+    stage: build
+    script:
+        - make doc
+    artifacts:
+        paths:
+            - doc/pcm-doc.tar.xz
+            - doc/html/
+    only:
+        - master
+
+
+pages:
+    stage: deploy
+    script:
+        - mkdir public
+        - cp -R doc/html/* public
+    dependencies:
+        - doc
+    artifacts:
+        paths:
+            - public
+    only:
+        - master
+

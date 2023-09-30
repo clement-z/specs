@@ -1,0 +1,28 @@
+* An Add-drop filter
+
+* Circuit parameters
+.assign lambda0 = 1.55e-6
+
+* Circuit definition
+;cwsrc1 in wl=1.55e-6 power=1
+vlsrc1 in values=[[0.5e-9,1,{lambda0}],[2e-9,0,{lambda0}]]
+
+coupler1 in 1 out 2 k=0.15
+coupler2 add 3 drop 4 k=0.15
+
+wg_ring_l 4 1 length=300e-6 neff=3.999
+wg_ring_r 2 3 length=300e-6 neff=3.999
+
+probe1 out
+probe2 drop
+probe3 in
+
+* Simulator options
+.options abstol=1e-6 reltol=1e-8 timescale=-12 traceall=1
+
+* Analysis parameter
+.assign dlambda = 1e-12
+
+* Analysis
+;.dc /cwsrc1/WL 1549.9e-9 1550.1e-9 {dlambda}
+.tran 3e-9

@@ -1,0 +1,58 @@
+* Paul 3 ring PUF
+
+.assign wl0=1.55e-6
+.assign neff=2.44 ng=4.3 att=3
+.assign R=10e-6 dR=10e-9 k=0.22360679774997896
+.assign L_r2r=3e-6 L_access=0e-6
+.assign R1={R} R2=({R}+{dR}) R3={R}+(2*{dR})
+.assign tau=1e-12
+.assign filename="inputstream.csv"
+.assign filename="inputstream_25wl.csv"
+.assign filename="paul_puf_bitstream_16bit_25wl.csv"
+.assign filename="paul_puf_bitstream_158b_3wl.csv"
+;.assign filename="paul_puf_bitstream_temp.csv"
+
+.include circuits/add_drop_sub.cir
+
+;CWSRC1 in wl={wl0} power=1
+VLSRC1 in values={filename}
+;VLSRC_bot in_top values={filename}
+;VLSRC_bot in_bot values={filename}
+;VLSRC_top in_top values=[[0,0,{wl0}],[{tau},1,],[2*{tau},0,],[3*{tau},1,],[4*{tau},0,]]
+;VLSRC_bot in_bot values=[[0,0,{wl0}],[{tau},1,],[2*{tau},0,],[3*{tau},1,],[4*{tau},0,]]
+
+SPLITTER1 in in_top in_bot
+MERGER1 drop_top_1 drop_bot_1 out_drop
+MLPROBE1 in [1.55e-6, 1.5599999999999999e-06, 1.57e-6]
+;PDETin in _ 1e-15
+PDET1 out_drop _ 1e-15
+PROBE1 out_drop
+
+WG1 in_top in_top_1 L={L_access} att={att} neff={neff} ng={ng}
+WG2 in_bot in_bot_1 L={L_access} att={att} neff={neff} ng={ng}
+
+WG3 through_bot_1 in_bot_2 L={L_r2r} att={att} neff={neff} ng={ng}
+WG4 through_bot_2 in_bot_3 L={L_r2r} att={att} neff={neff} ng={ng}
+WG5 through_top_2 in_top_3 L={L_r2r} att={att} neff={neff} ng={ng}
+WG6 through_top_1 in_top_2 L={L_r2r} att={att} neff={neff} ng={ng}
+
+XAD_top_1 in_top_1 drop_top_1 through_top_1 add_top_1 add_drop_filter radius_ring={R1} k1={k} k2={k} neff_wg={neff} ng_wg={ng} att_wg={att}
+XAD_top_2 in_top_2 drop_top_2 through_top_2 add_top_2 add_drop_filter radius_ring={R2} k1={k} k2={k} neff_wg={neff} ng_wg={ng} att_wg={att}
+XAD_top_3 in_top_3 drop_top_3 through_top_3 nothing add_drop_filter radius_ring={R3} k1={k} k2={k} neff_wg={neff} ng_wg={ng} att_wg={att}
+
+XAD_bot_1 in_bot_1 drop_bot_1 through_bot_1 add_bot_1 add_drop_filter radius_ring={R1} k1={k} k2={k} neff_wg={neff} ng_wg={ng} att_wg={att}
+XAD_bot_2 in_bot_2 drop_bot_2 through_bot_2 add_bot_2 add_drop_filter radius_ring={R2} k1={k} k2={k} neff_wg={neff} ng_wg={ng} att_wg={att}
+XAD_bot_3 in_bot_3 drop_bot_3 through_bot_3 nothing add_drop_filter radius_ring={R3} k1={k} k2={k} neff_wg={neff} ng_wg={ng} att_wg={att}
+
+WG13 drop_bot_3 add_bot_2 L={L_r2r} att={att} neff={neff} ng={ng}
+WG14 drop_bot_2 add_bot_1 L={L_r2r} att={att} neff={neff} ng={ng}
+WG16 drop_top_3 add_top_2 L={L_r2r} att={att} neff={neff} ng={ng}
+WG17 drop_top_2 add_top_1 L={L_r2r} att={att} neff={neff} ng={ng}
+
+WG18 through_top_3 out_top L={L_access} att={att} neff={neff} ng={ng}
+WG15 through_bot_3 out_bot L={L_access} att={att} neff={neff} ng={ng}
+
+.options abstol=1e-5 reltol=1e-4 traceall=0 timescale=-14 resolution=1
+.tran 8e-9
+;.dc WL(CWSRC1) 1.54e-6 1.56e-6 1e-11
+;.tran 300e-12

@@ -1,0 +1,6 @@
+[submodule "deps/args"]
+	path = thirdparty/args
+	url = https://github.com/Taywee/args
+[submodule "thirdparty/systemc"]
+	path = thirdparty/systemc
+	url = https://github.com/accellera-official/systemc

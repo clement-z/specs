@@ -1,0 +1,10 @@
+.subckt AAA 1 2 len=3
+WG 1 2 length={len} neff=1 ng=1 att=0
+.ends
+
+cwsrc in pow=1 wl=1.55e-6
+X1 in out AAA
+;probe out type=power
+
+.op
+

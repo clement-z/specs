@@ -1,0 +1,41 @@
+* An Add-drop filter
+
+* Circuit parameters
+.assign lambda0 = 1.55e-6
+.assign neff = 2.3
+.assign length_2pi = {lambda0}/{neff}
+.assign k = 0.85
+
+.subckt test p1 p2 length=100e-6 att=1 neff=2.2 ng=4.3
+wg1 p1 0 length={length} att={att} neff={neff} ng={ng}
+wg2 0 p2 length={length} att={att} neff={neff} ng={ng}
+.ends
+
+* Circuit definition
+cwsrc1 in_ wl=1.55e-6 power=1
+x1 in_ in test length=1e-3 neff=1 ng=4 att=0
+;wg_access in_ in length={length_2pi} neff={neff} ng=4
+
+coupler1 in ring_bl out ring_br k={k}
+coupler2 add ring_tr drop ring_tl k={k}
+
+wg_ring_l ring_tl ring_bl att=2 length=101*{length_2pi} neff={neff} ng=4.3
+wg_ring_r ring_br ring_tr att=2 length=101*{length_2pi} neff={neff} ng=4.3
+
+* Simulator options
+.options abstol=1e-12 reltol=1e-6 timescale=-15
+
+* DC analysis (CW sweep) parameters
+.assign lambda_min = {lambda0} - 15e-9
+.assign lambda_max = 2*{lambda0}-{lambda_min}
+.assign dlambda = 1*1e-9
+
+* Analysis
+;.dc WL(cwsrc1) {lambda_min} {lambda_max} {dlambda} P(cwsrc1) 0 1 0.01
+.dc /cwsrc1/WL {lambda_min} {lambda_max} {dlambda}
+;.dc P(cwsrc1) 0 1 0.1
+;.dc FREQ(cwsrc1) 192e12 194e12 1e9
+;.dc WL(cwsrc1)
+;.op
+;.tran
+;.dc wl(osrc1)=[{lambda_min},{lambda_max},{npoints}]

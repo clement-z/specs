@@ -1,0 +1,28 @@
+* Show bitstream source 
+
+* Initialize the sources
+one 0
+clk 1 100p
+
+*bsrc 0 1 13 {0, 0, 0}
+bsrc 0 1 2 {0, 252, 15, 0, 0, 0}
+
+* split
+dc 2 3 4 5
+dc 12 13 10 11
+
+wg 10 3 350.85477427u
+wg 5 12 350.85477427u
+
+* feed into detector
+* Input
+pdet 2 35 24
+
+* Inside ring
+pdet 12 36 23
+
+* Through 1 port
+pdet 4 37 25
+
+* Drop port
+pdet 11 39 27

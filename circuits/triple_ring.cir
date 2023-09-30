@@ -1,0 +1,76 @@
+* Show bitstream source 
+
+* Initialize the sources
+one 0
+clk 1 100p
+
+*bsrc 0 1 2 {0, 0, 0}
+bsrc 0 1 2 {0, 252, 15, 0} 1550.0e-9
+*bsrc 0 1 2 {0, 252, 15, 0} 1545.0e-9
+
+* split
+dc 2 3 4 5
+dc 6 7 8 9
+
+dc 12 13 10 11
+dc 16 17 14 15
+
+dc 18 19 20 21
+dc 24 25 22 23
+
+* ring 1
+wg 10 3 350.85477427u
+wg 5 12 350.85477427u
+
+* ring 2
+* resonance at 1545
+*wg 14 7 351.08113608611u
+*wg 9 16 351.08113608611u
+* resonance at 1550
+wg 14 7 350.85477427u
+wg 9 16 350.85477427u
+
+* ring 1 to ring 2
+wg 4 6 701.12011675u
+wg 15 13 701.12011675u
+
+* ring 2 to ring 3
+wg 8 18 1701.12011675u
+wg 23 17 1701.12011675u
+
+* ring 3
+wg 22 19 350.85477427u
+wg 21 24 350.85477427u
+
+* feed into detector
+* Input
+pdet 2 100 200
+
+* Inside ring1
+pdet 5 101 201
+
+* Inside ring2
+pdet 9 102 202
+
+* Inside ring3
+pdet 21 103 203
+
+* Through 1 port
+*pdet 4 104 204
+
+* Through 2 port
+pdet 8 105 205
+
+* Through 3 port
+pdet 20 106 206
+
+* Drop port
+pdet 11 107 207
+
+*tracefile "traces/double_ring"
+*tracenet 20 "SIG_IN"
+*tracenet 2 "SIG_IN_1"
+*tracenet 4 "SIG_ADD_1"
+*tracenet 11 "SIG_DROP_1"
+*tracenet 8 "SIG_ADD_2"
+*tracenet 15 "SIG_DROP_2"
