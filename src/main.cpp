@@ -181,7 +181,7 @@ int do_circuit(const string &filename, bool is_dry_run = false, const string& js
     return 0;
 }
 
-int build_circuit(ParseTree &pt, const vector<string> &filenames)
+int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer="")
 {
     yyscan_t scanner;
     yylex_init(&scanner);
@@ -192,6 +192,9 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames)
         FILE * f = open_netlist_file(fname, scanner);
         files.push_back(f);
     }
+
+    // add footer
+    netlist_buf_fifo.push_back(yy_scan_string(footer.c_str(), scanner));
 
     // Set up first file
     int res = yywrap(scanner);
@@ -239,7 +242,7 @@ int sc_main(int argc, char *argv[])
     args::ArgumentParser parser("The Scalable Photonic Event-driven Circuit Simulator.", "");
     args::ValueFlagList<string> file(
         parser, "circuit", "Simulate from circuit file", { 'f', "file" });
-    args::ValueFlag<int> set_timescale(parser,
+    args::ValueFlag<string> set_timescale(parser,
                           "set_timescale",
                           "Set the engine timescale (as log10(timestep/1s))"
                           "(0: seconds, -3: ms, -6:µs, ..., -15: fs)",
@@ -275,13 +278,13 @@ int sc_main(int argc, char *argv[])
                           { 'n', "dryrun" });
     // args::ValueFlag<double> set_reltol(parser,
     //                       "set_reltol",
-    //                       "Set the value of the rel_tol parameter",
+    //                       "Set the value of the reltol parameter",
     //                       { "reltol" });
-    args::ValueFlag<double> set_reltol(parser,
+    args::ValueFlag<string> set_reltol(parser,
                           "set_reltol",
                           "Set the value of the relative tolerance parameter for field",
                           { "reltol" });
-    args::ValueFlag<double> set_abstol(parser,
+    args::ValueFlag<string> set_abstol(parser,
                           "set_abstol",
                           "Set the value of the absolute tolerance parameter for field",
                           { "abstol" });
@@ -329,6 +332,9 @@ int sc_main(int argc, char *argv[])
         return 1;
     }
 
+
+    map<string,string> option_overrides;
+
     if (set_simulator_mode) {
         const string &s = set_simulator_mode.Get();
         if (strutils::iequals(s, "event-driven") || strutils::iequals(s, "time-domain") || strutils::iequals(s, "td"))
@@ -352,21 +358,30 @@ int sc_main(int argc, char *argv[])
             return 1;
         }
     }
+
     if (set_reltol) {
-        if (set_reltol.Get() > 0) {
-            specsGlobalConfig.default_reltol = set_reltol.Get();
-        } else {
-            cerr << "Invalid abs_tol_phase value" << endl;
+        double reltol_val;
+        stringstream ss;
+        ss << set_reltol.Get();
+        ss >> reltol_val;
+        cout << reltol_val << endl;
+        //cout << ss.good() << " " << ss.eof() << " " << ss.fail() << " " << ss.bad() << endl;
+        if (!ss.eof() || ss.fail() || reltol_val <= 0) {
+            cerr << "Invalid reltol value" << endl;
             return 1;
         }
+        option_overrides["reltol"] = set_reltol.Get();
     }
     if (set_abstol) {
-        if (set_abstol.Get() > 0) {
-            specsGlobalConfig.default_abstol = set_abstol.Get();
-        } else {
-            cerr << "Invalid abs_tol_power value" << endl;
+        double abstol_val;
+        stringstream ss;
+        ss << set_abstol.Get();
+        ss >> abstol_val;
+        if (!ss.eof() || ss.fail() || abstol_val <= 0) {
+            cerr << "Invalid abs_tol value" << endl;
             return 1;
         }
+        option_overrides["abstol"] = set_abstol.Get();
     }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();
@@ -377,8 +392,15 @@ int sc_main(int argc, char *argv[])
         #endif
     }
     if (set_timescale) {
-        cout << set_timescale.Get() << endl;
-        specsGlobalConfig.engine_timescale = SPECSConfig::EngineTimescale(set_timescale.Get());
+        int timescale_val;
+        stringstream ss;
+        ss << set_timescale.Get();
+        ss >> timescale_val;
+        if (!ss.eof() || ss.fail() || timescale_val > 0) {
+            cerr << "Invalid resolution value" << endl;
+            return 1;
+        }
+        option_overrides["timescale"] = set_timescale.Get();
     }
     if (run_manual_test) {
         return 0;
@@ -406,8 +428,15 @@ int sc_main(int argc, char *argv[])
     }
 
     if (file) {
+        stringstream footer;
+        for (const auto &option_override: option_overrides)
+        {
+            footer << ".options " << option_override.first << "=" << option_override.second << endl;
+        }
+        footer << endl;
+        //cout << footer.str() << endl;
         ParseTree pt;
-        int parse_result = build_circuit(pt, file.Get());
+        int parse_result = build_circuit(pt, file.Get(), footer.str());
         if (parse_result)
         {
             cerr << "Parsing failed with code " << parse_result << endl;
