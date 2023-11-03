@@ -93,6 +93,13 @@ static T from_string(const string &str)
 
 %%  /*** Rules section ***/
 
+^.*{EOL} {
+    // print the netlist as it is read
+    // note: doesnt handle included files
+    if(false)
+        cout << yytext; REJECT;
+}
+
 ^\.include  {yy_push_state(INCLUDE, yyscanner);}
 <INCLUDE>{WS}*      /* eat the whitespace */
 <INCLUDE>[^ ;\t\n\r]+   { /* got the include file name */
@@ -383,12 +390,12 @@ static T from_string(const string &str)
 <INITIAL,INCLUDE><<EOF>> {
     yypop_buffer_state(yyscanner);
 
-        if ( !YY_CURRENT_BUFFER )
-        {
+    if ( !YY_CURRENT_BUFFER )
+    {
         yyterminate();
-        }
-        return '\n';
     }
+    return '\n';
+}
 
 <SUBCKT_DECLARATION,IN_DQUOTES><<EOF>> {
     exit(yylerror(yyscanner, "Unexpected end of file."));

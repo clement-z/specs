@@ -27,6 +27,7 @@ using namespace literals;
 #include "../build/parser/parser.yy.h"
 extern int yydebug;
 int yywrap(yyscan_t scanner);
+extern "C" int yy_delete_buffer(yyscan_t scanner);
 
 static deque<YY_BUFFER_STATE> netlist_buf_fifo;
 
@@ -42,13 +43,22 @@ FILE* open_netlist_file(const string &filename, yyscan_t &scanner)
         exit(1);
     }
 
+    string header = "\n**** START of " + filename + " ****\n";
+    netlist_buf_fifo.push_back(yy_scan_string(header.c_str(), scanner));
+
     YY_BUFFER_STATE buf = yy_create_buffer(f, YY_BUF_SIZE, scanner);
     netlist_buf_fifo.push_back(buf);
+
+    string footer = "\n**** END of " + filename + " ****\n";
+    netlist_buf_fifo.push_back(yy_scan_string(footer.c_str(), scanner));
+
     return f;
 }
 
 int yywrap(yyscan_t scanner)
 {
+    static YY_BUFFER_STATE *last_buffer = NULL;
+
     if (netlist_buf_fifo.empty())
         return 1;
     else
@@ -56,6 +66,11 @@ int yywrap(yyscan_t scanner)
         YY_BUFFER_STATE buf = netlist_buf_fifo.front();
         netlist_buf_fifo.pop_front();
         yy_switch_to_buffer(buf, scanner);
+        if ( last_buffer )
+        {
+            yy_delete_buffer( *last_buffer, scanner);
+            last_buffer = &buf;
+        }
         return 0;
     }
 }
