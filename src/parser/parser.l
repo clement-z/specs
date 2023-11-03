@@ -24,7 +24,7 @@ EOL {EOL_PORTABLE}
 
 %option warn
 %option yylineno
-%option noyywrap
+/*%option noyywrap*/
 %option caseless
 %option reentrant
 %option bison-bridge

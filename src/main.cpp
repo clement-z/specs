@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <sstream>
 #include <chrono>
+#include <deque>
 
 #include <optical_signal.h>
 #include <time_monitor.h>
@@ -25,6 +26,39 @@ using namespace literals;
 #include "../build/parser/parser.tab.h"
 #include "../build/parser/parser.yy.h"
 extern int yydebug;
+int yywrap(yyscan_t scanner);
+
+static deque<YY_BUFFER_STATE> netlist_buf_fifo;
+
+FILE* open_netlist_file(const string &filename, yyscan_t &scanner)
+{
+    // Check whether the file exists
+    FILE *f;
+    if (filename == "-"s) {
+        cerr << "Error: stdin not supported." << endl;
+        exit(1);
+    } else if (!(f = fopen(filename.c_str(), "r"))) {
+        cerr << "Error: File not found \"" << filename << "\"" << endl;
+        exit(1);
+    }
+
+    YY_BUFFER_STATE buf = yy_create_buffer(f, YY_BUF_SIZE, scanner);
+    netlist_buf_fifo.push_back(buf);
+    return f;
+}
+
+int yywrap(yyscan_t scanner)
+{
+    if (netlist_buf_fifo.empty())
+        return 1;
+    else
+    {
+        YY_BUFFER_STATE buf = netlist_buf_fifo.front();
+        netlist_buf_fifo.pop_front();
+        yy_switch_to_buffer(buf, scanner);
+        return 0;
+    }
+}
 
 int do_list_tests()
 {
@@ -132,6 +166,54 @@ int do_circuit(const string &filename, bool is_dry_run = false, const string& js
     return 0;
 }
 
+int build_circuit(ParseTree &pt, const vector<string> &filenames)
+{
+    yyscan_t scanner;
+    yylex_init(&scanner);
+
+    vector<FILE*> files;
+    for(const auto &fname: filenames)
+    {
+        FILE * f = open_netlist_file(fname, scanner);
+        files.push_back(f);
+    }
+
+    // Set up first file
+    int res = yywrap(scanner);
+    if(res != 0)
+    {
+        cerr << "Expected yywrap to return 0" << endl;
+        exit(1);
+    }
+
+    cout << "╔═══════════════════╗" << endl;
+    cout << "║  PARSING CIRCUIT  ║" << endl;
+    cout << "╚═══════════════════╝" << endl;
+
+    int parsing_result = yyparse(scanner, &pt);
+
+    //yy_delete_buffer(buf, scanner);
+    yylex_destroy(scanner);
+
+    for (auto &f: files)
+        fclose(f);
+
+    // Return if unsuccessful
+    if (parsing_result != 0) {
+        return parsing_result;
+    }
+
+    pt.print();
+
+    cout << "╔══════════════════════╗" << endl;
+    cout << "║   BUILDING CIRCUIT   ║" << endl;
+    cout << "╚══════════════════════╝" << endl;
+
+    pt.build_circuit();
+
+    return 0;
+}
+
 int raphael_main() { cout<< "Hello world" << endl; return 0; }
 
 int tests_module_registry_access();
@@ -140,7 +222,7 @@ int sc_main(int argc, char *argv[])
 {
     // Define command line interface using args
     args::ArgumentParser parser("The Scalable Photonic Event-driven Circuit Simulator.", "");
-    args::ValueFlag<string> file(
+    args::ValueFlagList<string> file(
         parser, "circuit", "Simulate from circuit file", { 'f', "file" });
     args::ValueFlag<int> set_timescale(parser,
                           "set_timescale",
@@ -309,10 +391,41 @@ int sc_main(int argc, char *argv[])
     }
 
     if (file) {
-        return do_circuit(file.Get(), set_dry_run.Get(), export_json.Get());
-    }
-    if (set_dry_run)
-    {
+        ParseTree pt;
+        int parse_result = build_circuit(pt, file.Get());
+        if (parse_result)
+        {
+            cerr << "Parsing failed with code " << parse_result << endl;
+            exit(parse_result);
+        }
+        string json_filename = export_json.Get();
+        if (!json_filename.empty())
+        {
+            ofstream outfile;
+            outfile.open(json_filename, ios::out | ios::trunc);
+            outfile << pt.to_json();
+            outfile.close();
+            cout << "Exported flattened circuit as JSON > " << json_filename << endl;
+        }
+
+        if (!set_dry_run.Get())
+        {
+            cout << "╔══════════════════════╗" << endl;
+            cout << "║      SIMULATION      ║" << endl;
+            cout << "╚══════════════════════╝" << endl;
+
+            specsGlobalConfig.runAnalysis();
+        }
+        else
+        {
+            cout << "╔══════════════════════╗" << endl;
+            cout << "║  SIMULATION SKIPPED  ║" << endl;
+            cout << "╚══════════════════════╝" << endl;
+        }
+
+        cout << "╔═══════════════════╗" << endl;
+        cout << "║        DONE       ║" << endl;
+        cout << "╚═══════════════════╝" << endl;
         return 0;
     }
     if (test) {
