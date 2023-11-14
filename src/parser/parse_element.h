@@ -40,11 +40,12 @@ using std::unique_ptr;
         virtual ParseElement *clone() const                                            \
         { return new ELEM_NAME(*this); }                                               \
         /* Implement virtual function create(...) to construct element */              \
-        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;               \
+        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;           \
         virtual element_type_base *                                                    \
-        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;             \
+        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;         \
                                                                                        \
         virtual string kind() const { return ELEM_NAME_LONG; }                         \
+        virtual bool bidir_capable() const { return false; }                           \
     };
 
 /*************************************************/
@@ -64,13 +65,14 @@ using std::unique_ptr;
         virtual ParseElement *clone() const                                            \
         { return new ELEM_NAME(*this); }                                               \
         /* Implement virtual function create(...) to construct element */              \
-        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;               \
+        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;           \
         virtual element_type_base *                                                    \
-        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;             \
+        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;         \
         virtual element_type_base *                                                    \
-        instantiate_and_connect_bi(ParseTreeCreationHelper &pt_helper) const;              \
+        instantiate_and_connect_bi(ParseTreeCreationHelper &pt_helper) const;          \
                                                                                        \
         virtual string kind() const { return string(ELEM_NAME_LONG) + " (bidir)"; }    \
+        virtual bool bidir_capable() const { return true; }                            \
     };
 
 /** ******************************************* **/

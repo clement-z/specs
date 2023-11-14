@@ -560,6 +560,8 @@ struct ParseElement {
     }
 
     virtual string kind() const { return "UNDEFINED"; }
+    virtual bool bidir_capable() const { return false; }                            \
+
     virtual ~ParseElement() {}
 
     virtual string to_json() const;
@@ -806,6 +808,7 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
     const auto &net = pt->nets.at(net_name);
 
     // Get the signal to be written or read
+    sc_object *sig_raw;
     signal_type *sig = nullptr;
     if ( !net.bidirectional())
     {
@@ -814,12 +817,29 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
     }
     else
     {
-        int i_write = pt->nets.at(net_name).m_connect_count;
+        // verify no more than 2 writer in total
+        if(pt->nets.at(net_name).m_connect_writer_count + as_writer > 2)
+        {
+            cerr << "Attempted to add a third writer to a bidirectional net ("
+                 << net_name << ")." << endl;
+            exit(2);
+        }
+
+        int i_write = pt->nets.at(net_name).m_connect_writer_count;
+        i_write = max(i_write, 1);// If there are already 2 writers, act as a reader for the second one (imitate the second writer but only as a reader)
         int i_read = (i_write + 1) % 2;
         int i = as_writer ? i_write : i_read;
 
         auto sig_raw = circuit_signals.at(net_name)[i].get();
         sig = dynamic_cast<signal_type *>(sig_raw);
+    }
+
+    // Check corresponding signal could be found
+    if (!sig_raw)
+    {
+        cerr << "Missing object for signal connected to "
+                << net_name << endl;
+        exit(1);
     }
 
     // Check it could correctly be cast to requested type
@@ -849,13 +869,35 @@ void ParseTreeCreationHelper::connect_bi(port_in_type &p_in, port_out_type &p_ou
 
     if (net.bidirectional())
     {
+        // verify no more than 2 writer in total
+        if(pt->nets.at(net_name).m_connect_writer_count >= 2)
+        {
+            cerr << "Attempted to add a third writer to a bidirectional net ("
+                 << net_name << ")." << endl;
+            exit(1);
+        }
 
         // First get the signal to be written or read (in the right order)
-        int i_write = pt->nets.at(net_name).m_connect_count;
+        int i_write = pt->nets.at(net_name).m_connect_writer_count;
         int i_read = (i_write + 1) % 2;
 
         auto sig_writeable_raw = circuit_signals.at(net_name)[i_write].get();
         auto sig_readable_raw = circuit_signals.at(net_name)[i_read].get();
+
+        // Check corresponding signals could be found
+        if (!sig_writeable_raw)
+        {
+            cerr << "Missing object for output signal connected to "
+                 << net_name << endl;
+            exit(1);
+        }
+        if (!sig_readable_raw)
+        {
+            cerr << "Missing object for input signal connected to "
+                 << net_name << endl;
+            exit(1);
+        }
+
         auto sig_writeable = dynamic_cast<signal_type *>(sig_writeable_raw);
         auto sig_readable = dynamic_cast<signal_type *>(sig_readable_raw);
 
