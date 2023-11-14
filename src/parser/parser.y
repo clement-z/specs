@@ -10,6 +10,9 @@
 
     //extern int yylineno;
     //extern char *yytext;
+
+    string yyget_filename ( yyscan_t scanner );
+    string yyget_current_line ( yyscan_t scanner );
 }
 
 %{
@@ -954,8 +957,11 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err)
         }
     }
     string token_escaped = ss.str();
-    printf("-- Error in the netlist (line %u): %s\n", yyget_lineno(scanner), err);
-    printf("-- \"%s\"\n", token_escaped.c_str());
-    //cerr << err << endl;
+    
+    cerr << "Parsing error (" << yyget_filename(scanner) << ":" << yyget_lineno(scanner) << "): " << err << endl;
+    cerr << "-- offending token: \"" << token_escaped.c_str() << "\"" << endl;
+    string str = yyget_current_line(scanner);
+    if (!str.empty())
+        cerr << "-- while parsing line: \"" << str << "\"" << endl;
     exit(1);
 }

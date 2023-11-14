@@ -1,6 +1,7 @@
 #include "parse_tree.h"
 #include "parse_directive.h"
 #include "parse_element.h"
+#include "parser_state.h"
 #include "specs.h"
 
 #include <sstream>
@@ -310,9 +311,10 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     }
 
     yyscan_t scanner;
+    ParserState *parser_state = new ParserState;
     YY_BUFFER_STATE buf;
 
-    yylex_init(&scanner);
+    yylex_init_extra(parser_state, &scanner);
     buf = yy_scan_string(subcircuit.netlist.c_str(), scanner);
     yy_switch_to_buffer(buf, scanner);
 
@@ -320,6 +322,7 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
 
     //yy_delete_buffer(buf, scanner);
     yylex_destroy(scanner);
+    delete parser_state;
 
     // Return if unsuccessful
     if (parsing_result != 0) {
