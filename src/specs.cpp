@@ -374,10 +374,10 @@ inline void sc_trace(sc_trace_file *tf, const SPECSConfig &s, string parent_tree
     parent_tree += (parent_tree.size() ? "." : "");
     sc_trace(tf, s.default_abstol, parent_tree + "abstol");
     sc_trace(tf, s.default_reltol, parent_tree + "reltol");
-    sc_trace(tf, s.default_resolution_multiplier, parent_tree + "resolution_multiplier");
-    sc_trace(tf, s.engine_timescale, parent_tree + "engine_timescale");
-    sc_trace(tf, s.simulation_mode, parent_tree + "simulation_mode");
-    sc_trace(tf, s.analysis_type, parent_tree + "analysis_type");
+    sc_trace(tf, (int&)s.default_resolution_multiplier, parent_tree + "resolution_multiplier");
+    sc_trace(tf, (int&)s.engine_timescale, parent_tree + "engine_timescale");
+    sc_trace(tf, (int&)s.simulation_mode, parent_tree + "simulation_mode");
+    sc_trace(tf, (int&)s.analysis_type, parent_tree + "analysis_type");
     sc_trace(tf, s.trace_all_optical_nets, parent_tree + "trace_all_optical_nets");
     sc_trace(tf, s.verbose_component_initialization, parent_tree + "verbose_component_initialization");
 }
