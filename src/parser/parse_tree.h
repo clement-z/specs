@@ -812,7 +812,7 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
     signal_type *sig = nullptr;
     if ( !net.bidirectional())
     {
-        auto sig_raw = circuit_signals.at(net_name)[0].get();
+        sig_raw = circuit_signals.at(net_name)[0].get();
         sig = dynamic_cast<signal_type *>(sig_raw);
     }
     else
@@ -830,7 +830,7 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
         int i_read = (i_write + 1) % 2;
         int i = as_writer ? i_write : i_read;
 
-        auto sig_raw = circuit_signals.at(net_name)[i].get();
+        sig_raw = circuit_signals.at(net_name)[i].get();
         sig = dynamic_cast<signal_type *>(sig_raw);
     }
 
