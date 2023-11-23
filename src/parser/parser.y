@@ -415,7 +415,7 @@ atomdirective: directive.options { $$ = $1; }
 ;
 
 directive.with_args:
-  directive.with_args variable
+  directive.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
                 if (!cur_pt->directives[$1]->kwargs.empty())
@@ -460,7 +460,7 @@ atomelement: element.wg { $$ = $1; }
 ;
 
 element.with_args:
-  element.with_args variable
+  element.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
                 if (!cur_pt->elements[$1]->kwargs.empty())
@@ -554,7 +554,7 @@ atomanalysis: analysis.op { $$ = $1; }
 ;
 
 analysis.with_args:
-  analysis.with_args variable
+  analysis.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
                 if (!cur_pt->analyses[$1]->kwargs.empty())
@@ -729,6 +729,7 @@ net_name.base.str:
                 }
             | net_name.base.str '-' T_STR
                 {
+                    // FIXME: this rule is problematic (overlap with -expr)
                     $$ = $1;
                     *$1 += "-" + *$3;
                     delete $3;
@@ -881,6 +882,8 @@ constant: variable_base { $$ = $1; }
 expr:
   expr '+' term { $$ = $1; *$$ += *$3; delete $3; }
 | expr '-' term { $$ = $1; *$$ -= *$3; delete $3; }
+| '+' term { $$ = $2; }
+| '-' term { $$ = $2; *$$ *= -1; }
 | term { $$ = $1; }
 ;
 

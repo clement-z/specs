@@ -336,13 +336,15 @@ string convert_special_char(char c)
     return '"';
     }
 
-[+-]?{D}+ {
+(?# [+-]?{D}+)
+{D}+ {
     /* signed integer number */
     yylval_param->i_val = from_string<int>(yytext);
     return T_INT;
 }
 
-[+-]?{DOUBLE} {
+(?# [+-]?{DOUBLE}+)
+{DOUBLE} {
     /* signed floating point number */
     yylval_param->d_val = from_string<double>(yytext);
     return T_NUM;
