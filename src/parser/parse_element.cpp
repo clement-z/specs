@@ -1169,16 +1169,28 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         obj->m_meltEnergy = args[0].as_double();
     if(args.size() > 1)
         obj->m_nStates = args[1].as_integer();
+    if(args.size() > 2)
+        obj->m_Tc = args[2].as_double();
+    if(args.size() > 3)
+        obj->m_Ta = args[3].as_double();
 
     // Parse keyword arguments
     for (auto &p: kwargs)
     {
         string kw = p.first;
         strutils::toupper(kw);
-        if (kw == "MELT_ENERGY" || kw == "EMELT")
+        if (kw == "MELT_ENERGY" || kw == "EMELT" || kw == "E_MELT")
             obj->m_meltEnergy = p.second.as_double();
-        else if (kw == "N" || kw == "NSTATES")
+        else if (kw == "N" || kw == "NSTATES" || kw == "NLEVELS" || kw == "N_STATES" || kw == "N_LEVELS")
             obj->m_nStates = p.second.as_integer();
+        else if (kw == "K" || kw == "INITIAL_STATE")
+            obj->m_stateCurrent = p.second.as_integer();
+        else if (kw == "SP" || kw == "TC" || kw == "T_C")
+            obj->m_Tc = p.second.as_double();
+        else if (kw == "EP" || kw == "TA" || kw == "T_A")
+            obj->m_Ta = p.second.as_double();
+        else if (kw == "TANH_COEF")
+            obj->m_speed = p.second.as_double();
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);

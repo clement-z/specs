@@ -12,12 +12,14 @@ void PCMElement::on_input_changed()
     // setting the transmission for the initial state
     update_transmission_local();
 
-
     if (specsGlobalConfig.verbose_component_initialization)
     {
         cout << name() << ":" << endl;
         cout << "Emelt = " << m_meltEnergy*1e9 << " nJ" << endl;
         cout << "Nstates = " << m_nStates << "" << endl;
+        cout << "Tc = " << abs(m_Tc) << "W/W" << endl;
+        cout << "Ta = " << abs(m_Ta) << "W/W" << endl;
+        cout << "Initial state = " << m_stateCurrent << "" << endl;
         cout << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name();
         cout << " --> ";
         cout << (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name();
@@ -41,7 +43,7 @@ void PCMElement::on_input_changed()
         cur_wavelength_id = s.m_wavelength_id;
         m_memory_in[cur_wavelength_id] = s.m_field;
 
-        // Summing powers of all wavelengths
+        // Summing powers of all wavelengths (IGNORE heterodyne effects !)
         total_in_power = 0;
         for (auto lambdaID_field : m_memory_in)
         {
@@ -83,7 +85,7 @@ void PCMElement::on_input_changed()
         m_last_pulse_power = total_in_power;
 
         // Write attenuated signal to output
-        s *= m_transmission;
+        s *= m_Tcurrent_field;
         s.getNewId();
 
         m_out_writer.delayedWrite(s, SC_ZERO_TIME);
@@ -105,7 +107,7 @@ bool PCMElement::phase_change(const vector<pulse_sample_t> &samples, const bool 
     if (samples.empty())
         return true;
 
-    if (sc_time_stamp().to_seconds() -  samples.back().first < influence_time_ns*1e-9)
+    if (sc_time_stamp().to_seconds() -  samples.back().first < m_influence_time_ns*1e-9)
         return true;
 
     if (local)
@@ -119,11 +121,11 @@ bool PCMElement::phase_change(const vector<pulse_sample_t> &samples, const bool 
             energy_absorbed += samples[i].second * dur_pulse;
         }
         // if enough energy and not saturated
-        if ((energy_absorbed > m_meltEnergy) && (m_state < m_nStates))
+        if ((energy_absorbed > m_meltEnergy) && (m_stateCurrent < m_nStates))
         {
             // cout << sc_time_stamp() << ": \n\t" << name() << " phase changed with "
             //           << energy_absorbed*1e6 << " uJ" << endl;
-            m_state++;
+            m_stateCurrent++;
             // cout << "\tnew state: " << m_state << endl;
             update_transmission_local();
         }
@@ -139,12 +141,9 @@ bool PCMElement::phase_change(const vector<pulse_sample_t> &samples, const bool 
 
 void PCMElement::update_transmission_local()
 {
-    double sp = 0.85;
-    double ep = 0.95;
-    double speed = 3;
-    m_transmission = sp+(ep-sp)*tanh(speed*m_state/m_nStates);
+    m_Tcurrent = m_Tc+(m_Ta-m_Tc)*tanh(m_speed*m_stateCurrent/m_nStates);
     // cout << "\tnew trans_power: " << m_transmission << "- W/W" << endl;
 
     // For field need to do a square root
-    m_transmission = sqrt(m_transmission);
+    m_Tcurrent_field = sqrt(m_Tcurrent);
 }

@@ -89,7 +89,7 @@ void PCMElement_tb_run()
 
     spx::oa_signal_type IN, OUT;
 
-    PCMElement pcm("pcm", 25e-6, 63, 0);
+    PCMElement pcm("pcm", 25e-6, 63, 0, 0.85, 0.95);
     pcm.p_in(IN);
     pcm.p_out(OUT);
 
@@ -117,7 +117,7 @@ void PCMElement_tb_run()
     specsGlobalConfig.prepareSimulation();
 
     // extra traces should come after prepareSimulation
-    sc_trace(specsGlobalConfig.default_trace_file, pcm.m_state, "STATE");
+    sc_trace(specsGlobalConfig.default_trace_file, pcm.m_stateCurrent, "STATE");
 
     // Start simulation
     sc_start();
