@@ -1253,7 +1253,7 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
         else if (kw == "R" || kw == "RESPONSIVITY" || kw == "GAIN")
             obj->m_responsivity_A_W = p.second.as_double();
         else if (kw == "NOISE_BYPASS" || kw == "NB")
-            obj->m_noiseBypass = p.second.as_double();
+            obj->m_noiseBypass = p.second.as_boolean();
         else if (kw == "FREQUENCY" || kw == "FOP")
             obj->m_opFreq_Hz = p.second.as_double();            
         else {
