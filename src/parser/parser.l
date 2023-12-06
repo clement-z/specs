@@ -433,19 +433,19 @@ string convert_special_char(char c)
 }
 
 ^MLPROBE({ALPHA_PLUS_NUM})+ {
-    /* Probe instance */
+    /* Multi-wavelength probe instance */
     yylval_param->s_ptr = new string(yytext);
     return T_ELEM_MLPROBE;
 }
 
 ^PDET({ALPHA_PLUS_NUM})+ {
-    /* Probe instance */
+    /* Photodetector instance */
     yylval_param->s_ptr = new string(yytext);
     return T_ELEM_PDET;
 }
 
 ^PCMCELL({ALPHA_PLUS_NUM})+ {
-    /* Probe instance */
+    /* PCM cell instance */
     yylval_param->s_ptr = new string(yytext);
     return T_ELEM_PCMCELL;
 }

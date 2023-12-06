@@ -1134,7 +1134,7 @@ sc_module *MLProbeElement::create(ParseTreeCreationHelper &pt_helper) const
 }
 
 /** ******************************************* **/
-/**                 Photodetector               **/
+/**              Phase-change cell              **/
 /** ******************************************* **/
 INSTANTIATE_AND_CONNECT_UNI(PCMCellElement, pt_helper)
 {
@@ -1252,6 +1252,10 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
             obj->m_sampling_time = p.second.as_double();
         else if (kw == "R" || kw == "RESPONSIVITY" || kw == "GAIN")
             obj->m_responsivity_A_W = p.second.as_double();
+        else if (kw == "NOISE_BYPASS" || kw == "NB")
+            obj->m_noiseBypass = p.second.as_double();
+        else if (kw == "FREQUENCY" || kw == "FOP")
+            obj->m_opFreq_Hz = p.second.as_double();            
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);
