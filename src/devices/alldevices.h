@@ -32,6 +32,7 @@
 #include <probe.h>
 //#include <ring.h>
 #include <time_monitor.h>
+#include <power_meter.h>
 
 /** ******************************************* **/
 /**           Circuits                          **/

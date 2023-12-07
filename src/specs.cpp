@@ -12,6 +12,7 @@
 #include <cw_source.h>
 #include <probe.h>
 #include <detector.h>
+#include <power_meter.h>
 #include <generic_transmission_device.h>
 
 using std::string;
@@ -303,7 +304,13 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
         string detname = pdet->name();
         cout << detname << endl;
         pdet->trace(default_trace_file);
-        //sc_trace(default_trace_file, , (string(pdet->name()) + ".readout").c_str());
+    }
+
+    auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
+    for (auto &pwr_meter: all_pwr_meters) {
+        string pwr_meter_name = pwr_meter->name();
+        cout << pwr_meter_name << endl;
+        pwr_meter->trace(default_trace_file);
     }
 }
 

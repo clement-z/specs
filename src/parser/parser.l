@@ -450,6 +450,12 @@ string convert_special_char(char c)
     return T_ELEM_PCMCELL;
 }
 
+^PWR({ALPHA_PLUS_NUM})+ {
+    /* Power meter instance */
+    yylval_param->s_ptr = new string(yytext);
+    return T_ELEM_PWR_METER;
+}
+
 ^\.ASSIGN { return T_LOCAL_ASSIGNMENT; }
 ^\.PARAM { return T_LOCAL_ASSIGNMENT; }
 ^\.SAVE { return T_DIRECTIVE_SAVE; }

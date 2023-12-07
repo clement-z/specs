@@ -73,7 +73,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %token <s_ptr> T_ELEM_CWSRC T_ELEM_VLSRC T_ELEM_EVLSRC
 %token <s_ptr> T_ELEM_WG T_ELEM_COUPLER T_ELEM_MERGER T_ELEM_SPLITTER
 %token <s_ptr> T_ELEM_PSHIFT T_ELEM_MZI T_ELEM_CROSSING T_ELEM_PCMCELL
-%token <s_ptr> T_ELEM_PROBE T_ELEM_MLPROBE T_ELEM_PDET
+%token <s_ptr> T_ELEM_PROBE T_ELEM_MLPROBE T_ELEM_PDET T_ELEM_PWR_METER
 %token <s_ptr> T_ELEM_X
 %token <i_val> T_ANALYSIS_OP T_ANALYSIS_DC T_ANALYSIS_TRAN
 %token <i_val> T_DIRECTIVE_OPTIONS T_DIRECTIVE_NODESET
@@ -98,6 +98,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <i_val> element.evlsrc
 %type <i_val> element.probe
 %type <i_val> element.mlprobe
+%type <i_val> element.power_meter
 %type <i_val> element.pdet
 %type <i_val> element.x
 
@@ -375,6 +376,14 @@ element.pdet: T_ELEM_PDET net.oa.in net.eanalog
             }
 ;
 
+element.power_meter: T_ELEM_PWR_METER net.oa.in
+            {
+                $$ = cur_pt->register_element(new PowerMeterElement(*$1, {*$2}));
+                delete $1;
+                delete $2;
+            }
+;
+
 element.x: T_ELEM_X
             {
                 $$ = cur_pt->register_element(new XElement(*$1));
@@ -456,6 +465,7 @@ atomelement: element.wg { $$ = $1; }
            | element.evlsrc { $$ = $1; }
            | element.probe { $$ = $1; }
            | element.mlprobe { $$ = $1; }
+           | element.power_meter { $$ = $1; }
            | element.pdet { $$ = $1; }
 ;
 

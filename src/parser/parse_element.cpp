@@ -1134,6 +1134,50 @@ sc_module *MLProbeElement::create(ParseTreeCreationHelper &pt_helper) const
 }
 
 /** ******************************************* **/
+/**                Power meter                  **/
+/** ******************************************* **/
+INSTANTIATE_AND_CONNECT_UNI(PowerMeterElement, pt_helper)
+{
+    element_type_uni *obj = new element_type_uni(name.c_str());
+
+    // connect p_in
+    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_in, nets[0], AS_READER);
+
+    // return the module
+    return obj;
+}
+
+sc_module *PowerMeterElement::create(ParseTreeCreationHelper &pt_helper) const
+{
+    element_type_base *obj = nullptr;
+
+    // Verify number of nets
+    assert(nets.size() == n_nets);
+
+    // Verify number of positional args
+    assert(args.size() == 0);
+
+    // Create signals if they don't exist
+    pt_helper.create_signals(this);
+
+    // Create the object and connect ports to signals
+    INSTANTIATE(pt_helper, false);
+
+    // Parse positional args
+    // nothing
+
+    // Parse keyword arguments
+    for (auto &p: kwargs)
+    {
+        cerr << name << ": unknown keyword: " << p.first << endl;
+        exit(1);
+    }
+
+    return obj;
+}
+
+
+/** ******************************************* **/
 /**              Phase-change cell              **/
 /** ******************************************* **/
 INSTANTIATE_AND_CONNECT_UNI(PCMCellElement, pt_helper)

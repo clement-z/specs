@@ -1,6 +1,7 @@
 #pragma once
 
 #include "alldevices.h"
+#include "power_meter.h"
 #include "subcircuit_instance.h"
 #include "parse_tree.h"
 #include "specs.h"
@@ -95,6 +96,7 @@ DECLARE_UNIDIR_ELEMENT(PCMCellElement, "PCM CELL", PCMElement, 2);
 DECLARE_UNIDIR_ELEMENT(PhotodetectorElement, "PHOTODETECTOR", Detector, 2);
 DECLARE_UNIDIR_ELEMENT(ProbeElement, "PROBE", Probe, 1);
 DECLARE_UNIDIR_ELEMENT(MLProbeElement, "MULTIWAVELENGTH PROBE", MLambdaProbe, 1);
+DECLARE_UNIDIR_ELEMENT(PowerMeterElement, "POWER METER", PowerMeter, 1);
 
 // TODO: take care of subcircuit instance...
 DECLARE_UNIDIR_ELEMENT(XElement, "SUBCIRCUIT", SubcircuitInstance, 1);
