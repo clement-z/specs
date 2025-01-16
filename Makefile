@@ -30,6 +30,7 @@ SOURCES_ALLFILES = $(shell find $(SRC_PATH) -name '*.cpp' -or -name '*.h')
 
 # Add the whole source directory tree to INCLUDES
 INCLUDES += $(addprefix -I,$(shell find $(SRC_PATH) -type d))
+INCLUDES += -iquote"$(BUILD_PATH)/parser"
 
 # Find all bison/flex source files
 # - Note: bison/flex sources must have a matching filename
@@ -46,8 +47,11 @@ else
 endif
 
 # Add the objects filenames from the bison/flex sources
-OBJECTS_PARSE = $(FLEX_SOURCES:$(SRC_PATH)/%.l=$(BUILD_PATH)/%.yy.o)
-OBJECTS_PARSE += $(BISON_SOURCES:$(SRC_PATH)/%.y=$(BUILD_PATH)/%.tab.o)
+GEN_PARSE     =  $(BUILD_PATH)/parser/scanner.cpp $(BUILD_PATH)/parser/parser.cpp
+OBJECTS_PARSE =  $(BUILD_PATH)/parser/scanner.o
+OBJECTS_PARSE += $(BUILD_PATH)/parser/parser.o
+
+#OBJECTS_BIN   += $(OBJECTS_PARSE)
 
 # Same without main (without testbenches)
 OBJECTS_LIB = $(SOURCES_LIB:$(SRC_PATH)/%.cpp=$(BUILD_PATH_LIB)/%.o)
@@ -84,10 +88,11 @@ endif
 	all bin lib
 
 # Instruct make not to remove intermediate files from bison/flex compilation
-.SECONDARY: $(FLEX_SOURCES:$(SRC_PATH)/%.l=$(BUILD_PATH)/%.yy.h)
-.SECONDARY: $(FLEX_SOURCES:$(SRC_PATH)/%.l=$(BUILD_PATH)/%.yy.cpp)
-.SECONDARY: $(FLEX_SOURCES:$(SRC_PATH)/%.l=$(BUILD_PATH)/%.tab.h)
-.SECONDARY: $(BISON_SOURCES:$(SRC_PATH)/%.y=$(BUILD_PATH)/%.tab.cpp)
+# TODO: update
+.SECONDARY: $(BUILD_PATH)/parser.h)
+.SECONDARY: $(BUILD_PATH)/parser.cpp
+.SECONDARY: $(BUILD_PATH)/scanner.h
+.SECONDARY: $(BUILD_PATH)/scanner.cpp
 
 # Default rule
 all: bin
@@ -99,7 +104,7 @@ bin: $(BIN_NAME)
 lib: $(LIB_NAME)
 
 # Link all objects together into executable
-$(BIN_NAME): $(OBJECTS_BIN) $(OBJECTS_PARSE)
+$(BIN_NAME): $(OBJECTS_PARSE) $(OBJECTS_BIN)
 	@echo "Linking binary"
 	$(Q)$(CCACHE) $(CXX_LD) $(OBJECTS_BIN) $(OBJECTS_PARSE) $(LDFLAGS) -o $@
 	@echo "Done"
@@ -114,7 +119,7 @@ $(LIB_NAME): $(OBJECTS_LIB)
 $(OBJECTS_PARSE): $(ADDITIONAL_DEPS) | $(dir $(OBJECTS_PARSE))
 
 # Objects depend on their directories
-$(OBJECTS_BIN): $(ADDITIONAL_DEPS) | $(dir $(OBJECTS_BIN)) $(OBJECTS_PARSE)
+$(OBJECTS_BIN): $(ADDITIONAL_DEPS) | $(dir $(OBJECTS_BIN))
 
 # Objects depend on their directories
 $(OBJECTS_LIB): $(ADDITIONAL_DEPS) | $(dir $(OBJECTS_LIB))
@@ -136,7 +141,7 @@ $(BUILD_PATH_LIB)/%/:
 	$(Q)mkdir -p $@
 
 # Default .cpp → .o compilation rule
-$(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp
+$(BUILD_PATH)/%.o: $(SRC_PATH)/%.cpp | $(GEN_PARSE)
 	@echo "Compiling $<"
 	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -145,33 +150,50 @@ $(BUILD_PATH_LIB)/%.o: $(SRC_PATH)/%.cpp
 	@echo "Compiling $<"
 	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS_LIB) $(INCLUDES) -MMD -MP -c $< -o $@
 
-# Special .cpp compilation rule for flex generated sources
-%.yy.o: %.yy.cpp %.tab.h
+# Default .cpp → .o compilation rule
+$(BUILD_PATH)/parser/%.o: $(BUILD_PATH)/parser/%.cpp
 	@echo "Compiling $<"
-	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS) $(INCLUDES) -iquote"$(dir $@)" -c $< -o $@
+	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Special .cpp compilation rule for bison generated sources
-%.tab.o: %.tab.cpp %.yy.h
-	@echo "Compiling $<"
-	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS) $(INCLUDES) -iquote"$(dir $@)" -c $< -o $@
+## Special .cpp compilation rule for flex generated sources
+#%.yy.o: %.yy.cpp %.tab.h
+#	@echo "Compiling $<"
+#	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS) $(INCLUDES) -iquote"$(dir $@)" -c $< -o $@
+#
+## Special .cpp compilation rule for bison generated sources
+#%.tab.o: %.tab.cpp %.yy.h
+#	@echo "Compiling $<"
+#	$(Q)$(CCACHE) $(CXX) $(CXXFLAGS) $(INCLUDES) -iquote"$(dir $@)" -c $< -o $@
 
-# Default .l → .yy.cpp compilation rule
-$(BUILD_PATH)/%.yy.cpp: $(SRC_PATH)/%.l | $(dir $($@))
+$(BUILD_PATH)/parser/scanner.cpp: $(SRC_PATH)/parser/parser.l | $(dir $($@))
 	@echo "Lexing $<"
 	$(Q)flex --header-file="$(@:.cpp=.h)" -o $@ $<
 
-# Default .y → .tab.{h,cpp} compilation rule
-$(BUILD_PATH)/%.tab.cpp: $(SRC_PATH)/%.y $(BUILD_PATH)/%.yy.cpp | $(dir $($@))
+$(BUILD_PATH)/parser/parser.cpp: $(SRC_PATH)/parser/parser.y $(BUILD_PATH)/parser/scanner.cpp | $(dir $($@))
 	@echo "Bisoning $<"
 	$(Q)bison $(BISONFLAGS) --defines="$(@:.cpp=.h)" -o $@ -d $<
 
-# Dependency rule for .tab.h (bison output, needed to compile flex output)
-%.tab.h: | %.tab.cpp
+# Dependency rule for parser headers
+$(BUILD_PATH)/parser/%.h: | $(BUILD_PATH)/parser/%.cpp
 	@:
 
-# Dependency rule for .yy.h (bison output, needed to compile flex output)
-%.yy.h: | %.yy.cpp
-	@:
+# # Default .l → .yy.cpp compilation rule
+# $(BUILD_PATH)/%.yy.cpp: $(SRC_PATH)/%.l | $(dir $($@))
+# 	@echo "Lexing $<"
+# 	$(Q)flex --header-file="$(@:.cpp=.h)" -o $@ $<
+# 
+# # Default .y → .tab.{h,cpp} compilation rule
+# $(BUILD_PATH)/%.tab.cpp: $(SRC_PATH)/%.y $(BUILD_PATH)/%.yy.cpp | $(dir $($@))
+# 	@echo "Bisoning $<"
+# 	$(Q)bison $(BISONFLAGS) --defines="$(@:.cpp=.h)" -o $@ -d $<
+# 
+# # Dependency rule for .tab.h (bison output, needed to compile flex output)
+# %.tab.h: | %.tab.cpp
+# 	@:
+# 
+# # Dependency rule for .yy.h (flex output, needed to compile bison output)
+# %.yy.h: | %.yy.cpp
+# 	@:
 
 #$(ADDITIONAL_DEPS):
 #@:

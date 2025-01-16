@@ -24,8 +24,8 @@ using namespace std;
 using namespace std::chrono;
 using namespace literals;
 
-#include "../build/parser/parser.tab.h"
-#include "../build/parser/parser.yy.h"
+#include "parser.h"
+#include "scanner.h"
 extern int yydebug;
 extern int yy_load_next_buf(yyscan_t scanner);
 extern void yy_add_content_from_string(const string &str, const string &desc, yyscan_t &scanner);

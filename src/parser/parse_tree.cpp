@@ -19,8 +19,8 @@ using spx::ea_signal_type;
 using spx::ed_signal_type;
 using spx::ed_bus_type;
 
-#include "../build/parser/parser.tab.h"
-#include "../build/parser/parser.yy.h"
+#include "parser.h"
+#include "scanner.h"
 
 vector<shared_ptr<sc_object>> ParseNet::create(const string &name, bool force_bidir) const
 {

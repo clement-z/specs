@@ -27,8 +27,8 @@
 #include "parse_analysis.h"
 #include "parse_directive.h"
 
-#include "../build/parser/parser.tab.h"
-#include "../build/parser/parser.yy.h"
+#include "parser.h"
+#include "scanner.h"
 
 using std::string;
 using std::vector;

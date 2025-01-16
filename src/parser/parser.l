@@ -39,7 +39,7 @@ EOL {EOL_PORTABLE}
 #include "parse_tree.h"
 #include "parser_state.h"
 
-#include "parser.tab.h"
+#include "parser.h"
 
 using std::string;
 using std::vector;
