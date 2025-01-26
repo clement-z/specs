@@ -3,9 +3,9 @@
 #include "specs.h"
 #include <systemc.h>
 
-#include <spx_module.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/spx_module.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 /** An electrically-controllable phase shifter. */
 class PhaseShifterBase : public spx_module {

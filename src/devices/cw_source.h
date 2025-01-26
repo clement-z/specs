@@ -3,10 +3,10 @@
 #include <systemc.h>
 #include <fstream>
 
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "optical_output_port.h"
+#include "optical_signal.h"
 #include "specs.h"
-#include "spx_module.h"
+#include "devices/spx_module.h"
 
 class CWSource : public spx_module {
 public:

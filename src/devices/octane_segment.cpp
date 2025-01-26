@@ -1,4 +1,4 @@
-#include <octane_segment.h>
+#include "devices/octane_segment.h"
 
 
 #define __modname(SUFFIX, IDX) \

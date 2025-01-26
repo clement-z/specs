@@ -22,10 +22,10 @@
 #include <cstring>
 #include <cmath>
 #include <memory>
-#include "parse_tree.h"
-#include "parse_element.h"
-#include "parse_analysis.h"
-#include "parse_directive.h"
+#include "parser/parse_tree.h"
+#include "parser/parse_element.h"
+#include "parser/parse_analysis.h"
+#include "parser/parse_directive.h"
 
 #include "parser.h"
 #include "scanner.h"

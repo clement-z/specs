@@ -1,8 +1,8 @@
 #pragma once
 
-#include "parse_tree.h"
+#include "parser/parse_tree.h"
 #include "specs.h"
-#include "strutils.h"
+#include "utils/strutils.h"
 
 #include <initializer_list>
 #include <utility>

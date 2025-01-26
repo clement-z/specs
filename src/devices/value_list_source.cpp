@@ -1,5 +1,5 @@
 #include "specs.h"
-#include "value_list_source.h"
+#include "devices/value_list_source.h"
 
 using std::cout;
 using std::cerr;

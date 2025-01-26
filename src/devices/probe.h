@@ -5,10 +5,10 @@
 #include <map>
 #include <set>
 
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "optical_output_port.h"
+#include "optical_signal.h"
 #include "specs.h"
-#include "spx_module.h"
+#include "devices/spx_module.h"
 
 /*
 This class defines an ideal optical probe. It will sample the signal at its input and

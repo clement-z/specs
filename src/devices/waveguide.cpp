@@ -1,5 +1,5 @@
 #include "specs.h"
-#include <waveguide.h>
+#include "devices/waveguide.h"
 
 using namespace std;
 

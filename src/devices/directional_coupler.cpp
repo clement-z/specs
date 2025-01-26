@@ -1,5 +1,5 @@
 #include "specs.h"
-#include <directional_coupler.h>
+#include "devices/directional_coupler.h"
 
 using namespace std;
 

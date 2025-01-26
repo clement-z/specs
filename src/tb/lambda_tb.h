@@ -1,13 +1,13 @@
 #pragma once
 
-#include <optical_signal.h>
+#include "optical_signal.h"
 #include <systemc.h>
-#include <waveguide.h>
-#include <merger.h>
-#include <directional_coupler.h>
-#include <cw_source.h>
-#include <probe.h>
-#include <specs.h>
+#include "devices/waveguide.h"
+#include "devices/merger.h"
+#include "devices/directional_coupler.h"
+#include "devices/cw_source.h"
+#include "devices/probe.h"
+#include "specs.h"
 
 SC_MODULE(lambda_tb)
 {

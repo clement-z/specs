@@ -1,6 +1,6 @@
 #pragma once
 
-#include "parse_tree.h"
+#include "parser/parse_tree.h"
 
 #include <initializer_list>
 #include <utility>

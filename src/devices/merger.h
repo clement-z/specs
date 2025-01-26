@@ -3,12 +3,11 @@
 #include <systemc.h>
 #include <map>
 
-#include <spx_module.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/spx_module.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 #include "specs.h"
-#include "spx_module.h"
 
 // A symmetric no-delay merger
 class Merger : public spx_module {

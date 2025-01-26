@@ -1,4 +1,4 @@
-#include <octane_cell.h>
+#include "devices/octane_cell.h"
 
 #define __modname(SUFFIX, IDX) \
     ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())

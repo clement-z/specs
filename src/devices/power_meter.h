@@ -4,8 +4,8 @@
 #include <fstream>
 #include <random>
 
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "optical_output_port.h"
+#include "optical_signal.h"
 #include "specs.h"
 #include "spx_module.h"
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <systemc.h>
-#include <waveguide.h>
-#include <directional_coupler.h>
-#include <octane_cell.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/waveguide.h"
+#include "devices/directional_coupler.h"
+#include "devices/octane_cell.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 // TODO: remove these (are in spx_module.h)
 typedef sc_signal_in_if<OpticalSignal > if_in_type;

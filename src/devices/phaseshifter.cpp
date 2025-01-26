@@ -1,5 +1,5 @@
 #include "specs.h"
-#include <phaseshifter.h>
+#include "devices/phaseshifter.h"
 
 using namespace std;
 

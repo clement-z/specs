@@ -36,8 +36,8 @@ EOL {EOL_PORTABLE}
 #include <cstring> // for strcpy
 #include <vector>
 #include <deque>
-#include "parse_tree.h"
-#include "parser_state.h"
+#include "parser/parse_tree.h"
+#include "parser/parser_state.h"
 
 #include "parser.h"
 

@@ -2,10 +2,10 @@
 
 #include <systemc.h>
 
-#include <optical_signal.h>
-#include <pcm_device.h>
-#include <probe.h>
-#include <specs.h>
+#include "optical_signal.h"
+#include "devices/pcm_device.h"
+#include "devices/probe.h"
+#include "specs.h"
 
 SC_MODULE(PCMElement_tb)
 {

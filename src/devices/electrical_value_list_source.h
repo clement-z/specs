@@ -6,11 +6,11 @@
 #include <vector>
 #include <utility>
 
-#include "strutils.h"
+#include "utils/strutils.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
 #include "specs.h"
-#include "spx_module.h"
+#include "devices/spx_module.h"
 
 using std::vector;
 using std::pair;

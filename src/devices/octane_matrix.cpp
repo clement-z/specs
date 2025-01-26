@@ -1,4 +1,4 @@
-#include <octane_matrix.h>
+#include "devices/octane_matrix.h"
 
 
 #define __modname(SUFFIX, IDX) \

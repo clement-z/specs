@@ -2,9 +2,9 @@
 
 #include <systemc.h>
 #include <map>
-#include <optical_output_port.h>
-#include <optical_signal.h>
-#include "spx_module.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
+#include "devices/spx_module.h"
 
 
 class DirectionalCouplerBase : public spx_module {

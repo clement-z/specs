@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "specs.h"
-#include "spx_module.h"
+#include "devices/spx_module.h"
 
 using std::vector;
 using std::string;

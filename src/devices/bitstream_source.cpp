@@ -1,4 +1,4 @@
-#include <bitstream_source.h>
+#include "devices/bitstream_source.h"
 
 #include <random>
 #include <cstdlib>

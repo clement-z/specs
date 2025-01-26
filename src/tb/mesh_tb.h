@@ -1,10 +1,10 @@
 #pragma once
 
-#include <optical_signal.h>
+#include "optical_signal.h"
 #include <systemc.h>
-#include <probe.h>
-#include <specs.h>
-#include <clements.h>
+#include "devices/probe.h"
+#include "specs.h"
+#include "devices/clements.h"
 
 SC_MODULE(mesh_tb)
 {

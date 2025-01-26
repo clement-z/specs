@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysc_utils.h>
+#include "utils/sysc_utils.h"
 #include "optical_signal.h"
 #include "optical_output_port.h"
 

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <systemc.h>
-#include <octane_segment.h>
-#include <crossing.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/octane_segment.h"
+#include "devices/crossing.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 // TODO: remove these (are in spx_module.h)
 typedef sc_signal_in_if<OpticalSignal > if_in_type;

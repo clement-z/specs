@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/merger_tb.h>
+#include "tb/merger_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 
 void Merger_tb::run_1()
 {

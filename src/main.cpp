@@ -4,16 +4,16 @@
 #include <chrono>
 #include <deque>
 
-#include <optical_signal.h>
-#include <time_monitor.h>
-#include <tb/alltestbenches.h>
-#include <utils/strutils.h>
-
 #include <systemc.h>
-
 #include <args.hxx>
 
-#include <specs.h>
+#include "optical_signal.h"
+#include "devices/time_monitor.h"
+#include "tb/alltestbenches.h"
+#include "utils/strutils.h"
+
+
+#include "specs.h"
 #include "optical_output_port.h"
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"

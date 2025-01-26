@@ -1,19 +1,18 @@
-#include "bitstream_source.h"
+#include "devices/bitstream_source.h"
 #include "optical_signal.h"
-#include "sysc_utils.h"
+#include "utils/sysc_utils.h"
 #include <specs.h>
-#include "spx_module.h"
-#include "value_list_source.h"
-#include "electrical_value_list_source.h"
+#include "devices/spx_module.h"
+#include "devices/value_list_source.h"
+#include "devices/electrical_value_list_source.h"
 
 #include <systemc.h>
 #include <optical_output_port.h>
-#include <spx_module.h>
-#include <cw_source.h>
-#include <probe.h>
-#include <detector.h>
-#include <power_meter.h>
-#include <generic_transmission_device.h>
+#include "devices/cw_source.h"
+#include "devices/probe.h"
+#include "devices/detector.h"
+#include "devices/power_meter.h"
+#include "devices/generic_transmission_device.h"
 
 using std::string;
 

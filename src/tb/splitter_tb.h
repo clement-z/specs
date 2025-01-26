@@ -1,10 +1,10 @@
 #pragma once
 
-#include <optical_signal.h>
-#include <splitter.h>
+#include "optical_signal.h"
+#include "devices/splitter.h"
 #include <systemc.h>
-#include <probe.h>
-#include <specs.h>
+#include "devices/probe.h"
+#include "specs.h"
 
 SC_MODULE(Splitter_tb)
 {

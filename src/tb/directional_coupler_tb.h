@@ -1,10 +1,10 @@
 #pragma once
 
-#include <directional_coupler.h>
-#include <optical_signal.h>
+#include "devices/directional_coupler.h"
+#include "optical_signal.h"
 #include <systemc.h>
-#include <probe.h> 
-#include <specs.h>
+#include "devices/probe.h"
+#include "specs.h"
 
 SC_MODULE(DirectionalCoupler_tb)
 {

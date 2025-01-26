@@ -1,8 +1,8 @@
 #pragma once
 
-#include <specs.h>
-#include <spx_module.h>
-#include <mesh_col.h>
+#include "specs.h"
+#include "devices/spx_module.h"
+#include "devices/mesh_col.h"
 
 /* Clements MZI Mesh
 

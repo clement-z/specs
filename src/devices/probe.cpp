@@ -1,5 +1,5 @@
 #include <ios>
-#include <probe.h>
+#include "devices/probe.h"
 #include <cstdlib> // system()
 
 #define __modname(SUFFIX, IDX) \

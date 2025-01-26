@@ -1,14 +1,13 @@
 #pragma once
 
 #include <systemc.h>
-#include <waveguide.h>
-#include <directional_coupler.h>
-#include <detector.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
-#include <pcm_device.h>
-#include <directional_coupler.h>
-#include <merger.h>
+#include "devices/waveguide.h"
+#include "devices/detector.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
+#include "devices/pcm_device.h"
+#include "devices/directional_coupler.h"
+#include "devices/merger.h"
 
 #include <cassert>
 

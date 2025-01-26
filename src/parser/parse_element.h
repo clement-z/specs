@@ -1,9 +1,7 @@
 #pragma once
 
-#include "alldevices.h"
-#include "power_meter.h"
-#include "subcircuit_instance.h"
-#include "parse_tree.h"
+#include "devices/alldevices.h"
+#include "parser/parse_tree.h"
 #include "specs.h"
 
 #include <initializer_list>

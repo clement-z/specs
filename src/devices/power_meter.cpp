@@ -1,5 +1,5 @@
 #include "specs.h"
-#include <power_meter.h>
+#include "devices/power_meter.h"
 #include <cstdlib> // system()
 #include <random>
 #include <complex>

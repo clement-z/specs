@@ -2,10 +2,10 @@
 
 #include <systemc.h>
 
-#include <waveguide.h>
-#include <directional_coupler.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/waveguide.h"
+#include "devices/directional_coupler.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 /** A unidirectional waveguide module. */
 class Ring : public sc_module {

@@ -2,14 +2,14 @@
 
 #include <systemc.h>
 
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "optical_output_port.h"
+#include "optical_signal.h"
 #include "specs.h"
-#include "spx_module.h"
+#include "devices/spx_module.h"
 
-#include <directional_coupler.h>
-#include <phaseshifter.h>
-#include <waveguide.h>
+#include "devices/directional_coupler.h"
+#include "devices/phaseshifter.h"
+#include "devices/waveguide.h"
 
 /** A unidirectional waveguide module. */
 class MZI : public spx_module {

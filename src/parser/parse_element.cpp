@@ -1,8 +1,7 @@
-#include "parse_element.h"
-#include "alldevices.h"
-#include "subcircuit_instance.h"
+#include "parser/parse_element.h"
+#include "devices/alldevices.h"
 #include "specs.h"
-#include "strutils.h"
+#include "utils/strutils.h"
 
 #include <string>
 

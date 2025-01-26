@@ -1,7 +1,7 @@
-#include "parse_tree.h"
-#include "parse_directive.h"
-#include "parse_element.h"
-#include "parser_state.h"
+#include "parser/parse_tree.h"
+#include "parser/parse_directive.h"
+#include "parser/parse_element.h"
+#include "parser/parser_state.h"
 #include "specs.h"
 
 #include <sstream>

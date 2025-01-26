@@ -8,8 +8,8 @@
 #include <queue>
 #include <map>
 
-#include <optical_signal.h>
-#include <pqueue.h>
+#include "optical_signal.h"
+#include "utils/pqueue.h"
 
 using std::cout;
 using std::endl;

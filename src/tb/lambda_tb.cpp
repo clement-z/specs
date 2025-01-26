@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/lambda_tb.h>
+#include "tb/lambda_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 #include "devices/generic_waveguide.h"
 
 void lambda_tb::run_1()
