@@ -1,5 +1,6 @@
 #pragma once
 
+#if defined(BUILD_TB) && BUILD_TB == 1
 #include "tb/detector_tb.h"
 #include "tb/directional_coupler_tb.h"
 #include "tb/merger_tb.h"
@@ -13,6 +14,7 @@
 #include "tb/lambda_tb.h"
 #include "tb/phase_shifter_tb.h"
 #include "tb/mesh_tb.h"
+#endif
 
 #include <map>
 #include <string>

@@ -1,16 +1,14 @@
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-#include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-file(GLOB HH_FILES *.h)
-file(GLOB SRC_FILES *.cpp)
+file(GLOB HH_FILES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        CONFIGURE_DEPENDS
+        "*.h")
+file(GLOB SRC_FILES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        CONFIGURE_DEPENDS
+        "*.cpp")
 
 find_package(BISON)
 find_package(FLEX)
-
-message("hey ${SystemC_CXX_STANDARD}")
-message("hey ${SystemC_INCLUDE_DIRS}")
-
-message("hey ${PROJECT_INCLUDE_DIRS}")
 
 set(BISONFLAGS "--warnings -Wall" ) # -Wcex
 file(MAKE_DIRECTORY ${PARSER_OUTPUT_DIR})
@@ -20,14 +18,25 @@ flex_target(Scanner parser.l ${PARSER_OUTPUT_DIR}/scanner.cpp  DEFINES_FILE ${PA
 
 add_flex_bison_dependency(Scanner Parser)
 
-add_library(parse
-        STATIC
+#target_sources(${PROJECT_NAME} PRIVATE ${SRC_FILES} ${HH_FILES})
+#target_sources(${PROJECT_NAME} PRIVATE ${FLEX_Scanner_OUTPUTS} ${BISON_Parser_OUTPUTS})
+
+SET_SOURCE_FILES_PROPERTIES(${FLEX_Scanner_OUTPUTS} ${BISON_Parser_OUTPUTS} GENERATED)
+
+message(STATUS ___ "${BISON_Parser_OUTPUTS}" "${FLEX_Scanner_OUTPUTS}")
+add_library(${PROJECT_NAME}_parser OBJECT EXCLUDE_FROM_ALL
+        ${SRC_FILES}
+        ${HH_FILES}
         ${FLEX_Scanner_OUTPUTS}
         ${BISON_Parser_OUTPUTS}
-        ${HH_FILES}
-        ${SRC_FILES}
 )
-target_include_directories(parse PRIVATE ${PARSER_OUTPUT_DIR})
-target_include_directories(parse PRIVATE ${PARSER_OUTPUT_DIR})
-target_include_directories(parse PRIVATE ${SystemC_INCLUDE_DIRS})
-target_include_directories(parse SYSTEM PRIVATE /home/czrounba/git/specs/src)
+
+target_link_libraries(${PROJECT_NAME}_parser PRIVATE common)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_parser)
+
+
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName "HH_FILES" "SRC_FILES")
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
