@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/splitter_tb.h>
+#include "tb/splitter_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 
 void Splitter_tb::run_1()
 {

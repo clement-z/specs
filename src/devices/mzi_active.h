@@ -2,11 +2,11 @@
 
 #include "specs.h"
 #include <systemc.h>
-#include <waveguide.h>
-#include <phaseshifter.h>
-#include <directional_coupler.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/waveguide.h"
+#include "devices/phaseshifter.h"
+#include "devices/directional_coupler.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 //TODO: pass element's characteristics as argument, for instance, pass an example of waveguide,
 // or an example of DC such that it copies. Requires: constructors in each element to build

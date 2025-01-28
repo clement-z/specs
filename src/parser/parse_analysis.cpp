@@ -1,13 +1,13 @@
-#include "parse_analysis.h"
-#include "cw_source.h"
+#include "parser/parse_analysis.h"
+#include "devices/cw_source.h"
 #include "devices/alldevices.h"
-#include "directional_coupler.h"
+#include "devices/directional_coupler.h"
 #include "optical_output_port.h"
-#include "parse_tree.h"
+#include "parser/parse_tree.h"
 #include "specs.h"
-#include "strutils.h"
-#include "sysc_utils.h"
-#include "general_utils.h"
+#include "utils/strutils.h"
+#include "utils/sysc_utils.h"
+#include "utils/general_utils.h"
 #include <functional>
 
 using spx::oa_value_type;

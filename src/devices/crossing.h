@@ -2,10 +2,10 @@
 
 #include <systemc.h>
 
-#include <spx_module.h>
+#include "devices/spx_module.h"
 
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 
 /* A waveguide crossing that accounts for */

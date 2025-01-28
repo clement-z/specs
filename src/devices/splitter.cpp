@@ -1,5 +1,5 @@
-#include <splitter.h>
-#include <specs.h>
+#include "devices/splitter.h"
+#include "specs.h"
 
 void Splitter::on_port_in_changed()
 {

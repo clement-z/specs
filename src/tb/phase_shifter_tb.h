@@ -1,12 +1,12 @@
 #pragma once
 
-#include <optical_signal.h>
+#include "optical_signal.h"
 #include <systemc.h>
-#include <waveguide.h>
-#include <phaseshifter.h>
-#include <merger.h>
-#include <probe.h>
-#include <specs.h>
+#include "devices/waveguide.h"
+#include "devices/phaseshifter.h"
+#include "devices/merger.h"
+#include "devices/probe.h"
+#include "specs.h"
 
 SC_MODULE(ps_tb)
 {

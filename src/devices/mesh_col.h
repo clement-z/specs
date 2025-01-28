@@ -1,10 +1,10 @@
 #pragma once
 
 #include <systemc.h>
-#include <specs.h>
-#include <spx_module.h>
-#include <mzi.h>
-#include <waveguide.h>
+#include "specs.h"
+#include "devices/spx_module.h"
+#include "devices/mzi.h"
+#include "devices/waveguide.h"
 
 /**
  * This class implements a single column of an MZI mesh

@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/phase_shifter_tb.h>
+#include "tb/phase_shifter_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 #include "specs.h"
 
 void ps_tb::run_1()

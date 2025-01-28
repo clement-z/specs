@@ -1,5 +1,5 @@
-#include <merger.h>
-#include <specs.h>
+#include "devices/merger.h"
+#include "specs.h"
 
 using namespace std;
 

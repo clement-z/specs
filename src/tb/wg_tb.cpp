@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/wg_tb.h>
+#include "tb/wg_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 #include "devices/generic_waveguide.h"
 #include "specs.h"
 

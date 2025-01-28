@@ -1,11 +1,11 @@
 #pragma once
 
-#include <detector.h>
-#include <optical_signal.h>
+#include "devices/detector.h"
+#include "optical_signal.h"
 #include <systemc.h>
-#include <probe.h>
-#include <specs.h>
-#include <waveguide.h>
+#include "devices/probe.h"
+#include "specs.h"
+#include "devices/waveguide.h"
 
 SC_MODULE(Detector_tb)
 {

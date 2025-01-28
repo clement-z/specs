@@ -1,18 +1,18 @@
-#include "bitstream_source.h"
+#include "devices/bitstream_source.h"
 #include "optical_signal.h"
-#include "sysc_utils.h"
-#include <specs.h>
-#include "spx_module.h"
-#include "value_list_source.h"
-#include "electrical_value_list_source.h"
+#include "utils/sysc_utils.h"
+#include "specs.h"
+#include "devices/spx_module.h"
+#include "devices/value_list_source.h"
+#include "devices/electrical_value_list_source.h"
 
 #include <systemc.h>
-#include <optical_output_port.h>
-#include <spx_module.h>
-#include <cw_source.h>
-#include <probe.h>
-#include <detector.h>
-#include <generic_transmission_device.h>
+#include "optical_output_port.h"
+#include "devices/cw_source.h"
+#include "devices/probe.h"
+#include "devices/detector.h"
+#include "devices/power_meter.h"
+#include "devices/generic_transmission_device.h"
 
 using std::string;
 
@@ -303,7 +303,13 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
         string detname = pdet->name();
         cout << detname << endl;
         pdet->trace(default_trace_file);
-        //sc_trace(default_trace_file, , (string(pdet->name()) + ".readout").c_str());
+    }
+
+    auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
+    for (auto &pwr_meter: all_pwr_meters) {
+        string pwr_meter_name = pwr_meter->name();
+        cout << pwr_meter_name << endl;
+        pwr_meter->trace(default_trace_file);
     }
 }
 
@@ -374,10 +380,10 @@ inline void sc_trace(sc_trace_file *tf, const SPECSConfig &s, string parent_tree
     parent_tree += (parent_tree.size() ? "." : "");
     sc_trace(tf, s.default_abstol, parent_tree + "abstol");
     sc_trace(tf, s.default_reltol, parent_tree + "reltol");
-    sc_trace(tf, s.default_resolution_multiplier, parent_tree + "resolution_multiplier");
-    sc_trace(tf, s.engine_timescale, parent_tree + "engine_timescale");
-    sc_trace(tf, s.simulation_mode, parent_tree + "simulation_mode");
-    sc_trace(tf, s.analysis_type, parent_tree + "analysis_type");
+    sc_trace(tf, (int&)s.default_resolution_multiplier, parent_tree + "resolution_multiplier");
+    sc_trace(tf, (int&)s.engine_timescale, parent_tree + "engine_timescale");
+    sc_trace(tf, (int&)s.simulation_mode, parent_tree + "simulation_mode");
+    sc_trace(tf, (int&)s.analysis_type, parent_tree + "analysis_type");
     sc_trace(tf, s.trace_all_optical_nets, parent_tree + "trace_all_optical_nets");
     sc_trace(tf, s.verbose_component_initialization, parent_tree + "verbose_component_initialization");
 }

@@ -1,8 +1,8 @@
-#include "parse_directive.h"
+#include "parser/parse_directive.h"
 #include "devices/alldevices.h"
-#include "directional_coupler.h"
+#include "devices/directional_coupler.h"
 #include "optical_signal.h"
-#include "parse_tree.h"
+#include "parser/parse_tree.h"
 #include "specs.h"
 
 using spx::oa_value_type;

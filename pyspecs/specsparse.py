@@ -55,7 +55,7 @@ def parse_vcd_dataframe(filename):
     # print(f'top level scopes: {[x["name"] for x in scopes]}')
     # print(f'top level probes: {[x["name"] for x in probes]}')
 
-    is_wl_sweep = check_wl_sweep(probes)
+    is_wl_sweep = check_wl_sweep(top_scope)
     has_wl = False
     save_wl = False
 
@@ -255,25 +255,15 @@ def is_probe(data):
             return False
     return True
 
-def check_wl_sweep(probes):
-    for probe in probes:
-        # see if wavelength is part of probe attributes
-        attrs = ["wavelength", "power", "abs", "phase"]
-        lengths = {a:-1 for a in attrs}
-        for signal in probe['children']:
-            for a in attrs:
-                if signal['name'] == a:
-                    lengths[a] = len( signal['data'] )
-
-        match = False
-        if lengths[attrs[1]] != -1:
-            match = lengths[attrs[0]] == lengths[attrs[1]]
-        if lengths[attrs[2]] != -1:
-            match = lengths[attrs[0]] == lengths[attrs[2]]
-
-        if match and lengths[attrs[0]] != 1:
-            return True
-    return False
+def check_wl_sweep(top_scope):
+    # Need to check that SystemC.analysis_type == 1 (CW sweep)
+    for child in top_scope['children']:
+        if child['name'] == 'analysis_type':
+            print(child)
+            analysis_type = child['data'][0][1]
+            print(f'analysis_type:{analysis_type}')
+            return analysis_type == 'b01'
+    raise ValueError('Expected to find key "analysis_type" in VCD trace.')
 
 def vcd_get_data_vector(signal):
     data = np.array([float(tup[1][1::]) for tup in signal['data']])

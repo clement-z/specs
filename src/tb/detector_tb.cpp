@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/detector_tb.h>
+#include "tb/detector_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 
 void Detector_tb::run_1()
 {

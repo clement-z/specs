@@ -1,5 +1,5 @@
 #include <map>
-#include <tb/alltestbenches.h>
+#include "tb/alltestbenches.h"
 
 #if defined(BUILD_TB) && BUILD_TB == 1
 std::map<std::string, tb_func_t> tb_map = {

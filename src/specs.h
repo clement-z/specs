@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysc_utils.h>
+#include "utils/sysc_utils.h"
 #include "optical_signal.h"
 #include "optical_output_port.h"
 
@@ -73,10 +73,10 @@ public:
     };
 
     enum AnalysisType {
-        ANALYSIS_TYPE_MINVAL,
-        CW_OPERATING_POINT,
-        CW_SWEEP,
-        TIME_DOMAIN,
+        ANALYSIS_TYPE_MINVAL = -1,
+        CW_OPERATING_POINT = 0,
+        CW_SWEEP = 1,
+        TIME_DOMAIN = 2,
         ANALYSIS_TYPE_MAXVAL,
 
         // aliases
@@ -114,7 +114,7 @@ public:
 
     // other
     sc_signal<bool, SC_MANY_WRITERS> drop_all_events;
-    bool verbose_component_initialization = true;
+    bool verbose_component_initialization = false;
 
     SPECSConfig(sc_module_name name);
 

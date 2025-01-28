@@ -1,12 +1,12 @@
 #pragma once
 
-#include <optical_signal.h>
+#include "optical_signal.h"
 #include <systemc.h>
-#include <waveguide.h>
-#include <directional_coupler.h>
-#include <probe.h>
-#include <crow.h>
-#include <specs.h>
+#include "devices/waveguide.h"
+#include "devices/directional_coupler.h"
+#include "devices/probe.h"
+#include "devices/crow.h"
+#include "specs.h"
 
 SC_MODULE(freqsweep_tb)
 {

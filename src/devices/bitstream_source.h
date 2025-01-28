@@ -3,8 +3,8 @@
 #include <systemc.h>
 #include <fstream>
 
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 using namespace std;
 

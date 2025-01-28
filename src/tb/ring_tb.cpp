@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/ring_tb.h>
+#include "tb/ring_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 
 void ring_tb::run_1()
 {

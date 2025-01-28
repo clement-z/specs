@@ -10,6 +10,9 @@
 
     //extern int yylineno;
     //extern char *yytext;
+
+    string yyget_filename ( yyscan_t scanner );
+    string yyget_current_line ( yyscan_t scanner );
 }
 
 %{
@@ -19,13 +22,13 @@
 #include <cstring>
 #include <cmath>
 #include <memory>
-#include "parse_tree.h"
-#include "parse_element.h"
-#include "parse_analysis.h"
-#include "parse_directive.h"
+#include "parser/parse_tree.h"
+#include "parser/parse_element.h"
+#include "parser/parse_analysis.h"
+#include "parser/parse_directive.h"
 
-#include "../build/parser/parser.tab.h"
-#include "../build/parser/parser.yy.h"
+#include "parser.h"
+#include "scanner.h"
 
 using std::string;
 using std::vector;
@@ -70,7 +73,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %token <s_ptr> T_ELEM_CWSRC T_ELEM_VLSRC T_ELEM_EVLSRC
 %token <s_ptr> T_ELEM_WG T_ELEM_COUPLER T_ELEM_MERGER T_ELEM_SPLITTER
 %token <s_ptr> T_ELEM_PSHIFT T_ELEM_MZI T_ELEM_CROSSING T_ELEM_PCMCELL
-%token <s_ptr> T_ELEM_PROBE T_ELEM_MLPROBE T_ELEM_PDET
+%token <s_ptr> T_ELEM_PROBE T_ELEM_MLPROBE T_ELEM_PDET T_ELEM_PWR_METER
 %token <s_ptr> T_ELEM_X
 %token <i_val> T_ANALYSIS_OP T_ANALYSIS_DC T_ANALYSIS_TRAN
 %token <i_val> T_DIRECTIVE_OPTIONS T_DIRECTIVE_NODESET
@@ -95,6 +98,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <i_val> element.evlsrc
 %type <i_val> element.probe
 %type <i_val> element.mlprobe
+%type <i_val> element.power_meter
 %type <i_val> element.pdet
 %type <i_val> element.x
 
@@ -372,6 +376,14 @@ element.pdet: T_ELEM_PDET net.oa.in net.eanalog
             }
 ;
 
+element.power_meter: T_ELEM_PWR_METER net.oa.in
+            {
+                $$ = cur_pt->register_element(new PowerMeterElement(*$1, {*$2}));
+                delete $1;
+                delete $2;
+            }
+;
+
 element.x: T_ELEM_X
             {
                 $$ = cur_pt->register_element(new XElement(*$1));
@@ -412,7 +424,7 @@ atomdirective: directive.options { $$ = $1; }
 ;
 
 directive.with_args:
-  directive.with_args variable
+  directive.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
                 if (!cur_pt->directives[$1]->kwargs.empty())
@@ -453,11 +465,12 @@ atomelement: element.wg { $$ = $1; }
            | element.evlsrc { $$ = $1; }
            | element.probe { $$ = $1; }
            | element.mlprobe { $$ = $1; }
+           | element.power_meter { $$ = $1; }
            | element.pdet { $$ = $1; }
 ;
 
 element.with_args:
-  element.with_args variable
+  element.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
                 if (!cur_pt->elements[$1]->kwargs.empty())
@@ -551,7 +564,7 @@ atomanalysis: analysis.op { $$ = $1; }
 ;
 
 analysis.with_args:
-  analysis.with_args variable
+  analysis.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
                 if (!cur_pt->analyses[$1]->kwargs.empty())
@@ -726,6 +739,7 @@ net_name.base.str:
                 }
             | net_name.base.str '-' T_STR
                 {
+                    // FIXME: this rule is problematic (overlap with -expr)
                     $$ = $1;
                     *$1 += "-" + *$3;
                     delete $3;
@@ -878,6 +892,8 @@ constant: variable_base { $$ = $1; }
 expr:
   expr '+' term { $$ = $1; *$$ += *$3; delete $3; }
 | expr '-' term { $$ = $1; *$$ -= *$3; delete $3; }
+| '+' term { $$ = $2; }
+| '-' term { $$ = $2; *$$ *= -1; }
 | term { $$ = $1; }
 ;
 
@@ -954,8 +970,11 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err)
         }
     }
     string token_escaped = ss.str();
-    printf("-- Error in the netlist (line %u): %s\n", yyget_lineno(scanner), err);
-    printf("-- \"%s\"\n", token_escaped.c_str());
-    //cerr << err << endl;
+    
+    cerr << "Parsing error (" << yyget_filename(scanner) << ":" << yyget_lineno(scanner) << "): " << err << endl;
+    cerr << "-- offending token: \"" << token_escaped.c_str() << "\"" << endl;
+    string str = yyget_current_line(scanner);
+    if (!str.empty())
+        cerr << "-- while parsing line: \"" << str << "\"" << endl;
     exit(1);
 }

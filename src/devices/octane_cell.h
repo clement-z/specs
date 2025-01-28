@@ -1,12 +1,12 @@
 #pragma once
 
 #include <systemc.h>
-#include <waveguide.h>
-#include <pcm_device.h>
-#include <merger.h>
-#include <detector.h>
-#include <optical_output_port.h>
-#include <optical_signal.h>
+#include "devices/waveguide.h"
+#include "devices/pcm_device.h"
+#include "devices/merger.h"
+#include "devices/detector.h"
+#include "optical_output_port.h"
+#include "optical_signal.h"
 
 /** The minimal octane cell composed of merger, waveguides, PCM and a detector. */
 /** For now, all photonic parameters will be internal and constant. The only */

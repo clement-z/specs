@@ -1,5 +1,5 @@
 #include "specs.h"
-#include <cw_source.h>
+#include "devices/cw_source.h"
 
 using std::cout;
 using std::endl;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <merger.h>
-#include <optical_signal.h>
+#include "devices/merger.h"
+#include "optical_signal.h"
 #include <systemc.h>
-#include <probe.h>
-#include <specs.h>
+#include "devices/probe.h"
+#include "specs.h"
 
 SC_MODULE(Merger_tb)
 {

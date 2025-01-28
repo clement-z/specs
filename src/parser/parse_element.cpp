@@ -1,8 +1,7 @@
-#include "parse_element.h"
-#include "alldevices.h"
-#include "subcircuit_instance.h"
+#include "parser/parse_element.h"
+#include "devices/alldevices.h"
 #include "specs.h"
-#include "strutils.h"
+#include "utils/strutils.h"
 
 #include <string>
 
@@ -1134,7 +1133,51 @@ sc_module *MLProbeElement::create(ParseTreeCreationHelper &pt_helper) const
 }
 
 /** ******************************************* **/
-/**                 Photodetector               **/
+/**                Power meter                  **/
+/** ******************************************* **/
+INSTANTIATE_AND_CONNECT_UNI(PowerMeterElement, pt_helper)
+{
+    element_type_uni *obj = new element_type_uni(name.c_str());
+
+    // connect p_in
+    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_in, nets[0], AS_READER);
+
+    // return the module
+    return obj;
+}
+
+sc_module *PowerMeterElement::create(ParseTreeCreationHelper &pt_helper) const
+{
+    element_type_base *obj = nullptr;
+
+    // Verify number of nets
+    assert(nets.size() == n_nets);
+
+    // Verify number of positional args
+    assert(args.size() == 0);
+
+    // Create signals if they don't exist
+    pt_helper.create_signals(this);
+
+    // Create the object and connect ports to signals
+    INSTANTIATE(pt_helper, false);
+
+    // Parse positional args
+    // nothing
+
+    // Parse keyword arguments
+    for (auto &p: kwargs)
+    {
+        cerr << name << ": unknown keyword: " << p.first << endl;
+        exit(1);
+    }
+
+    return obj;
+}
+
+
+/** ******************************************* **/
+/**              Phase-change cell              **/
 /** ******************************************* **/
 INSTANTIATE_AND_CONNECT_UNI(PCMCellElement, pt_helper)
 {
@@ -1169,16 +1212,28 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         obj->m_meltEnergy = args[0].as_double();
     if(args.size() > 1)
         obj->m_nStates = args[1].as_integer();
+    if(args.size() > 2)
+        obj->m_Tc = args[2].as_double();
+    if(args.size() > 3)
+        obj->m_Ta = args[3].as_double();
 
     // Parse keyword arguments
     for (auto &p: kwargs)
     {
         string kw = p.first;
         strutils::toupper(kw);
-        if (kw == "MELT_ENERGY" || kw == "EMELT")
+        if (kw == "MELT_ENERGY" || kw == "EMELT" || kw == "E_MELT")
             obj->m_meltEnergy = p.second.as_double();
-        else if (kw == "N" || kw == "NSTATES")
+        else if (kw == "N" || kw == "NSTATES" || kw == "NLEVELS" || kw == "N_STATES" || kw == "N_LEVELS")
             obj->m_nStates = p.second.as_integer();
+        else if (kw == "K" || kw == "INITIAL_STATE")
+            obj->m_stateCurrent = p.second.as_integer();
+        else if (kw == "SP" || kw == "TC" || kw == "T_C")
+            obj->m_Tc = p.second.as_double();
+        else if (kw == "EP" || kw == "TA" || kw == "T_A")
+            obj->m_Ta = p.second.as_double();
+        else if (kw == "TANH_COEF")
+            obj->m_speed = p.second.as_double();
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);
@@ -1240,6 +1295,10 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
             obj->m_sampling_time = p.second.as_double();
         else if (kw == "R" || kw == "RESPONSIVITY" || kw == "GAIN")
             obj->m_responsivity_A_W = p.second.as_double();
+        else if (kw == "NOISE_BYPASS" || kw == "NB")
+            obj->m_noiseBypass = p.second.as_boolean();
+        else if (kw == "FREQUENCY" || kw == "FOP")
+            obj->m_opFreq_Hz = p.second.as_double();            
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);

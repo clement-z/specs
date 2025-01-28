@@ -1,5 +1,5 @@
 #include "specs.h"
-#include <detector.h>
+#include "devices/detector.h"
 #include <cstdlib> // system()
 #include <random>
 #include <complex>

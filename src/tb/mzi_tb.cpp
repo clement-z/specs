@@ -1,8 +1,8 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/mzi_tb.h>
+#include "tb/mzi_tb.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 
 void mzi_tb::run_1()
 {

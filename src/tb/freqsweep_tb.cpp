@@ -1,13 +1,13 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/freqsweep_tb.h>
+#include "tb/freqsweep_tb.h"
 
 #include <cstdlib>
 #include <unistd.h>
 
-#include "time_monitor.h"
+#include "devices/time_monitor.h"
 
-#include "general_utils.h"
+#include "utils/general_utils.h"
 
 /* ----------------------------------------------------------------------------- *
     This testbench is called freqsweep because it is capable of this

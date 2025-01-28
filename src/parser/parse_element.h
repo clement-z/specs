@@ -1,8 +1,7 @@
 #pragma once
 
-#include "alldevices.h"
-#include "subcircuit_instance.h"
-#include "parse_tree.h"
+#include "devices/alldevices.h"
+#include "parser/parse_tree.h"
 #include "specs.h"
 
 #include <initializer_list>
@@ -40,11 +39,12 @@ using std::unique_ptr;
         virtual ParseElement *clone() const                                            \
         { return new ELEM_NAME(*this); }                                               \
         /* Implement virtual function create(...) to construct element */              \
-        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;               \
+        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;           \
         virtual element_type_base *                                                    \
-        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;             \
+        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;         \
                                                                                        \
         virtual string kind() const { return ELEM_NAME_LONG; }                         \
+        virtual bool bidir_capable() const { return false; }                           \
     };
 
 /*************************************************/
@@ -64,13 +64,14 @@ using std::unique_ptr;
         virtual ParseElement *clone() const                                            \
         { return new ELEM_NAME(*this); }                                               \
         /* Implement virtual function create(...) to construct element */              \
-        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;               \
+        virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;           \
         virtual element_type_base *                                                    \
-        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;             \
+        instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;         \
         virtual element_type_base *                                                    \
-        instantiate_and_connect_bi(ParseTreeCreationHelper &pt_helper) const;              \
+        instantiate_and_connect_bi(ParseTreeCreationHelper &pt_helper) const;          \
                                                                                        \
         virtual string kind() const { return string(ELEM_NAME_LONG) + " (bidir)"; }    \
+        virtual bool bidir_capable() const { return true; }                            \
     };
 
 /** ******************************************* **/
@@ -93,6 +94,7 @@ DECLARE_UNIDIR_ELEMENT(PCMCellElement, "PCM CELL", PCMElement, 2);
 DECLARE_UNIDIR_ELEMENT(PhotodetectorElement, "PHOTODETECTOR", Detector, 2);
 DECLARE_UNIDIR_ELEMENT(ProbeElement, "PROBE", Probe, 1);
 DECLARE_UNIDIR_ELEMENT(MLProbeElement, "MULTIWAVELENGTH PROBE", MLambdaProbe, 1);
+DECLARE_UNIDIR_ELEMENT(PowerMeterElement, "POWER METER", PowerMeter, 1);
 
 // TODO: take care of subcircuit instance...
 DECLARE_UNIDIR_ELEMENT(XElement, "SUBCIRCUIT", SubcircuitInstance, 1);

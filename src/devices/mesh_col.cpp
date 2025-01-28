@@ -1,4 +1,4 @@
-#include <mesh_col.h>
+#include "devices/mesh_col.h"
 
 #define __modname(SUFFIX, IDX) \
     ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())

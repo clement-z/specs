@@ -1,18 +1,20 @@
 #pragma once
 
-#include <tb/detector_tb.h>
-#include <tb/directional_coupler_tb.h>
-#include <tb/merger_tb.h>
-#include <tb/pcm_device_tb.h>
-#include <tb/splitter_tb.h>
-#include <tb/wg_tb.h>
+#if defined(BUILD_TB) && BUILD_TB == 1
+#include "tb/detector_tb.h"
+#include "tb/directional_coupler_tb.h"
+#include "tb/merger_tb.h"
+#include "tb/pcm_device_tb.h"
+#include "tb/splitter_tb.h"
+#include "tb/wg_tb.h"
 #include "tb/mzi_tb.h"
 #include "tb/ring_tb.h"
 #include "tb/freqsweep_tb.h"
 #include "tb/crow_tb.h"
 #include "tb/lambda_tb.h"
 #include "tb/phase_shifter_tb.h"
-#include "mesh_tb.h"
+#include "tb/mesh_tb.h"
+#endif
 
 #include <map>
 #include <string>

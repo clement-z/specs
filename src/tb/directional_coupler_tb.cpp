@@ -1,9 +1,9 @@
 #include <ctime>
 #include <iomanip>
-#include <tb/directional_coupler_tb.h>
+#include "tb/directional_coupler_tb.h"
 
-#include "general_utils.h"
-#include "generic_2x2_coupler.h"
+#include "utils/general_utils.h"
+#include "devices/generic_2x2_coupler.h"
 
 void DirectionalCoupler_tb::run_1()
 {

@@ -1,8 +1,8 @@
 
-#include "time_monitor.h"
+#include "devices/time_monitor.h"
 #include "optical_output_port.h"
 #include "specs.h"
-#include "sysc_utils.h"
+#include "utils/sysc_utils.h"
 #include <vector>
 #include <set>
 
