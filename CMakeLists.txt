@@ -23,7 +23,7 @@ set (SystemC_INCLUDE_DIRS "${SYSTEMC_INSTALL_ROOT}/include")
 option(BUILD_TB "Build testbenches" ON)
 
 # Find source files
-file(GLOB_RECURSE SOURCES_BIN "${SRC_PATH}/*.cpp")
+file(GLOB_RECURSE SOURCES_BIN CONFIGURE_DEPENDS "${SRC_PATH}/*.cpp")
 list(FILTER SOURCES_BIN EXCLUDE REGEX ".*/tb/.*")
 list(FILTER SOURCES_BIN EXCLUDE REGEX ".*/parser/.*")
 
