@@ -1,46 +1,34 @@
 #! /bin/sh
 
-set -e 
+set -e # Exit on error
 
-# Download required submodules
+SRC_DIR=$(pwd)
+
 echo ------------------------------
 echo Dowloading required submodules
 echo ------------------------------
 git submodule update --init --recursive --single-branch
 
-# Compiling the systemc submodule
-
 echo ------------------------------
-echo Changing into SystemC folder
+echo Compiling SystemC
 echo ------------------------------
-cd ./thirdparty/systemc
-
-if [ -d "./objdir" ] 
-then
-    echo "objdir already exists, not recreating." 
-else
-    mkdir objdir
-fi
-
-
+cd "$SRC_DIR/thirdparty/systemc"
+mkdir -p objdir
 cd objdir
-
-echo ------------------------------
-echo Configuring SystemC
-echo ------------------------------
-cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../sc_install -DCMAKE_INSTALL_DOCDIR=../sc_doc
-make -j2
+cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../sc_install
+make -j4
 make install
-
-
 
 echo ------------------------------
 echo Compiling SPECS
 echo ------------------------------
 cd ../../..
 specs_dir=$(pwd)
-make -j2
+mkdir -p build
+cd build
+cmake .. -DBUILD_TB=1
+make -j4
 
 echo ------------------------------
-echo Finished!
+echo All done!
 echo ------------------------------
