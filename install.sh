@@ -13,11 +13,10 @@ echo ------------------------------
 echo Compiling SystemC
 echo ------------------------------
 cd "$SRC_DIR/thirdparty/systemc"
-mkdir -p objdir
-cd objdir
-cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../sc_install
-make -j4
-make install
+mkdir -p build
+cd build
+cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=install
+make -j install
 
 echo ------------------------------
 echo Compiling SPECS
@@ -27,7 +26,7 @@ specs_dir=$(pwd)
 mkdir -p build
 cd build
 cmake .. -DBUILD_TB=1
-make -j4
+make -j
 
 echo ------------------------------
 echo All done!
