@@ -7,7 +7,7 @@ add_library(${PROJECT_NAME}_tb OBJECT EXCLUDE_FROM_ALL
         ${HH_FILES}
 )
 
-if(BUILD_TB)
+if(BUILD_OLD_TB)
     target_compile_definitions(${PROJECT_NAME}_tb PUBLIC "BUILD_TB=1")
 
     # Glob all *_tb.cpp files in the current directory
