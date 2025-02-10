@@ -373,6 +373,8 @@ void SPECSConfig::prepareSimulation() {
     applyDefaultTraceFileToAllSignals();
     if (default_trace_file)
         sc_trace(default_trace_file, *this, "");
+
+    // sc_start(SC_ZERO_TIME); // ← May have to add this here to handle initial events directly written to device ports (rather than sources)
 }
 
 inline void sc_trace(sc_trace_file *tf, const SPECSConfig &s, string parent_tree)

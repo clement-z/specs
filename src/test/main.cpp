@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "specs.h"
+#include "test/utils.h"
 
 int sc_main(int argc, char* argv[]) {
 
@@ -13,6 +14,11 @@ int sc_main(int argc, char* argv[]) {
     return status;
 }
 
+
 TEST(A, B) {
-    EXPECT_EQ(1, 1);
+    SPECS_TEST_HEADER()
+    {
+        // Do SPECS stuff independently of other tests
+    }
+    SPECS_TEST_FOOTER();
 }

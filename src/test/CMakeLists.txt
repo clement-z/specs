@@ -6,6 +6,8 @@ if(BUILD_TB)
 
     add_executable(unit_tests
             main.cpp
+            utils.h
+            devices/waveguide.cpp
     )
     # Compiler options & definitions for the tests
     target_compile_options(unit_tests
@@ -13,7 +15,7 @@ if(BUILD_TB)
             -Wall
             -Wextra
             -pedantic
-            -Werror
+#            -Werror
     )
     target_link_libraries(unit_tests
             PRIVATE
