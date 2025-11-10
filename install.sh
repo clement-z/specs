@@ -15,7 +15,7 @@ echo ------------------------------
 cd "$SRC_DIR/thirdparty/systemc"
 mkdir -p build
 cd build
-cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=install
+cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=install -DDISABLE_COPYRIGHT_MESSAGE=ON
 make -j install
 
 echo ------------------------------
