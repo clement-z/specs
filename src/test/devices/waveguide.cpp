@@ -162,9 +162,7 @@ TEST(Waveguide, OperatingPoint)
             // Run analysis
             specsGlobalConfig.runOPAnalysis();
 
-            // EXPECT_ANGLE_EQ(waveguideTest->a_out.read(), waveguideTest->expected_phase_delay(1.55e-6)+pi/2);
             EXPECT_ANGLE_EQ(tb.b_out.read(), tb.expected_phase_delay(wl));
-            std::cout << wl << std::endl;
         }
     }
     SPECS_TEST_FOOTER();
