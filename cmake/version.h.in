@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mmpp::version {
+namespace spx::version {
     constexpr unsigned major{@PROJECT_VERSION_MAJOR@};
     constexpr unsigned minor{@PROJECT_VERSION_MINOR@};
     constexpr unsigned patch{@PROJECT_VERSION_PATCH@};

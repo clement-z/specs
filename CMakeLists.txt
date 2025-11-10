@@ -14,7 +14,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(SystemCLanguage CONFIG REQUIRED PATHS "${CMAKE_SOURCE_DIR}/thirdparty/systemc/build/install")
 find_package(args CONFIG REQUIRED PATHS "${CMAKE_SOURCE_DIR}/thirdparty/args/build/install")
 
-
 # Find source files
 set(SRC_PATH ${CMAKE_SOURCE_DIR}/src)
 file(GLOB_RECURSE SOURCES_BIN CONFIGURE_DEPENDS "${SRC_PATH}/*.cpp")
@@ -42,6 +41,9 @@ target_compile_options(common INTERFACE -Wfatal-errors)
 target_compile_options(common INTERFACE -iquote ${SRC_PATH})
 target_link_libraries(common INTERFACE SystemC::systemc)
 
+# Generate version information and add include path
+include(cmake/version.cmake)
+target_include_directories(common INTERFACE "${CMAKE_BINARY_DIR}/generated/")
 
 # ****************************************************************
 
