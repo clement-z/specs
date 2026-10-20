@@ -61,6 +61,7 @@
   "opt/vci",
   "regress/b006-empty-output",
   "regress/b131-nrings-crow",
+  "regress/b150-include-in-subckt",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -210,6 +211,12 @@
    "only": "^err/b149-",
    "gtest": false,
    "note": "B-149: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:01:55Z",
+   "only": "^regress/b150-",
+   "gtest": false,
+   "note": "B-150: new regression case"
   }
  ]
 }

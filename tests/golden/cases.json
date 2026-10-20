@@ -125,6 +125,23 @@
    "note": "B-149: 'x1 L=1' (kwargs only, no subcircuit name) used to crash; clean error, exit 1"
   },
   {
+   "id": "regress/b150-include-in-subckt",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b150-include-in-subckt.cir"
+   ],
+   "note": "B-150: .include inside a .subckt body is run per instance at flatten time (was a syntax error)"
+  },
+  {
    "id": "cir-json/add_drop",
    "args": [
     "-n",

@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b150-include-in-subckt.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 5015,
+   "kind": "vcd",
+   "sha256": "1e3974f1b2fd3b34582d50e8bf9b15e5d3a9864df30866e414289664b0d27353",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b150-include-in-subckt"
+}

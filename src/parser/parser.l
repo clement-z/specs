@@ -240,7 +240,7 @@ string convert_special_char(char c)
 
 %%  /*** Rules section ***/
 
-<INITIAL,SUBCKT_DEFINITION>^\.include  {
+<INITIAL>^\.include  {
     yy_push_state(INCLUDE, yyscanner);
 }
 <INCLUDE>{WS}*      /* eat the whitespace */
