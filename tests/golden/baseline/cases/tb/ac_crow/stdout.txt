@@ -2,15 +2,15 @@
 1
 2
 3
-wg_top_0
-wg_bot_0
-dc_0
-wg_top_1
-wg_bot_1
-dc_1
-wg_top_2
-wg_bot_2
-dc_2
+crow_wg_top_0
+crow_wg_bot_0
+crow_dc_0
+crow_wg_top_1
+crow_wg_bot_1
+crow_dc_1
+crow_wg_top_2
+crow_wg_bot_2
+crow_dc_2
 Current SPECS config:
 - simulation mode: Event-driven time-domain
 - analysis type: TIME DOMAIN

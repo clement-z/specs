@@ -65,6 +65,12 @@
    "only": "^cir/paul_3ring_puf$",
    "gtest": false,
    "note": "B-064: error message names the missing values file"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:14Z",
+   "only": "^tb/ac_crow$",
+   "gtest": false,
+   "note": "B-072: CROW children are prefixed with the instance name; stdout child names only (B-065 not landed), VCD unchanged"
   }
  ]
 }
