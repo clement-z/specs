@@ -116,9 +116,8 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <s_ptr> net_name.base.str
 %type <s_ptr> net_name_base
 %type <s_ptr> net_name
-%type <s_ptr> net.oanalog net.eanalog net.edigital
+%type <s_ptr> net.oanalog net.eanalog
 %type <s_ptr> net.oa.explicit_bidir
-%type <s_ptr> net.oa.bidir
 %type <s_ptr> net.oa.in
 %type <s_ptr> net.oa.out
 
@@ -621,18 +620,6 @@ net.oa.explicit_bidir:
     }
 ;
 
-net.oa.bidir:
-  net.oa.explicit_bidir
-| net.oanalog
-    {
-        // this net will be both written to and read from by the new device
-        // so increment both reader and writer count
-        cur_pt->nets[*$1].m_readers_count++;
-        cur_pt->nets[*$1].m_writers_count++;
-        $$ = $1;
-    }
-;
-
 net.oa.in:
   net.oanalog
     {
@@ -677,19 +664,6 @@ net.eanalog: net_name
                         stringstream ret;
                         ret << "Error creating net '" + *$1 + "': net already exists with a different type" << endl;
                         ret << "\t (new type: " << "EANALOG" << ", old type: " << cur_pt->nets[*$1].type_str() << ")" << endl;
-                        yyerror(scanner, pt, ret.str().c_str());
-                    }
-                    $$ = $1;
-                }
-
-net.edigital: net_name
-                {
-                    bool ok = cur_pt->nets[*$1].setType(ParseNet::EDIGITAL);
-                    if (!ok)
-                    {
-                        stringstream ret;
-                        ret << "Error creating net '" + *$1 + "': net already exists with a different type" << endl;
-                        ret << "\t (new type: " << "EDIGITAL" << ", old type: " << cur_pt->nets[*$1].type_str() << ")";
                         yyerror(scanner, pt, ret.str().c_str());
                     }
                     $$ = $1;
