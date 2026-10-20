@@ -25,3 +25,7 @@ B-156, B-143 (path resolution), B-155 (location).
 ## Verification
 Patched scratch build: the repro runs (rc 0, `Including file:` printed at flatten time). An include of a `.param`
 file inside a body also works. Golden is unchanged.
+
+**Independent second check (V7, of F-A4-09): CONFIRMED.** Method: changed parser.l:243 to `<INITIAL>^\.include`, rebuilt; ran the repro, a top-level-include reference, and a .param include with 2 instances against its flat reference; golden check 44/44 (atol 0)
+
+Base: the repro gives rc 1 (syntax error). Every body-level `.include` fails today: after BEGIN(INITIAL) bison expects `.ends`, and a later `.ends` in INITIAL is fatal, so only failing inputs change. Patched: rc 0, with drop = 0.832 mW and out = 0.158 mW, identical to `.include` at top level plus a direct `x1 ... add_drop_filter`. `v7-inc-param.cir` (`.include` of a `.param` file inside the body, 2 instances) gives rc 0 with 2 "Including file" lines, and out = 1 mW at -2.4727 rad, identical to the flat reference. SUBCKT_DECLARATION is an inclusive state and never matched `.include` before either, so nothing else changes. pyspecs/utils/doc emit no `.include`. Sequencing with B-156 (fclose) as noted is fine.

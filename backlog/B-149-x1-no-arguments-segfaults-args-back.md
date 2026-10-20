@@ -26,3 +26,7 @@ B-155.
 - Review ids: F-A4-08.
 ## Verification
 Patched scratch build: both `x1` and `x1 L=1` give the message and rc 1.
+
+**Independent second check (V7, of F-A4-08): CONFIRMED.** Method: applied the fix on the scratch copy, rebuilt; golden check 44/44 (atol 0)
+
+Base, both Release and the Debug build: `x1` and `x1 L=1` give rc 139 after "Flattening ROOT". Patched: both print `Error: subcircuit instance ROOT/X1 has no subcircuit name` and exit with rc 1. `args.back()` at parse_tree.cpp:841 is the only such use; the same code path also covers nested subckts. The fix only affects input that crashed before.

@@ -27,3 +27,7 @@ B-113 (flex trailing-context rule, needs-design), B-109 (`yy_top_state`), B-112 
 ## Verification
 Reviewers A4 and A7 both confirmed the warnings and that the nonterminals are unreferenced. A4 applied this change
 (together with the other B-113 items) on a scratch build: bison warnings gone, golden check passes.
+
+**Independent second check (V8, of F-Z-01): CONFIRMED.** Method: applied the deletions (type list :119, :121, rules :622-632 and :683-694, kept the closing `;`), rebuilt, golden --atol 0; ran bison 3.7.4 on the old and new parser.y and compared the generated tables
+
+The bison warnings "2 nonterminals useless" / "3 rules useless" disappear; only the flex "dangerous trailing context" warning (B-113) remains. The language is unchanged: yytable, yycheck, yypact, yydefact, yypgoto, yydefgoto, yyr1, yyr2 and yystos are byte-identical, with 199 states in both. Golden: 44 pass, no notes.

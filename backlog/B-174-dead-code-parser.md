@@ -21,6 +21,11 @@ Removed.
 Delete them, one commit per file. Do not touch `T_DIRECTIVE_SAVE`/`.nodeset` until B-157/23 are decided.
 
 Skip `main.cpp:65-141` and `:187`: they are covered by B-026.
+
+Corrections from the second check:
+- The `ICDirective::create` range is `parse_directive.cpp:128-132` (deleting :128-131 leaves a stray `}`).
+- Optional: the commented `return T_NONE`/`T_BOOL` block at `parser.l:492-505` refers to the removed token and can go too.
+- Deleting the X-element TODO comments loses a design note; removing only the empty `if` and keeping the comment is also acceptable.
 ## Golden impact
 None (behaviour-neutral).
 ## Related
@@ -29,3 +34,9 @@ B-173, B-113.
 - Review ids: F-A4-38.
 ## Verification
 Code reading and grep for references.
+
+**Independent second check (V8, of F-A4-38): ADJUST.** Method: deleted every listed range (main.cpp included), rebuilt, golden --atol 0, differential -n run of all netlists, edge-syntax tests (positional after kwarg for element/directive/analysis/X, subckt port after kwarg, `None` in lists), bison state comparison; grep of every deleted symbol
+
+All the code is truly dead. These symbols have 0 references outside their definitions: `validate()`, `bidir_capable()` (base and both macros), base `n_nets`/`bidirectionalable` (only the macro members are used), `set_global_variable`, `ParseTree::clone`, `ICDirective`, `do_circuit`, `raphael_main`, `c_ptr`/`vec_d_ptr`, `delete_me_npos`. T_NONE is only "returned" inside a /* */ comment in parser.l, so `None` is a syntax error before and after the change. The "positional after keyword" checks and the subckt port-after-kwarg check cannot fire, because the grammar rejects that input first and register_subcircuit always creates a fresh object. I tested both: identical "syntax error" output before and after. The automaton goes from 199 to 198 states (only the T_NONE shift state disappears). Build OK. Golden: 44 pass, 2 reordered notes (heap layout, as in B-156). Differential run: no rc/stderr change. Corrections: (1) `parse_directive.cpp:128-131` must be **:128-132** (the closing brace of ICDirective::create is on :132; deleting :128-131 leaves a stray `}`). (2) decisions.json already says to skip main.cpp:65-141/:187 (B-026). (3) Optional: the commented `return T_NONE`/T_BOOL block in parser.l:492-505 refers to the removed token and could go too. Deleting the X-element TODO comments loses a design note; keeping the comment and removing only the empty `if` is also acceptable.
+
+**Orchestrator:** ICDirective line range corrected (128-132).

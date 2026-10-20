@@ -27,3 +27,15 @@ B-159 (CrossingBi never used), B-144.
 - Review ids: F-A4-04.
 ## Verification
 Patched a scratch build: `e:0 = 1 mW, -2.1890 rad`, identical to the coupler version. Golden unchanged.
+
+**Independent second check (V7, of F-A4-04): ADJUST.** Method: applied AS_WRITER alone and together with B-144; ran the repro, a coupler reference and 4 crossing variants of my own; golden check 44/44 for both
+
+Base repro: e:0 = 0. Coupler (k=0) reference: e:0 = 1 mW at -2.1890 rad. With AS_WRITER alone, the repro gives e:0 = 1 mW at -2.1890 rad, as claimed.
+**Applied alone, it breaks circuits that work today.** In `v7-xing-v4.cir` and `v7-xing-v5.cir`, the crossing output `c&` is read by a uni splitter. Base gives z1 = 0.5 mW (correct). With AS_WRITER alone, z1 = 0. The reason: a uni writer at writer count 0 takes slot 1 while readers read slot 0 (the B-144 convention).
+`v7-xing-v3.cir` (crossing output `c&` read by wg1) is broken in base and stays broken with AS_WRITER alone.
+With B-144 + F-A4-04 every variant is correct: repro e:0 = 1 mW; v3 e:0 = 1 mW and z1 = 0.5 mW; v4 and v5 z1 = 0.5 mW. `v7-xing-v2.cir` (crossing created first, its output upgraded later) is 1 mW in every build.
+Changes needed:
+- Keep needs-human, and add: "depends on B-144; must not be applied alone."
+- Golden impact None is confirmed.
+- AS_WRITER is the only correct binding for the uni variant. Instantiating CrossingBi when a net is bidirectional (as DC does, B-159) is a separate design option.
+Location lines 539-540 are correct.

@@ -33,3 +33,7 @@ B-150, B-143, B-170.
 ## Verification
 Patched scratch build: 1100 includes under `ulimit -n 1024` give rc 0. `subckt_tests.cir` and the
 include-in-subckt repro still run.
+
+**Independent second check (V8, of F-A4-15): CONFIRMED.** Method: applied the suggested <<EOF>> patch, rebuilt, golden --atol 0, ran a4-include-fd-leak.sh base vs patched, strace of open/close on nested includes, ran subckt_tests and include-in-subckt
+
+Base: rc 1, `Error: included file not found "circuits/common_definitions.def"`, 1020 includes done. Patched: rc 0, 1100 includes. strace on a 2-level nested include file, included twice: every include fd is closed exactly once (fds 4/5 are reused), and the main file is closed once by yy_load_next_buf. No double close. Golden: 44 pass, 2 informational notes ("line order differs (reordered)" on cir/subckt_tests and opt/vci). I checked those: the sorted stdout is identical, and only the pointer-ordered OP printout lines move, as the finding says. a4-include-in-subckt.cir gives the same (pre-existing) syntax error before and after.

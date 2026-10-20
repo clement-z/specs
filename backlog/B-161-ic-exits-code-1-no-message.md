@@ -20,3 +20,7 @@ B-162, B-174 (ICDirective dead code).
 - Review ids: F-A4-22.
 ## Verification
 Patched scratch build: prints the message with file:line.
+
+**Independent second check (V8, of F-A4-22): CONFIRMED.** Method: applied the parser.l:469 change, rebuilt, golden --atol 0, ran a4-ic-silent.cir, `.icfoo 1` and `.ic` inside a subckt (base vs patched)
+
+Base: rc 1, no message for all three. Patched: rc 1 (kept) with `Parsing error (<file>:4): the .ic directive is not supported` and `-- while parsing line: ".ic /a/P=1"`. `.icfoo` is also caught with the same message. Inside a subckt body the location prints `(:1)`; that is the pre-existing subckt error-location problem, not caused by this fix. Golden: 44 pass, no notes.

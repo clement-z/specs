@@ -45,6 +45,12 @@ Replace each `assert(args.size() <= N);` (and `== 0`) with
 - `parse_directive.cpp:21`: `.options: unexpected positional argument`.
 
 Skip `parse_analysis.cpp:34` (bare `.dc`): it is handled by B-008.
+
+Corrections from the second check (apply them):
+- **PCMCELL (:1202) must use `if (args.size() > 4)` ("expected at most 4")**, not 2: four positional args (Emelt N Tc Ta) work in Release today (`backlog/repro/a3-pcm-positional.cir`).
+- Bounds once B-052 is applied: PSHIFT 2, MZI 1, CROSSING 2, CWSRC 3 (wl, power, phi), VLSRC/EVLSRC 1 (file), MLPROBE 1, PWR 0, PDET 2, PROBE 4 (existing switch default).
+- **Ordering:** land B-052 first, or in the same commit. Landed alone, this fix would reject a 4-arg CWSRC (today the only positional way to set phi) and 2-arg VLSRC/EVLSRC, which load a file in Release today. If this lands first, B-052 must edit the new `if` bounds instead of the asserts.
+- Keep the `nets.size() == n_nets` asserts: they are grammar-guaranteed.
 ## Golden impact
 None (verified on a scratch build with all conversions).
 ## Related
@@ -54,3 +60,12 @@ B-052, B-052, B-153 (`verifyConfig` asserts in specs.h:138-146 belong to the eng
 - Review ids: F-A4-06.
 ## Verification
 Patched scratch build: every row gives rc 1 with a one-line message. Golden cir/cir-json/opt are unchanged.
+
+**Independent second check (V8, of F-A4-06): ADJUST.** Method: applied the fix literally (bounds from the existing asserts) on scratch copy /tmp/ws-review-V8, rebuilt Release, golden check --atol 0 (44 pass, no notes); ran a4-asserts.sh and a differential -n run of every circuits/*.cir and repro/*.cir (base vs patched)
+
+Problem reproduced: Debug gives 134 on all 14 rows; Release gives the rc values listed. Patched: all 14 rows give rc 1 with one line (PROBE via the existing switch default; `.dc:`, `.options:` and `.tran:` messages as suggested). Golden: no change. Differential run: only 2 netlists change. (1) a1-dc-bare.cir rc 0 -> 1 under -n; this is expected, and decisions.json already says to skip parse_analysis.cpp:34 because B-008 handles it. (2) **a3-pcm-positional.cir (`pcmcell1 in out 1e-12 10 0.85 0.95`) goes from rc 0 to rc 1** with "too many positional arguments (4, expected at most 2)". The PCMCELL code parses 4 positional args (Emelt N Tc Ta), Release accepts them today, and B-052 (which B-052 was merged into) raises the bound to 4. So "keep the Debug accept/reject rule" is wrong for PCMCELL: it would break a netlist that works in Release.
+Required change to the suggested fix: PCMCELL (:1202) must use `if (args.size() > 4)` ("expected at most 4"), not 2. All other bounds match the code once B-052 is applied: PSHIFT 2, MZI 1, CROSSING 2, CWSRC 3 (wl, power, phi after the index fix), VLSRC/EVLSRC 1 (file, after `> 0`), MLPROBE 1, PWR 0, PDET 2, PROBE 4 (switch).
+Ordering with B-052: land B-052 first or in the same commit. If F-A4-06 lands alone, (a) a 4-arg CWSRC (today the only positional way to set phi) is rejected before the index fix exists, and (b) VLSRC/EVLSRC cannot load a file positionally at all: 1 arg is still ignored and 2 args (which load args[0] in Release today) are rejected. B-052's fix text edits `assert(args.size() <= 2)` -> `<= 4`. If F-A4-06 lands first, that assert no longer exists, so B-052 must change the bound of the new `if` instead.
+Golden-impact text "None" is correct. Locations are correct. The `nets.size() == n_nets` asserts are grammar-guaranteed: keeping them is right.
+
+**Orchestrator:** PCMCELL bound corrected to 4 and ordering dependency on B-052 recorded.

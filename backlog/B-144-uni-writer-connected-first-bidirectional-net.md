@@ -51,3 +51,10 @@ B-145 (same slot convention), B-176 (elaboration order depends on pointer order)
 Ran the 4 repros on `/tmp/ws-review-build/specs` and on the patched scratch build. Ran the golden check
 (cir|cir-json|opt) on the patched build: only the B-154 JSON diffs remained, and they come from another patch in
 the same tree.
+
+**Independent second check (V7, of F-A4-01): CONFIRMED.** Method: ran the 4 repros plus 6 of my own line-order variants on base and on the candidate fix; golden check with --atol 0: 44/44 pass
+
+Base: `a4-uni-writer-first` b:0 = 0 W, while `-second` b:0 = 1.000 mW at -2.1890 rad. Hand value: default att = 0 dB/cm, so the waveguide passes 1 mW unchanged, and the phase is 2*pi*2.2111*1e-4/1.55e-6 wrapped = -2.189 rad. `a2-bidir-source-first` gives out:0 = 0 W. `a4-two-sources-one-net` gives rc 1 (E115). The E115 only fires when both writers write in the same delta (the signal policy is SC_MANY_WRITERS). Otherwise the clash is silent, which is what happens in the uni-writer-first case.
+With the candidate: uni-writer-first gives b:0 = 1 mW at -2.1890 rad, identical to -second. A2's repro gives out:0 = 1 W. two-sources gives rc 0. In my variants (`v7-rd-1..6`: src, wg and a uni splitter reader in all 6 line orders), b:0 = 1 mW in every order, where base gives 0 W in 3 of the 6. Location lines 828-831 and 881-882 are correct.
+Needs-design is justified. The writer-slot part of the fix is essentially forced. However, a *uni reader* on a bidirectional net with 2 writers still reads a slot that depends on creation order, in base and with the candidate alike: the splitter output z1 is 0.5 mW (it reads cwsrc1) or 1 mW (it reads wg1's backward output), depending on the line order in `v7-rd-*`. This belongs in the same slot-convention decision.
+Add to Related: B-147 must be applied after or together with this fix (see B-147). `a4-three-writers` still gives E115 with the fix: `bidirectional()` only tests `m_writers_count == 2`. That is out of scope here.

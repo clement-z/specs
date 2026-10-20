@@ -22,6 +22,10 @@ No debug noise. Comments match the code.
 - Optional: `" points)"`.
 
 Keep the coupler warning at :281: it documents `k` semantics (rewording it is a separate decision).
+
+Corrections from the second check:
+- The `" points)"` text is at `parse_analysis.h:68`, not :65-66.
+- On the coupler, **do not touch the comments at :304 and :315** (they are correct). Only reword :318 (`kp`: power cross-coupling coefficient) and :321 (`t`: through field coefficient). Delete the comments at :495, :505, :647, :660 and :663.
 ## Golden impact
 The `created ROOT/PROBEn` lines (3 per case) disappear from stdout of cir/add_drop_pyspecs,
 cir-json/add_drop_pyspecs, opt/mode-sampled-time and opt/tracefile-o. The `points)` fix changes one line in
@@ -35,3 +39,9 @@ B-174.
 ## Verification
 Grep of the golden stdout files. Removing the duplicate TRACEALL branch was verified neutral in the scratch build
 (golden unchanged).
+
+**Independent second check (V8, of F-A4-36): ADJUST.** Method: deleted :378, :475, :1058, :1247, parse_tree.cpp:245 and parse_directive.cpp:38-39, fixed the copy-pasted comments, left " points)" alone, rebuilt, golden --atol 0 and a full diff of the failing cases
+
+The golden impact is exactly as claimed. Only cir/add_drop_pyspecs, cir-json/add_drop_pyspecs, opt/tracefile-o and opt/mode-sampled-time fail, each only because the 3 `created ROOT/PROBEn` lines are gone; no other file differs. The `\t<sig0>,<sig1>` upgrade print, the PSHIFT/MZI warnings and `-----` do not appear in any golden output. The duplicate TRACEALL branch is unreachable, and removing it is neutral. The `(30points)` line is in exactly the 5 cases listed. Location corrections: (1) the "points)" text is at **parse_analysis.h:68**, not :65-66. (2) On the coupler, the comments at **:304 and :315 are correct** (`k` = cross-coupling field coefficient, 1-k^2). Only :318 (`kp`: should say power coefficient) and :321 (`t`: through field coefficient) are wrong. The comments at :495, :505, :647, :660 and :663 should just be deleted. Reword "Fix the comments" accordingly so an unattended fixer does not touch :304/:315. The other locations are correct.
+
+**Orchestrator:** Location corrections recorded (comment lines to keep vs reword).
