@@ -34,3 +34,13 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 ## Merged into ws/fixes
 | ID | commit | note |
 |---|---|---|
+| B-076 | 0ec69a4 | D (python) |
+| B-077 | 1abd047 | D (python) |
+| B-085 | dfa3440 | D (python) |
+| B-086 | 33fc498 | D (python) |
+| B-087 | 94921a3 | D (python) |
+| B-088 | 7def19f | D (python) |
+| B-089 | ffb51fa | D (python) |
+| B-091 | 956ab10 | D (python) |
+| B-092 | 5e54f9b | D (python) |
+| B-099 | 936f458 | D (python) |
