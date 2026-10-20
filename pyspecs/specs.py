@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 import subprocess
 import time
 from .specsparse import *
@@ -230,7 +231,7 @@ def simulate(netlist_file=None,
         arguments += create_arguments_dictionary(current_settings)
 
     simulator_name = "specs"
-    simulator_command = [simulator_directory + simulator_name]
+    simulator_command = [os.path.join(simulator_directory, simulator_name)]
 
     outputs = run_and_time(simulator_command, arguments, verbose)
 
