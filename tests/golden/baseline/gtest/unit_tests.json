@@ -3,7 +3,13 @@
  "id": "gtest/unit_tests",
  "tests": {
   "A.B": "PASS",
+  "DirectionalCouplerModel.LosslessUnitarity": "PASS",
+  "DirectionalCouplerModel.Smatrix": "PASS",
+  "MergerModel.CoherentSum": "PASS",
+  "SplitterModel.EqualSplitWithLoss": "PASS",
   "Waveguide.Instantiation": "PASS",
-  "Waveguide.OperatingPoint": "PASS"
+  "Waveguide.OperatingPoint": "PASS",
+  "WaveguideModel.GroupDelay": "PASS",
+  "WaveguideModel.LossAndPhaseZeroSlope": "PASS"
  }
 }

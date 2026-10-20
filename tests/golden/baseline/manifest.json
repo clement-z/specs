@@ -83,6 +83,12 @@
    "only": "^gtest",
    "gtest": true,
    "note": "B-123: in-tree unit_tests with the angle check finished upstream (b7d6fff, CmpHelperAngleEQ); Waveguide.OperatingPoint FAIL -> PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:48Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-136: 6 new device S-parameter unit tests (src/test/devices/models.cpp), all PASS"
   }
  ]
 }
