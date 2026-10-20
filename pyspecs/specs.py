@@ -16,7 +16,7 @@ Ideas:
 """
 
 default_settings = {
-    "o": "traces/delete_me.vcd",
+    "o": "traces/delete_me",
     "abstol": 1e-8,
     "reltol": 1e-4
 }
@@ -148,9 +148,10 @@ def simulate(netlist_file=None,
             Defaults to "".
 
         output_file (str, optional):
-            VCD file containing all the recorded events.
+            Base name of the VCD file containing all the recorded
+            events; SPECS appends ".vcd" to it.
             Can be read with GTKWAVE or parsed with parse_vcd()
-            Defaults to "traces/delete_me.vcd".
+            Defaults to "traces/delete_me" (-> traces/delete_me.vcd).
 
         abstol (double, optional):
             Field absolute tolerance for propagating events in the simulator.
