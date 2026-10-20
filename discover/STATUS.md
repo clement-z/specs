@@ -62,6 +62,7 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
   (B-052, B-146, B-147, B-035, B-009) and the field-vs-power meaning of coupler `k`.
 - Meson items tagged **[review]** in `discover/meson/DECISIONS.md`; CI has never run on real runners.
 - Feature roadmap: `discover/scout/FEATURES.md`.
-- Housekeeping (not done, needs approval): 7 cherry-picked implementer worktrees + `worktree-agent-*` branches under
-  the main checkout's `.claude/worktrees/`; paseo workspaces `ws-meson/review/scout/fixes/cleanup` and `ws/*` branches
-  (all merged); scratch under `/tmp/specs-sprint`, `/tmp/ws-*`.
+- Housekeeping: **done 2026-10-20** with maintainer approval. Removed 21 scratch worktrees (5 paseo `ws-*`, 7 implementer
+  worktrees under the main checkout's `.claude/`, 9 `/tmp/ws-cleanup-wt`), their 20 merged/cherry-picked branches, the
+  empty `.claude/` dir in the main checkout, and ~4.2 GB of `/tmp` scratch; archived the 5 paseo agents. Kept:
+  `~/.local/opt/specs-deps` (SystemC + args), `~/.local/bin/meson`, the `codebase-onboarding` skill.
