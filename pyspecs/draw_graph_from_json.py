@@ -8,7 +8,7 @@ def shorten(s, length=8):
         return "[...]"
     s = str(s)
     if len(s) > length:
-        return s[:length-3]
+        return s[:length-3] + '...'
     else:
         return s
 
