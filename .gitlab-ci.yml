@@ -30,29 +30,31 @@ default:
         paths:
             - .deps/systemc
 
+# specs and libspx.so need libsystemc.so.3.0 at run time: it is shipped in the artefacts
+# (.deps/systemc/lib*/), use LD_LIBRARY_PATH to run them elsewhere.
 build:
     stage: build
     script:
-        - meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+        - meson setup build -Dnative=false -Dspx=true -Dcmake_prefix_path="$SYSTEMC_PREFIX"
         - meson compile -C build
-        # libspx.so is not built by default
-        - meson compile -C build spx
     artifacts:
         paths:
-            - build/
+            - build/specs
+            - build/libspx.so
+            - .deps/systemc/lib*/libsystemc.so*
         expire_in: 1 week
 
+# A build dir does not survive being passed as an artefact (fresh checkout timestamps, absolute
+# paths, gtest wrap sources outside build/), so the test job configures and builds its own.
 test:
     stage: test
     needs: [build]
     script:
-        # The build directory comes from the build job's artifacts; this only re-links if needed
+        - meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
         - meson test -C build --print-errorlogs
     artifacts:
         when: always
         paths:
-            - build/specs
-            - build/libspx.so
             - build/meson-logs/
             - build/traces/*.vcd
 

@@ -57,7 +57,7 @@ jobs:
         run: utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
 
       - name: Configure
-        run: meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+        run: meson setup build -Dnative=false -Dspx=true -Dcmake_prefix_path="$SYSTEMC_PREFIX"
 
       - name: Build
         run: meson compile -C build
@@ -69,6 +69,7 @@ jobs:
         if: matrix.compiler == 'gcc'
         run: ninja -C build doc
 
+      # They need libsystemc.so.3.0 at run time (shipped here; use LD_LIBRARY_PATH)
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
@@ -76,6 +77,7 @@ jobs:
           path: |
             build/specs
             build/libspx.so
+            .deps/systemc/lib*/libsystemc.so*
 
       - name: Upload documentation
         if: matrix.compiler == 'gcc'
@@ -97,6 +99,8 @@ jobs:
     name: asan + ubsan (debug, gcc)
     runs-on: ubuntu-24.04
     continue-on-error: true
+    env:
+      CXX: g++
     steps:
       - uses: actions/checkout@v4
         with:
@@ -118,7 +122,7 @@ jobs:
         id: systemc
         run: |
           echo "sha=$(git -C thirdparty/systemc rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "cxx=$(c++ --version | head -n 1 | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+          echo "cxx=$($CXX --version | head -n 1 | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
 
       - name: Cache SystemC
         uses: actions/cache@v4

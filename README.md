@@ -25,7 +25,7 @@ build/specs -f circuits/add_drop.cir -o traces/out               # needs a trace
 Without `-Dcmake_prefix_path` (and no `systemc` pkg-config package), Meson builds SystemC from the
 `thirdparty/systemc` submodule. Useful options: `-Dnative=false` (portable binaries, no `-march=native`),
 `-Dold_tb=false` (no built-in testbenches), `-Dtests=disabled` (no googletest download). The shared library
-is built with `meson compile -C build spx`, and the Doxygen docs with `ninja -C build doc`.
+is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs it), and the Doxygen docs with `ninja -C build doc`.
 
 If you want to contribute with the project, check the `todo.txt` file for some inspiration on points to work on. We are also open for new ideas, so feel free to open an issue and discuss.
 

@@ -19,7 +19,8 @@ if [ ! -f "$src/CMakeLists.txt" ]; then
     exit 1
 fi
 
-stamp="$(git -C "$src" rev-parse HEAD) $(${CXX:-c++} --version | head -n 1)"
+# Compiler identity without the program name ("c++ (GCC) 13.2" and "g++ (GCC) 13.2" are the same)
+stamp="$(git -C "$src" rev-parse HEAD) $(${CXX:-c++} --version | head -n 1 | sed 's/^[^ ]* //')"
 if [ -f "$prefix/.specs-systemc-stamp" ] && [ "$(cat "$prefix/.specs-systemc-stamp")" = "$stamp" ]; then
     echo "SystemC already installed in $prefix ($stamp)"
     exit 0

@@ -143,13 +143,15 @@ specs_exe = executable('specs',
 )
 
 # libspx.so: core + devices, without main(), the parser and the testbenches (sc_main is left to
-# the consumer). Not built by default, like the former CMake target (EXCLUDE_FROM_ALL).
+# the consumer). Not built by default, like the former CMake target (EXCLUDE_FROM_ALL), unless
+# -Dspx=true; install: true would put it into `all`, so both follow the option. (unit_tests links
+# it, which builds it anyway when the tests are enabled.)
 spx_lib = shared_library('spx',
   core_sources,
   dependencies: [systemc_dep],
   implicit_include_directories: false,
-  build_by_default: false,
-  install: true,
+  build_by_default: get_option('spx'),
+  install: get_option('spx'),
   install_rpath: systemc_libdir,
 )
 

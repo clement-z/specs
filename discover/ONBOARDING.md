@@ -85,7 +85,7 @@ Full trace with file:line in report 01 §3.
 - Deps: SystemC + args installed in `~/.local/opt/specs-deps` (shared by all sprint worktrees). Elsewhere
   `./install.sh` builds SystemC from the submodule, or Meson falls back to building it as a CMake subproject.
 - Build: `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps && meson compile -C build`
-  (release by default; options in `meson.options`: `native`, `old_tb`, `tests`, `golden`, `docs`)
+  (release by default; options in `meson.options`: `native`, `old_tb`, `spx`, `tests`, `golden`, `docs`)
 - Tests: `meson test -C build` (suites `unit`, `tb`, `golden`; `--suite golden` for the gate only)
 - Run a netlist: `build/specs -f circuits/add_drop.cir -o /tmp/trace`
 - Legacy testbench: `build/specs -t wg`

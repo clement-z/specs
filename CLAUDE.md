@@ -9,7 +9,7 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   `~/.local/opt/specs-deps`; otherwise use the submodules (`git submodule update --init --recursive`).
 - Build (Meson, release by default):
   `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps && meson compile -C build`
-  - Options (`meson.options`): `native` (`-march=native`, default on), `old_tb`, `tests`, `golden`, `docs`.
+  - Options (`meson.options`): `native` (`-march=native`, default on), `old_tb`, `spx`, `tests`, `golden`, `docs`.
     `libspx.so`: `meson compile -C build spx`. Docs: `ninja -C build doc`. Decisions: `discover/meson/DECISIONS.md`.
   - Asserts are on by default (`b_ndebug=false`). The golden baseline was recorded with `-DNDEBUG`; both pass.
   - Without the prebuilt deps: `./install.sh`, or plain `meson setup build` (builds SystemC from the submodule).
