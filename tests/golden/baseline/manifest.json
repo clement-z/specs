@@ -38,6 +38,11 @@
   "err/b148-pshift-args",
   "err/b148-pwr-args",
   "err/b148-tran-args",
+  "err/b153-abstol-negative",
+  "err/b153-reltol-zero",
+  "err/b153-resolution-below-one",
+  "err/b153-resolution-negative",
+  "err/b153-timescale-out-of-range",
   "err/b165-dc-stray-args",
   "err/b165-dc-stray-kwarg",
   "err/b165-op-stray-args",
@@ -175,6 +180,12 @@
    "only": "^err/b165-",
    "gtest": false,
    "note": "B-165: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:05:49Z",
+   "only": "^err/b153-",
+   "gtest": false,
+   "note": "B-153: new regression cases"
   }
  ]
 }

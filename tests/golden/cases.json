@@ -427,6 +427,111 @@
    "note": "B-165: .dc with a keyword arg after the sweep order is rejected (was silently ignored)"
   },
   {
+   "id": "err/b153-resolution-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-resolution-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options resolution=-1 is rejected (was cast to 2^64-1 and accepted)"
+  },
+  {
+   "id": "err/b153-resolution-below-one",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-resolution-below-one.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options resolution=0.5 is rejected (truncated to 0: verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "err/b153-timescale-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-timescale-out-of-range.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options timescale=-20 is rejected (verifyConfig assert / SystemC E705 with NDEBUG)"
+  },
+  {
+   "id": "err/b153-abstol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-abstol-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options abstol=-1 is rejected (verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "err/b153-reltol-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-reltol-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options reltol=0 is rejected (verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
    "id": "opt/tracefile-o",
    "args": [
     "-o",
