@@ -23,7 +23,7 @@ private:
     static unsigned int nextId;
 
 public:
-    field_type m_field; // complex field of the signal (V/m)
+    field_type m_field; // complex field of the signal (sqrt(W))
     uint32_t m_wavelength_id; // accesses the global vector of wavelengths
     unsigned int m_id;
 
@@ -231,7 +231,7 @@ inline std::ostream &operator<<(std::ostream &os, const OpticalSignal &s)
     oss << "[" << setw(4) << setfill('0') << s.m_id << setfill(' ') << "] ";
     oss << " @ " << setw(4) << setprecision(8) << s.getWavelength() * 1e9 << setw(2)
         << (isnan(s.getWavelength()) ? "" : " nm");
-    oss << " (" << setprecision(6) << fixed << s.modulus() << " V.m⁻¹";
+    oss << " (" << setprecision(6) << fixed << s.modulus() << " √W";
     oss << ", " << setprecision(6) << fixed << s.power() << " W";
     oss << ", " << setprecision(4) << fixed << s.phase() << " rad";
     oss << ")";

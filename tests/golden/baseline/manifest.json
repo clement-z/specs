@@ -262,6 +262,12 @@
    "only": "^regress/b036-vci-crow$",
    "gtest": false,
    "note": "B-036: re-record on top of B-072 (CROW child names prefixed with the instance name)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:22:13Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|regress/b150-include-in-subckt|opt/tracefile-o|opt/tol-resolution-overrides|opt/mode-sampled-time|opt/mode-fd|opt/multi-file|opt/vci|regress/b031-mzi-bidir|tb/wg|tb/waveguide|tb/merg|tb/merger|tb/dc|tb/directional_coupler|tb/spli|tb/splitter|tb/det|tb/detector|tb/pcm|tb/mzi|tb/ring|tb/lambda|tb/phaseshifter|tb/ps|tb/mesh|regress/b006-empty-output)$",
+   "gtest": false,
+   "note": "B-023: field label V.m\u207b\u00b9 -> \u221aW in the stored stdout of these 30 cases (label substituted in place, so heap-layout-dependent VCD declaration order is not churned; the new build's outputs match the substituted baseline with --rtol 0 --atol 0 --print-slack 0)"
   }
  ]
 }
