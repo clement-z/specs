@@ -15,6 +15,10 @@ merged. A coordinator merges your branch locally. **Never `git push`.**
   *valid* inputs (physics, numerics, tolerances, event semantics), even if it looks easy. If an "easy" item
   turns out to need a decision, stop, mark it `needs-design` with your notes, and move on.
 - Leave pure `style/maintainability` items to the later cleanup phase unless they are a one-line part of a fix.
+- The backlog was written against the pre-Meson tree (CMake + Makefile). Items about `CMakeLists.txt`, `cmake/`,
+  the `Makefile`, `config.mk`, `install.sh` or the old CI may be obsolete now: check each against the Meson build
+  and mark it `status: obsolete (meson migration, <commit>)` or re-target it. `discover/meson/DECISIONS.md` lists
+  what the migration already fixed (e.g. the default build type, the `unit_tests` compile fix).
 
 ## Process per item (one commit per backlog ID)
 1. Work in **batches of independent items** (different files). Fan them out to implementer subagents (Agent tool,

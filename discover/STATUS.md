@@ -16,7 +16,7 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | 0c | Discovery (5 probes) → `discover/0*.md` | here (subagents) | Opus 5.5 | done |
 | 0d | Golden-output baseline → `tests/golden/` (45 cases) | here (probe 4) | Opus 5.5 | done, independently re-verified |
 | 0e | Onboarding guide + CLAUDE.md | here | Opus 5.5 | done |
-| 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | running |
+| 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | done, re-verified, merged (b86a745) |
 | 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | running |
 | 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (7787aed) |
 | 2 | Easy fixes (unattended) | paseo `ws-fixes` | Opus 5.5 xhigh orch. | pending |
@@ -39,3 +39,7 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 - 2026-10-20 — ws-scout merged: 30 ranked features, 15 briefs, bench evidence (paper plateau reproduced; `.dc` matches
   closed-form add-drop to 1e-6). Top 5: F-01 reproducible runs, F-02 sweeps/Monte-Carlo, F-03 S-parameter device,
   F-04 receiver chain, F-05 outputs/tracing. ws-review: B-001..B-122 committed, parser/tests areas + verification ongoing.
+- 2026-10-20 — ws-meson merged. Coordinator re-verification on a fresh worktree: setup+compile OK (1m43 at -j4),
+  `meson test` 10 ok + 1 expected-fail (`Waveguide.OperatingPoint`), golden 45/45 at `--atol 0` incl. gtest; only
+  source edit is the approved `src/test/utils.h` patch. CI never ran on real runners (no push). Human-review items:
+  `discover/meson/DECISIONS.md` entries tagged **[review]**.
