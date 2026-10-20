@@ -18,10 +18,15 @@ jobs:
       matrix:
         include:
           - compiler: gcc
+            cc: gcc
             cxx: g++
           - compiler: clang
+            cc: clang
             cxx: clang++
     env:
+      # CC too: SystemC compiles C and assembly (QuickThreads) with it, using flags chosen for $CXX
+      # (clang-only -Qunused-arguments breaks a gcc `cc`).
+      CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
     steps:
       - uses: actions/checkout@v4
@@ -100,6 +105,7 @@ jobs:
     runs-on: ubuntu-24.04
     continue-on-error: true
     env:
+      CC: gcc
       CXX: g++
     steps:
       - uses: actions/checkout@v4
