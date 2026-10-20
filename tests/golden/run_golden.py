@@ -926,6 +926,14 @@ def cmd_record(args):
         old = json.loads((outdir / "manifest.json").read_text(encoding="utf-8"))
         ids = sorted(set(old.get("cases", [])) | {c["id"] for c in cases})
         old["cases"] = ids
+        # Keep the note of a partial re-record (the top-level note describes the full record).
+        if args.note:
+            old.setdefault("rerecords", []).append({
+                "recorded_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "only": args.only,
+                "gtest": bool(gres),
+                "note": args.note,
+            })
         (outdir / "manifest.json").write_text(json.dumps(old, indent=1) + "\n", encoding="utf-8")
     else:
         write_manifest(outdir, cases, args, gres, args.note)

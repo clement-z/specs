@@ -51,7 +51,8 @@ Useful options (all sub-commands that compare):
 
 Re-record (and commit) the baseline when a change *intentionally* alters the
 output, e.g. a bug fix. Put the reason in `--note`; it is stored in
-`baseline/manifest.json`.
+`baseline/manifest.json` (for a partial re-record with `--only`, it is appended to
+the manifest's `rerecords` list together with the regex and the date).
 
 ## What a case is
 
@@ -61,6 +62,11 @@ is copied in (netlists use `.include circuits/...`, which resolves relative to
 the cwd) and an empty `traces/` is created. Testbenches and the default trace
 file write to `traces/<name>.vcd` relative to the cwd. If `traces/` is missing,
 SystemC fails with `E701 cannot open trace file`.
+
+Netlists that only exist to test a fix (error paths, regressions) live in
+`tests/golden/netlists/`, not in `circuits/` (the examples). Their cases override
+`setup` with `{"copy": ["circuits", "tests/golden/netlists"], "mkdir": ["traces"]}`
+and run `-f tests/golden/netlists/<name>.cir`.
 
 For every case the harness records:
 
@@ -135,7 +141,7 @@ record again.
 ## Baseline contents (`baseline/`, about 1.8 MB, all files stored in full)
 
 ```
-baseline/manifest.json              format, date, note (build used, gtest provenance), case ids
+baseline/manifest.json              format, date, note (build used, gtest provenance), case ids, partial re-records
 baseline/cases/<group>/<name>/case.json    args, exit status, list of output files (+sha256, size)
 baseline/cases/<group>/<name>/stdout.txt   normalised
 baseline/cases/<group>/<name>/stderr.txt   normalised
