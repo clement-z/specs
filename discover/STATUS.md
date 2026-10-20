@@ -16,9 +16,9 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | 0c | Discovery (5 probes) → `discover/0*.md` | here (subagents) | Opus 5.5 | done |
 | 0d | Golden-output baseline → `tests/golden/` (45 cases) | here (probe 4) | Opus 5.5 | done, independently re-verified |
 | 0e | Onboarding guide + CLAUDE.md | here | Opus 5.5 | done |
-| 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` | Opus 5.5 | pending |
-| 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` | Opus 5.5 xhigh orch. | pending |
-| 1c | Feature scout → `discover/scout/` | paseo `ws-scout` | Fable 5.1 xhigh | pending |
+| 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | running |
+| 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | running |
+| 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | running |
 | 2 | Easy fixes (unattended) | paseo `ws-fixes` | Opus 5.5 xhigh orch. | pending |
 | 3 | Easy cleanup | paseo `ws-cleanup` | Opus high → Sonnet → Opus | pending |
 
@@ -34,3 +34,4 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
   rebuild passes with `--atol 0`; a perturbed wrapper fails. Known: in-tree `unit_tests` doesn't compile
   (baseline gtest recorded with `discover/meson/unit-tests-minimal.patch`); `tb/mesh` segfaults (recorded as-is);
   detector traces read uninitialised memory at t=0 (4 signals excluded).
+- 2026-10-20 — phase 1 launched: ws-meson, ws-review, ws-scout (all paseo `auto` mode, worktrees under `~/.paseo/worktrees/31cq0kv6/ws-*`).
