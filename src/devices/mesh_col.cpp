@@ -1,8 +1,5 @@
 #include "devices/mesh_col.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
 void MeshCol::init_ports()
 {
     // --------------------------------------------------------------------------//
@@ -14,7 +11,7 @@ void MeshCol::init_ports()
     p_in.clear();
     for(size_t i = 0; i < m_N; i++)
     {
-        p_in.push_back(make_unique<spx::oa_port_in_type>(__modname("IN_", i)));
+        p_in.push_back(make_unique<spx::oa_port_in_type>(spx_child_name(this, "_IN_", i).c_str()));
     }
 
     // --------------------------------------------------------------------------//
@@ -26,7 +23,7 @@ void MeshCol::init_ports()
     p_out.clear();
     for(size_t i = 0; i < m_N; i++)
     {
-        p_out.push_back(make_unique<spx::oa_port_out_type>(__modname("OUT_", i)));
+        p_out.push_back(make_unique<spx::oa_port_out_type>(spx_child_name(this, "_OUT_", i).c_str()));
     }
 
     // --------------------------------------------------------------------------//
@@ -45,8 +42,8 @@ void MeshCol::init_ports()
 
     for(size_t i = 0; i < num_of_electrical_ports; i++)
     {
-        p_vphi.push_back(make_unique<sc_in<double>>(__modname("VPHI_", i)));
-        p_vtheta.push_back(make_unique<sc_in<double>>(__modname("VTHETA_", i)));
+        p_vphi.push_back(make_unique<sc_in<double>>(spx_child_name(this, "_VPHI_", i).c_str()));
+        p_vtheta.push_back(make_unique<sc_in<double>>(spx_child_name(this, "_VTHETA_", i).c_str()));
     }
 }
 
@@ -84,7 +81,7 @@ void MeshCol::init_N_even_j_even()
 {
     for(size_t i = 0; i < m_N/2; i++)
     {
-        m_mzi.push_back(make_unique<MZI>(__modname("MZI_", i),
+        m_mzi.push_back(make_unique<MZI>(spx_child_name(this, "_MZI_", i).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_attenuation_coupler_dB, m_attenuation_ps_dB,
                 m_neff, m_ng));
@@ -121,7 +118,7 @@ void MeshCol::init_N_even_j_odd()
     assert(m_N >= 4);
 
     // Zero neff so it doesn't add any phase
-    m_wg.push_back(make_unique<Waveguide>(__modname("WG_", 0),
+    m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_neff, m_ng));
     m_wg[0]->p_in(*p_in[0]);
@@ -129,7 +126,7 @@ void MeshCol::init_N_even_j_odd()
 
     for(size_t i = 1; i <= m_N/2 - 1; i++)
     {
-        m_mzi.push_back(make_unique<MZI>(__modname("MZI_", i),
+        m_mzi.push_back(make_unique<MZI>(spx_child_name(this, "_MZI_", i).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_attenuation_coupler_dB, m_attenuation_ps_dB,
                 m_neff, m_ng));
@@ -145,7 +142,7 @@ void MeshCol::init_N_even_j_odd()
     }
 
     // Zero neff so it doesn't add any phase
-    m_wg.push_back(make_unique<Waveguide>(__modname("WG_", 1),
+    m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 1).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_neff, m_ng));
     m_wg[1]->p_in(*p_in[m_N-1]);
@@ -176,7 +173,7 @@ void MeshCol::init_N_odd_j_even()
     cout << "odd-even" << endl;
     for(size_t i = 0; i < m_N/2; i++)
     {
-        m_mzi.push_back(make_unique<MZI>(__modname("MZI_", i),
+        m_mzi.push_back(make_unique<MZI>(spx_child_name(this, "_MZI_", i).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_attenuation_coupler_dB, m_attenuation_ps_dB,
                 m_neff, m_ng));
@@ -190,7 +187,7 @@ void MeshCol::init_N_odd_j_even()
         m_mzi[i]->init();
     }
     // Zero neff so it doesn't add any phase
-    m_wg.push_back(make_unique<Waveguide>(__modname("WG_", 0),
+    m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_neff, m_ng));
     m_wg[0]->p_in(*p_in[m_N-1]);
@@ -219,7 +216,7 @@ void MeshCol::init_N_odd_j_odd()
 {
     cout << "odd-odd" << endl;
     // Zero neff so it doesn't add any phase
-    m_wg.push_back(make_unique<Waveguide>(__modname("WG_", 0),
+    m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_neff, m_ng));
     m_wg[0]->p_in(*p_in[0]);
@@ -227,7 +224,7 @@ void MeshCol::init_N_odd_j_odd()
 
     for(size_t i = 1; i <= m_N/2; i++)
     {
-        m_mzi.push_back(make_unique<MZI>(__modname("MZI_", i),
+        m_mzi.push_back(make_unique<MZI>(spx_child_name(this, "_MZI_", i).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
                 m_attenuation_coupler_dB, m_attenuation_ps_dB,
                 m_neff, m_ng));

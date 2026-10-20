@@ -1,10 +1,6 @@
 #include <ios>
 #include "devices/probe.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
-
 void Probe::on_port_in_changed()
 {
     if (specsGlobalConfig.verbose_component_initialization)
@@ -45,7 +41,6 @@ void Probe::on_port_in_changed()
     }
 }
 
-//__modname(SUFFIX, IDX)
 void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
 {
     m_Tf = Tf;
@@ -69,15 +64,15 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
 
         temp_vector.clear();
 
-        temp_signal = make_unique<sc_signal<double>>(__modname("trace_pow", i*3));
+        temp_signal = make_unique<sc_signal<double>>(spx_child_name(this, "_trace_pow", i*3).c_str());
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".power@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
-        temp_signal = make_unique<sc_signal<double>>(__modname("trace_mod", i*3));
+        temp_signal = make_unique<sc_signal<double>>(spx_child_name(this, "_trace_mod", i*3).c_str());
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".abs@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
-        temp_signal = make_unique<sc_signal<double>>(__modname("trace_phase", i*3));
+        temp_signal = make_unique<sc_signal<double>>(spx_child_name(this, "_trace_phase", i*3).c_str());
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".phase@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
