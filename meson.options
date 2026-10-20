@@ -1,0 +1,12 @@
+option('native', type: 'boolean', value: true,
+       description: 'Compile with -march=native (fast, but the binaries only run on CPUs like the build host)')
+option('old_tb', type: 'boolean', value: true,
+       description: 'Build the legacy testbenches in src/tb (specs -t/-p); defines BUILD_TB=1 for specs')
+option('spx', type: 'boolean', value: false,
+       description: 'Build and install libspx.so by default (otherwise: meson compile -C <builddir> spx)')
+option('tests', type: 'feature', value: 'auto',
+       description: 'GoogleTest unit tests (system gtest, else the thirdparty/gtest.wrap fallback)')
+option('golden', type: 'boolean', value: true,
+       description: 'Register the golden-output regression test (meson test --suite golden)')
+option('docs', type: 'feature', value: 'auto',
+       description: 'Doxygen documentation run target (ninja -C <builddir> doc)')

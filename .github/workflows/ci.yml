@@ -1,0 +1,152 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  MESON_VERSION: "1.11.2"
+  SYSTEMC_PREFIX: ${{ github.workspace }}/.deps/systemc
+
+jobs:
+  build-test:
+    name: build + test (${{ matrix.compiler }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gcc
+            cxx: g++
+          - compiler: clang
+            cxx: clang++
+    env:
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build flex bison doxygen graphviz
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install meson
+        run: python -m pip install "meson==${MESON_VERSION}"
+
+      - name: SystemC cache key
+        id: systemc
+        run: |
+          echo "sha=$(git -C thirdparty/systemc rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "cxx=$($CXX --version | head -n 1 | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache SystemC
+        uses: actions/cache@v4
+        with:
+          path: .deps/systemc
+          key: systemc-${{ runner.os }}-${{ steps.systemc.outputs.sha }}-${{ steps.systemc.outputs.cxx }}
+
+      # No-op when the cache was restored (stamp file check in the script)
+      - name: Build SystemC (C++20)
+        run: utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
+
+      - name: Configure
+        run: meson setup build -Dnative=false -Dspx=true -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Documentation
+        if: matrix.compiler == 'gcc'
+        run: ninja -C build doc
+
+      # They need libsystemc.so.3.0 at run time (shipped here; use LD_LIBRARY_PATH)
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: specs-${{ matrix.compiler }}
+          path: |
+            build/specs
+            build/libspx.so
+            .deps/systemc/lib*/libsystemc.so*
+
+      - name: Upload documentation
+        if: matrix.compiler == 'gcc'
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-html
+          path: build/doc/html
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meson-logs-${{ matrix.compiler }}
+          path: build/meson-logs
+
+  # Not gating yet: known memory bugs (backlog, e.g. `specs -t mesh` use-after-free), and the
+  # sanitizer reports change the stderr the golden test compares.
+  sanitizers:
+    name: asan + ubsan (debug, gcc)
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    env:
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build flex bison
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install meson
+        run: python -m pip install "meson==${MESON_VERSION}"
+
+      - name: SystemC cache key
+        id: systemc
+        run: |
+          echo "sha=$(git -C thirdparty/systemc rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "cxx=$($CXX --version | head -n 1 | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache SystemC
+        uses: actions/cache@v4
+        with:
+          path: .deps/systemc
+          key: systemc-${{ runner.os }}-${{ steps.systemc.outputs.sha }}-${{ steps.systemc.outputs.cxx }}
+
+      - name: Build SystemC (C++20)
+        run: utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
+
+      - name: Configure
+        run: >
+          meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+          -Dbuildtype=debug -Db_sanitize=address,undefined -Db_lundef=false
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meson-logs-sanitizers
+          path: build/meson-logs

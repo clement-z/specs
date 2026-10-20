@@ -16,14 +16,14 @@ SystemC device modules exchanging per-wavelength complex optical fields, and run
 ## Tech stack
 | Layer | Technology | Version / notes |
 |---|---|---|
-| Language | C++ | C++20 (CMake); the legacy Makefile still says C++17 |
+| Language | C++ | C++20 (`gnu++20`) |
 | Kernel | SystemC | 3.0.1 (submodule `thirdparty/systemc`, built with `CMAKE_CXX_STANDARD=20`) |
 | CLI | taywee/args | submodule `thirdparty/args`, header-only |
 | Parser | flex + bison | reentrant scanner, caseless; generated into the build dir |
-| Build | CMake ≥3.14 **and** a legacy Makefile | being replaced by **Meson** (sprint 2026-10) |
-| Tests | GoogleTest (FetchContent) with fork-per-test macros; legacy `specs -t <tb>` testbenches with no assertions; **golden-output harness** `tests/golden/` (new) | |
+| Build | **Meson** ≥1.3 (+ Ninja) | replaced CMake and the Makefile in sprint 2026-10 (`discover/meson/`) |
+| Tests | GoogleTest (WrapDB wrap `thirdparty/gtest.wrap`) with fork-per-test macros; legacy `specs -t <tb>` testbenches with no assertions; **golden-output harness** `tests/golden/` (new) | |
 | Python | `pyspecs/` subprocess wrapper + VCD→pandas | not packaged, undeclared deps |
-| CI | `.gitlab-ci.yml` (Alpine + Makefile) | the remote is GitHub, so CI is effectively absent |
+| CI | `.github/workflows/ci.yml` and `.gitlab-ci.yml` (Ubuntu 24.04, Meson) | not yet run on a remote |
 | Licence | LGPL-3.0 | no per-file headers |
 
 ## Architecture (one screen)
@@ -78,15 +78,19 @@ Full trace with file:line in report 01 §3.
 - PascalCase classes; `m_` members **with units in the name** (`m_length_cm`); ports `p_in`/`p0_out`;
   threads `on_<port>_changed()`; method case varies, so **follow the surrounding class**; `typedef`, not `using`.
 - Units: SI in netlists, **cm internally for waveguides**, dB/cm; field is √W (labelled V/m).
-- **Never run `make format` / bulk clang-format**: 104/108 files are non-compliant. Match local style.
+- **Never run `ninja clang-format` / bulk clang-format**: 104/108 files are non-compliant. Match local style.
 - Git: work on `dev`, `--no-ff` merges to `master`; lowercase imperative commit subjects; one tag `v0.1`.
 
-## Common tasks (pre-Meson; see report 04 for details)
-- Deps: SystemC + args installed in `~/.local/opt/specs-deps` (shared by all sprint worktrees).
-- Build: `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/.local/opt/specs-deps && ninja -C build`
+## Common tasks (Meson; decisions in `discover/meson/DECISIONS.md`)
+- Deps: SystemC + args installed in `~/.local/opt/specs-deps` (shared by all sprint worktrees). Elsewhere
+  `./install.sh` builds SystemC from the submodule, or Meson falls back to building it as a CMake subproject.
+- Build: `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps && meson compile -C build`
+  (release by default; options in `meson.options`: `native`, `old_tb`, `spx`, `tests`, `golden`, `docs`)
+- Tests: `meson test -C build` (suites `unit`, `tb`, `golden`; `--suite golden` for the gate only)
 - Run a netlist: `build/specs -f circuits/add_drop.cir -o /tmp/trace`
 - Legacy testbench: `build/specs -t wg`
-- Golden regression: `python3 -I tests/golden/run_golden.py check --specs build/specs --baseline tests/golden/baseline`
+- Golden regression: `python3 -I tests/golden/run_golden.py check --specs build/specs --unit-tests build/src/test/unit_tests --baseline tests/golden/baseline`
+- Docs: `ninja -C build doc` → `build/doc/html`; coverage: `-Db_coverage=true`, `meson test`, `ninja -C build coverage-html`
 
 ## Where to look
 | I want to… | Look at… |
@@ -105,4 +109,3 @@ Full trace with file:line in report 01 §3.
 - Positional args of CWSRC/VLSRC/PCMCELL are shifted by one.
 - Coupling `k` is a field coefficient in code but a power ratio in the paper.
 - Nondeterminism: pointer-ordered `std::set` traversal; detector RNG seeded from `random_device`.
-- No default build type, so `install.sh` builds unoptimised.
