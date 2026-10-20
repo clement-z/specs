@@ -57,7 +57,7 @@ if not systemc_dep.found()
   endif
 endif
 # Where an installed specs/libspx.so finds a shared SystemC outside the default linker paths
-# (Meson drops build-tree rpaths on install). Not needed for the static subproject fallback.
+# (Meson drops build-tree rpaths on install).
 systemc_libdir = ''
 if systemc_dep.found() and systemc_dep.type_name() == 'pkgconfig'
   systemc_libdir = systemc_dep.get_variable(pkgconfig: 'libdir', default_value: '')
@@ -70,11 +70,6 @@ elif systemc_dep.found()
     endforeach
   endforeach
 endif
-if systemc_libdir in ['/usr/lib', '/usr/lib64', '/usr/local/lib', '/usr/local/lib64'] or \
-   systemc_libdir.startswith('/usr/lib/')
-  systemc_libdir = ''
-endif
-
 if not systemc_dep.found()
   if not fs.exists('thirdparty/systemc/CMakeLists.txt')
     error('SystemC not found. Pass -Dcmake_prefix_path=<SystemC prefix> or run ',
@@ -86,7 +81,8 @@ if not systemc_dep.found()
   systemc_opts.add_cmake_defines({
     'CMAKE_CXX_STANDARD': '20',
     'CMAKE_CXX_STANDARD_REQUIRED': true,
-    'BUILD_SHARED_LIBS': false,
+    # Shared: a static SystemC would be copied into both libspx.so and unit_tests.
+    'BUILD_SHARED_LIBS': true,
     'ENABLE_EXAMPLES': false,
     'DISABLE_COPYRIGHT_MESSAGE': true,
     'CMAKE_EXPORT_NO_PACKAGE_REGISTRY': true,
@@ -95,9 +91,21 @@ if not systemc_dep.found()
   })
   systemc_opts.set_override_option('cpp_std', get_option('cpp_std'))
   systemc_opts.set_override_option('warning_level', '0')
-  systemc_opts.set_install(false)
+  # Meson cannot evaluate SystemC's $<COMPILE_LANGUAGE:ASM> generator expression, so its
+  # -xassembler-with-cpp (meant for the QuickThreads .s file) lands on every C file, qt.c
+  # included. -xnone restores suffix-based languages; the .s file then skips cpp, whose only
+  # directive there (#if __linux__ && __ELF__ around .note.GNU-stack) gas reads as a comment.
+  systemc_opts.append_compile_args('c', '-xnone')
+  # libsystemc.so calls the user's sc_main: it must link with undefined symbols.
+  systemc_opts.set_override_option('b_lundef', 'false')
+  # Installed next to specs (library only, no headers).
+  systemc_opts.set_install(true)
   systemc_dep = cmake.subproject('systemc', options: systemc_opts).dependency('systemc',
                                                                              include_type: 'system')
+  systemc_libdir = get_option('prefix') / get_option('libdir')
+endif
+if systemc_libdir in ['/usr/lib', '/usr/lib64'] or systemc_libdir.startswith('/usr/lib/')
+  systemc_libdir = ''
 endif
 
 # taywee/args is header-only.
