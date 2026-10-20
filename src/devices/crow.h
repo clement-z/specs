@@ -60,19 +60,19 @@ public:
             ss << i;
             _i = ss.str();
             cout << _i << endl;
-            S_TL.push_back(make_shared<sc_signal<OpticalSignal>>((string("S_TL") + "_" + _i).c_str()));
-            S_BL.push_back(make_shared<sc_signal<OpticalSignal>>((string("S_BL") + "_" + _i).c_str()));
-            S_TR.push_back(make_shared<sc_signal<OpticalSignal>>((string("S_TR") + "_" + _i).c_str()));
-            S_BR.push_back(make_shared<sc_signal<OpticalSignal>>((string("S_BR") + "_" + _i).c_str()));
-            wg_bot.push_back(make_shared<Waveguide>((string("wg_bot") + "_" + _i).c_str()));
-            wg_top.push_back(make_shared<Waveguide>((string("wg_top") + "_" + _i).c_str()));
-            dc.push_back(make_shared<DirectionalCoupler>((string("dc") + "_" + _i).c_str()));
+            S_TL.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_TL_" + _i).c_str()));
+            S_BL.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_BL_" + _i).c_str()));
+            S_TR.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_TR_" + _i).c_str()));
+            S_BR.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_BR_" + _i).c_str()));
+            wg_bot.push_back(make_shared<Waveguide>((string(name()) + "_wg_bot_" + _i).c_str()));
+            wg_top.push_back(make_shared<Waveguide>((string(name()) + "_wg_top_" + _i).c_str()));
+            dc.push_back(make_shared<DirectionalCoupler>((string(name()) + "_dc_" + _i).c_str()));
         }
         ss.str(std::string());
         ss << N;
         _i = ss.str();
         cout << _i << endl;
-        dc.push_back(make_shared<DirectionalCoupler>((string("dc") + "_" + _i).c_str()));
+        dc.push_back(make_shared<DirectionalCoupler>((string(name()) + "_dc_" + _i).c_str()));
         connect_submodules();
     }
 

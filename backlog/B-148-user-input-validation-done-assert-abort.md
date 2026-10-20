@@ -1,5 +1,5 @@
 # B-148: User-input validation is done with assert(): abort (134) in Debug, silently accepted in Release
-severity: med | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED
+severity: med | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 987293d
 location: src/parser/parse_analysis.cpp:34, src/parser/parse_analysis.cpp:87, src/parser/parse_directive.cpp:21, src/parser/parse_element.cpp:396, :492, :584, :637, :705, :858, :1001, :1084, :1157, :1202, :1275
 ## Problem
 Positional-arg counts and missing analysis arguments are checked with `assert`. In a Debug build, such input

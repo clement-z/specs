@@ -1,0 +1,283 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+18 elements
+ - ROOT/MZI_U1 (MZI MODULATOR (bidir)) ROOT/in_u1 ROOT/nc_u1 ROOT/out1_u1 ROOT/out2_u1 ROOT/v_u1 {} {att (INTEGER) = 1, length (DOUBLE) = 1e-05, length_ref (DOUBLE) = 1.02e-05, sensitivity (DOUBLE) = 0.7, }
+ - ROOT/CWSRC_U1 (CW SOURCE) ROOT/in_u1 {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC_U1 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/v_u1 {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":0}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-11}, {"type":"DOUBLE","value":1.300000e+00}]}], }
+ - ROOT/MZI_U2 (MZI MODULATOR (bidir)) ROOT/nc_u2 ROOT/in_u2 ROOT/out1_u2 ROOT/out2_u2 ROOT/v_u2 {} {att (INTEGER) = 1, length (DOUBLE) = 1e-05, length_ref (DOUBLE) = 1.02e-05, sensitivity (DOUBLE) = 0.7, }
+ - ROOT/CWSRC_U2 (CW SOURCE) ROOT/in_u2 {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC_U2 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/v_u2 {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":0}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-11}, {"type":"DOUBLE","value":1.300000e+00}]}], }
+ - ROOT/MZI_B1 (MZI MODULATOR (bidir)) ROOT/in_b1 ROOT/nc_b1 ROOT/out1_b1 ROOT/out2_b1 ROOT/v_b1 {} {att (INTEGER) = 1, length (DOUBLE) = 1e-05, length_ref (DOUBLE) = 1.02e-05, sensitivity (DOUBLE) = 0.7, }
+ - ROOT/CWSRC_B1 (CW SOURCE) ROOT/in_b1 {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC_B1 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/v_b1 {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":0}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-11}, {"type":"DOUBLE","value":1.300000e+00}]}], }
+ - ROOT/MZI_B2 (MZI MODULATOR (bidir)) ROOT/nc_b2 ROOT/in_b2 ROOT/out1_b2 ROOT/out2_b2 ROOT/v_b2 {} {att (INTEGER) = 1, length (DOUBLE) = 1e-05, length_ref (DOUBLE) = 1.02e-05, sensitivity (DOUBLE) = 0.7, }
+ - ROOT/CWSRC_B2 (CW SOURCE) ROOT/in_b2 {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC_B2 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/v_b2 {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":0}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-11}, {"type":"DOUBLE","value":1.300000e+00}]}], }
+ - ROOT/MZI_R1 (MZI MODULATOR (bidir)) ROOT/in1_r1 ROOT/in2_r1 ROOT/src_r1 ROOT/out2_r1 ROOT/v_r1 {} {att (INTEGER) = 1, length (DOUBLE) = 1e-05, length_ref (DOUBLE) = 1.02e-05, sensitivity (DOUBLE) = 0.7, }
+ - ROOT/CWSRC_R1 (CW SOURCE) ROOT/src_r1 {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC_R1 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/v_r1 {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":0}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-11}, {"type":"DOUBLE","value":1.300000e+00}]}], }
+ - ROOT/MZI_R2 (MZI MODULATOR (bidir)) ROOT/in1_r2 ROOT/in2_r2 ROOT/out1_r2 ROOT/src_r2 ROOT/v_r2 {} {att (INTEGER) = 1, length (DOUBLE) = 1e-05, length_ref (DOUBLE) = 1.02e-05, sensitivity (DOUBLE) = 0.7, }
+ - ROOT/CWSRC_R2 (CW SOURCE) ROOT/src_r2 {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC_R2 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/v_r2 {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":0}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-11}, {"type":"DOUBLE","value":1.300000e+00}]}], }
+-----------
+30 named nets
+ - ROOT/in1_r1: OANALOG<1>b (0|1)
+ - ROOT/in1_r2: OANALOG<1>b (0|1)
+ - ROOT/in2_r1: OANALOG<1>b (0|1)
+ - ROOT/in2_r2: OANALOG<1>b (0|1)
+ - ROOT/in_b1: OANALOG<1>u (1|1)
+ - ROOT/in_b2: OANALOG<1>u (1|1)
+ - ROOT/in_u1: OANALOG<1>u (1|1)
+ - ROOT/in_u2: OANALOG<1>u (1|1)
+ - ROOT/nc_b1: OANALOG<1>b (0|1)
+ - ROOT/nc_b2: OANALOG<1>b (0|1)
+ - ROOT/nc_u1: OANALOG<1>u (0|1)
+ - ROOT/nc_u2: OANALOG<1>u (0|1)
+ - ROOT/out1_b1: OANALOG<1>u (1|0)
+ - ROOT/out1_b2: OANALOG<1>u (1|0)
+ - ROOT/out1_r2: OANALOG<1>b (1|0)
+ - ROOT/out1_u1: OANALOG<1>u (1|0)
+ - ROOT/out1_u2: OANALOG<1>u (1|0)
+ - ROOT/out2_b1: OANALOG<1>u (1|0)
+ - ROOT/out2_b2: OANALOG<1>u (1|0)
+ - ROOT/out2_r1: OANALOG<1>b (1|0)
+ - ROOT/out2_u1: OANALOG<1>u (1|0)
+ - ROOT/out2_u2: OANALOG<1>u (1|0)
+ - ROOT/src_r1: OANALOG<1>b (2|0)
+ - ROOT/src_r2: OANALOG<1>b (2|0)
+ - ROOT/v_b1: EANALOG<1>u (0|0)
+ - ROOT/v_b2: EANALOG<1>u (0|0)
+ - ROOT/v_r1: EANALOG<1>u (0|0)
+ - ROOT/v_r2: EANALOG<1>u (0|0)
+ - ROOT/v_u1: EANALOG<1>u (0|0)
+ - ROOT/v_u2: EANALOG<1>u (0|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {2e-11 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Elaborating network of ROOT/in1_r1...
+Creating ROOT/MZI_R1 (reason: connection to bidir net)
+Warning (ROOT/MZI_R1): default coupling power for DC currently set to field.
+Done creating ROOT/MZI_R1
+Creating - ROOT/CWSRC_R1 (reason: bidir backlog)
+Done creating ROOT/CWSRC_R1
+Creating - ROOT/EVLSRC_R1 (reason: bidir backlog)
+Done creating ROOT/EVLSRC_R1
+Done (elaborating network of ROOT/in1_r1)
+Elaborating network of ROOT/in1_r2...
+Creating ROOT/MZI_R2 (reason: connection to bidir net)
+Warning (ROOT/MZI_R2): default coupling power for DC currently set to field.
+Done creating ROOT/MZI_R2
+Creating - ROOT/CWSRC_R2 (reason: bidir backlog)
+Done creating ROOT/CWSRC_R2
+Creating - ROOT/EVLSRC_R2 (reason: bidir backlog)
+Done creating ROOT/EVLSRC_R2
+Done (elaborating network of ROOT/in1_r2)
+Elaborating network of ROOT/nc_b1...
+Creating ROOT/MZI_B1 (reason: connection to bidir net)
+Warning (ROOT/MZI_B1): default coupling power for DC currently set to field.
+	ROOT/in_b1:0,ROOT/in_b1:1
+	ROOT/out1_b1:0,ROOT/out1_b1:1
+	ROOT/out2_b1:0,ROOT/out2_b1:1
+Done creating ROOT/MZI_B1
+Creating - ROOT/CWSRC_B1 (reason: bidir backlog)
+Done creating ROOT/CWSRC_B1
+Creating - ROOT/EVLSRC_B1 (reason: bidir backlog)
+Done creating ROOT/EVLSRC_B1
+Done (elaborating network of ROOT/nc_b1)
+Elaborating network of ROOT/nc_b2...
+Creating ROOT/MZI_B2 (reason: connection to bidir net)
+Warning (ROOT/MZI_B2): default coupling power for DC currently set to field.
+	ROOT/in_b2:0,ROOT/in_b2:1
+	ROOT/out1_b2:0,ROOT/out1_b2:1
+	ROOT/out2_b2:0,ROOT/out2_b2:1
+Done creating ROOT/MZI_B2
+Creating - ROOT/CWSRC_B2 (reason: bidir backlog)
+Done creating ROOT/CWSRC_B2
+Creating - ROOT/EVLSRC_B2 (reason: bidir backlog)
+Done creating ROOT/EVLSRC_B2
+Done (elaborating network of ROOT/nc_b2)
+Done with bidirectional nets
+Elaborating network of ROOT/in_u1...
+Creating ROOT/MZI_U1 (reason: connection to unidir net)
+Warning (ROOT/MZI_U1): default coupling power for DC currently set to field.
+Done creating ROOT/MZI_U1
+Creating ROOT/CWSRC_U1 (reason: unidir backlog)
+Done creating ROOT/CWSRC_U1
+Creating ROOT/EVLSRC_U1 (reason: unidir backlog)
+Done creating ROOT/EVLSRC_U1
+Done (elaborating network of ROOT/in_u1)
+Elaborating network of ROOT/in_u2...
+Creating ROOT/MZI_U2 (reason: connection to unidir net)
+Warning (ROOT/MZI_U2): default coupling power for DC currently set to field.
+Done creating ROOT/MZI_U2
+Creating ROOT/CWSRC_U2 (reason: unidir backlog)
+Done creating ROOT/CWSRC_U2
+Creating ROOT/EVLSRC_U2 (reason: unidir backlog)
+Done creating ROOT/EVLSRC_U2
+Done (elaborating network of ROOT/in_u2)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+ROOT/CWSRC_R1 emitted: [0365]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC_R2 emitted: [0373]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC_B1 emitted: [0381]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC_B2 emitted: [0389]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC_U1 emitted: [0397]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC_U2 emitted: [0405]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/in1_r1:0 (OPTICAL) = [1284]  @ 1550 nm (0.778117 √W, 0.605467 W, 0.5371 rad)
+║ - ROOT/in1_r1:1 (OPTICAL) = [0004]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in2_r1:0 (OPTICAL) = [1286]  @ 1550 nm (0.627934 √W, 0.394301 W, -2.6045 rad)
+║ - ROOT/in2_r1:1 (OPTICAL) = [0010]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/src_r1:0 (OPTICAL) = [0013]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/src_r1:1 (OPTICAL) = [0436]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/out2_r1:0 (OPTICAL) = [0019]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out2_r1:1 (OPTICAL) = [0022]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in1_r2:0 (OPTICAL) = [1280]  @ 1550 nm (0.627934 √W, 0.394301 W, -2.6045 rad)
+║ - ROOT/in1_r2:1 (OPTICAL) = [0029]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in2_r2:0 (OPTICAL) = [1282]  @ 1550 nm (0.778117 √W, 0.605467 W, -2.6045 rad)
+║ - ROOT/in2_r2:1 (OPTICAL) = [0035]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out1_r2:0 (OPTICAL) = [0038]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out1_r2:1 (OPTICAL) = [0041]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/src_r2:0 (OPTICAL) = [0044]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/src_r2:1 (OPTICAL) = [0438]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/in_b1:0 (OPTICAL) = [0066]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/nc_b1:0 (OPTICAL) = [0054]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/nc_b1:1 (OPTICAL) = [0057]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out1_b1:0 (OPTICAL) = [1276]  @ 1550 nm (0.778117 √W, 0.605467 W, 0.5371 rad)
+║ - ROOT/out2_b1:0 (OPTICAL) = [1278]  @ 1550 nm (0.627934 √W, 0.394301 W, -2.6045 rad)
+║ - ROOT/in_b1:1 (OPTICAL) = [0440]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/out1_b1:1 (OPTICAL) = [0075]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out2_b1:1 (OPTICAL) = [0081]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/nc_b2:0 (OPTICAL) = [0085]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/nc_b2:1 (OPTICAL) = [0088]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in_b2:0 (OPTICAL) = [0100]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out1_b2:0 (OPTICAL) = [1272]  @ 1550 nm (0.627934 √W, 0.394301 W, -2.6045 rad)
+║ - ROOT/out2_b2:0 (OPTICAL) = [1274]  @ 1550 nm (0.778117 √W, 0.605467 W, -2.6045 rad)
+║ - ROOT/in_b2:1 (OPTICAL) = [0442]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/out1_b2:1 (OPTICAL) = [0109]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out2_b2:1 (OPTICAL) = [0115]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in_u1 (OPTICAL) = [0444]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/nc_u1 (OPTICAL) = [0122]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out1_u1 (OPTICAL) = [1268]  @ 1550 nm (0.778117 √W, 0.605467 W, 0.5371 rad)
+║ - ROOT/out2_u1 (OPTICAL) = [1270]  @ 1550 nm (0.627934 √W, 0.394301 W, -2.6045 rad)
+║ - ROOT/nc_u2 (OPTICAL) = [0132]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in_u2 (OPTICAL) = [0446]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/out1_u2 (OPTICAL) = [1264]  @ 1550 nm (0.627934 √W, 0.394301 W, -2.6045 rad)
+║ - ROOT/out2_u2 (OPTICAL) = [1266]  @ 1550 nm (0.778117 √W, 0.605467 W, -2.6045 rad)
+║ - ROOT/MZI_R2/DC1_out1_0 (OPTICAL) = [0145]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/DC1_out2_0 (OPTICAL) = [0148]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/DC2_in1_0 (OPTICAL) = [0151]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/DC2_in2_0 (OPTICAL) = [0154]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/PS1_in_0 (OPTICAL) = [0157]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/PS1_out_0 (OPTICAL) = [0160]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/DC1_out1_1 (OPTICAL) = [1110]  @ 1550 nm (0.707025 √W, 0.499885 W, 2.7869 rad)
+║ - ROOT/MZI_R2/DC1_out2_1 (OPTICAL) = [0764]  @ 1550 nm (0.707024 √W, 0.499883 W, 2.9997 rad)
+║ - ROOT/MZI_R2/DC2_in1_1 (OPTICAL) = [0608]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.5708 rad)
+║ - ROOT/MZI_R2/DC2_in2_1 (OPTICAL) = [0610]  @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/MZI_R2/PS1_in_1 (OPTICAL) = [1024]  @ 1550 nm (0.707066 √W, 0.499942 W, 2.1788 rad)
+║ - ROOT/MZI_R2/PS1_out_1 (OPTICAL) = [0766]  @ 1550 nm (0.707066 √W, 0.499942 W, 2.1788 rad)
+║ - ROOT/MZI_B1/DC1_out1_0 (OPTICAL) = [0604]  @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/MZI_B1/DC1_out2_0 (OPTICAL) = [0606]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.5708 rad)
+║ - ROOT/MZI_B1/DC2_in1_0 (OPTICAL) = [1112]  @ 1550 nm (0.707025 √W, 0.499885 W, 1.2161 rad)
+║ - ROOT/MZI_B1/DC2_in2_0 (OPTICAL) = [0768]  @ 1550 nm (0.707024 √W, 0.499883 W, -1.7127 rad)
+║ - ROOT/MZI_B1/PS1_in_0 (OPTICAL) = [0770]  @ 1550 nm (0.707066 √W, 0.499942 W, 0.6081 rad)
+║ - ROOT/MZI_B1/PS1_out_0 (OPTICAL) = [1018]  @ 1550 nm (0.707066 √W, 0.499942 W, 0.6081 rad)
+║ - ROOT/MZI_B1/DC1_out1_1 (OPTICAL) = [0199]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B1/DC1_out2_1 (OPTICAL) = [0202]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B1/DC2_in1_1 (OPTICAL) = [0205]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B1/DC2_in2_1 (OPTICAL) = [0208]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B1/PS1_in_1 (OPTICAL) = [0211]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B1/PS1_out_1 (OPTICAL) = [0214]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/DC1_out1_0 (OPTICAL) = [0600]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.5708 rad)
+║ - ROOT/MZI_B2/DC1_out2_0 (OPTICAL) = [0602]  @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/DC2_in1_0 (OPTICAL) = [1114]  @ 1550 nm (0.707025 √W, 0.499885 W, 2.7869 rad)
+║ - ROOT/MZI_B2/DC2_in2_0 (OPTICAL) = [0772]  @ 1550 nm (0.707024 √W, 0.499883 W, 2.9997 rad)
+║ - ROOT/MZI_B2/PS1_in_0 (OPTICAL) = [0774]  @ 1550 nm (0.707066 √W, 0.499942 W, 2.1788 rad)
+║ - ROOT/MZI_B2/PS1_out_0 (OPTICAL) = [1012]  @ 1550 nm (0.707066 √W, 0.499942 W, 2.1788 rad)
+║ - ROOT/MZI_B2/DC1_out1_1 (OPTICAL) = [0235]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/DC1_out2_1 (OPTICAL) = [0238]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/DC2_in1_1 (OPTICAL) = [0241]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/DC2_in2_1 (OPTICAL) = [0244]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/PS1_in_1 (OPTICAL) = [0247]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_B2/PS1_out_1 (OPTICAL) = [0250]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_U1/DC1_out1 (OPTICAL) = [0596]  @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/MZI_U1/DC1_out2 (OPTICAL) = [0598]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.5708 rad)
+║ - ROOT/MZI_U1/DC2_in1 (OPTICAL) = [1116]  @ 1550 nm (0.707025 √W, 0.499885 W, 1.2161 rad)
+║ - ROOT/MZI_U1/DC2_in2 (OPTICAL) = [0776]  @ 1550 nm (0.707024 √W, 0.499883 W, -1.7127 rad)
+║ - ROOT/MZI_U1/PS1_in (OPTICAL) = [0778]  @ 1550 nm (0.707066 √W, 0.499942 W, 0.6081 rad)
+║ - ROOT/MZI_U1/PS1_out (OPTICAL) = [1006]  @ 1550 nm (0.707066 √W, 0.499942 W, 0.6081 rad)
+║ - ROOT/MZI_R1/DC1_out1_0 (OPTICAL) = [0271]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/DC1_out2_0 (OPTICAL) = [0274]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/DC2_in1_0 (OPTICAL) = [0277]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/DC2_in2_0 (OPTICAL) = [0280]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/PS1_in_0 (OPTICAL) = [0283]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/PS1_out_0 (OPTICAL) = [0286]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/DC1_out1_1 (OPTICAL) = [1108]  @ 1550 nm (0.707025 √W, 0.499885 W, 1.2161 rad)
+║ - ROOT/MZI_R1/DC1_out2_1 (OPTICAL) = [0760]  @ 1550 nm (0.707024 √W, 0.499883 W, -1.7127 rad)
+║ - ROOT/MZI_R1/DC2_in1_1 (OPTICAL) = [0612]  @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/MZI_R1/DC2_in2_1 (OPTICAL) = [0614]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.5708 rad)
+║ - ROOT/MZI_R1/PS1_in_1 (OPTICAL) = [1030]  @ 1550 nm (0.707066 √W, 0.499942 W, 0.6081 rad)
+║ - ROOT/MZI_R1/PS1_out_1 (OPTICAL) = [0762]  @ 1550 nm (0.707066 √W, 0.499942 W, 0.6081 rad)
+║ - ROOT/MZI_U2/DC1_out1 (OPTICAL) = [0592]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.5708 rad)
+║ - ROOT/MZI_U2/DC1_out2 (OPTICAL) = [0594]  @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/MZI_U2/DC2_in1 (OPTICAL) = [1118]  @ 1550 nm (0.707025 √W, 0.499885 W, 2.7869 rad)
+║ - ROOT/MZI_U2/DC2_in2 (OPTICAL) = [0780]  @ 1550 nm (0.707024 √W, 0.499883 W, 2.9997 rad)
+║ - ROOT/MZI_U2/PS1_in (OPTICAL) = [0782]  @ 1550 nm (0.707066 √W, 0.499942 W, 2.1788 rad)
+║ - ROOT/MZI_U2/PS1_out (OPTICAL) = [1000]  @ 1550 nm (0.707066 √W, 0.499942 W, 2.1788 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+ROOT/EVLSRC_R1 was enabled
+ROOT/EVLSRC_R2 was enabled
+ROOT/EVLSRC_B1 was enabled
+ROOT/EVLSRC_B2 was enabled
+ROOT/EVLSRC_U1 was enabled
+ROOT/EVLSRC_U2 was enabled
+@0 s, ROOT/EVLSRC_U2 emitted: 0
+@0 s, ROOT/EVLSRC_U1 emitted: 0
+@0 s, ROOT/EVLSRC_B2 emitted: 0
+@0 s, ROOT/EVLSRC_B1 emitted: 0
+@0 s, ROOT/EVLSRC_R2 emitted: 0
+@0 s, ROOT/EVLSRC_R1 emitted: 0
+@10 ps, ROOT/EVLSRC_U2 emitted: 1.3
+@10 ps, ROOT/EVLSRC_R1 emitted: 1.3
+@10 ps, ROOT/EVLSRC_R2 emitted: 1.3
+@10 ps, ROOT/EVLSRC_B1 emitted: 1.3
+@10 ps, ROOT/EVLSRC_B2 emitted: 1.3
+@10 ps, ROOT/EVLSRC_U1 emitted: 1.3
+Simulated 20 ps
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

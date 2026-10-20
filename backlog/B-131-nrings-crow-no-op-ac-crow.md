@@ -1,5 +1,5 @@
 # B-131: `--nrings_crow` is a no-op; `ac_crow` always simulates 3 rings
-severity: low | category: cli | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: cli | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in ac676da
 location: src/main.cpp:244-247, src/main.cpp:341-345 (assignment commented out), src/tb/crow_tb.cpp:33,171, src/tb/crow_tb.h:30
 ## Problem
 The option is parsed but its only effect is commented out (`//nrings_crow = set_nrings_crow.Get();`). `crow_tb_run()` constructs `CROW("crow", nrings_crow)` with the global initialised to 3. The help text is just "temporary". The testbench also does not use the ECOC paper's benchmark parameters: the paper uses N up to 512, 1 mW pulses at 500 MHz, 10 pulses, waveguides (33.2 +- 5.0) um from a normal distribution, power cross-coupling 0.15; `crow_tb` uses 1 W, 4 pulses, a fixed 775.775 um ring, coupling_through 0.8 (cross 0.2), neff 1, ng 2.

@@ -1,5 +1,5 @@
 # B-177: Delete the useless grammar nonterminals `net.oa.bidir` and `net.edigital` (bison warnings)
-severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 2cf960d
 location: src/parser/parser.y:119, src/parser/parser.y:121, src/parser/parser.y:622-632, src/parser/parser.y:683-695
 ## Problem
 Every build prints `parser.y: warning: 2 nonterminals useless in grammar` and `3 rules useless`

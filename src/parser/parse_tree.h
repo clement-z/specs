@@ -733,9 +733,11 @@ struct ParseTree {
                 if(x) delete x;
             for (const auto &x : directives)
                 if(x) delete x;
-            for (const auto &x : subcircuits)
-                if(x) delete x;
         }
+        // a sub-tree hands its elements over to its parent when flattened,
+        // but its subcircuit definitions are only used by its own flatten()
+        for (const auto &x : subcircuits)
+            if(x) delete x;
     }
 };
 

@@ -1,0 +1,11 @@
+* B-156: included by b156-many-includes.cir; includes the leaf file 10 times
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir
+.include tests/golden/netlists/b156-include-leaf.cir

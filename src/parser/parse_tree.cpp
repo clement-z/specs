@@ -342,12 +342,16 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     if (directives.size() > 0)
     {
         cerr << name << ": found a directive in subcircuit, ignoring." << endl;
+        for (const auto &x : directives)
+            delete x;
         directives.clear();
     }
 
     if (analyses.size() > 0)
     {
         cerr << name << ": found an analysis in subcircuit, ignoring." << endl;
+        for (const auto &x : analyses)
+            delete x;
         analyses.clear();
     }
     // print();
@@ -570,7 +574,7 @@ string ParseNet::to_json() const
     ss << ',';
     ss << "\"readers\":" << m_readers_count;
     ss << ',';
-    ss << "\"writers\":" << m_readers_count;
+    ss << "\"writers\":" << m_writers_count;
     ss << '}';
     return ss.str();
 }
@@ -838,6 +842,11 @@ void ParseTree::flatten()
         }
 
         // get subcircuit name
+        if (xelem->args.empty())
+        {
+            cerr << "Error: subcircuit instance " << xelem->name << " has no subcircuit name" << endl;
+            exit(1);
+        }
         string subcircuit_name = xelem->args.back().as_string();
         strutils::toupper(subcircuit_name);
 

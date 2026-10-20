@@ -1,5 +1,5 @@
 # B-085: `simulate()` default output file is `traces/delete_me.vcd.vcd`
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in dfa3440
 location: pyspecs/specs.py:19-20, :150-153 (docstring)
 ## Problem
 `-o` takes a basename: SystemC appends `.vcd`. The default `"o": "traces/delete_me.vcd"` therefore produces `traces/delete_me.vcd.vcd`, and the docstring documents the wrong default. The notebook passes `../traces/delete_me` (no extension), so it is not affected.

@@ -19,7 +19,7 @@ void VLSource::runner()
         }
         cout << endl;
         cout << "--> " <<
-            (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name() << endl;
+            port_channel_name(p_out) << endl;
         cout << endl;
     }
 

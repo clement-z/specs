@@ -1,0 +1,3 @@
+Parsing error (tests/golden/netlists/b161-ic-unsupported.cir:4): the .ic directive is not supported
+-- while parsing line: ".ic /a/P=1"
+

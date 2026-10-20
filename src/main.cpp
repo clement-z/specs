@@ -144,7 +144,8 @@ int do_circuit(const string &filename, bool is_dry_run = false, const string& js
 int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer="")
 {
     yyscan_t scanner;
-    yylex_init_extra(new ParserState(), &scanner);
+    ParserState *parser_state = new ParserState();
+    yylex_init_extra(parser_state, &scanner);
 
     for(const auto &fname: filenames)
         yy_add_content_from_file(fname, scanner);
@@ -168,6 +169,7 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
 
     //yy_delete_buffer(buf, scanner);
     yylex_destroy(scanner);
+    delete parser_state;
 
     // Return if unsuccessful
     if (parsing_result != 0) {
@@ -349,7 +351,12 @@ int sc_main(int argc, char *argv[])
     }
     if (set_nrings_crow) {
         #if BUILD_TB == 1
-        //nrings_crow = set_nrings_crow.Get();
+        if (set_nrings_crow.Get() < 1 || set_nrings_crow.Get() > 1024)
+        {
+            cerr << "Invalid --nrings_crow value (expected 1..1024)" << endl;
+            return 1;
+        }
+        nrings_crow = set_nrings_crow.Get();
         #endif
     }
     if (set_timescale) {
@@ -357,7 +364,7 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_timescale.Get();
         ss >> timescale_val;
-        if (!ss.eof() || ss.fail() || timescale_val > 0) {
+        if (!ss.eof() || ss.fail() || timescale_val > 0 || timescale_val < -15) {
             cerr << "Invalid resolution value" << endl;
             return 1;
         }
@@ -408,6 +415,11 @@ int sc_main(int argc, char *argv[])
         {
             ofstream outfile;
             outfile.open(json_filename, ios::out | ios::trunc);
+            if (!outfile)
+            {
+                cerr << "Error: cannot open JSON output file \"" << json_filename << "\"" << endl;
+                return 1;
+            }
             outfile << pt.to_json();
             outfile.close();
             cout << "Exported flattened circuit as JSON > " << json_filename << endl;

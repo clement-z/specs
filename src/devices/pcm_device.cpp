@@ -20,9 +20,9 @@ void PCMElement::on_input_changed()
         cout << "Tc = " << abs(m_Tc) << "W/W" << endl;
         cout << "Ta = " << abs(m_Ta) << "W/W" << endl;
         cout << "Initial state = " << m_stateCurrent << "" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name();
+        cout << port_channel_name(p_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name();
+        cout << port_channel_name(p_out);
         cout << endl;
         cout << endl;
     }

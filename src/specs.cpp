@@ -40,6 +40,7 @@ SPECSConfig::SPECSConfig(sc_module_name name)
 
 void SPECSConfig::runAnalysis()
 {
+    verifyConfig();
     applyEngineResolution();
     prepareSimulation();
 
@@ -146,6 +147,11 @@ void SPECSConfig::runDCAnalysis()
         cws->enable = sc_logic(1);
     }
 
+    if (cw_sweep_orders.empty())
+    {
+        cerr << "Error: .dc analysis requires a sweep order (e.g. .dc /cwsrc1/WL start stop step)" << endl;
+        exit(1);
+    }
     const auto &order = *cw_sweep_orders.begin();
     wavelengths_vector.reserve(order.second.second.size());
     cout << "Starting sweep on " << order.first;
@@ -366,7 +372,8 @@ void SPECSConfig::prepareSimulation() {
         if (!default_trace_file && trace_filename.size())
             default_trace_file = sc_create_vcd_trace_file(trace_filename.c_str());
 
-        default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
+        if (default_trace_file)
+            default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
     }
 
     applyDefaultOpticalOutputPortConfig();

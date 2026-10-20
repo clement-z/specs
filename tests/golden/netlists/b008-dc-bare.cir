@@ -1,0 +1,4 @@
+* B-008: bare .dc (no sweep order) must stop with a clean error
+cwsrc1 a wl=1.55e-6 power=1
+wg1 a b length=1e-6
+.dc

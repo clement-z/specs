@@ -1,5 +1,5 @@
 # B-117: CMake source filters match the absolute path: a checkout under any `test/`, `tb/` or `parser/` directory builds nothing
-severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: obsolete (meson migration, b86a745: CMakeLists.txt removed; Meson lists sources explicitly)
 location: CMakeLists.txt:20-23, :26, :49
 ## Problem
 `file(GLOB_RECURSE SOURCES_BIN "${SRC_PATH}/*.cpp")` returns absolute paths, then `list(FILTER ... EXCLUDE REGEX ".*/tb/.*")`, `".*/parser/.*"`, `".*/test/.*"` are applied to those absolute paths. If the repository lives anywhere below a directory called `test`, `tb` or `parser` (e.g. `/builds/test/specs`, `~/test/specs`), every source is filtered out and CMake fails with `No SOURCES given to target: spx`. Also `${SOURCES_TB}` on line 49 is never defined. obsoleted-by-meson: yes (explicit source lists); the CMake fix is only worth doing if the Meson merge slips.

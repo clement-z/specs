@@ -18,7 +18,11 @@ using spx::ed_bus_type;
 void OPTIONSDirective::create() const
 {
     // Verify number of nodes
-    assert(args.size() == 0);
+    if (args.size() > 0)
+    {
+        cerr << "Error: .options: too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -28,13 +32,49 @@ void OPTIONSDirective::create() const
         if (kw == "TRACEALL")
             specsGlobalConfig.trace_all_optical_nets = p.second.as_boolean();
         else if (kw == "ABSTOL")
-            specsGlobalConfig.default_abstol = p.second.as_double();
+        {
+            const double v = p.second.as_double();
+            if (!(v > 0))
+            {
+                cerr << "Error: .options: " << kw << " must be > 0 (got " << v << ")" << endl;
+                exit(1);
+            }
+            specsGlobalConfig.default_abstol = v;
+        }
         else if (kw == "RELTOL")
-            specsGlobalConfig.default_reltol = p.second.as_double();
+        {
+            const double v = p.second.as_double();
+            if (!(v > 0))
+            {
+                cerr << "Error: .options: " << kw << " must be > 0 (got " << v << ")" << endl;
+                exit(1);
+            }
+            specsGlobalConfig.default_reltol = v;
+        }
         else if (kw == "TS" || kw == "TIMESCALE")
+        {
+            // as_integer() truncates toward zero: check the truncated value
+            // as a double first (an out-of-range double-to-int cast is UB)
+            const double v = std::trunc(p.second.as_double());
+            if (!(v >= static_cast<int>(SPECSConfig::ONE_FS) && v <= static_cast<int>(SPECSConfig::ONE_SEC)))
+            {
+                cerr << "Error: .options: " << kw << " must be between " << SPECSConfig::ONE_FS
+                     << " and " << SPECSConfig::ONE_SEC << " (got " << p.second.as_double() << ")" << endl;
+                exit(1);
+            }
             specsGlobalConfig.engine_timescale = (SPECSConfig::EngineTimescale)p.second.as_integer();
+        }
         else if (kw == "RESOLUTION")
-            specsGlobalConfig.default_resolution_multiplier = p.second.as_double();
+        {
+            // checked before the conversion to an unsigned 64-bit integer
+            const double v = p.second.as_double();
+            if (!(v >= 1 && v < 18446744073709551616.0))
+            {
+                cerr << "Error: .options: " << kw << " must be >= 1 and < 2^64 (got " << v << ")" << endl;
+                exit(1);
+            }
+            specsGlobalConfig.default_resolution_multiplier = v;
+        }
         else if (kw == "TRACEALL")
             specsGlobalConfig.trace_all_optical_nets = p.second.as_double();
         else if (kw == "TEST_VARIABLE")

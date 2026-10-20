@@ -51,7 +51,8 @@ Useful options (all sub-commands that compare):
 
 Re-record (and commit) the baseline when a change *intentionally* alters the
 output, e.g. a bug fix. Put the reason in `--note`; it is stored in
-`baseline/manifest.json`.
+`baseline/manifest.json` (for a partial re-record with `--only`, it is appended to
+the manifest's `rerecords` list together with the regex and the date).
 
 ## What a case is
 
@@ -61,6 +62,11 @@ is copied in (netlists use `.include circuits/...`, which resolves relative to
 the cwd) and an empty `traces/` is created. Testbenches and the default trace
 file write to `traces/<name>.vcd` relative to the cwd. If `traces/` is missing,
 SystemC fails with `E701 cannot open trace file`.
+
+Netlists that only exist to test a fix (error paths, regressions) live in
+`tests/golden/netlists/`, not in `circuits/` (the examples). Their cases override
+`setup` with `{"copy": ["circuits", "tests/golden/netlists"], "mkdir": ["traces"]}`
+and run `-f tests/golden/netlists/<name>.cir`.
 
 For every case the harness records:
 
@@ -102,17 +108,20 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `vcd_ignore_values`: regexes on signal names excluded from the VCD comparison;
   * `unordered_streams`: streams compared as a multiset of lines even with `--strict-order`;
   * `ignore_streams`, `ignore_files` (globs), `timeout`;
+  * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (44 `specs` cases + 1 gtest case)
+## Case list (80 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
 | `cir/*` (9) | every `circuits/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
 | `cir-json/*` (4) | `-n --json flat.json -f` on the 4 netlists that parse | flattened-netlist JSON export, dry run |
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time`, `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
-| `tb/*` (19) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included | legacy device testbenches (`BUILD_OLD_TB`) |
+| `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
+| `err/bNNN-*` (29) | bad inputs from the 2026-10 fix phase (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
+| `regress/bNNN-*` (6) | regression cases of the 2026-10 fix phase | behaviour that a fix made work (bidirectional MZI, `--vci` on CROW, many includes, ...) |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
@@ -120,22 +129,20 @@ is visible; re-record when it is fixed on purpose.
 
 * `cir/double_ring`, `cir/triple_ring`, `cir/paul_simple_ring`: parse error
   (legacy netlist syntax, `one 0` at line 4), exit 1.
-* `cir/subckt_test`: parse error (`cwsrc` is not a recognised element), exit 1.
 * `cir/paul_3ring_puf`: the VLSRC values file
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
-* `tb/mesh`: **SIGSEGV** in `SPECSConfig::prepareSimulation()`. It calls
-  `init()` on every `spx_module`, and `Clements::init()` destroys and
-  re-creates its children while the loop is still iterating over them.
 * `cli/unknown-testbench`, `cli/missing-netlist`, `cli/bad-mode`: exit 1 by design.
+* `err/*`: exit 1 by design. Most of them set `ignore_streams: [stdout]`, so only
+  the exit status and the error message are compared.
 
 `record` warns when a `circuits/*.cir` or a `specs -p` testbench has no case,
 so new netlists and testbenches get noticed. Add them to `cases.json`, then
 record again.
 
-## Baseline contents (`baseline/`, about 1.8 MB, all files stored in full)
+## Baseline contents (`baseline/`, about 3 MB, all files stored in full)
 
 ```
-baseline/manifest.json              format, date, note (build used, gtest provenance), case ids
+baseline/manifest.json              format, date, note (build used, gtest provenance), case ids, partial re-records
 baseline/cases/<group>/<name>/case.json    args, exit status, list of output files (+sha256, size)
 baseline/cases/<group>/<name>/stdout.txt   normalised
 baseline/cases/<group>/<name>/stderr.txt   normalised
@@ -144,15 +151,19 @@ baseline/gtest/unit_tests.json      per-test PASS/FAIL
 ```
 
 The current baseline was recorded with the CMake Release build (GCC 11.5,
-`-std=gnu++20 -O3 -march=native`, SystemC 3.0.1). The largest file is about
-400 kB, so nothing is gzipped or summarised.
+`-std=gnu++20 -O3 -march=native`, SystemC 3.0.1). Cases re-recorded or added
+since then (the `rerecords` list of `manifest.json`) come from the Meson GCC
+build with its default options. The largest file is about 400 kB, so nothing is
+gzipped or summarised.
 
-**gtest provenance:** the in-tree `unit_tests` target does not compile
-(`src/test/utils.h:81` contains `static_assert(false, "Work in progress…")`, and
-`EXPECT_ANGLE_EQ` misuses `EXPECT_PRED_FORMAT2`). The gtest baseline was
-recorded from an out-of-tree copy with exactly those two spots patched. Result:
-`A.B` PASS, `Waveguide.Instantiation` PASS, `Waveguide.OperatingPoint` FAIL
-(the angle check is unfinished).
+**gtest provenance:** the gtest baseline is recorded from the in-tree
+`unit_tests` (Meson: `<builddir>/src/test/unit_tests`) and re-recorded on its
+own with `record --only '^gtest' --unit-tests ...` (the `rerecords` list of
+`manifest.json` says when and why). Every test PASSes, `Waveguide.OperatingPoint`
+included since the angle check in `src/test/utils.h` was finished upstream
+(b7d6fff; B-123). The first
+baseline came from an out-of-tree patched copy, because `unit_tests` did not
+compile then; it had `Waveguide.OperatingPoint` FAIL.
 
 `tests/golden/.gitignore` re-includes `*.vcd`/`*.json`/`baseline/**`, because
 the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
@@ -161,13 +172,14 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
 
 * `record --repeat 3`, and two independent `record` runs compared with
   `--rtol 0 --atol 0 --print-slack 0`, are **bit-identical** for every case
-  except `tb/det` and `tb/detector`.
-* `tb/det`, `tb/detector`: `Detector::m_cur_readout` and
-  `m_cur_readout_no_interf` (`src/devices/detector.h:18-19`) are never
-  initialised and are dumped at t=0, for example `r6.92e-310` (stale pointer
-  bits). Their values (`uut.readout*`, `uut2.readout*`) are excluded through
-  `vcd_ignore_values`. The `random_device`-seeded detector noise is *not*
-  exercised: the testbench never enables the detectors.
+  (`tb/det` and `tb/detector` since B-054, see below).
+* `tb/det`, `tb/detector`: until B-054, `Detector::m_cur_readout` and
+  `m_cur_readout_no_interf` (`src/devices/detector.h:18-19`) were never
+  initialised and were dumped at t=0, for example `r6.92e-310` (stale pointer
+  bits), so `uut*.readout*` had to be excluded through `vcd_ignore_values`.
+  They are now initialised to 0 and compared like every other signal. The
+  `random_device`-seeded detector noise is *not* exercised: the testbench
+  never enables the detectors.
 * **Pointer-ordered iteration.** `sc_get_all_object_by_type<T>()` and
   `sc_get_all_module_by_type<T>()` (`src/utils/sysc_utils.h`) return
   `std::set<T*>`, so the following are listed in memory-address order:

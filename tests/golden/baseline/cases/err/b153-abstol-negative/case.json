@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-abstol-negative.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b153-abstol-negative"
+}

@@ -1,4 +1,1 @@
-Parsing error (circuits/subckt_test.cir:5): syntax error
--- offending token: "cwsrc"
--- while parsing line: "cwsrc in pow=1 wl=1.55e-6"
 

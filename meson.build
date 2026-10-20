@@ -163,10 +163,11 @@ subdir('src/test')
 if get_option('old_tb')
   # One smoke test per testbench, as in the old `make test`. `specs -t` exits 0 even when a
   # testbench prints "Failure!", so these only catch crashes and errors.
-  # Disabled in `make test` too: ring, ac_add_drop, ac_crow, mesh (mesh segfaults, see backlog).
+  # Disabled in `make test` too: ring, ac_add_drop, ac_crow. (mesh was disabled there because it
+  # segfaulted; it runs since B-047.)
   sh = find_program('sh')
   foreach tb : ['waveguide', 'splitter', 'merger', 'detector', 'directional_coupler',
-                'phaseshifter', 'mzi', 'pcm']
+                'phaseshifter', 'mzi', 'pcm', 'mesh']
     # Testbenches write traces/<name>.vcd relative to the cwd.
     test(tb, sh,
       args: ['-c', 'mkdir -p traces && exec "$0" -t "$1"', specs_exe.full_path(), tb],

@@ -1,0 +1,33 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+1 local assignments
+ - filename (STRING) = no_such_evlsrc_values.csv
+-----------
+1 elements
+ - ROOT/EVLSRC1 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/e {} {values (STRING) = no_such_evlsrc_values.csv, }
+-----------
+1 named nets
+ - ROOT/e: EANALOG<1>u (0|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {1e-09 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/e...
+Creating ROOT/EVLSRC1 (reason: connection to unidir net)
+

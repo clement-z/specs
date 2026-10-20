@@ -539,12 +539,19 @@ def run_case(case, specs, repo, tmp_root):
             (wd / d).mkdir(parents=True, exist_ok=True)
         before = snapshot(wd)
         argv = ["specs"] + list(case.get("args", []))
+        exe = str(specs)
+        if case.get("rlimit_nofile") is not None:
+            # Lower the soft open-files limit in a shell that then execs specs: no Python code
+            # may run between fork and exec (preexec_fn), because cases run in threads.
+            argv = ["sh", "-c", 'ulimit -S -n "$1" && shift && exec "$0" "$@"',
+                    exe, str(int(case["rlimit_nofile"]))] + list(case.get("args", []))
+            exe = "/bin/sh"
         timeout = case.get("timeout", 120)
         t0 = time.monotonic()
         try:
             p = subprocess.run(
                 argv,
-                executable=str(specs),
+                executable=exe,
                 cwd=str(wd),
                 env=make_env(),
                 stdin=subprocess.DEVNULL,
@@ -926,6 +933,14 @@ def cmd_record(args):
         old = json.loads((outdir / "manifest.json").read_text(encoding="utf-8"))
         ids = sorted(set(old.get("cases", [])) | {c["id"] for c in cases})
         old["cases"] = ids
+        # Keep the note of a partial re-record (the top-level note describes the full record).
+        if args.note:
+            old.setdefault("rerecords", []).append({
+                "recorded_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "only": args.only,
+                "gtest": bool(gres),
+                "note": args.note,
+            })
         (outdir / "manifest.json").write_text(json.dumps(old, indent=1) + "\n", encoding="utf-8")
     else:
         write_manifest(outdir, cases, args, gres, args.note)

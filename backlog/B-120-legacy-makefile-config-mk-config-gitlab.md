@@ -1,5 +1,5 @@
 # B-120: Legacy Makefile, config.mk, .config.gitlab-ci.mk and .gitlab-ci.yml are broken and drifted from CMake
-severity: low | category: build | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: build | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: obsolete (meson migration, b86a745: Makefile, config.mk, .config.gitlab-ci.mk removed; .gitlab-ci.yml rewritten)
 location: Makefile:25-26,65,279-280, config.mk:6,20, .config.gitlab-ci.mk:16, .gitlab-ci.yml:26-42,55-64, CHANGELOG.md:9
 ## Problem
 obsoleted-by-meson: yes (PLAN.md:125 deletes all four files and rewrites the CI for GitLab and GitHub). Do not fix individually; make sure the port covers the points below.

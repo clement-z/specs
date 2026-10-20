@@ -93,5 +93,4 @@ void CROW::connect_submodules()
     dc.at(N)->p_in2(p_add);
     dc.at(N)->p_out2(p_out_d);
 
-    dc.at(0)->m_out1_writer.m_converger = false;
 }

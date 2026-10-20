@@ -1,0 +1,18 @@
+{
+ "args": [
+  "-t",
+  "ac_crow",
+  "--nrings_crow",
+  "2"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/crow_tb.vcd": {
+   "bytes": 84024,
+   "kind": "vcd",
+   "sha256": "9aa8dd6dfbc4f22f66d1d781a58f2d95657303530ec4fd8c7cf166c743ef46a9",
+   "stored": "files/traces/crow_tb.vcd"
+  }
+ },
+ "id": "regress/b131-nrings-crow"
+}

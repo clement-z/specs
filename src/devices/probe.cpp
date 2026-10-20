@@ -11,7 +11,7 @@ void Probe::on_port_in_changed()
     if (specsGlobalConfig.verbose_component_initialization)
     {
         cout << name() << ":" << endl;
-        cout << "Signal: " << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name() << endl;
+        cout << "Signal: " << port_channel_name(p_in) << endl;
         cout << "trace power: " << m_trace_power << endl;
         cout << "trace modulus: " << m_trace_modulus << endl;
         cout << "trace phase: " << m_trace_phase << endl;
@@ -131,7 +131,7 @@ void MLambdaProbe::on_port_in_changed()
             cout << p.first << ", ";
         }
         cout << "\b\b)" << endl;
-        cout << "Signal: " << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name() << endl;
+        cout << "Signal: " << port_channel_name(p_in) << endl;
         cout << endl;
     }
     //m_trace_sig.write(0);

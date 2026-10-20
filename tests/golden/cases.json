@@ -1,6 +1,6 @@
 {
  "format": 1,
- "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines).",
+ "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines), rlimit_nofile (soft open-files limit of the specs process).",
  "defaults": {
   "timeout": 120,
   "setup": {
@@ -54,7 +54,7 @@
     "circuits/paul_3ring_puf.cir"
    ],
    "expect": "fail",
-   "note": "VLSRC values file 'paul_puf_bitstream_158b_3wl.csv' is not in the repo ('Error: Cannot open the file.')"
+   "note": "VLSRC values file 'paul_puf_bitstream_158b_3wl.csv' is not in the repo ('Error: Cannot open the file \"paul_puf_bitstream_158b_3wl.csv\".')"
   },
   {
    "id": "cir/paul_simple_ring",
@@ -70,9 +70,7 @@
    "args": [
     "-f",
     "circuits/subckt_test.cir"
-   ],
-   "expect": "fail",
-   "note": "parse error: element 'cwsrc' (line 5) is not a recognised element name"
+   ]
   },
   {
    "id": "cir/subckt_tests",
@@ -89,6 +87,78 @@
    ],
    "expect": "fail",
    "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+  },
+  {
+   "id": "err/b149-x-noargs",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b149-x-noargs.cir"
+   ],
+   "expect": "fail",
+   "note": "B-149: 'x1' without a subcircuit name used to crash; clean error, exit 1"
+  },
+  {
+   "id": "err/b149-x-kwargs-only",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b149-x-kwargs-only.cir"
+   ],
+   "expect": "fail",
+   "note": "B-149: 'x1 L=1' (kwargs only, no subcircuit name) used to crash; clean error, exit 1"
+  },
+  {
+   "id": "regress/b150-include-in-subckt",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b150-include-in-subckt.cir"
+   ],
+   "note": "B-150: .include inside a .subckt body is run per instance at flatten time (was a syntax error)"
+  },
+  {
+   "id": "regress/b156-many-includes",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/b156-many-includes.cir"
+   ],
+   "rlimit_nofile": 64,
+   "note": "B-156: 110 nested .include under a 64 open-files limit (included files were never closed)"
   },
   {
    "id": "cir-json/add_drop",
@@ -133,6 +203,489 @@
     "circuits/subckt_tests.cir"
    ],
    "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "err/b008-dc-bare",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b008-dc-bare.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-008: bare .dc (no sweep order) gives a clean error (was an assert abort, or UB in specs.cpp with NDEBUG)"
+  },
+  {
+   "id": "err/b148-tran-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-tran-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: .tran with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-options-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-options-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: .options with a positional arg gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pshift-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pshift-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PSHIFT with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-mzi-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-mzi-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: MZI with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-crossing-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-crossing-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: CROSSING with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-probe-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-probe-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PROBE with 5 positional args gives the existing 'Too many input arguments' error (was an assert abort)"
+  },
+  {
+   "id": "err/b148-mlprobe-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-mlprobe-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: MLPROBE with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pwr-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pwr-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PWR with a positional arg gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pdet-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pdet-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PDET with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b165-op-stray-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-op-stray-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .op with a stray positional arg is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-op-stray-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-op-stray-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .op with a stray keyword arg is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-dc-stray-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-dc-stray-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .dc with a positional arg after the sweep order is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-dc-stray-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-dc-stray-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .dc with a keyword arg after the sweep order is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b153-resolution-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-resolution-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options resolution=-1 is rejected (was cast to 2^64-1 and accepted)"
+  },
+  {
+   "id": "err/b153-resolution-below-one",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-resolution-below-one.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options resolution=0.5 is rejected (truncated to 0: verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "err/b153-timescale-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-timescale-out-of-range.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options timescale=-20 is rejected (verifyConfig assert / SystemC E705 with NDEBUG)"
+  },
+  {
+   "id": "err/b153-abstol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-abstol-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options abstol=-1 is rejected (verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "err/b153-reltol-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-reltol-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options reltol=0 is rejected (verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "err/b161-ic-unsupported",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b161-ic-unsupported.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-161: .ic gives a parse error naming the unsupported directive (was exit 1 with no message)"
+  },
+  {
+   "id": "err/b034-coupler-k-gt-1",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-coupler-k-gt-1.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: COUPLER k=1.1 is rejected (through power < 0: NaN, silent 0 W with NDEBUG, std::polar abort with assertions)"
+  },
+  {
+   "id": "err/b034-coupler-kp-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-coupler-kp-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: COUPLER kp=-0.01 is rejected (through power > 1: NaN cross output)"
+  },
+  {
+   "id": "err/b034-splitter-ratio-gt-1",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-splitter-ratio-gt-1.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: SPLITTER ratio=1.5 is rejected (was accepted: NaN on out2 and gain on out1)"
   },
   {
    "id": "opt/tracefile-o",
@@ -194,6 +747,35 @@
     "circuits/subckt_tests.cir"
    ],
    "note": "verbose component initialisation"
+  },
+  {
+   "id": "regress/b031-mzi-bidir",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b031-mzi-bidir.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward"
+  },
+  {
+   "id": "regress/b036-vci-crow",
+   "args": [
+    "--vci",
+    "-t",
+    "ac_crow"
+   ],
+   "ignore_files": [
+    "traces/crow_tb.vcd"
+   ],
+   "note": "B-036: --vci printing used to segfault (exit 139) on ports bound to a channel that is not an spx::oa_signal_type (CROW uses sc_signal<OpticalSignal>). The VCD is that of tb/ac_crow (apart from verbose_component_initialization), so it is not stored"
   },
   {
    "id": "tb/wg",
@@ -265,10 +847,7 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run; NONDETERMINISTIC: Detector::m_cur_readout / m_cur_readout_no_interf (src/devices/detector.h:18-19) are never initialised and are dumped at t=0 in the VCD (garbage such as 6.9e-310); these two signals are therefore excluded from the VCD comparison. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
-   "vcd_ignore_values": [
-    "(^|\\.)uut2?\\.readout(_no_interference)?$"
-   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
    "unordered_streams": [
     "stdout"
    ]
@@ -279,10 +858,7 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run; NONDETERMINISTIC: Detector::m_cur_readout / m_cur_readout_no_interf (src/devices/detector.h:18-19) are never initialised and are dumped at t=0 in the VCD (garbage such as 6.9e-310); these two signals are therefore excluded from the VCD comparison. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
-   "vcd_ignore_values": [
-    "(^|\\.)uut2?\\.readout(_no_interference)?$"
-   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
    "unordered_streams": [
     "stdout"
    ]
@@ -328,6 +904,16 @@
    "note": "src/tb/alltestbenches.cpp: crow_tb_run"
   },
   {
+   "id": "tb/ac_add_drop-fd",
+   "args": [
+    "-t",
+    "ac_add_drop",
+    "-m",
+    "fd"
+   ],
+   "note": "B-138: frequency sweep branch of freqsweep_tb"
+  },
+  {
    "id": "tb/lambda",
    "args": [
     "-t",
@@ -357,8 +943,25 @@
     "-t",
     "mesh"
    ],
-   "note": "src/tb/alltestbenches.cpp: mesh_tb_run; segfaults (SIGSEGV) in SPECSConfig::prepareSimulation (use-after-free: Clements::init() re-creates children while prepareSimulation iterates over them)",
-   "expect": "crash"
+   "note": "src/tb/alltestbenches.cpp: mesh_tb_run"
+  },
+  {
+   "id": "err/b064-evlsrc-missing-file",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b064_evlsrc_missing_file.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "expect": "fail",
+   "note": "B-064: the error names the missing EVLSRC values file"
   },
   {
    "id": "cli/help",
@@ -403,6 +1006,60 @@
     "circuits/add_drop.cir"
    ],
    "expect": "fail"
+  },
+  {
+   "id": "regress/b006-empty-output",
+   "args": [
+    "-o",
+    "",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file)"
+  },
+  {
+   "id": "err/b017-json-unwritable",
+   "args": [
+    "-n",
+    "--json",
+    "no_such_dir/flat.json",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "B-017: --json to a path that cannot be opened is an error (was: 'Exported ...', exit 0, no file)"
+  },
+  {
+   "id": "err/b018-resolution-below-fs",
+   "args": [
+    "-R",
+    "-16",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "B-018: -R below -15 (1 fs) is rejected by the CLI (was: assert abort, or E705 with NDEBUG)"
+  },
+  {
+   "id": "regress/b131-nrings-crow",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "2"
+   ],
+   "note": "B-131: --nrings_crow sets the number of rings of the ac_crow testbench (was ignored: always 3)"
+  },
+  {
+   "id": "err/b131-nrings-crow-zero",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "0"
+   ],
+   "expect": "fail",
+   "note": "B-131: --nrings_crow outside 1..1024 is rejected"
   }
  ]
 }

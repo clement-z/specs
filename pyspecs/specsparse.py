@@ -101,7 +101,7 @@ def parse_vcd_dataframe(filename):
             df_probes = df_probes.drop(df_probes.loc[df_probes['wavelength']== 0].index.values)
             df_probes = df_probes.interpolate()
         else:
-            df_probes = df_probes.fillna(method='ffill')
+            df_probes = df_probes.ffill()
 
     # Same with pdetectors
     df_pdet = pd.DataFrame()
@@ -143,7 +143,7 @@ def parse_vcd_dataframe(filename):
         df_pdet = df_pdet.drop(columns=['tick'])
 
         # getting rid of the NaNs: for time domain we repeat the last valid value,
-        df_pdet = df_pdet.fillna(method='ffill')
+        df_pdet = df_pdet.ffill()
 
 
     print('--- Contents of simulation ---')
@@ -259,10 +259,9 @@ def check_wl_sweep(top_scope):
     # Need to check that SystemC.analysis_type == 1 (CW sweep)
     for child in top_scope['children']:
         if child['name'] == 'analysis_type':
-            print(child)
+            # SystemC strips leading zeros from the vector: 'b1' = CW_SWEEP, 'b10' = TIME_DOMAIN (AnalysisType, src/specs.h)
             analysis_type = child['data'][0][1]
-            print(f'analysis_type:{analysis_type}')
-            return analysis_type == 'b01'
+            return int(analysis_type[1:], 2) == 1
     raise ValueError('Expected to find key "analysis_type" in VCD trace.')
 
 def vcd_get_data_vector(signal):

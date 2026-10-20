@@ -94,9 +94,6 @@ void OpticalOutputPort::start_of_simulation() {
 
 void OpticalOutputPort::on_data_ready()
 {
-    // Initialize output queue
-    m_queue = queue_type();
-
     spx::oa_value_type::field_type desired;
 
     while (true) {
@@ -108,8 +105,8 @@ void OpticalOutputPort::on_data_ready()
             if (specsGlobalConfig.drop_all_events)
                 continue;
             cerr << "error: write cancelled, because no values are present" << endl;
-            if (true) sc_stop();
-            else      continue;
+            sc_stop();
+            continue;
         }
 
         // Get current time
@@ -134,8 +131,8 @@ void OpticalOutputPort::on_data_ready()
             cerr << "\t - expected time:" << t.to_seconds() << endl;
             cerr << "\t - current time:" << now.to_seconds() << endl;
             cerr << "\t - signal:" << s << endl;
-            if (true) sc_stop();
-            else      continue;
+            sc_stop();
+            continue;
         }
 
         // Check signal error to decice whether to emit signal

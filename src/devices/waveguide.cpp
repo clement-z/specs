@@ -41,9 +41,9 @@ void WaveguideUni::on_port_in_changed()
         cout << " ("
                 << fmod((2 * M_PI * m_neff / 1.55e-6) * m_length_cm * 1e-2, 2 * M_PI)
                 << "rad @1.55)" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name();
+        cout << port_channel_name(p_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name();
+        cout << port_channel_name(p_out);
         cout << endl;
         cout << endl;
     }
@@ -139,13 +139,13 @@ void WaveguideBi::on_p0_in_changed()
         cout << " ("
                 << fmod((2 * M_PI * m_neff / 1.55e-6) * m_length_cm * 1e-2, 2 * M_PI)
                 << "rad @1.55)" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_in.get_interface()))->name();
+        cout << port_channel_name(p0_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_out.get_interface()))->name();
+        cout << port_channel_name(p1_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_out.get_interface()))->name();
+        cout << port_channel_name(p0_out);
         cout << " <-- ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_in.get_interface()))->name();
+        cout << port_channel_name(p1_in);
         cout << endl;
         cout << endl;
     }

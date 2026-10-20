@@ -1,0 +1,26 @@
+0
+1
+2
+crow_wg_top_0
+crow_wg_bot_0
+crow_dc_0
+crow_wg_top_1
+crow_wg_bot_1
+crow_dc_1
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/crow_tb.vcd)
+----------------------------
+Starting time-domain simulation
+
+
+.vcd trace file: traces/crow_tb
+Total runtime: <DURATION> ms
+

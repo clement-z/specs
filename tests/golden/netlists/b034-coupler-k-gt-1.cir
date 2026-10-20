@@ -1,0 +1,5 @@
+* B-034: COUPLER k=1.1 (field) gives a through power 1-k^2 < 0 (NaN): must be rejected
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in _ c1o1 c1o2 k=1.1
+probe1 c1o1
+.op

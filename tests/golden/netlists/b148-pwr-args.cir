@@ -1,0 +1,4 @@
+* B-148: PWR with a positional argument (none accepted)
+cwsrc1 a wl=1.55e-6 power=1e-3
+pwr1 a 1
+.tran 1e-11

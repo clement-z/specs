@@ -1,0 +1,12 @@
+{
+ "args": [
+  "-n",
+  "--json",
+  "no_such_dir/flat.json",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b017-json-unwritable"
+}

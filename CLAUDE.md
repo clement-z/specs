@@ -54,4 +54,5 @@ semantics change simulation results. **They need human sign-off**: open/annotate
 - Integration branch `dev`, `--no-ff` merges to `master`. Short lowercase imperative subjects
   (`fix(B-012): ...`, `build: ...`, `doc: ...`).
 - Never `git push` unless the maintainer explicitly asks.
-- Root `.gitignore` ignores `*.cir` and `*.vcd` repo-wide: use `git add -f` for new example/repro netlists.
+- Root `.gitignore` ignores `*.cir` (except `circuits/*.cir`; `tests/golden/` re-includes its own) and `*.vcd`
+  repo-wide: use `git add -f` for other new netlists (e.g. `backlog/repro/`).

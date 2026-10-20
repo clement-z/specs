@@ -1,5 +1,5 @@
 # B-110: `typedef struct {...} netlist_content_t` is an anonymous struct with default member initialiser (clang warning, C++20 P1766R1)
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style)
 location: src/parser/parser.l:48-56
 ## Problem
 An unnamed struct that has a default member initialiser (`FILE *fp = nullptr;`) and non-trivial members (`std::string`) and is named only through a `typedef` is no longer a valid "typedef name for linkage" in C++20 (P1766R1). Clang 19 already warns (`-Wnon-c-typedef-for-linkage`) and newer GCC/clang may turn it into an error. Needed for the clang job planned in PLAN.md:102. Survives the migration.

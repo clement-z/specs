@@ -1,0 +1,4 @@
+* B-165: .dc with a stray keyword argument after the sweep order
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.dc /cwsrc1/WL 1.5e-6 1.6e-6 1e-8 foo=1

@@ -1,0 +1,35 @@
+* B-031 regression: an MZI with a bidirectional optical net instantiates MZIActiveBi.
+* Before the fix, elaboration aborted (E107: PS1 p_vin bound twice, exit 1), and the
+* lower (reference) arm was miswired.
+* Reference: the unidirectional MZI (MZIActiveUni, *_u*). The bidirectional one must
+* give the same out1/out2 in the forward direction (*_b*, '&' on a dangling input) and
+* the same transmission backwards (*_r*: light into out1/out2 comes out of in1/in2,
+* i.e. it is reciprocal). V = 0 V in the OP printout, 1.3 V from 10 ps in the VCD.
+* Each MZI has its own nets, and every bidirectional MZI is created before its source
+* (the uni-writer slot issue is B-144).
+
+* forward, unidirectional reference: light into in1, then into in2
+mzi_u1 in_u1 nc_u1 out1_u1 out2_u1 v_u1 length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+cwsrc_u1 in_u1 wl=1.55e-6 power=1
+evlsrc_u1 v_u1 values=[[0, 0], [10e-12, 1.3]]
+mzi_u2 nc_u2 in_u2 out1_u2 out2_u2 v_u2 length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+cwsrc_u2 in_u2 wl=1.55e-6 power=1
+evlsrc_u2 v_u2 values=[[0, 0], [10e-12, 1.3]]
+
+* forward, bidirectional: light into in1, then into in2
+mzi_b1 in_b1 nc_b1& out1_b1 out2_b1 v_b1 length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+cwsrc_b1 in_b1 wl=1.55e-6 power=1
+evlsrc_b1 v_b1 values=[[0, 0], [10e-12, 1.3]]
+mzi_b2 nc_b2& in_b2 out1_b2 out2_b2 v_b2 length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+cwsrc_b2 in_b2 wl=1.55e-6 power=1
+evlsrc_b2 v_b2 values=[[0, 0], [10e-12, 1.3]]
+
+* backward, bidirectional: light into out1, then into out2
+mzi_r1 in1_r1& in2_r1& src_r1& out2_r1& v_r1 length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+cwsrc_r1 src_r1 wl=1.55e-6 power=1
+evlsrc_r1 v_r1 values=[[0, 0], [10e-12, 1.3]]
+mzi_r2 in1_r2& in2_r2& out1_r2& src_r2& v_r2 length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+cwsrc_r2 src_r2 wl=1.55e-6 power=1
+evlsrc_r2 v_r2 values=[[0, 0], [10e-12, 1.3]]
+
+.tran 20e-12

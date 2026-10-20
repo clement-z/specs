@@ -1,9 +1,20 @@
 {
- "exit": 1,
+ "exit": 0,
  "id": "gtest/unit_tests",
  "tests": {
   "A.B": "PASS",
+  "DirectionalCouplerModel.LosslessUnitarity": "PASS",
+  "DirectionalCouplerModel.Smatrix": "PASS",
+  "MergerModel.CoherentSum": "PASS",
+  "OpticalOutputPort.DesyncStopsWithoutEmitting": "PASS",
+  "OpticalOutputPort.EmptyQueueStopsWithoutEmitting": "PASS",
+  "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
+  "SPECSConfig.VerifyConfigAcceptsValidValues": "PASS",
+  "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",
+  "SplitterModel.EqualSplitWithLoss": "PASS",
   "Waveguide.Instantiation": "PASS",
-  "Waveguide.OperatingPoint": "FAIL"
+  "Waveguide.OperatingPoint": "PASS",
+  "WaveguideModel.GroupDelay": "PASS",
+  "WaveguideModel.LossAndPhaseZeroSlope": "PASS"
  }
 }

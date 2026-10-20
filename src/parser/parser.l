@@ -28,6 +28,7 @@ EOL {EOL_PORTABLE}
 %option reentrant
 %option bison-bridge
 %option stack
+%option noyy_top_state
 %option extra-type="void *"
 
 %{
@@ -128,18 +129,12 @@ int yy_load_next_buf(yyscan_t scanner)
 
 void yy_add_content_from_string(const string &str, const string &desc, yyscan_t &scanner)
 {
-    // Allocate memory for the string (c-style)
-    // necessary as flex will delete the buffer
-    char* cstr = new char[str.size() + 1];
-
-    // Copy the contents of the std::string to the new memory
-    std::strcpy(cstr, str.c_str());
-
     netlist_content_t netlist_content;
 
     netlist_content.type = netlist_content_t::STRING;
     netlist_content.description = desc;
-    netlist_content.buf = yy_scan_string(cstr, scanner);
+    // yy_scan_string copies the string into a buffer owned by flex
+    netlist_content.buf = yy_scan_string(str.c_str(), scanner);
     netlist_content.fp = nullptr;
     netlist_content_fifo.push_back(netlist_content);
 }
@@ -240,7 +235,7 @@ string convert_special_char(char c)
 
 %%  /*** Rules section ***/
 
-<INITIAL,SUBCKT_DEFINITION>^\.include  {
+<INITIAL>^\.include  {
     yy_push_state(INCLUDE, yyscanner);
 }
 <INCLUDE>{WS}*      /* eat the whitespace */
@@ -466,7 +461,7 @@ string convert_special_char(char c)
 
 ^\.OPTIONS { return T_DIRECTIVE_OPTIONS; }
 ^\.NODESET { return T_DIRECTIVE_NODESET; }
-^\.IC { exit(1); }
+^\.IC { yylerror(yyscanner, "the .ic directive is not supported"); exit(1); }
 ^\.SUBCKT {
     /* Subcircuit declaration */
     // enter new parser state
@@ -537,7 +532,12 @@ string convert_special_char(char c)
 
 
 <INITIAL><<EOF>> {
+    FILE *popped_file = YY_CURRENT_BUFFER ? YY_CURRENT_BUFFER->yy_input_file : nullptr;
     yypop_buffer_state(yyscanner);
+    // a buffer below the popped one means it was pushed by .include: close its file
+    // (main files are alone on the stack and are closed by yy_load_next_buf)
+    if (YY_CURRENT_BUFFER && popped_file)
+        fclose(popped_file);
 
     if ( !YY_CURRENT_BUFFER )
     {

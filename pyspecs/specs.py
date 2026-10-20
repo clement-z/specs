@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 import subprocess
 import time
 from .specsparse import *
@@ -16,7 +17,7 @@ Ideas:
 """
 
 default_settings = {
-    "o": "traces/delete_me.vcd",
+    "o": "traces/delete_me",
     "abstol": 1e-8,
     "reltol": 1e-4
 }
@@ -107,8 +108,7 @@ def run_and_time(simulator_command, arguments, verbose):
     print("Command: ", ' '.join(process_call))
     #p = subprocess.Popen(process_call, env=spec_env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     p = subprocess.Popen(process_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    specs_stdout, specs_stderr = p.communicate()
-    p.wait()
+    specs_stdout, _ = p.communicate()
     toc_ns = time.perf_counter_ns()
 
     time_ms = (toc_ns - tic_ns)*1e-6
@@ -116,8 +116,11 @@ def run_and_time(simulator_command, arguments, verbose):
     specs_return_code = p.returncode
     print("Execution finished with code: ", specs_return_code)
 
-    if (not specs_return_code == 0) or (verbose):
-        print("SPECS had an error. Here is the full output: ")
+    if specs_return_code != 0:
+        print(f"SPECS failed with code {specs_return_code}. Here is the full output: ")
+    elif verbose:
+        print("SPECS output: ")
+    if specs_return_code != 0 or verbose:
         for line in specs_stdout.splitlines():
             print(line.decode(encoding='utf-8', errors='ignore'))
 
@@ -148,9 +151,10 @@ def simulate(netlist_file=None,
             Defaults to "".
 
         output_file (str, optional):
-            VCD file containing all the recorded events.
+            Base name of the VCD file containing all the recorded
+            events; SPECS appends ".vcd" to it.
             Can be read with GTKWAVE or parsed with parse_vcd()
-            Defaults to "traces/delete_me.vcd".
+            Defaults to "traces/delete_me" (-> traces/delete_me.vcd).
 
         abstol (double, optional):
             Field absolute tolerance for propagating events in the simulator.
@@ -201,7 +205,8 @@ def simulate(netlist_file=None,
             to the Python shell.
     """
 
-    assert((netlist_file is not None) or (custom_arguments is not None))
+    if netlist_file is None and custom_arguments is None:
+        raise ValueError("simulate() needs netlist_file or custom_arguments")
 
 
     if 'abstol' in kwargs:
@@ -229,7 +234,7 @@ def simulate(netlist_file=None,
         arguments += create_arguments_dictionary(current_settings)
 
     simulator_name = "specs"
-    simulator_command = [simulator_directory + simulator_name]
+    simulator_command = [os.path.join(simulator_directory, simulator_name)]
 
     outputs = run_and_time(simulator_command, arguments, verbose)
 

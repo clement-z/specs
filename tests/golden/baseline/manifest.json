@@ -24,13 +24,49 @@
   "cli/missing-netlist",
   "cli/no-args",
   "cli/unknown-testbench",
+  "err/b008-dc-bare",
+  "err/b017-json-unwritable",
+  "err/b018-resolution-below-fs",
+  "err/b034-coupler-k-gt-1",
+  "err/b034-coupler-kp-negative",
+  "err/b034-splitter-ratio-gt-1",
+  "err/b064-evlsrc-missing-file",
+  "err/b131-nrings-crow-zero",
+  "err/b148-crossing-args",
+  "err/b148-mlprobe-args",
+  "err/b148-mzi-args",
+  "err/b148-options-args",
+  "err/b148-pdet-args",
+  "err/b148-probe-args",
+  "err/b148-pshift-args",
+  "err/b148-pwr-args",
+  "err/b148-tran-args",
+  "err/b149-x-kwargs-only",
+  "err/b149-x-noargs",
+  "err/b153-abstol-negative",
+  "err/b153-reltol-zero",
+  "err/b153-resolution-below-one",
+  "err/b153-resolution-negative",
+  "err/b153-timescale-out-of-range",
+  "err/b161-ic-unsupported",
+  "err/b165-dc-stray-args",
+  "err/b165-dc-stray-kwarg",
+  "err/b165-op-stray-args",
+  "err/b165-op-stray-kwarg",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
   "opt/tol-resolution-overrides",
   "opt/tracefile-o",
   "opt/vci",
+  "regress/b006-empty-output",
+  "regress/b031-mzi-bidir",
+  "regress/b036-vci-crow",
+  "regress/b131-nrings-crow",
+  "regress/b150-include-in-subckt",
+  "regress/b156-many-includes",
   "tb/ac_add_drop",
+  "tb/ac_add_drop-fd",
   "tb/ac_crow",
   "tb/dc",
   "tb/det",
@@ -51,5 +87,187 @@
   "tb/wg"
  ],
  "gtest": "gtest/unit_tests",
- "note": "Recorded on sprint/2026-10 @ 26bf92c with the CMake Release build (GCC 11.5, -std=gnu++20 -O3 -DNDEBUG -march=native on an i5-6600K, SystemC 3.0.1 built as C++20). gtest results come from an out-of-tree PATCHED copy of src/test, because the in-tree unit_tests does not compile: utils.h:81 static_assert(false) removed, and EXPECT_ANGLE_EQ rewritten as EXPECT_PRED2 with a lambda calling angleIsEqual(a.m_field, b)."
+ "note": "Recorded on sprint/2026-10 @ 26bf92c with the CMake Release build (GCC 11.5, -std=gnu++20 -O3 -DNDEBUG -march=native on an i5-6600K, SystemC 3.0.1 built as C++20). gtest results come from an out-of-tree PATCHED copy of src/test, because the in-tree unit_tests does not compile: utils.h:81 static_assert(false) removed, and EXPECT_ANGLE_EQ rewritten as EXPECT_PRED2 with a lambda calling angleIsEqual(a.m_field, b).",
+ "rerecords": [
+  {
+   "recorded_at_utc": "2026-10-20T07:00:30Z",
+   "only": "^err/b064-",
+   "gtest": false,
+   "note": "B-064: new regression case (EVLSRC missing values file named in error)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:00:30Z",
+   "only": "^cir/paul_3ring_puf$",
+   "gtest": false,
+   "note": "B-064: error message names the missing values file"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:14Z",
+   "only": "^tb/ac_crow$",
+   "gtest": false,
+   "note": "B-072: CROW children are prefixed with the instance name; stdout child names only (B-065 not landed), VCD unchanged"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:04:05Z",
+   "only": "^cir/subckt_test$",
+   "gtest": false,
+   "note": "B-132: circuits/subckt_test.cir syntax fixed; exit 1 -> 0, no VCD"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:45Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-123: in-tree unit_tests with the angle check finished upstream (b7d6fff, CmpHelperAngleEQ); Waveguide.OperatingPoint FAIL -> PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:48Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-136: 6 new device S-parameter unit tests (src/test/devices/models.cpp), all PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:04:59Z",
+   "only": "^tb/ac_add_drop-fd$",
+   "gtest": false,
+   "note": "B-138: new case tb/ac_add_drop-fd (frequency sweep branch of freqsweep_tb)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:58:43Z",
+   "only": "^regress/b006-",
+   "gtest": false,
+   "note": "B-006: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:09:08Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-020: 3 new OpticalOutputPort error-path unit tests, all PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:01:38Z",
+   "only": "^err/b017-",
+   "gtest": false,
+   "note": "B-017: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:06:17Z",
+   "only": "^err/b018-",
+   "gtest": false,
+   "note": "B-018: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:11:15Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-018: 2 new SPECSConfig::verifyConfig unit tests, all PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:07:30Z",
+   "only": "^(regress|err)/b131-",
+   "gtest": false,
+   "note": "B-131: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:11:56Z",
+   "only": "^regress/b131-nrings-crow$",
+   "gtest": false,
+   "note": "B-131: re-record on top of B-072 (CROW child names prefixed with the instance name)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:08Z",
+   "only": "^err/b008-",
+   "gtest": false,
+   "note": "B-008: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:01:50Z",
+   "only": "^err/b148-",
+   "gtest": false,
+   "note": "B-148: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:18Z",
+   "only": "^err/b165-",
+   "gtest": false,
+   "note": "B-165: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:05:49Z",
+   "only": "^err/b153-",
+   "gtest": false,
+   "note": "B-153: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:07:04Z",
+   "only": "^err/b161-",
+   "gtest": false,
+   "note": "B-161: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:09:30Z",
+   "only": "^err/b034-",
+   "gtest": false,
+   "note": "B-034: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:40Z",
+   "only": "^err/b149-",
+   "gtest": false,
+   "note": "B-149: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:01:55Z",
+   "only": "^regress/b150-",
+   "gtest": false,
+   "note": "B-150: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:05:58Z",
+   "only": "^regress/b156-",
+   "gtest": false,
+   "note": "B-156: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:07:00Z",
+   "only": "^cir-json/",
+   "gtest": false,
+   "note": "B-154: JSON export wrote the readers count as writers"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:23Z",
+   "only": "^tb/mesh$",
+   "gtest": false,
+   "note": "B-047: specs -t mesh no longer segfaults (double init removed from mesh_tb.cpp)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:40Z",
+   "only": "^regress/b031-",
+   "gtest": false,
+   "note": "B-031: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:06:41Z",
+   "only": "^tb/det(ector)?$",
+   "gtest": false,
+   "note": "B-054: detector readouts initialised to 0 (were garbage at t=0); vcd_ignore_values dropped"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:14:07Z",
+   "only": "^regress/b036-",
+   "gtest": false,
+   "note": "B-036: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:19:30Z",
+   "only": "^regress/b036-vci-crow$",
+   "gtest": false,
+   "note": "B-036: re-record on top of B-072 (CROW child names prefixed with the instance name)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:22:13Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|regress/b150-include-in-subckt|opt/tracefile-o|opt/tol-resolution-overrides|opt/mode-sampled-time|opt/mode-fd|opt/multi-file|opt/vci|regress/b031-mzi-bidir|tb/wg|tb/waveguide|tb/merg|tb/merger|tb/dc|tb/directional_coupler|tb/spli|tb/splitter|tb/det|tb/detector|tb/pcm|tb/mzi|tb/ring|tb/lambda|tb/phaseshifter|tb/ps|tb/mesh|regress/b006-empty-output)$",
+   "gtest": false,
+   "note": "B-023: field label V.m\u207b\u00b9 -> \u221aW in the stored stdout of these 30 cases (label substituted in place, so heap-layout-dependent VCD declaration order is not churned; the new build's outputs match the substituted baseline with --rtol 0 --atol 0 --print-slack 0)"
+  }
+ ]
 }

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b034-coupler-kp-negative.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b034-coupler-kp-negative"
+}

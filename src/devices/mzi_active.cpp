@@ -97,7 +97,7 @@ void MZIActiveBi::init()
     m_dc1_p2_in = make_shared<spx::oa_signal_type>((string(name()) + "/DC1_out1_1").c_str());
     m_dc1_p3_in = make_shared<spx::oa_signal_type>((string(name()) + "/DC1_out2_1").c_str());
     m_dc2_p0_out = make_shared<spx::oa_signal_type>((string(name()) + "/DC2_in1_1").c_str());
-    m_dc2_p1_out = make_shared<spx::oa_signal_type>((string(name()) + "/DC1_in2_1").c_str());
+    m_dc2_p1_out = make_shared<spx::oa_signal_type>((string(name()) + "/DC2_in2_1").c_str());
     m_ps_p0_out = make_shared<spx::oa_signal_type>((string(name()) + "/PS1_in_1").c_str());
     m_ps_p1_in = make_shared<spx::oa_signal_type>((string(name()) + "/PS1_out_1").c_str());
 
@@ -169,10 +169,10 @@ void MZIActiveBi::connect_submodules()
 
         // Bot arm
         wg3->p0_in(*m_dc1_p3_out);
-        wg3->p1_out(*m_ps_p1_out);
+        wg3->p1_out(*m_dc2_p1_in);
 
         dc2->p0_in(*m_dc2_p0_in);
-        dc2->p1_in(*m_ps_p1_out);
+        dc2->p1_in(*m_dc2_p1_in);
         dc2->p2_out(p2_out);
         dc2->p3_out(p3_out);
     }
@@ -189,17 +189,16 @@ void MZIActiveBi::connect_submodules()
 
         ps->p0_out(*m_ps_p0_out);
         ps->p1_in(*m_ps_p1_in);
-        ps->p_vin(p_vin);
 
         wg2->p0_out(*m_ps_p1_in);
         wg2->p1_in(*m_dc2_p0_out);
 
         // Bot arm
         wg3->p0_out(*m_dc1_p3_in);
-        wg3->p1_in(*m_ps_p1_in);
+        wg3->p1_in(*m_dc2_p1_out);
 
         dc2->p0_out(*m_dc2_p0_out);
-        dc2->p1_out(*m_ps_p1_in);
+        dc2->p1_out(*m_dc2_p1_out);
         dc2->p2_in(p2_in);
         dc2->p3_in(p3_in);
     }

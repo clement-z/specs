@@ -1,0 +1,10 @@
+{
+ "args": [
+  "--vci",
+  "-t",
+  "ac_crow"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b036-vci-crow"
+}

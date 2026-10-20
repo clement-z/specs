@@ -28,14 +28,14 @@ void DirectionalCouplerUni::on_port_in1_changed()
         cout << "through_field = " << abs(S13) << "" << endl;
         cout << "cross_field = " << abs(S14)<< "" << endl;
         cout << "insertion loss = " << m_dc_loss << "dB" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in1.get_interface()))->name();
+        cout << port_channel_name(p_in1);
         cout << " --,__,-> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out1.get_interface()))->name();
+        cout << port_channel_name(p_out1);
         cout << endl;
 
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in2.get_interface()))->name();
+        cout << port_channel_name(p_in2);
         cout << " --'  '-> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out2.get_interface()))->name();
+        cout << port_channel_name(p_out2);
         cout << endl;
 
         cout << endl;
@@ -136,23 +136,23 @@ void DirectionalCouplerBi::on_p0_in_changed()
         cout << "through_field = " << abs(S02) << "" << endl;
         cout << "cross_field = " << abs(S03)<< "" << endl;
         cout << "insertion loss = " << m_dc_loss << "dB" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_in.get_interface()))->name();
+        cout << port_channel_name(p0_in);
 
         cout << " --,__,-> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p2_out.get_interface()))->name();
+        cout << port_channel_name(p2_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_in.get_interface()))->name();
+        cout << port_channel_name(p1_in);
         cout << " --'  '-> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p3_out.get_interface()))->name();
+        cout << port_channel_name(p3_out);
         cout << endl;
 
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_out.get_interface()))->name();
+        cout << port_channel_name(p0_out);
         cout << " <-,__,-- ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p2_in.get_interface()))->name();
+        cout << port_channel_name(p2_in);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_out.get_interface()))->name();
+        cout << port_channel_name(p1_out);
         cout << " <-'  '-- ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p3_in.get_interface()))->name();
+        cout << port_channel_name(p3_in);
         cout << endl;
 
         cout << endl;

@@ -1,0 +1,6 @@
+* B-153: invalid .options value (resolution=-1) must be rejected
+cwsrc1 a wl=1.55e-6 power=1e-3
+wg1 a b length=1e-4
+probe1 b
+.options resolution=-1
+.tran 1e-11

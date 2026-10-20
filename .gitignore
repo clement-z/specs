@@ -21,13 +21,14 @@ detector_trace.txt
 **/.clangd/**
 detector_traces/**
 .vimrc.local
-specs
-libspecs.so
+/specs
+/libspecs.so
 gmon.out
 **/main
 **/a.out
 *.exe
 *.cir
+!/circuits/*.cir
 tmp/
 # Meson: build dirs, and wrap downloads/lock in thirdparty/ (subproject_dir)
 builddir/
