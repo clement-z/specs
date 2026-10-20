@@ -343,6 +343,90 @@
    "note": "B-148: PDET with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
   },
   {
+   "id": "err/b165-op-stray-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-op-stray-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .op with a stray positional arg is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-op-stray-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-op-stray-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .op with a stray keyword arg is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-dc-stray-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-dc-stray-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .dc with a positional arg after the sweep order is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-dc-stray-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-dc-stray-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .dc with a keyword arg after the sweep order is rejected (was silently ignored)"
+  },
+  {
    "id": "opt/tracefile-o",
    "args": [
     "-o",

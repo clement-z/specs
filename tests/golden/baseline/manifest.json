@@ -38,6 +38,10 @@
   "err/b148-pshift-args",
   "err/b148-pwr-args",
   "err/b148-tran-args",
+  "err/b165-dc-stray-args",
+  "err/b165-dc-stray-kwarg",
+  "err/b165-op-stray-args",
+  "err/b165-op-stray-kwarg",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -165,6 +169,12 @@
    "only": "^err/b148-",
    "gtest": false,
    "note": "B-148: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:18Z",
+   "only": "^err/b165-",
+   "gtest": false,
+   "note": "B-165: new regression cases"
   }
  ]
 }

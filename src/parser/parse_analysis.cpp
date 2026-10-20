@@ -24,12 +24,38 @@ void OPAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::OP;
     specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+
+    if (args.size() > 0)
+    {
+        cerr << "Error: .op: too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
+    for (const auto &p : kwargs)
+    {
+        string kw = p.first;
+        strutils::toupper(kw);
+        cerr << "Error: .op: unknown keyword " << kw << endl;
+        exit(1);
+    }
 }
 
 void DCAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::DC;
     specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+
+    if (args.size() > 0)
+    {
+        cerr << "Error: .dc: too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
+    for (const auto &p : kwargs)
+    {
+        string kw = p.first;
+        strutils::toupper(kw);
+        cerr << "Error: .dc: unknown keyword " << kw << endl;
+        exit(1);
+    }
 
     if (sweep_orders.empty())
     {

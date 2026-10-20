@@ -1,0 +1,2 @@
+Error: .op: unknown keyword FOO
+
