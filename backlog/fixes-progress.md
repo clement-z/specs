@@ -75,3 +75,7 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 | B-170 | 0446727 | wave 1 |
 | B-109 | 5611f3d | wave 1 |
 | B-177 | 2cf960d | wave 1 |
+| B-047 | 302e640 | wave 1 |
+| B-031 | 3a99564 | wave 1 |
+| B-054 | f398a14 | wave 1 |
+| B-036 | fb97125 | wave 1 |
