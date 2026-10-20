@@ -30,3 +30,10 @@ gmon.out
 *.exe
 *.cir
 tmp/
+# Meson: build dirs, and wrap downloads/lock in thirdparty/ (subproject_dir)
+builddir/
+thirdparty/packagecache/
+thirdparty/googletest-*/
+thirdparty/.wraplock
+# install.sh / CI: SystemC build and install prefix
+.deps/
