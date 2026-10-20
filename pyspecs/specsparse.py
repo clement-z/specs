@@ -101,7 +101,7 @@ def parse_vcd_dataframe(filename):
             df_probes = df_probes.drop(df_probes.loc[df_probes['wavelength']== 0].index.values)
             df_probes = df_probes.interpolate()
         else:
-            df_probes = df_probes.fillna(method='ffill')
+            df_probes = df_probes.ffill()
 
     # Same with pdetectors
     df_pdet = pd.DataFrame()
@@ -143,7 +143,7 @@ def parse_vcd_dataframe(filename):
         df_pdet = df_pdet.drop(columns=['tick'])
 
         # getting rid of the NaNs: for time domain we repeat the last valid value,
-        df_pdet = df_pdet.fillna(method='ffill')
+        df_pdet = df_pdet.ffill()
 
 
     print('--- Contents of simulation ---')
