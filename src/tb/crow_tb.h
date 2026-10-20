@@ -20,8 +20,6 @@ public:
         SC_THREAD(run_fd);
         SC_THREAD(run_td);
         SC_THREAD(monitor);
-        if (false)
-            sensitive << IN << ADD << THROUGH << DROP;
     }
 };
 

@@ -14,12 +14,16 @@
 #include "specs.h"
 
 #define EXPECT_CPLX_EQ(a,b) \
-EXPECT_FLOAT_EQ(a.real(), b.real()); \
-EXPECT_FLOAT_EQ(a.imag(), b.imag());
+do { \
+    EXPECT_DOUBLE_EQ((a).real(), (b).real()); \
+    EXPECT_DOUBLE_EQ((a).imag(), (b).imag()); \
+} while (0)
 
 #define ASSERT_CPLX_EQ(a,b) \
-ASSERT_FLOAT_EQ(a.real(), b.real()); \
-ASSERT_FLOAT_EQ(a.imag(), b.imag());
+do { \
+    ASSERT_DOUBLE_EQ((a).real(), (b).real()); \
+    ASSERT_DOUBLE_EQ((a).imag(), (b).imag()); \
+} while (0)
 
 #define EXPECT_ANGLE_EQ(x, y) \
 EXPECT_PRED_FORMAT2(::testing::CmpHelperAngleEQ, x, y);

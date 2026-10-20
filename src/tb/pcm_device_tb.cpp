@@ -8,7 +8,7 @@ void PCMElement_tb::run_1()
 {
     IN->write(OpticalSignal(sqrt(1.0e-3), 1.55e-6));
     wait(10, SC_MS);
-    IN->write(OpticalSignal(sqrt(2*1e-3), 1.55e-6)); // to 2W
+    IN->write(OpticalSignal(sqrt(2*1e-3), 1.55e-6)); // to 2 mW
     wait(10, SC_MS);
     IN->write(OpticalSignal(0, 1.55e-6));
     wait(10, SC_MS);
