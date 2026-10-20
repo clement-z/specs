@@ -57,3 +57,14 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 | B-125 | 538d8f8 | wave 1 |
 | B-136 | 1510b75 | wave 1 |
 | B-138 | dd26ddc | wave 1 |
+| B-006 | e111932 | wave 1 |
+| B-020 | d3478a9 | wave 1 |
+| B-017 | 0577e14 | wave 1 |
+| B-018 | 587c4de | wave 1 |
+| B-131 | ac676da | wave 1 |
+| B-008 | cb1f02a | wave 1 |
+| B-148 | 987293d | wave 1 |
+| B-165 | c95e3dd | wave 1 |
+| B-153 | 5055fa1 | wave 1 |
+| B-161 | 313a0cf | wave 1 |
+| B-034 | 3f7eb1c | wave 1 |
