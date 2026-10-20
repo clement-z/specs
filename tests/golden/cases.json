@@ -462,6 +462,27 @@
    ],
    "expect": "fail",
    "note": "B-018: -R below -15 (1 fs) is rejected by the CLI (was: assert abort, or E705 with NDEBUG)"
+  },
+  {
+   "id": "regress/b131-nrings-crow",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "2"
+   ],
+   "note": "B-131: --nrings_crow sets the number of rings of the ac_crow testbench (was ignored: always 3)"
+  },
+  {
+   "id": "err/b131-nrings-crow-zero",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "0"
+   ],
+   "expect": "fail",
+   "note": "B-131: --nrings_crow outside 1..1024 is rejected"
   }
  ]
 }

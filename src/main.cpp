@@ -349,7 +349,12 @@ int sc_main(int argc, char *argv[])
     }
     if (set_nrings_crow) {
         #if BUILD_TB == 1
-        //nrings_crow = set_nrings_crow.Get();
+        if (set_nrings_crow.Get() < 1 || set_nrings_crow.Get() > 1024)
+        {
+            cerr << "Invalid --nrings_crow value (expected 1..1024)" << endl;
+            return 1;
+        }
+        nrings_crow = set_nrings_crow.Get();
         #endif
     }
     if (set_timescale) {
