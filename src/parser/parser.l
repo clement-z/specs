@@ -537,7 +537,12 @@ string convert_special_char(char c)
 
 
 <INITIAL><<EOF>> {
+    FILE *popped_file = YY_CURRENT_BUFFER ? YY_CURRENT_BUFFER->yy_input_file : nullptr;
     yypop_buffer_state(yyscanner);
+    // a buffer below the popped one means it was pushed by .include: close its file
+    // (main files are alone on the stack and are closed by yy_load_next_buf)
+    if (YY_CURRENT_BUFFER && popped_file)
+        fclose(popped_file);
 
     if ( !YY_CURRENT_BUFFER )
     {

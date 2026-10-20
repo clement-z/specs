@@ -539,12 +539,19 @@ def run_case(case, specs, repo, tmp_root):
             (wd / d).mkdir(parents=True, exist_ok=True)
         before = snapshot(wd)
         argv = ["specs"] + list(case.get("args", []))
+        exe = str(specs)
+        if case.get("rlimit_nofile") is not None:
+            # Lower the soft open-files limit in a shell that then execs specs: no Python code
+            # may run between fork and exec (preexec_fn), because cases run in threads.
+            argv = ["sh", "-c", 'ulimit -S -n "$1" && shift && exec "$0" "$@"',
+                    exe, str(int(case["rlimit_nofile"]))] + list(case.get("args", []))
+            exe = "/bin/sh"
         timeout = case.get("timeout", 120)
         t0 = time.monotonic()
         try:
             p = subprocess.run(
                 argv,
-                executable=str(specs),
+                executable=exe,
                 cwd=str(wd),
                 env=make_env(),
                 stdin=subprocess.DEVNULL,

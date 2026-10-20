@@ -1,6 +1,6 @@
 {
  "format": 1,
- "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines).",
+ "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines), rlimit_nofile (soft open-files limit of the specs process).",
  "defaults": {
   "timeout": 120,
   "setup": {
@@ -140,6 +140,25 @@
     "tests/golden/netlists/b150-include-in-subckt.cir"
    ],
    "note": "B-150: .include inside a .subckt body is run per instance at flatten time (was a syntax error)"
+  },
+  {
+   "id": "regress/b156-many-includes",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/b156-many-includes.cir"
+   ],
+   "rlimit_nofile": 64,
+   "note": "B-156: 110 nested .include under a 64 open-files limit (included files were never closed)"
   },
   {
    "id": "cir-json/add_drop",

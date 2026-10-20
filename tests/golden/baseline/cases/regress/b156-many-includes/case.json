@@ -1,0 +1,10 @@
+{
+ "args": [
+  "-n",
+  "-f",
+  "tests/golden/netlists/b156-many-includes.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b156-many-includes"
+}

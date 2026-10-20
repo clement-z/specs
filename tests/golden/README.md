@@ -108,6 +108,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `vcd_ignore_values`: regexes on signal names excluded from the VCD comparison;
   * `unordered_streams`: streams compared as a multiset of lines even with `--strict-order`;
   * `ignore_streams`, `ignore_files` (globs), `timeout`;
+  * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
 ## Case list (44 `specs` cases + 1 gtest case)
