@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b031-mzi-bidir.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 28721,
+   "kind": "vcd",
+   "sha256": "1996ebbfee82a7024d11f0217561be890141bdfd993eae61ddc2c8cabd4ce62f",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b031-mzi-bidir"
+}

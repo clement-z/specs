@@ -60,6 +60,7 @@
   "opt/tracefile-o",
   "opt/vci",
   "regress/b006-empty-output",
+  "regress/b031-mzi-bidir",
   "regress/b131-nrings-crow",
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
@@ -236,6 +237,12 @@
    "only": "^tb/mesh$",
    "gtest": false,
    "note": "B-047: specs -t mesh no longer segfaults (double init removed from mesh_tb.cpp)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:03:40Z",
+   "only": "^regress/b031-",
+   "gtest": false,
+   "note": "B-031: new regression case"
   }
  ]
 }

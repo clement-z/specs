@@ -749,6 +749,23 @@
    "note": "verbose component initialisation"
   },
   {
+   "id": "regress/b031-mzi-bidir",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b031-mzi-bidir.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward"
+  },
+  {
    "id": "tb/wg",
    "args": [
     "-t",

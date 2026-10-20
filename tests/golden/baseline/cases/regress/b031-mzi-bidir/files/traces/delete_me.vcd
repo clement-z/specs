@@ -1,0 +1,1129 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaapk  abstol       $end
+$var real    1  aaapl  reltol       $end
+$var wire   32  aaapm  resolution_multiplier [31:0]  $end
+$var wire   32  aaapn  engine_timescale [31:0]  $end
+$var wire   32  aaapo  simulation_mode [31:0]  $end
+$var wire   32  aaapp  analysis_type [31:0]  $end
+$var wire    1  aaapq  trace_all_optical_nets       $end
+$var wire    1  aaapr  verbose_component_initialization       $end
+$scope module PROBE{ROOT/MZI_B1/DC1_out1_0} $end
+$var real    1  aaaia  power       $end
+$var real    1  aaaib  abs       $end
+$var real    1  aaaic  phase       $end
+$var real    1  aaaid  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC1_out1_1} $end
+$var real    1  aaaiy  power       $end
+$var real    1  aaaiz  abs       $end
+$var real    1  aaaja  phase       $end
+$var real    1  aaajb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC1_out2_0} $end
+$var real    1  aaaie  power       $end
+$var real    1  aaaif  abs       $end
+$var real    1  aaaig  phase       $end
+$var real    1  aaaih  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC1_out2_1} $end
+$var real    1  aaajc  power       $end
+$var real    1  aaajd  abs       $end
+$var real    1  aaaje  phase       $end
+$var real    1  aaajf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC2_in1_0} $end
+$var real    1  aaaii  power       $end
+$var real    1  aaaij  abs       $end
+$var real    1  aaaik  phase       $end
+$var real    1  aaail  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC2_in1_1} $end
+$var real    1  aaajg  power       $end
+$var real    1  aaajh  abs       $end
+$var real    1  aaaji  phase       $end
+$var real    1  aaajj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC2_in2_0} $end
+$var real    1  aaaim  power       $end
+$var real    1  aaain  abs       $end
+$var real    1  aaaio  phase       $end
+$var real    1  aaaip  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/DC2_in2_1} $end
+$var real    1  aaajk  power       $end
+$var real    1  aaajl  abs       $end
+$var real    1  aaajm  phase       $end
+$var real    1  aaajn  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/PS1_in_0} $end
+$var real    1  aaaiq  power       $end
+$var real    1  aaair  abs       $end
+$var real    1  aaais  phase       $end
+$var real    1  aaait  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/PS1_in_1} $end
+$var real    1  aaajo  power       $end
+$var real    1  aaajp  abs       $end
+$var real    1  aaajq  phase       $end
+$var real    1  aaajr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/PS1_out_0} $end
+$var real    1  aaaiu  power       $end
+$var real    1  aaaiv  abs       $end
+$var real    1  aaaiw  phase       $end
+$var real    1  aaaix  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B1/PS1_out_1} $end
+$var real    1  aaajs  power       $end
+$var real    1  aaajt  abs       $end
+$var real    1  aaaju  phase       $end
+$var real    1  aaajv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC1_out1_0} $end
+$var real    1  aaajw  power       $end
+$var real    1  aaajx  abs       $end
+$var real    1  aaajy  phase       $end
+$var real    1  aaajz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC1_out1_1} $end
+$var real    1  aaaku  power       $end
+$var real    1  aaakv  abs       $end
+$var real    1  aaakw  phase       $end
+$var real    1  aaakx  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC1_out2_0} $end
+$var real    1  aaaka  power       $end
+$var real    1  aaakb  abs       $end
+$var real    1  aaakc  phase       $end
+$var real    1  aaakd  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC1_out2_1} $end
+$var real    1  aaaky  power       $end
+$var real    1  aaakz  abs       $end
+$var real    1  aaala  phase       $end
+$var real    1  aaalb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC2_in1_0} $end
+$var real    1  aaake  power       $end
+$var real    1  aaakf  abs       $end
+$var real    1  aaakg  phase       $end
+$var real    1  aaakh  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC2_in1_1} $end
+$var real    1  aaalc  power       $end
+$var real    1  aaald  abs       $end
+$var real    1  aaale  phase       $end
+$var real    1  aaalf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC2_in2_0} $end
+$var real    1  aaaki  power       $end
+$var real    1  aaakj  abs       $end
+$var real    1  aaakk  phase       $end
+$var real    1  aaakl  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/DC2_in2_1} $end
+$var real    1  aaalg  power       $end
+$var real    1  aaalh  abs       $end
+$var real    1  aaali  phase       $end
+$var real    1  aaalj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/PS1_in_0} $end
+$var real    1  aaakm  power       $end
+$var real    1  aaakn  abs       $end
+$var real    1  aaako  phase       $end
+$var real    1  aaakp  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/PS1_in_1} $end
+$var real    1  aaalk  power       $end
+$var real    1  aaall  abs       $end
+$var real    1  aaalm  phase       $end
+$var real    1  aaaln  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/PS1_out_0} $end
+$var real    1  aaakq  power       $end
+$var real    1  aaakr  abs       $end
+$var real    1  aaaks  phase       $end
+$var real    1  aaakt  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_B2/PS1_out_1} $end
+$var real    1  aaalo  power       $end
+$var real    1  aaalp  abs       $end
+$var real    1  aaalq  phase       $end
+$var real    1  aaalr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC1_out1_0} $end
+$var real    1  aaamq  power       $end
+$var real    1  aaamr  abs       $end
+$var real    1  aaams  phase       $end
+$var real    1  aaamt  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC1_out1_1} $end
+$var real    1  aaano  power       $end
+$var real    1  aaanp  abs       $end
+$var real    1  aaanq  phase       $end
+$var real    1  aaanr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC1_out2_0} $end
+$var real    1  aaamu  power       $end
+$var real    1  aaamv  abs       $end
+$var real    1  aaamw  phase       $end
+$var real    1  aaamx  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC1_out2_1} $end
+$var real    1  aaans  power       $end
+$var real    1  aaant  abs       $end
+$var real    1  aaanu  phase       $end
+$var real    1  aaanv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC2_in1_0} $end
+$var real    1  aaamy  power       $end
+$var real    1  aaamz  abs       $end
+$var real    1  aaana  phase       $end
+$var real    1  aaanb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC2_in1_1} $end
+$var real    1  aaanw  power       $end
+$var real    1  aaanx  abs       $end
+$var real    1  aaany  phase       $end
+$var real    1  aaanz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC2_in2_0} $end
+$var real    1  aaanc  power       $end
+$var real    1  aaand  abs       $end
+$var real    1  aaane  phase       $end
+$var real    1  aaanf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/DC2_in2_1} $end
+$var real    1  aaaoa  power       $end
+$var real    1  aaaob  abs       $end
+$var real    1  aaaoc  phase       $end
+$var real    1  aaaod  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/PS1_in_0} $end
+$var real    1  aaang  power       $end
+$var real    1  aaanh  abs       $end
+$var real    1  aaani  phase       $end
+$var real    1  aaanj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/PS1_in_1} $end
+$var real    1  aaaoe  power       $end
+$var real    1  aaaof  abs       $end
+$var real    1  aaaog  phase       $end
+$var real    1  aaaoh  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/PS1_out_0} $end
+$var real    1  aaank  power       $end
+$var real    1  aaanl  abs       $end
+$var real    1  aaanm  phase       $end
+$var real    1  aaann  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R1/PS1_out_1} $end
+$var real    1  aaaoi  power       $end
+$var real    1  aaaoj  abs       $end
+$var real    1  aaaok  phase       $end
+$var real    1  aaaol  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC1_out1_0} $end
+$var real    1  aaage  power       $end
+$var real    1  aaagf  abs       $end
+$var real    1  aaagg  phase       $end
+$var real    1  aaagh  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC1_out1_1} $end
+$var real    1  aaahc  power       $end
+$var real    1  aaahd  abs       $end
+$var real    1  aaahe  phase       $end
+$var real    1  aaahf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC1_out2_0} $end
+$var real    1  aaagi  power       $end
+$var real    1  aaagj  abs       $end
+$var real    1  aaagk  phase       $end
+$var real    1  aaagl  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC1_out2_1} $end
+$var real    1  aaahg  power       $end
+$var real    1  aaahh  abs       $end
+$var real    1  aaahi  phase       $end
+$var real    1  aaahj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC2_in1_0} $end
+$var real    1  aaagm  power       $end
+$var real    1  aaagn  abs       $end
+$var real    1  aaago  phase       $end
+$var real    1  aaagp  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC2_in1_1} $end
+$var real    1  aaahk  power       $end
+$var real    1  aaahl  abs       $end
+$var real    1  aaahm  phase       $end
+$var real    1  aaahn  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC2_in2_0} $end
+$var real    1  aaagq  power       $end
+$var real    1  aaagr  abs       $end
+$var real    1  aaags  phase       $end
+$var real    1  aaagt  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/DC2_in2_1} $end
+$var real    1  aaaho  power       $end
+$var real    1  aaahp  abs       $end
+$var real    1  aaahq  phase       $end
+$var real    1  aaahr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/PS1_in_0} $end
+$var real    1  aaagu  power       $end
+$var real    1  aaagv  abs       $end
+$var real    1  aaagw  phase       $end
+$var real    1  aaagx  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/PS1_in_1} $end
+$var real    1  aaahs  power       $end
+$var real    1  aaaht  abs       $end
+$var real    1  aaahu  phase       $end
+$var real    1  aaahv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/PS1_out_0} $end
+$var real    1  aaagy  power       $end
+$var real    1  aaagz  abs       $end
+$var real    1  aaaha  phase       $end
+$var real    1  aaahb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_R2/PS1_out_1} $end
+$var real    1  aaahw  power       $end
+$var real    1  aaahx  abs       $end
+$var real    1  aaahy  phase       $end
+$var real    1  aaahz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U1/DC1_out1} $end
+$var real    1  aaals  power       $end
+$var real    1  aaalt  abs       $end
+$var real    1  aaalu  phase       $end
+$var real    1  aaalv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U1/DC1_out2} $end
+$var real    1  aaalw  power       $end
+$var real    1  aaalx  abs       $end
+$var real    1  aaaly  phase       $end
+$var real    1  aaalz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U1/DC2_in1} $end
+$var real    1  aaama  power       $end
+$var real    1  aaamb  abs       $end
+$var real    1  aaamc  phase       $end
+$var real    1  aaamd  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U1/DC2_in2} $end
+$var real    1  aaame  power       $end
+$var real    1  aaamf  abs       $end
+$var real    1  aaamg  phase       $end
+$var real    1  aaamh  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U1/PS1_in} $end
+$var real    1  aaami  power       $end
+$var real    1  aaamj  abs       $end
+$var real    1  aaamk  phase       $end
+$var real    1  aaaml  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U1/PS1_out} $end
+$var real    1  aaamm  power       $end
+$var real    1  aaamn  abs       $end
+$var real    1  aaamo  phase       $end
+$var real    1  aaamp  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U2/DC1_out1} $end
+$var real    1  aaaom  power       $end
+$var real    1  aaaon  abs       $end
+$var real    1  aaaoo  phase       $end
+$var real    1  aaaop  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U2/DC1_out2} $end
+$var real    1  aaaoq  power       $end
+$var real    1  aaaor  abs       $end
+$var real    1  aaaos  phase       $end
+$var real    1  aaaot  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U2/DC2_in1} $end
+$var real    1  aaaou  power       $end
+$var real    1  aaaov  abs       $end
+$var real    1  aaaow  phase       $end
+$var real    1  aaaox  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U2/DC2_in2} $end
+$var real    1  aaaoy  power       $end
+$var real    1  aaaoz  abs       $end
+$var real    1  aaapa  phase       $end
+$var real    1  aaapb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U2/PS1_in} $end
+$var real    1  aaapc  power       $end
+$var real    1  aaapd  abs       $end
+$var real    1  aaape  phase       $end
+$var real    1  aaapf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/MZI_U2/PS1_out} $end
+$var real    1  aaapg  power       $end
+$var real    1  aaaph  abs       $end
+$var real    1  aaapi  phase       $end
+$var real    1  aaapj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in1_r1:0} $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in1_r1:1} $end
+$var real    1  aaaae  power       $end
+$var real    1  aaaaf  abs       $end
+$var real    1  aaaag  phase       $end
+$var real    1  aaaah  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in1_r2:0} $end
+$var real    1  aaabg  power       $end
+$var real    1  aaabh  abs       $end
+$var real    1  aaabi  phase       $end
+$var real    1  aaabj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in1_r2:1} $end
+$var real    1  aaabk  power       $end
+$var real    1  aaabl  abs       $end
+$var real    1  aaabm  phase       $end
+$var real    1  aaabn  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2_r1:0} $end
+$var real    1  aaaai  power       $end
+$var real    1  aaaaj  abs       $end
+$var real    1  aaaak  phase       $end
+$var real    1  aaaal  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2_r1:1} $end
+$var real    1  aaaam  power       $end
+$var real    1  aaaan  abs       $end
+$var real    1  aaaao  phase       $end
+$var real    1  aaaap  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2_r2:0} $end
+$var real    1  aaabo  power       $end
+$var real    1  aaabp  abs       $end
+$var real    1  aaabq  phase       $end
+$var real    1  aaabr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2_r2:1} $end
+$var real    1  aaabs  power       $end
+$var real    1  aaabt  abs       $end
+$var real    1  aaabu  phase       $end
+$var real    1  aaabv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in_b1:0} $end
+$var real    1  aaacm  power       $end
+$var real    1  aaacn  abs       $end
+$var real    1  aaaco  phase       $end
+$var real    1  aaacp  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in_b1:1} $end
+$var real    1  aaadg  power       $end
+$var real    1  aaadh  abs       $end
+$var real    1  aaadi  phase       $end
+$var real    1  aaadj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in_b2:0} $end
+$var real    1  aaaea  power       $end
+$var real    1  aaaeb  abs       $end
+$var real    1  aaaec  phase       $end
+$var real    1  aaaed  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in_b2:1} $end
+$var real    1  aaaem  power       $end
+$var real    1  aaaen  abs       $end
+$var real    1  aaaeo  phase       $end
+$var real    1  aaaep  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in_u1} $end
+$var real    1  aaaey  power       $end
+$var real    1  aaaez  abs       $end
+$var real    1  aaafa  phase       $end
+$var real    1  aaafb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in_u2} $end
+$var real    1  aaafs  power       $end
+$var real    1  aaaft  abs       $end
+$var real    1  aaafu  phase       $end
+$var real    1  aaafv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc_b1:0} $end
+$var real    1  aaacq  power       $end
+$var real    1  aaacr  abs       $end
+$var real    1  aaacs  phase       $end
+$var real    1  aaact  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc_b1:1} $end
+$var real    1  aaacu  power       $end
+$var real    1  aaacv  abs       $end
+$var real    1  aaacw  phase       $end
+$var real    1  aaacx  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc_b2:0} $end
+$var real    1  aaads  power       $end
+$var real    1  aaadt  abs       $end
+$var real    1  aaadu  phase       $end
+$var real    1  aaadv  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc_b2:1} $end
+$var real    1  aaadw  power       $end
+$var real    1  aaadx  abs       $end
+$var real    1  aaady  phase       $end
+$var real    1  aaadz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc_u1} $end
+$var real    1  aaafc  power       $end
+$var real    1  aaafd  abs       $end
+$var real    1  aaafe  phase       $end
+$var real    1  aaaff  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc_u2} $end
+$var real    1  aaafo  power       $end
+$var real    1  aaafp  abs       $end
+$var real    1  aaafq  phase       $end
+$var real    1  aaafr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_b1:0} $end
+$var real    1  aaacy  power       $end
+$var real    1  aaacz  abs       $end
+$var real    1  aaada  phase       $end
+$var real    1  aaadb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_b1:1} $end
+$var real    1  aaadk  power       $end
+$var real    1  aaadl  abs       $end
+$var real    1  aaadm  phase       $end
+$var real    1  aaadn  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_b2:0} $end
+$var real    1  aaaee  power       $end
+$var real    1  aaaef  abs       $end
+$var real    1  aaaeg  phase       $end
+$var real    1  aaaeh  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_b2:1} $end
+$var real    1  aaaeq  power       $end
+$var real    1  aaaer  abs       $end
+$var real    1  aaaes  phase       $end
+$var real    1  aaaet  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_r2:0} $end
+$var real    1  aaabw  power       $end
+$var real    1  aaabx  abs       $end
+$var real    1  aaaby  phase       $end
+$var real    1  aaabz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_r2:1} $end
+$var real    1  aaaca  power       $end
+$var real    1  aaacb  abs       $end
+$var real    1  aaacc  phase       $end
+$var real    1  aaacd  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_u1} $end
+$var real    1  aaafg  power       $end
+$var real    1  aaafh  abs       $end
+$var real    1  aaafi  phase       $end
+$var real    1  aaafj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out1_u2} $end
+$var real    1  aaafw  power       $end
+$var real    1  aaafx  abs       $end
+$var real    1  aaafy  phase       $end
+$var real    1  aaafz  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_b1:0} $end
+$var real    1  aaadc  power       $end
+$var real    1  aaadd  abs       $end
+$var real    1  aaade  phase       $end
+$var real    1  aaadf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_b1:1} $end
+$var real    1  aaado  power       $end
+$var real    1  aaadp  abs       $end
+$var real    1  aaadq  phase       $end
+$var real    1  aaadr  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_b2:0} $end
+$var real    1  aaaei  power       $end
+$var real    1  aaaej  abs       $end
+$var real    1  aaaek  phase       $end
+$var real    1  aaael  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_b2:1} $end
+$var real    1  aaaeu  power       $end
+$var real    1  aaaev  abs       $end
+$var real    1  aaaew  phase       $end
+$var real    1  aaaex  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_r1:0} $end
+$var real    1  aaaay  power       $end
+$var real    1  aaaaz  abs       $end
+$var real    1  aaaba  phase       $end
+$var real    1  aaabb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_r1:1} $end
+$var real    1  aaabc  power       $end
+$var real    1  aaabd  abs       $end
+$var real    1  aaabe  phase       $end
+$var real    1  aaabf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_u1} $end
+$var real    1  aaafk  power       $end
+$var real    1  aaafl  abs       $end
+$var real    1  aaafm  phase       $end
+$var real    1  aaafn  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out2_u2} $end
+$var real    1  aaaga  power       $end
+$var real    1  aaagb  abs       $end
+$var real    1  aaagc  phase       $end
+$var real    1  aaagd  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/src_r1:0} $end
+$var real    1  aaaaq  power       $end
+$var real    1  aaaar  abs       $end
+$var real    1  aaaas  phase       $end
+$var real    1  aaaat  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/src_r1:1} $end
+$var real    1  aaaau  power       $end
+$var real    1  aaaav  abs       $end
+$var real    1  aaaaw  phase       $end
+$var real    1  aaaax  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/src_r2:0} $end
+$var real    1  aaace  power       $end
+$var real    1  aaacf  abs       $end
+$var real    1  aaacg  phase       $end
+$var real    1  aaach  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/src_r2:1} $end
+$var real    1  aaaci  power       $end
+$var real    1  aaacj  abs       $end
+$var real    1  aaack  phase       $end
+$var real    1  aaacl  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0 aaaaa
+r0 aaaab
+r0 aaaac
+r0 aaaad
+r0 aaaae
+r0 aaaaf
+r0 aaaag
+r0 aaaah
+r0 aaaai
+r0 aaaaj
+r0 aaaak
+r0 aaaal
+r0 aaaam
+r0 aaaan
+r0 aaaao
+r0 aaaap
+r0 aaaaq
+r0 aaaar
+r0 aaaas
+r0 aaaat
+r0 aaaau
+r0 aaaav
+r0 aaaaw
+r0 aaaax
+r0 aaaay
+r0 aaaaz
+r0 aaaba
+r0 aaabb
+r0 aaabc
+r0 aaabd
+r0 aaabe
+r0 aaabf
+r0 aaabg
+r0 aaabh
+r0 aaabi
+r0 aaabj
+r0 aaabk
+r0 aaabl
+r0 aaabm
+r0 aaabn
+r0 aaabo
+r0 aaabp
+r0 aaabq
+r0 aaabr
+r0 aaabs
+r0 aaabt
+r0 aaabu
+r0 aaabv
+r0 aaabw
+r0 aaabx
+r0 aaaby
+r0 aaabz
+r0 aaaca
+r0 aaacb
+r0 aaacc
+r0 aaacd
+r0 aaace
+r0 aaacf
+r0 aaacg
+r0 aaach
+r0 aaaci
+r0 aaacj
+r0 aaack
+r0 aaacl
+r0 aaacm
+r0 aaacn
+r0 aaaco
+r0 aaacp
+r0 aaacq
+r0 aaacr
+r0 aaacs
+r0 aaact
+r0 aaacu
+r0 aaacv
+r0 aaacw
+r0 aaacx
+r0 aaacy
+r0 aaacz
+r0 aaada
+r0 aaadb
+r0 aaadc
+r0 aaadd
+r0 aaade
+r0 aaadf
+r0 aaadg
+r0 aaadh
+r0 aaadi
+r0 aaadj
+r0 aaadk
+r0 aaadl
+r0 aaadm
+r0 aaadn
+r0 aaado
+r0 aaadp
+r0 aaadq
+r0 aaadr
+r0 aaads
+r0 aaadt
+r0 aaadu
+r0 aaadv
+r0 aaadw
+r0 aaadx
+r0 aaady
+r0 aaadz
+r0 aaaea
+r0 aaaeb
+r0 aaaec
+r0 aaaed
+r0 aaaee
+r0 aaaef
+r0 aaaeg
+r0 aaaeh
+r0 aaaei
+r0 aaaej
+r0 aaaek
+r0 aaael
+r0 aaaem
+r0 aaaen
+r0 aaaeo
+r0 aaaep
+r0 aaaeq
+r0 aaaer
+r0 aaaes
+r0 aaaet
+r0 aaaeu
+r0 aaaev
+r0 aaaew
+r0 aaaex
+r0 aaaey
+r0 aaaez
+r0 aaafa
+r0 aaafb
+r0 aaafc
+r0 aaafd
+r0 aaafe
+r0 aaaff
+r0 aaafg
+r0 aaafh
+r0 aaafi
+r0 aaafj
+r0 aaafk
+r0 aaafl
+r0 aaafm
+r0 aaafn
+r0 aaafo
+r0 aaafp
+r0 aaafq
+r0 aaafr
+r0 aaafs
+r0 aaaft
+r0 aaafu
+r0 aaafv
+r0 aaafw
+r0 aaafx
+r0 aaafy
+r0 aaafz
+r0 aaaga
+r0 aaagb
+r0 aaagc
+r0 aaagd
+r0 aaage
+r0 aaagf
+r0 aaagg
+r0 aaagh
+r0 aaagi
+r0 aaagj
+r0 aaagk
+r0 aaagl
+r0 aaagm
+r0 aaagn
+r0 aaago
+r0 aaagp
+r0 aaagq
+r0 aaagr
+r0 aaags
+r0 aaagt
+r0 aaagu
+r0 aaagv
+r0 aaagw
+r0 aaagx
+r0 aaagy
+r0 aaagz
+r0 aaaha
+r0 aaahb
+r0 aaahc
+r0 aaahd
+r0 aaahe
+r0 aaahf
+r0 aaahg
+r0 aaahh
+r0 aaahi
+r0 aaahj
+r0 aaahk
+r0 aaahl
+r0 aaahm
+r0 aaahn
+r0 aaaho
+r0 aaahp
+r0 aaahq
+r0 aaahr
+r0 aaahs
+r0 aaaht
+r0 aaahu
+r0 aaahv
+r0 aaahw
+r0 aaahx
+r0 aaahy
+r0 aaahz
+r0 aaaia
+r0 aaaib
+r0 aaaic
+r0 aaaid
+r0 aaaie
+r0 aaaif
+r0 aaaig
+r0 aaaih
+r0 aaaii
+r0 aaaij
+r0 aaaik
+r0 aaail
+r0 aaaim
+r0 aaain
+r0 aaaio
+r0 aaaip
+r0 aaaiq
+r0 aaair
+r0 aaais
+r0 aaait
+r0 aaaiu
+r0 aaaiv
+r0 aaaiw
+r0 aaaix
+r0 aaaiy
+r0 aaaiz
+r0 aaaja
+r0 aaajb
+r0 aaajc
+r0 aaajd
+r0 aaaje
+r0 aaajf
+r0 aaajg
+r0 aaajh
+r0 aaaji
+r0 aaajj
+r0 aaajk
+r0 aaajl
+r0 aaajm
+r0 aaajn
+r0 aaajo
+r0 aaajp
+r0 aaajq
+r0 aaajr
+r0 aaajs
+r0 aaajt
+r0 aaaju
+r0 aaajv
+r0 aaajw
+r0 aaajx
+r0 aaajy
+r0 aaajz
+r0 aaaka
+r0 aaakb
+r0 aaakc
+r0 aaakd
+r0 aaake
+r0 aaakf
+r0 aaakg
+r0 aaakh
+r0 aaaki
+r0 aaakj
+r0 aaakk
+r0 aaakl
+r0 aaakm
+r0 aaakn
+r0 aaako
+r0 aaakp
+r0 aaakq
+r0 aaakr
+r0 aaaks
+r0 aaakt
+r0 aaaku
+r0 aaakv
+r0 aaakw
+r0 aaakx
+r0 aaaky
+r0 aaakz
+r0 aaala
+r0 aaalb
+r0 aaalc
+r0 aaald
+r0 aaale
+r0 aaalf
+r0 aaalg
+r0 aaalh
+r0 aaali
+r0 aaalj
+r0 aaalk
+r0 aaall
+r0 aaalm
+r0 aaaln
+r0 aaalo
+r0 aaalp
+r0 aaalq
+r0 aaalr
+r0 aaals
+r0 aaalt
+r0 aaalu
+r0 aaalv
+r0 aaalw
+r0 aaalx
+r0 aaaly
+r0 aaalz
+r0 aaama
+r0 aaamb
+r0 aaamc
+r0 aaamd
+r0 aaame
+r0 aaamf
+r0 aaamg
+r0 aaamh
+r0 aaami
+r0 aaamj
+r0 aaamk
+r0 aaaml
+r0 aaamm
+r0 aaamn
+r0 aaamo
+r0 aaamp
+r0 aaamq
+r0 aaamr
+r0 aaams
+r0 aaamt
+r0 aaamu
+r0 aaamv
+r0 aaamw
+r0 aaamx
+r0 aaamy
+r0 aaamz
+r0 aaana
+r0 aaanb
+r0 aaanc
+r0 aaand
+r0 aaane
+r0 aaanf
+r0 aaang
+r0 aaanh
+r0 aaani
+r0 aaanj
+r0 aaank
+r0 aaanl
+r0 aaanm
+r0 aaann
+r0 aaano
+r0 aaanp
+r0 aaanq
+r0 aaanr
+r0 aaans
+r0 aaant
+r0 aaanu
+r0 aaanv
+r0 aaanw
+r0 aaanx
+r0 aaany
+r0 aaanz
+r0 aaaoa
+r0 aaaob
+r0 aaaoc
+r0 aaaod
+r0 aaaoe
+r0 aaaof
+r0 aaaog
+r0 aaaoh
+r0 aaaoi
+r0 aaaoj
+r0 aaaok
+r0 aaaol
+r0 aaaom
+r0 aaaon
+r0 aaaoo
+r0 aaaop
+r0 aaaoq
+r0 aaaor
+r0 aaaos
+r0 aaaot
+r0 aaaou
+r0 aaaov
+r0 aaaow
+r0 aaaox
+r0 aaaoy
+r0 aaaoz
+r0 aaapa
+r0 aaapb
+r0 aaapc
+r0 aaapd
+r0 aaape
+r0 aaapf
+r0 aaapg
+r0 aaaph
+r0 aaapi
+r0 aaapj
+r1e-08 aaapk
+r0.0001 aaapl
+b1 aaapm
+b11111111111111111111111111110011 aaapn
+b1 aaapo
+b10 aaapp
+1aaapq
+0aaapr
+$end
+
+#100
+r0.1789283139109808 aaaaa
+r0.4229991890192945 aaaab
+r0.9921134679638195 aaaac
+r1.55e-06 aaaad
+r0.8208391520375122 aaaai
+r0.906001739533381 aaaaj
+r-2.149482189046377 aaaak
+r1.55e-06 aaaal
+r0.8208391520375123 aaabg
+r0.906001739533381 aaabh
+r-2.149482189046377 aaabi
+r1.55e-06 aaabj
+r0.1789283139109809 aaabo
+r0.4229991890192946 aaabp
+r-2.149479185625974 aaabq
+r1.55e-06 aaabr
+r0.1789283139109808 aaacy
+r0.4229991890192945 aaacz
+r0.9921134679638195 aaada
+r1.55e-06 aaadb
+r0.8208391520375122 aaadc
+r0.906001739533381 aaadd
+r-2.149482189046377 aaade
+r1.55e-06 aaadf
+r0.8208391520375123 aaaee
+r0.906001739533381 aaaef
+r-2.149482189046377 aaaeg
+r1.55e-06 aaaeh
+r0.1789283139109809 aaaei
+r0.4229991890192946 aaaej
+r-2.149479185625974 aaaek
+r1.55e-06 aaael
+r0.1789283139109808 aaafg
+r0.4229991890192945 aaafh
+r0.9921134679638195 aaafi
+r1.55e-06 aaafj
+r0.8208391520375122 aaafk
+r0.906001739533381 aaafl
+r-2.149482189046377 aaafm
+r1.55e-06 aaafn
+r0.8208391520375123 aaafw
+r0.906001739533381 aaafx
+r-2.149482189046377 aaafy
+r1.55e-06 aaafz
+r0.1789283139109809 aaaga
+r0.4229991890192946 aaagb
+r-2.149479185625974 aaagc
+r1.55e-06 aaagd
+r0.4998848839990784 aaahc
+r0.7070253771959522 aaahd
+r-2.586288598349926 aaahe
+r1.55e-06 aaahf
+r0.4999424386862344 aaahs
+r0.7070660780197523 aaaht
+r3.088846517812279 aaahu
+r1.55e-06 aaahv
+r0.4998848839990783 aaaii
+r0.707025377195952 aaaij
+r2.126100382034764 aaaik
+r1.55e-06 aaail
+r0.4999424386862344 aaaiu
+r0.7070660780197523 aaaiv
+r1.518050191017382 aaaiw
+r1.55e-06 aaaix
+r0.4998848839990784 aaake
+r0.7070253771959522 aaakf
+r-2.586288598349926 aaakg
+r1.55e-06 aaakh
+r0.4999424386862344 aaakq
+r0.7070660780197523 aaakr
+r3.088846517812279 aaaks
+r1.55e-06 aaakt
+r0.4998848839990783 aaama
+r0.707025377195952 aaamb
+r2.126100382034764 aaamc
+r1.55e-06 aaamd
+r0.4999424386862344 aaamm
+r0.7070660780197523 aaamn
+r1.518050191017382 aaamo
+r1.55e-06 aaamp
+r0.4998848839990783 aaano
+r0.707025377195952 aaanp
+r2.126100382034764 aaanq
+r1.55e-06 aaanr
+r0.4999424386862344 aaaoe
+r0.7070660780197523 aaaof
+r1.518050191017382 aaaog
+r1.55e-06 aaaoh
+r0.4998848839990784 aaaou
+r0.7070253771959522 aaaov
+r-2.586288598349926 aaaow
+r1.55e-06 aaaox
+r0.4999424386862344 aaapg
+r0.7070660780197523 aaaph
+r3.088846517812279 aaapi
+r1.55e-06 aaapj
+
