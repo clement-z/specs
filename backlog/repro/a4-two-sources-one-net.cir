@@ -1,0 +1,5 @@
+* Two sources on one net (2 writers => net becomes bidirectional)
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 a wl=1.55e-6 power=2e-3
+probe1 a
+.tran 1e-11

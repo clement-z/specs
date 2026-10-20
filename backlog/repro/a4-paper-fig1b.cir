@@ -1,0 +1,11 @@
+* Netlist of the ECOC 2023 paper (doc/papers/zrounba2023-specs-ecoc.pdf), Fig. 1b, DC part, verbatim.
+* Fails on .save, then on the "dc1" coupler prefix, then on ".dc WL(cwsrc1)".
+.param wl0=1.55e-6
+.save P(out) P(drop)
+* Circuit definition
+dc1 in 1 out 2 k=0.15
+dc2 add 3 drop 4 k=0.15
+wg_ring_l 4 1 length=300e-6
+wg_ring_r 2 3 length=300e-6
+cwsrc1 in wl={wl0} power=1
+.dc WL(cwsrc1) 1549.9e-9 1550.1e-9 1e-12

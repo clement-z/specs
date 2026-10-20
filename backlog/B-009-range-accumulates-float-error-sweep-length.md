@@ -1,5 +1,5 @@
 # B-009: `range()` accumulates float error: sweep length and endpoint depend on rounding
-severity: med | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: bug | effort: S | fix-class: needs-human | verdict: CONFIRMED
 location: src/utils/general_utils.h:20-35 (loop at 32), src/parser/parse_analysis.cpp:74
 ## Problem
 `for (val = min; val < max; val += step)` accumulates rounding error. Depending on that rounding, the stop value
@@ -23,6 +23,12 @@ $ sh backlog/repro/a5-dc-sweep-endpoint.sh build/specs
 python: accumulated 30 steps from 1.535e-6 -> 1.564000000000002e-6, next 1.5650000000000019e-6 >= 1.565e-6  => dropped
         accumulated 10 steps from 1.0e-6   -> 1.999999999999999e-06 < 2.0e-6                               => kept
 ```
+
+Additional evidence (independent report F-A4-17, A4 reviewer):
+
+- `backlog/repro/a4-dc-endpoint.cir` (`.dc /cwsrc1/WL 1.5e-6 1.6e-6 1e-8`): prints
+  `Recorded sweep order for WL(CWSRC1) (9points)` but emits **11** points, 1500…1600 nm (endpoint included).
+- add_drop (`1.535e-6 1.565e-6 1e-9`): `(30points)`, 30 emitted, 1535…1564 nm (endpoint excluded).
 ## Expected
 A deterministic number of points, computed as `start + i·step`, with documented stop semantics (SPICE includes the stop).
 ## Suggested fix
@@ -34,8 +40,8 @@ DC cases: `cir/add_drop`, `cir/add_drop_sub`, `opt/mode-fd`, `opt/multi-file`, `
 ## Related
 B-010. A5 has a similar repro (a5-dc-sweep-endpoint.sh).
 
-- Discovery seeds: S1.25 (see `backlog/README.md` for seed numbering).
-- Merged duplicate reports: F-A5-02 (A5).
-- Review ids: F-A1-09, F-A5-02.
+- Discovery seeds: S1.25, S3.19 (see `backlog/README.md` for seed numbering).
+- Merged duplicate reports: F-A5-02 (A5), F-A4-17 (A4).
+- Review ids: F-A1-09, F-A5-02, F-A4-17.
 ## Verification
 Ran the repro, and emulated the loop in Python for the golden sweep.

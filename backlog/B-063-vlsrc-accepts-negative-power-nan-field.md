@@ -6,6 +6,11 @@ location: src/parser/parse_element.cpp:785-813, src/devices/value_list_source.h:
 ## Evidence
 - Golden `cir/subckt_tests` stdout: `@3 ns, ROOT/VLSRC1 emitted: ... (nan V.m⁻¹, nan W, nan rad)`.
 - Its VCD `PROBE{ROOT/in}.power`: `#1000000 r1`, `#2000000 r2`, `#4000000 r0`. It stays at 2 W through 3 ns.
+
+Additional evidence (independent report F-A4-27, A4 reviewer):
+
+tests/golden/baseline/cases/cir/subckt_tests/stdout.txt:101:
+`@3 ns, ROOT/VLSRC1 emitted: [3219] @ 1550 nm (nan V.m⁻¹, nan W, nan rad)`.
 ## Expected
 An error, or a documented clamp, for P < 0 or non-finite values, in both the list and the file paths.
 ## Suggested fix
@@ -17,6 +22,7 @@ B-053, A1 (OOP silently swallowing NaN).
 
 - Coupled with B-135: `circuits/subckt_tests.cir` (golden case `cir/subckt_tests`) relies on a negative power today.
 
-- Review ids: F-A3-17.
+- Merged duplicate reports: F-A4-27 (A4).
+- Review ids: F-A3-17, F-A4-27.
 ## Verification
 Golden baseline outputs (stdout and VCD) inspected.

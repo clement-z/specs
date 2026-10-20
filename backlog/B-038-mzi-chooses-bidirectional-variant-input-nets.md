@@ -9,6 +9,10 @@ inconsistent with WG and COUPLER, which go bidirectional when any of their nets 
 ## Evidence
 `mzi1 in _ out1& out2 v` with `.op` runs (exit 0) and builds a Uni MZI: the OP shows the `MZI1/DC1_out1` uni wires.
 `mzi1 in& _ out1 out2 v` builds the Bi variant (and aborts, B-031).
+
+Additional evidence (independent report F-A4-21, A4 reviewer):
+
+Code at :486-487 (`nets[0]`, `nets[1]` only).
 ## Expected
 The same rule as the other bidirectional elements: bidirectional if any optical net (0..3) is bidirectional.
 ## Suggested fix
@@ -19,6 +23,9 @@ None. No MZI netlist in golden.
 ## Related
 B-031 must land first, otherwise these netlists start aborting.
 
-- Review ids: F-A2-08.
+- The A4 reviewer filed the same issue (B-038, merged) and rated it needs-human; kept needs-design because the bidirectional MZI aborts today (B-031).
+
+- Merged duplicate reports: F-A4-21 (A4).
+- Review ids: F-A2-08, F-A4-21.
 ## Verification
 Ran both netlists on the stock binary. Code reading of :483-490.

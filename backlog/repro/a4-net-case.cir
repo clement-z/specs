@@ -1,0 +1,4 @@
+* "In" and "in" are two different nets; probe1 sees nothing, no warning
+cwsrc1 In wl=1.55e-6 power=1e-3
+probe1 in
+.tran 1e-11

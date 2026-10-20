@@ -1,0 +1,6 @@
+* Flat equivalent of xshared.cir
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2 wl=1.55e-6 power=1e-3
+wg1 in1 mid length=1e-4
+wg2 in2 mid length=1e-4
+.tran 1e-11

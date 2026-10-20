@@ -20,6 +20,8 @@ Delete lines 65-141, 187, 189, 319, includes 1-2 and 5, line 21 and line 25. In 
 ## Related
 B-025.
 
+- Overlaps: the `ParserState` leak is also in B-170; `do_circuit`/`raphael_main` are also listed in B-174, which defers to this issue.
+
 - Discovery seeds: S1.28, S3.32, S4.21, S5.19 (see `backlog/README.md` for seed numbering).
 - Review ids: F-A1-26.
 ## Verification

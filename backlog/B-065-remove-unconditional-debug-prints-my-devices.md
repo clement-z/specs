@@ -19,6 +19,8 @@ Golden stdouts:
 No debug output, or output gated on `specsGlobalConfig.verbose_component_initialization`.
 ## Suggested fix
 Delete these statements: crow.h:62 and :74 (`cout << _i << endl;`), crow.cpp:33/39/45, mesh_col.cpp:176/220, generic_transmission_device.cpp:157, parse_element.cpp:1058 and :1247. In specs.cpp:301-313, delete the `string detname...; cout << detname` and `pwr_meter_name` lines and keep the `trace()` calls.
+
+Skip `parse_element.cpp:1058` and `:1247`: they are covered by B-173.
 ## Golden impact
 Removed debug noise only. Re-record the stdout of tb/ac_crow, tb/det, tb/detector, cir/add_drop_pyspecs, cir-json/add_drop_pyspecs, opt/mode-sampled-time, opt/tracefile-o, and tb/mesh (with B-047). `unordered_streams` can then be removed for tb/det and tb/detector.
 ## Related

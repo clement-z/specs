@@ -1,0 +1,9 @@
+* .include inside a .subckt body (run from the repo root: resolves circuits/ relative to the cwd)
+.subckt t a b c d
+.include circuits/add_drop_sub.cir
+x1 a b c d add_drop_filter
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in drop out add t
+probe1 out
+.tran 1e-11

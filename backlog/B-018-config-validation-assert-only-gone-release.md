@@ -21,6 +21,8 @@ None (no golden case uses invalid values; the `-R` bound was validated).
 ## Related
 B-008.
 
+- Complementary: B-153 validates `.options` values at parse time.
+
 - Discovery seeds: S1.27 (see `backlog/README.md` for seed numbering).
 - Review ids: F-A1-18.
 ## Verification

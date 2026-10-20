@@ -26,6 +26,8 @@ None (validated).
 ## Related
 B-018 (asserts compiled out).
 
+- B-148 converts the other user-input asserts of the parser.
+
 - Discovery seeds: S1.24 (see `backlog/README.md` for seed numbering).
 - Review ids: F-A1-08.
 ## Verification
