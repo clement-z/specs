@@ -68,3 +68,10 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 | B-153 | 5055fa1 | wave 1 |
 | B-161 | 313a0cf | wave 1 |
 | B-034 | 3f7eb1c | wave 1 |
+| B-149 | 30cdd55 | wave 1 |
+| B-150 | f597031 | wave 1 |
+| B-156 | e22a9f9 | wave 1 |
+| B-154 | 96262f1 | wave 1 |
+| B-170 | 0446727 | wave 1 |
+| B-109 | 5611f3d | wave 1 |
+| B-177 | 2cf960d | wave 1 |
