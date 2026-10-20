@@ -17,9 +17,9 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | 0d | Golden-output baseline → `tests/golden/` (45 cases) | here (probe 4) | Opus 5.5 | done, independently re-verified |
 | 0e | Onboarding guide + CLAUDE.md | here | Opus 5.5 | done |
 | 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | done, re-verified, merged (b86a745) |
-| 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | running |
+| 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | done, merged |
 | 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (7787aed) |
-| 2 | Easy fixes (unattended) | paseo `ws-fixes` | Opus 5.5 xhigh orch. | pending |
+| 2 | Easy fixes (unattended) | paseo `ws-fixes` (branch `ws/fixes`) | Opus 5.5 xhigh orch. | running |
 | 3 | Easy cleanup | paseo `ws-cleanup` | Opus high → Sonnet → Opus | pending |
 
 ## Rules for all workstreams
@@ -43,3 +43,6 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
   `meson test` 10 ok + 1 expected-fail (`Waveguide.OperatingPoint`), golden 45/45 at `--atol 0` incl. gtest; only
   source edit is the approved `src/test/utils.h` patch. CI never ran on real runners (no push). Human-review items:
   `discover/meson/DECISIONS.md` entries tagged **[review]**.
+- 2026-10-20 — ws-review merged: 178 issues (0 critical, 15 high), 70 easy-unattended; 85 independent second checks
+  (61 confirmed, 24 corrected, 0 refuted). Reviewer rule needing maintainer sign-off: any fix that changes results of a
+  netlist that runs today is `needs-human` even if mechanical (B-052, B-146, B-147, B-035, B-009). Phase 2 launched.
