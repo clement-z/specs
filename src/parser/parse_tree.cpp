@@ -570,7 +570,7 @@ string ParseNet::to_json() const
     ss << ',';
     ss << "\"readers\":" << m_readers_count;
     ss << ',';
-    ss << "\"writers\":" << m_readers_count;
+    ss << "\"writers\":" << m_writers_count;
     ss << '}';
     return ss.str();
 }

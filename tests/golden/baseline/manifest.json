@@ -224,6 +224,12 @@
    "only": "^regress/b156-",
    "gtest": false,
    "note": "B-156: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:07:00Z",
+   "only": "^cir-json/",
+   "gtest": false,
+   "note": "B-154: JSON export wrote the readers count as writers"
   }
  ]
 }
