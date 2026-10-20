@@ -3,6 +3,7 @@
 # C++ standard in a link-time symbol, so it must match SPECS (cpp_std=gnu++20).
 # Does nothing if PREFIX already holds the same SystemC commit built by the same compiler
 # (stamp file), e.g. when restored from a CI cache. Used by install.sh and CI.
+# The build tree is not registered in the CMake user package registry (~/.cmake/packages).
 #
 # Usage: utils/build-systemc.sh PREFIX [BUILD_DIR]     (compiler: $CXX, default c++)
 set -e
@@ -28,7 +29,8 @@ cmake -S "$src" -B "$build" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON \
     -DCMAKE_INSTALL_PREFIX="$prefix" \
-    -DENABLE_EXAMPLES=OFF -DDISABLE_COPYRIGHT_MESSAGE=ON
+    -DENABLE_EXAMPLES=OFF -DDISABLE_COPYRIGHT_MESSAGE=ON \
+    -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON
 cmake --build "$build"
 cmake --install "$build"
 printf '%s\n' "$stamp" > "$prefix/.specs-systemc-stamp"

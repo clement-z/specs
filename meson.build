@@ -36,6 +36,10 @@ systemc_abi_check = '''
 #include <systemc.h>
 int sc_main(int, char *[]) { return 0; }
 '''
+# SystemC's CMake build registers its build trees in the CMake user package registry
+# (~/.cmake/packages), which may point to stale scratch builds: never search it.
+cmake_no_registry = ['-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF',
+                     '-DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON']
 systemc_dep = dependency('systemc', method: 'pkg-config', required: false, include_type: 'system')
 if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: systemc_dep,
                                          name: 'pkg-config SystemC matches cpp_std')
@@ -44,7 +48,7 @@ if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: system
 endif
 if not systemc_dep.found()
   systemc_dep = dependency('SystemCLanguage', method: 'cmake', modules: ['SystemC::systemc'],
-                           required: false, include_type: 'system')
+                           cmake_args: cmake_no_registry, required: false, include_type: 'system')
   if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: systemc_dep,
                                            name: 'CMake SystemC matches cpp_std')
     warning('Ignoring CMake SystemC package: it was built with another C++ standard than',
@@ -85,6 +89,7 @@ if not systemc_dep.found()
     'BUILD_SHARED_LIBS': false,
     'ENABLE_EXAMPLES': false,
     'DISABLE_COPYRIGHT_MESSAGE': true,
+    'CMAKE_EXPORT_NO_PACKAGE_REGISTRY': true,
     'ENABLE_REGRESSION': false,
     'BUILD_SOURCE_DOCUMENTATION': false,
   })
@@ -96,15 +101,17 @@ if not systemc_dep.found()
 endif
 
 # taywee/args is header-only.
-args_dep = dependency('args', method: 'cmake', modules: ['taywee::args'], required: false,
+args_dep = dependency('args', method: 'cmake', modules: ['taywee::args'],
+                      cmake_args: cmake_no_registry, required: false,
                       include_type: 'system')
 if not args_dep.found()
   if not fs.exists('thirdparty/args/args.hxx')
     error('taywee/args not found. Pass -Dcmake_prefix_path=<args prefix> or run ',
           '`git submodule update --init --recursive`.')
   endif
-  args_dep = declare_dependency(include_directories: include_directories('thirdparty/args',
-                                                                         is_system: true))
+  # Plain -isystem: include_directories() into the subproject_dir is a sandbox violation.
+  args_dep = declare_dependency(compile_args: ['-isystem',
+                                               meson.project_source_root() / 'thirdparty/args'])
 endif
 
 m_dep = cxx.find_library('m', required: false)
