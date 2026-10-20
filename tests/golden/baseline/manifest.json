@@ -25,6 +25,7 @@
   "cli/no-args",
   "cli/unknown-testbench",
   "err/b017-json-unwritable",
+  "err/b018-resolution-below-fs",
   "err/b064-evlsrc-missing-file",
   "opt/mode-fd",
   "opt/mode-sampled-time",
@@ -116,6 +117,18 @@
    "only": "^err/b017-",
    "gtest": false,
    "note": "B-017: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:06:17Z",
+   "only": "^err/b018-",
+   "gtest": false,
+   "note": "B-018: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:11:15Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-018: 2 new SPECSConfig::verifyConfig unit tests, all PASS"
   }
  ]
 }

@@ -40,6 +40,7 @@ SPECSConfig::SPECSConfig(sc_module_name name)
 
 void SPECSConfig::runAnalysis()
 {
+    verifyConfig();
     applyEngineResolution();
     prepareSimulation();
 

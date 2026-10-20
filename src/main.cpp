@@ -357,7 +357,7 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_timescale.Get();
         ss >> timescale_val;
-        if (!ss.eof() || ss.fail() || timescale_val > 0) {
+        if (!ss.eof() || ss.fail() || timescale_val > 0 || timescale_val < -15) {
             cerr << "Invalid resolution value" << endl;
             return 1;
         }

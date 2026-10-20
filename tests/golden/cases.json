@@ -451,6 +451,17 @@
    ],
    "expect": "fail",
    "note": "B-017: --json to a path that cannot be opened is an error (was: 'Exported ...', exit 0, no file)"
+  },
+  {
+   "id": "err/b018-resolution-below-fs",
+   "args": [
+    "-R",
+    "-16",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "B-018: -R below -15 (1 fs) is rejected by the CLI (was: assert abort, or E705 with NDEBUG)"
   }
  ]
 }

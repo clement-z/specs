@@ -137,12 +137,24 @@ public:
     void applyDefaultTraceFileToAllSignals();
     void verifyConfig()
     {
-        assert(default_abstol > 0);
-        assert(default_reltol > 0);
-        assert(default_resolution_multiplier >= 1);
-        assert(ONE_FS <= engine_timescale && engine_timescale <= ONE_SEC);
-        assert(PORT_MODE_MINVAL < simulation_mode && simulation_mode < PORT_MODE_MAXVAL);
-        assert(ANALYSIS_TYPE_MINVAL < analysis_type && analysis_type < ANALYSIS_TYPE_MAXVAL);
+        // Not asserts: the values come from user input and must also be checked with NDEBUG
+        auto invalid = [](const char *what, const auto &value)
+        {
+            std::cerr << "Error: invalid configuration: " << what << " (got " << value << ")" << std::endl;
+            exit(1);
+        };
+        if (!(default_abstol > 0))
+            invalid("abstol must be > 0", default_abstol);
+        if (!(default_reltol > 0))
+            invalid("reltol must be > 0", default_reltol);
+        if (!(default_resolution_multiplier >= 1))
+            invalid("resolution multiplier must be >= 1", default_resolution_multiplier);
+        if (!(ONE_FS <= engine_timescale && engine_timescale <= ONE_SEC))
+            invalid("timescale must be between -15 (1 fs) and 0 (1 s)", engine_timescale);
+        if (!(PORT_MODE_MINVAL < simulation_mode && simulation_mode < PORT_MODE_MAXVAL))
+            invalid("unknown simulation mode", simulation_mode);
+        if (!(ANALYSIS_TYPE_MINVAL < analysis_type && analysis_type < ANALYSIS_TYPE_MAXVAL))
+            invalid("unknown analysis type", analysis_type);
     }
     string analysisTypeDesc() const;
     void printConfig() const;
