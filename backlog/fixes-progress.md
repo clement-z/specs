@@ -1,0 +1,36 @@
+# ws-fixes — progress log (working file; the final report is `FIXES-REPORT.md`)
+
+Orchestrator: Opus 5.5 on branch `ws/fixes` (from `sprint/2026-10` @ 5539495). Instructions:
+`discover/orchestration/ws-fixes.md`. If this run is interrupted, resume from the tables below: an item is done
+when its `fix(B-NNN)` commit is on `ws/fixes`.
+
+## Scope decisions
+- 70 `easy-unattended` items, all `CONFIRMED` (no `PLAUSIBLE` candidate).
+- **Deferred to the cleanup phase (ws-cleanup)**, as the orchestration rules ask for pure `style/maintainability` items
+  (22): B-026, B-027, B-028, B-041, B-043, B-045, B-065, B-067, B-068, B-073, B-075, B-090, B-094, B-097, B-110,
+  B-111, B-112, B-141, B-142, B-173, B-174, B-178.
+- **Obsolete (Meson migration, b86a745)**: B-117, B-118 (CMake files removed; Meson uses explicit source lists and
+  defaults to `buildtype=release`). Also bookkept, though not `easy-unattended`: B-119, B-120, B-121.
+- **B-023** (field label `V.m⁻¹` → `√W`) re-records the stdout of ~25 cases, so it is done last, on top of every
+  other fix (B-047, B-132 add stdout that also carries the label).
+- B-044, B-072, B-170 are listed under "cleanup" in `SUMMARY.md` but are categorised bug / memory, so they are
+  taken here.
+- Golden harness: `record --only --note` now keeps the note (`manifest.json` → `rerecords`, b8b2aaf). Test-only
+  netlists go in `tests/golden/netlists/`; new case ids are `err/bNNN-*` (clean rejection) or `regress/bNNN-*`.
+- "Reordered" notes (heap-layout dependent stdout order, B-016) are accepted and not re-recorded per item.
+
+## Wave 1 (implementer subagents, isolated worktrees)
+| Agent | Model | Items (in order) |
+|---|---|---|
+| A test infra | Opus | B-123, B-125, B-136, B-138 |
+| B engine/CLI | Opus | B-006, B-020, B-017, B-018, B-131 |
+| C parser validation | Opus | B-008, B-148, B-165, B-153, B-161, B-034 |
+| E parser lexer/tree/memory | Opus | B-149, B-150, B-156, B-154, B-170, B-109, B-177 |
+| F devices crash/UB | Opus | B-047, B-031, B-054, B-036 |
+| D python | Sonnet | B-076, B-077, B-085, B-086, B-087, B-088, B-089, B-091, B-092, B-099 |
+| G docs/misc | Sonnet | B-114, B-083, B-100, B-102, B-082, B-064, B-044, B-072, B-132 |
+| (last) | — | B-023 |
+
+## Merged into ws/fixes
+| ID | commit | note |
+|---|---|---|
