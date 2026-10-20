@@ -27,3 +27,7 @@ B-098.
 - Review ids: F-A6-24.
 ## Verification
 Ran the function copy on the inputs above.
+
+**Independent second check (V5, of F-A6-24): CONFIRMED.** Method: extracted bitstream_as_values via ast and ran it before/after the two edits on 7 inputs
+
+Before: ([1,0,1,1,0,0,1,0],2) -> [2,1,3,2,0]; ([1,0,1,1],4) -> [11,6]; ([],8) -> [0]; ([1,1,0],1) -> [1,1,0,0]. After: [2,3,0,2]; [11]; []; [1,1,0]; ([1,0,1,1,0,1,1],4) -> [11,6] (padding when needed is kept). The two replacements are unique and local. Dependency: B-098 may delete the file; if so drop this one. The script imports scipy and matplotlib at the top, so test by extracting the function (as done) or in an environment with scipy installed.

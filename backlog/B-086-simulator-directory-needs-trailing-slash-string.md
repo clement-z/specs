@@ -26,3 +26,7 @@ B-088 (notebook uses `../build/`).
 - Review ids: F-A6-11.
 ## Verification
 `backlog/repro/a6-pyspecs-simulate.py` section 5; semantics of `os.path.join` for `""`, `"./"`, `"/abs/"`, `"/abs"`.
+
+**Independent second check (V5, of F-A6-11): CONFIRMED.** Method: applied `import os` + `os.path.join` on a scratch copy and called simulate() with 5 different simulator_directory values
+
+With the fix: "/tmp/ws-review-build", "/tmp/ws-review-build/", "/tmp/ws-review-build//", "./" (binary in the cwd) and "" (specs found via PATH) all run with rc 0. The original code fails without a trailing slash, since `dir + "specs"` becomes `.../buildspecs`. The import line (line 4, between numpy/pandas and the subprocess import) collides with the B-094 import rewrite. Apply B-094 first or add `import os` next to `import subprocess`.

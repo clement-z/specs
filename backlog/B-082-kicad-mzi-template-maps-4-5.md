@@ -29,3 +29,7 @@ B-081.
 - Review ids: F-A6-07.
 ## Verification
 Reproduced both failures with the prebuilt binary; s-expression parenthesis balance checked with a script (depth 0 at EOF). KiCad itself is not installed, so the library was not loaded in KiCad.
+
+**Independent second check (V5, of F-A6-07): CONFIRMED.** Method: reproduced both failures with /tmp/ws-review-build/specs; applied both edits on a scratch copy; paren-balance script
+
+`mzi1 a b c d length=...` gives "Parsing error ... offending token: length", and with 5 nets it runs to DONE. `evlsrc1 a values=[[0,1,1550e-9],[1e-9,0,1550e-9]]` gives "Nx2 list" error, and `[[0,1],[1e-9,0]]` runs to DONE. Edits: line 1120 (inside symbol MZI, lines 1104-1466; pins 1-4 are the left/right optical pins and pin 5 is the top "Electric" pin) `"1=1 2=2 3=3 4=4"` -> `"1=1 2=2 3=3 4=4 5=5"`; line 799 (inside ELECTRIC_V_SOURCE_LIST, 783-956) -> `values=[[t0,v0],[t1,v1]]`. S-expression depth is 0 at EOF afterwards. The identical template text at line 1843 (V_SOURCE_LIST) must stay, so use line-targeted edits. TRAP for the fixer: `utils/specs.kicad_sym` has CRLF line endings (`git ls-files --eol`: i/crlf; 1986 CRs). Use `sed -i '1120s/.../.../; 799s/.../.../'`, which preserves CR. Do not rewrite the file via Python text mode, `read().replace()` with universal newlines, or an editor that normalises EOLs. Check afterwards that `grep -c $'\r'` still returns 1986 and `git diff --stat` shows 2 lines changed.

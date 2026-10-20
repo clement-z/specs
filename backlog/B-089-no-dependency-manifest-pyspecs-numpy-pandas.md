@@ -29,3 +29,7 @@ B-077, B-094, B-084.
 - Review ids: F-A6-14.
 ## Verification
 Created a venv, installed exactly these packages and ran every script/snippet of this review with them.
+
+**Independent second check (V5, of F-A6-14): CONFIRMED.** Method: created a fresh venv from the proposed requirements.txt (py3.9) and imported pyspecs.specs; also installed it on py3.12
+
+`pip install -r` of the proposed file gives numpy 2.0.2, pandas 2.3.3, matplotlib 3.9.4, pyDigitalWaveTools 1.2 (the latest release; versions on the index end at 1.2) and `import pyspecs.specs` works. The file is not git-ignored (`git check-ignore` rc 1). Two ordering notes: (a) on Python >=3.11 the unpinned `pandas` resolves to 3.0.6, which crashes pyspecs until B-077 is applied (verified), so land B-077 first or in the same commit; (b) after B-094 removes the unused matplotlib imports from specs.py and specsparse.py, matplotlib is needed only by the notebook and utils/analyze_detector_trace.py, so the file stays valid but a comment could say so (optional). Fixer check: `python3 -m venv v && v/bin/pip install -r pyspecs/requirements.txt && v/bin/python -c 'import pyspecs.specs'` from the repo root.

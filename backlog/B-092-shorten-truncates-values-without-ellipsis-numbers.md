@@ -23,3 +23,7 @@ B-090, B-091.
 - Review ids: F-A6-17.
 ## Verification
 Ran the function on the listed inputs.
+
+**Independent second check (V5, of F-A6-17): CONFIRMED.** Method: ran shorten() on 8 inputs before/after; generated the DOT for add_drop.json (from `specs -n --json=`) and ran `dot` on it
+
+After `return s[:length-3] + '...'` (line 11): 1.2345e-09 -> '1.234...', 299792458.0 -> '29979...', 'ROOT/N00001' -> 'ROOT/...'; strings of length <= 8 and lists ('[...]') are unchanged. Both call sites pass the value through html.escape, and the generated graph (layout switched to dot for the check) renders and contains "...". The fix is one local line, no design choice.

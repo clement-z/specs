@@ -42,3 +42,7 @@ B-084, B-102, B-103, B-120.
 - Review ids: F-A6-08.
 ## Verification
 Ran doxygen with the unchanged Doxyfile (output redirected to `/tmp/ws-review-A6/doxy2`), then a scratch tree with the proposed mainpage: link target resolved to `md__r_e_a_d_m_e.html`. May be partly absorbed by the Meson doc target, but the Doxyfile edits are needed either way.
+
+**Independent second check (V5, of F-A6-08): CONFIRMED.** Method: ran doxygen 1.9.1 out of tree (OUTPUT_DIRECTORY=/tmp/ws-review-V5/doxy_*, HAVE_DOT=NO, from the tree root) before and after applying the edits
+
+Before: 77 warnings, including TCL_SUBST obsolete (line 270), COLS_IN_ALPHA_INDEX obsolete (line 1134), "input source 'QUICKSTART.md' does not exist" and "not a readable file or directory". index.html has dead `readme.html` and `quickstart.html` hrefs. After the exact edits (INPUT without QUICKSTART.md and the tab-indented README line, both obsolete tags deleted, mainpage rewritten as suggested): 73 warnings; the 4 config warnings are the only difference. index.html now has `<a class="el" href="md__r_e_a_d_m_e.html">Readme</a>`, which exists. The edit is unique and local. Detail: the Doxyfile has a blank line after each of the two obsolete tags, so delete only the tag line (or the line plus its blank) consistently. Both are harmless. Fixer check: rerun doxygen out of tree as above and expect 73 warnings with no "Tag ... obsolete", "QUICKSTART" or dead-link lines. The Doxyfile must be run from the repo root because INPUT is relative.

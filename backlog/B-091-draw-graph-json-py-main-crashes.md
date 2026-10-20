@@ -38,3 +38,7 @@ B-090, B-092, B-093.
 - Review ids: F-A6-16.
 ## Verification
 Ran the script without arguments (traceback above); with a JSON from `specs --json` it produced `ad.json.png`.
+
+**Independent second check (V5, of F-A6-16): CONFIRMED.** Method: ran the script with no args before/after; stubbed graphviz.Source to compare DOT source and out_file for 1-arg, 2-arg and 0-arg runs
+
+Before: UnboundLocalError at `out_file = json_file + ".png"`. After the suggested diff: usage message on stderr, exit status 2; the 1-arg and 2-arg cases pass the identical DOT source (md5 equal) and the same out_file to `render` as before, because `draw_graph()` has the same body as `main()` had. Real rendering could not be tested end to end here: `dot` on this host fails with "Graphviz not built with triangulation library" (that is B-093 / the separate finding about sfdp, unrelated to this fix). Fixer check: `python3 -I utils/draw_graph_from_json.py; echo $?` -> usage and 2; `python3 -m py_compile`.

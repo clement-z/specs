@@ -25,3 +25,7 @@ B-079 (same dict), B-007.
 - Review ids: F-A6-10.
 ## Verification
 `backlog/repro/a6-pyspecs-simulate.py` section 1 (file list shows `delete_me.vcd.vcd`).
+
+**Independent second check (V5, of F-A6-10): CONFIRMED.** Method: ran simulate() with the prebuilt binary before/after the one-line default change
+
+Before: `-o traces/delete_me.vcd` produces `traces/delete_me.vcd.vcd`. After changing line 19 to `"traces/delete_me"`: the file is `traces/delete_me.vcd`. The golden case opt/tracefile-o (`-o traces/custom` -> custom.vcd) confirms that `-o` takes a basename. The default dict is also used on the `custom_arguments` path, which gets the same fix. Docstring location is lines 150-153; the dict entry is line 19 only (line 20 is `abstol`; the stated range "19-20" is harmless). Same file and dict as B-079, B-086, B-087 and B-094, so apply those sequentially with content-anchored edits. Fixer check: `python3 -m py_compile`, then simulate(netlist_file=..., simulator_directory="/tmp/ws-review-build/") in a cwd with traces/ and check the file name.

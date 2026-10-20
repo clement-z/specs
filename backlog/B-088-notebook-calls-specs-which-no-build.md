@@ -22,3 +22,7 @@ B-079, B-086, B-007.
 - Review ids: F-A6-13.
 ## Verification
 Read the notebook cells with `json.load`; file layout and CMake output location checked. Not re-run end to end (jupyter not installed), but the same calls were executed from Python with `simulator_directory="/tmp/ws-review-build/"`.
+
+**Independent second check (V5, of F-A6-13): CONFIRMED.** Method: extracted and exec'd all notebook code cells from pyspecs/ in a scratch tree before and after the JSON edit (jupyter is not installed)
+
+Before: cell 2 raises FileNotFoundError '../specs' (no build produces it). After the edit (new line `simulator_directory = os.path.join(path_to_specs, "build") + os.sep` after the `sys.path.insert` line, and `simulator_directory=simulator_directory` in cells 2 and 3) with build/specs present: cells 0-9 all run, Command is `../build/specs ...`, rc 0, "Type of simulation: TD". The notebook JSON round-trips byte for byte with `json.dumps(nb, indent=1, ensure_ascii=False) + "\n"`, so a fixer may edit it via json.load/dump this way. Without `ensure_ascii=False` or the trailing newline the whole file diffs. Stored cell outputs still show `../specs`; that is expected (do not re-execute). Note: cell 0 also contains the `# Dependencies:` comment that B-089 mentions, so combine the edits if both touch it.

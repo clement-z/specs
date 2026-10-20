@@ -36,3 +36,7 @@ B-079.
 - Review ids: F-A6-12.
 ## Verification
 Read lines 100-124 and ran the verbose call; the banner appears with return code 0.
+
+**Independent second check (V5, of F-A6-12): CONFIRMED.** Method: applied the exact diff on a scratch copy; ran success, verbose, failing-netlist and no-argument cases; ran the original under `python -O`
+
+Original: with `verbose=True` and rc 0 the header is "SPECS had an error..." (reproduced by reading lines 119-120 and by the diff). Fixed: the non-verbose success prints nothing extra; verbose success prints "SPECS output:" and the output; a failing run (missing netlist, rc 1) prints "SPECS failed with code 1. Here is the full output:". The return tuple types are unchanged (float, int, bytes). With no arguments it raises `ValueError: simulate() needs netlist_file or custom_arguments`. The original under `python -O` silently skips the assert and tries to run `specs` with no arguments. Nothing in the repo catches AssertionError or matches on the old banner. The message strings are the reviewer's wording, a trivial choice that is fully specified in the finding.
