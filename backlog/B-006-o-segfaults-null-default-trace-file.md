@@ -25,3 +25,7 @@ B-007.
 ## Verification
 Ran the repro (rc=139). With the patch: rc=0, a netlist with an explicit PROBE also runs fine, and golden passes.
 Safe because both later users of the pointer already null-check it.
+
+**Independent second check (V3, of F-A1-06): CONFIRMED.** Method: applied the exact diff on the scratch copy, rebuilt, golden check --atol 0, ran the repro and probe netlists with -o ""
+
+Base: rc=139 (SIGSEGV). Patched: rc=0, "Simulated 3300 fs". Netlists with PROBE+MLPROBE+PDET (.tran) and PROBE (.dc) also run, rc=0. Golden: 44/44, 0 notes. Every other user of default_trace_file in the CLI path is after the null check at specs.cpp:261/374. Testbenches always set a trace_filename.

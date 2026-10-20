@@ -21,7 +21,7 @@ main.cpp:146 (1), parse_tree.cpp:406 from the sub-parse (1).
 - `~ParseTree`: always delete `subcircuits`.
 - parse_tree.cpp:345/351: delete the pointers before `clear()`.
 ## Golden impact
-None (behaviour-neutral).
+No value change. `check` passes, but expect heap-layout "line order differs (reordered)" notes in 6 cases (cir/add_drop_pyspecs, cir/subckt_tests, opt/tracefile-o, opt/mode-sampled-time, opt/multi-file, opt/vci): the pointer-ordered OP printout (B-016) and element creation order (B-176) move with the heap layout. Sorted stdout and all trace values are identical at `--atol 0`. Re-record those cases if `--strict-order` is in use.
 ## Related
 B-171.
 
@@ -36,3 +36,5 @@ definitions of a sub-tree are only used during its own `flatten()`.
 **Independent second check (V8, of F-A4-33): CONFIRMED.** Method: applied all 5 sub-fixes, rebuilt, golden --atol 0, valgrind --leak-check=full on `-n -f circuits/subckt_tests.cir` and on a full run of a nested-subckt netlist with a directive and an analysis inside a subckt body (base vs patched)
 
 subckt_tests: base `definitely lost: 1,450 bytes in 14 blocks` (matches the finding), patched `0 bytes in 0 blocks`, 0 errors. Nested-subckt full run: base 888 bytes in 11 blocks, patched 0. No Invalid read/write/free in either; the only remaining valgrind errors are identical SystemC coroutine stack-switch "uninitialised" reports, present in base too. Deleting sub-tree subcircuits is safe: they are only used through `xelem->parent->find_subcircuit` during that sub-tree's own flatten(). Golden: 44 pass, with 6 informational "line order differs (reordered)" notes (cir/add_drop_pyspecs, cir/subckt_tests, opt/tracefile-o, opt/mode-sampled-time, opt/multi-file, opt/vci). The sorted stdout is identical in all six: the pointer-ordered OP printout and "unidir backlog" creation order move with the heap layout, and all trace values are identical at atol 0. Suggest adding to the Golden impact: "check passes; expect heap-layout 'reordered' notes".
+
+**Orchestrator:** Golden-impact text completed with the heap-layout reorder notes observed by the second check.

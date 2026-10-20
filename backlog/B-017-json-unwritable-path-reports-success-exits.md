@@ -24,3 +24,7 @@ none.
 - Review ids: F-A1-17.
 ## Verification
 Ran the repro (`backlog/repro/a1-cli.sh`). With the patch: error message, rc=1, golden unchanged.
+
+**Independent second check (V3, of F-A1-17): CONFIRMED.** Method: ran `specs -n --json /nonexistent/x.json -f ...` before and after the exact patch (inserted after main.cpp:401), golden check --atol 0
+
+Base: "Exported ... > /nonexistent/x.json", rc=0. Patched: `Error: cannot open JSON output file "/nonexistent/x.json"`, rc=1. A writable path still writes the file, rc=0. Golden: 44/44, 0 notes. The same pattern in the dead do_circuit (main.cpp:114-118) goes away with B-026.

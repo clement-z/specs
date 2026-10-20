@@ -32,6 +32,8 @@ None. No golden case uses CROSSING.
 ## Related
 B-032 (same code; fix together). Discover 02 §4 "Crossing".
 
+- The crossing reaches the cross-wavelength branches of `OpticalSignal::operator+=`/`-=` (`optical_signal.cpp:17-32,46-61`): in TIME_DOMAIN they print to `cerr` on every event and drop the right-hand side; in FREQUENCY_DOMAIN they keep the longer λ; the mode is read from the **global** `simulation_mode`, which says TIME_DOMAIN during the OP phase of a `.tran`. That behaviour is part of this issue (seed S1.17, initially rejected as unreachable; the second check V3 showed it is reachable). The GenericTransmissionDevice also uses `operator-` but is unreachable from netlists (B-069).
+
 - Discovery seeds: S2.08 (see `backlog/README.md` for seed numbering).
 - Review ids: F-A2-03.
 ## Verification

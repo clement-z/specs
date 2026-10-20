@@ -7,7 +7,6 @@ Sorted by severity, then ID.
 | ID | title | severity | category | effort | fix-class | verdict | file:line |
 |---|---|---|---|---|---|---|---|
 | [B-001](backlog/B-001-fd-write-merges-only-queue-top.md) | FD write merges only with the queue top: stale per-λ value wins in multi-λ OP/DC | high | bug | XS | needs-human | CONFIRMED | `src/optical_output_port.cpp:371-405` |
-| [B-002](backlog/B-002-m-sampled-time-silently-drops-every.md) | `-m sampled-time` silently drops every optical write when it takes effect | high | cli | S | needs-design | CONFIRMED | `src/optical_output_port.cpp:360-369` |
 | [B-031](backlog/B-031-fix-mziactivebi-p-vin-bound-twice.md) | Fix MZIActiveBi: p_vin bound twice (elaboration abort) and arms miswired | high | bug | XS | easy-unattended | CONFIRMED | `src/devices/mzi_active.cpp:165` |
 | [B-032](backlog/B-032-crossing-s-matrix-not-passive-phase.md) | Crossing S-matrix is not passive (in-phase crosstalk, \|t\|²+\|x\|² > 1, signed xtalk) | high | physics | S | needs-human | CONFIRMED | `src/devices/crossing.cpp:9-18` |
 | [B-048](backlog/B-048-probes-never-trace-values-established-during.md) | Probes never trace values established during the OP, so constant (CW) nets show 0 in .tran | high | bug | XS | needs-design | CONFIRMED | `src/devices/probe.cpp:26-31` |
@@ -22,6 +21,7 @@ Sorted by severity, then ID.
 | [B-145](backlog/B-145-upgrade-signal-swaps-signals-existing-port.md) | upgrade_signal swaps signals when the existing port is a reader, so it loses the light | high | bug | XS | needs-design | CONFIRMED | `src/parser/parse_tree.cpp:230-237` |
 | [B-146](backlog/B-146-flatten-merges-subckt-port-nets-against.md) | Flatten merges subckt port nets against the pre-flatten map (E115, lost type check) | high | bug | XS | needs-human | CONFIRMED | `src/parser/parse_tree.cpp:899` |
 | [B-147](backlog/B-147-crossing-outputs-connected-reader-so-output.md) | Crossing outputs are connected AS_READER, so output light is dropped on bidir nets | high | bug | XS | needs-human | CONFIRMED | `src/parser/parse_element.cpp:539-540` |
+| [B-002](backlog/B-002-m-sampled-time-silently-drops-every.md) | `-m sampled-time` silently drops every optical write when it takes effect | med | cli | S | needs-design | CONFIRMED | `src/optical_output_port.cpp:360-369` |
 | [B-003](backlog/B-003-dc-sweep-point-whose-output-falls.md) | DC sweep: a point whose output falls below abstol keeps the previous point's value and λ | med | bug | XS | needs-human | CONFIRMED | `src/specs.cpp:161-175` |
 | [B-004](backlog/B-004-op-dc-tran-silently-override-m.md) | `.op`/`.dc`/`.tran` silently override the `-m` CLI mode | med | cli | S | needs-design | CONFIRMED | `src/parser/parse_analysis.cpp:26` |
 | [B-005](backlog/B-005-vcd-misses-final-timestep-every-run.md) | VCD misses the final timestep of every run that ends by event starvation | med | bug | S | needs-design | CONFIRMED | `src/specs.cpp:235-240` |

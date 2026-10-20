@@ -23,3 +23,7 @@ B-027.
 - Review ids: F-A1-28.
 ## Verification
 Grep. Compile-only change.
+
+**Independent second check (V3, of F-A1-28): CONFIRMED.** Method: grepped all symbols (src, src/tb, src/test, build files, Meson plan); applied the deletions (sc_object_is_module h+cpp, general_utils.cpp, ModuleFlags/flags, SubcircuitInstance signals/modules), rebuilt with testbenches (CMake re-glob ran automatically), golden check --atol 0
+
+Compiles. Golden: 44/44, 0 notes. There are no users anywhere, including src/test and the testbenches. describe() is correctly left alone (GTD overrides it). The Makefile uses `find`, so the deleted .cpp is picked up automatically. No meson.build exists yet. If the Meson port lands first with explicit lists, general_utils.cpp must also be removed from src/meson.build.

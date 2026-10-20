@@ -1,5 +1,5 @@
 # B-002: `-m sampled-time` silently drops every optical write when it takes effect
-severity: high | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED
 location: src/optical_output_port.cpp:360-369,413-415, src/main.cpp:204-207,297-301
 ## Problem
 `delayedWriteSampledTime` is an empty TODO. When `-m sampled-time` is in effect, every device output is
@@ -20,6 +20,8 @@ Until the mode is implemented, reject it. In main.cpp:297-301 print
 the SAMPLED_TIME case report an error instead of returning silently. Remove "sampled-time" from the help text.
 This needs a decision together with B-004 (if `-m` stops being overridden, the golden case would start dropping
 output).
+
+Correction from the second check: do not report the error inside `delayedWrite` (per-event hot path). Reject `SAMPLED_TIME` once, at configuration time: in `main.cpp:297-301` and in `verifyConfig()`/`applyConfig`, so testbenches and API users are covered too. Scope: every `.op`/`.dc`/`.tran` overrides `-m` (B-004); only the `ac_add_drop` and `ac_crow` testbenches honour it; in an analysis-less netlist the OP phase still writes, so only post-OP writes are dropped.
 ## Golden impact
 `opt/mode-sampled-time` becomes exit 1 (re-record it as expect=fail, or drop it). `cli/help` changes if the help text is edited.
 ## Related
@@ -29,3 +31,9 @@ B-004.
 - Review ids: F-A1-02.
 ## Verification
 Ran the repro with all 3 modes and compared the VCDs. Code reading: lines 360-369 have no body and line 414 returns.
+
+**Independent second check (V3, of F-A1-02): ADJUST.** Method: ran backlog/repro/a1-tran-no-analysis.cir with -m td/sampled-time/fd; ran `-t ac_add_drop -m td|sampled-time`; grepped every simulation_mode writer
+
+Reproduced. With sampled-time the VCD has 0 timestamps after $dumpvars (td: 3), "Simulated 2 ps", and rc=0. The ac_add_drop testbench VCD body has 25 lines instead of 1286. Scope is narrower than stated, in two ways. (a) Among testbenches, only ac_add_drop and ac_crow honour -m. The other 17 tb_map entries force EVENT_DRIVEN (src/tb/*_tb.cpp `simulation_mode = EVENT_DRIVEN`). (b) In an analysis-less netlist, the OP phase still runs in NO_DELAY, so CW propagation and the OP printout work. Only writes after OP (in the TRAN phase) are dropped. Every .op/.dc/.tran overrides -m. The output is conspicuously empty, not plausibly wrong. I suggest severity med instead of high. Fix note: do not report the error inside delayedWrite (CLAUDE.md: no printing in per-event hot paths). Reject SAMPLED_TIME once, in main.cpp:297-301 and in verifyConfig()/applyConfig, so that testbenches and API users are covered too. needs-design and golden impact text are OK.
+
+**Orchestrator:** Severity lowered high -> med (the effect is a conspicuously empty trace on a narrow path); fix location corrected.

@@ -35,8 +35,14 @@ None (validated: 44/44 golden pass with exactly these changes plus B-006/08/17/1
 ## Related
 B-027. These errors (like other `sc_stop()` error paths, e.g. GTD) still exit with status 0.
 
+- Wording correction from the second check: `sc_stop()` *does* return to the caller, which is exactly why the thread falls through. Overlap: `optical_output_port.cpp:108-109` (`drop_all_events`) is deleted by B-027.
+
 - Discovery seeds: S1.06, S1.07 (see `backlog/README.md` for seed numbering).
 - Review ids: F-A1-20.
 ## Verification
 Code reading and a golden run of the patched binary. Safe because the removed reset only drops entries that the
 `sc_event_queue` still expects, and the two `continue`s only affect paths that are already errors.
+
+**Independent second check (V3, of F-A1-20): CONFIRMED.** Method: applied exactly the three changes (first occurrence only; the #if 0 copy at :215-216 is untouched), rebuilt with testbenches, golden check --atol 0; grepped baseline for the error strings
+
+Golden: 44/44, 0 notes, including tb/mesh (still SIGSEGV, which is unrelated: B-047). No baseline output contains "write cancelled" or "desync", so all changed paths are error-only. The queue reset is a no-op in every golden case, because the OOP thread runs before its writers at init. Otherwise "write cancelled" would already appear. Wording nit: sc_stop() does return to the caller (that is why execution falls through to m_queue.top()). The parenthetical "which does not return control" should read "which returns, so the thread keeps executing".

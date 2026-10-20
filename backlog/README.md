@@ -51,6 +51,9 @@ there.
 - Repro commands assume a Release build at `build/specs` and a cwd that contains `circuits/` and an empty
   `traces/` dir, e.g. `mkdir -p /tmp/r/traces && cp -r circuits backlog/repro /tmp/r && cd /tmp/r &&
   <repo>/build/specs -f repro/<file>.cir`.
+- Paths under `/tmp/ws-review-*` (e.g. `/tmp/ws-review-build/specs`, `/tmp/ws-review-ninja.log`) record where a
+  reviewer or second checker ran something. They are provenance only and are not kept; everything needed to
+  reproduce an issue is in `backlog/repro/`.
 - **Golden impact** names case ids from `tests/golden/cases.json` (`python3 -I tests/golden/run_golden.py list`).
   A fix whose impact is not "none" must re-record the baseline in the same commit (see `CLAUDE.md`).
 - **Seeds** `S<r>.<n>` refer to the n-th bullet of the "Seeds for backlog" section of
