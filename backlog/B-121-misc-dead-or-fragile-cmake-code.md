@@ -11,6 +11,10 @@ obsoleted-by-meson: yes for all (PLAN.md:85-91,125 replaces them with `-Dtests`/
 - src/parser/CMakeLists.txt:34-38 leaves a debugging `get_cmake_property` + `message(STATUS "HH_FILES=...")` that prints on every configure; src/tb/CMakeLists.txt lists the sources twice (`add_library(... ${SRC_FILES})` then `target_sources`).
 ## Evidence
 Commands above (cfg4/cfg5 scratch configures).
+
+Additional evidence (independent report F-A5-23, A5 reviewer):
+
+Code reading; `unit_tests` failed to compile in `all` until B-123; the discovery doc (04-build-test-ci.md section 2) lists `-DBUILD_TB=OFF` as "without gtest".
 ## Expected
 n/a (deleted with CMake).
 ## Suggested fix
@@ -20,7 +24,8 @@ none.
 ## Related
 B-117, B-118, B-119, B-120.
 
-- Discovery seeds: S4.12, S4.19, S5.27, S5.28 (see `backlog/README.md` for seed numbering).
-- Review ids: F-A7-18.
+- Discovery seeds: S4.12, S4.19, S5.27, S5.28, S1.04 (see `backlog/README.md` for seed numbering).
+- Merged duplicate reports: F-A5-23 (A5).
+- Review ids: F-A7-18, F-A5-23.
 ## Verification
 Configures in `/tmp/ws-review-A7/cfg*`; `ctest -N` in root and in `src/test`.

@@ -12,6 +12,8 @@ location: src/main.cpp:197-201,209-212,219-222,244-247,341-345,357-359,382-429
 Every flag either works or is removed. Conflicting flags are rejected.
 ## Suggested fix
 Remove `-T`. Either wire `--nrings_crow` (uncomment main.cpp:343 under `BUILD_TB`) or remove it. Error on `-f` together with `-t`. Fix the help strings.
+
+Note: the `--nrings_crow` part is split out as B-131 (wire the option back, with a range check). This issue keeps `-T`, `-f` vs `-t` and the help strings.
 ## Golden impact
 `cli/help` stdout.
 ## Related

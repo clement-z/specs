@@ -1,0 +1,8 @@
+* lossless all-pass ring, CW operating point: |T|^2 must be 1.0 W
+* run: specs -f a5-allpass-ring-op.cir --reltol 1e-4  -> out = 0.995098 W (0.49 % error); --reltol 1e-9 -> 1.000000 W
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=0.3872983346207417
+wg_ring ring_br ring_bl length=775e-6 neff=1 ng=1 att=0
+probe1 out
+.options timescale=-13
+.op

@@ -15,6 +15,8 @@ cir/subckt_tests and opt/vci (same netlist) would fail or change unless the exam
 ## Related
 B-053, A1 (OOP silently swallowing NaN).
 
+- Coupled with B-135: `circuits/subckt_tests.cir` (golden case `cir/subckt_tests`) relies on a negative power today.
+
 - Review ids: F-A3-17.
 ## Verification
 Golden baseline outputs (stdout and VCD) inspected.

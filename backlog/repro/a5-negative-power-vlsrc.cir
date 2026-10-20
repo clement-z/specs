@@ -1,0 +1,6 @@
+* A value list entry with negative power gives a NaN field (sqrt(-2)); shipped in circuits/subckt_tests.cir:26 as [3e-9, -2,]
+* run: specs -f a5-negative-power-vlsrc.cir | grep emitted
+*   @3 ns, ROOT/VLSRC1 emitted: ... (nan V.m^-1, -nan W, -nan rad)
+vlsrc1 in values=[[1e-9,1,1.55e-6],[3e-9,-2,],[4e-9,0,]]
+probe1 in
+.tran 5e-9

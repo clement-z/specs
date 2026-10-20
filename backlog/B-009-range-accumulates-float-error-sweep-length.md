@@ -13,6 +13,16 @@ Starting sweep on P(ROOT/CWSRC1) (11 points)        <- last point P=0.9999999999
 ```
 With step 0.25 the stop is excluded (4 points). In golden add_drop.cir (1535-1565 nm, 1 nm step), 28 of 30 λ
 differ from `start+i·step`. The VCD shows e.g. `1.546000000000001e-06`.
+
+Additional evidence (independent report F-A5-02, A5 reviewer):
+
+```
+$ sh backlog/repro/a5-dc-sweep-endpoint.sh build/specs
+== a.cir   Starting sweep on WL(ROOT/CWSRC1) (30 points) ... last: emitted @ 1564 nm   (window 1535..1565, step 1e-9)
+== b.cir   Starting sweep on WL(ROOT/CWSRC1) (11 points) ... last: emitted @ 2000 nm   (1.0..2.0 um step 0.1 um)
+python: accumulated 30 steps from 1.535e-6 -> 1.564000000000002e-6, next 1.5650000000000019e-6 >= 1.565e-6  => dropped
+        accumulated 10 steps from 1.0e-6   -> 1.999999999999999e-06 < 2.0e-6                               => kept
+```
 ## Expected
 A deterministic number of points, computed as `start + i·step`, with documented stop semantics (SPICE includes the stop).
 ## Suggested fix
@@ -25,6 +35,7 @@ DC cases: `cir/add_drop`, `cir/add_drop_sub`, `opt/mode-fd`, `opt/multi-file`, `
 B-010. A5 has a similar repro (a5-dc-sweep-endpoint.sh).
 
 - Discovery seeds: S1.25 (see `backlog/README.md` for seed numbering).
-- Review ids: F-A1-09.
+- Merged duplicate reports: F-A5-02 (A5).
+- Review ids: F-A1-09, F-A5-02.
 ## Verification
 Ran the repro, and emulated the loop in Python for the golden sweep.
