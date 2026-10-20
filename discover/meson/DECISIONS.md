@@ -119,15 +119,17 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
     test). When the angle check is fixed, `unit-known-failure` turns red, which prompts merging it back and
     re-recording the golden gtest baseline. `should_fail` is deprecated in Meson 1.11 in favour of
     `expected_fail`, but `expected_fail` does not exist in the 1.3 minimum, so `should_fail` stays (a NOTICE
-    only).
+    only). *Superseded (fix phase, B-123): the angle check is fixed, `unit-known-failure` is gone and `unit`
+    runs every test.*
 22. **`unit`, `unit-known-failure` and `golden` are `is_parallel: false`:** the unit tests write the fixed path
-    `/tmp/specs_test2.vcd`, and the golden test runs `unit_tests` too.
+    `/tmp/specs_test2.vcd`, and the golden test runs `unit_tests` too. (`unit-known-failure` no longer
+    exists since B-123.)
 23. **`tb` suite:** one test per name of the old `make test` (`waveguide splitter merger detector
     directional_coupler phaseshifter mzi pcm`). `ring`, `ac_add_drop`, `ac_crow` and `mesh` stay disabled, as
     they were commented out in the Makefile; `mesh` segfaults (backlog). They run through `sh -c 'mkdir -p
     traces && exec specs -t <name>'` in the build root, so traces go to `<builddir>/traces/`. As before they
     only catch crashes, because `specs -t` exits 0 even when it prints `Failure!`. The golden suite covers all
-    19 names with outputs.
+    19 names with outputs. *Since B-047 `mesh` no longer segfaults and is in the `tb` suite.*
 24. **`golden` test** = the CLAUDE.md gate command (default tolerances, `-j 4`, `--unit-tests` when built). It is
     only registered with `-Dold_tb=true`, because the `tb/*` cases need the testbenches.
 
