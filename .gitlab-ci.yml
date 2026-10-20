@@ -1,8 +1,6 @@
-# Currently using alpine as base
-#image: alpine:latest
-image: alpine:latest
-# TODO: Migrate to another base including all the dependencies
-# in order to avoid fetching and installing everything each time
+# Same steps as .github/workflows/ci.yml. SystemC is built from the thirdparty/systemc submodule
+# as C++20 (distro packages may use another standard, which fails at link time) and cached.
+image: ubuntu:24.04
 
 stages:
     - build
@@ -12,68 +10,73 @@ stages:
 variables:
     # Recursive submodule update
     GIT_SUBMODULE_STRATEGY: recursive
+    DEBIAN_FRONTEND: noninteractive
+    MESON_VERSION: "1.11.2"
+    SYSTEMC_PREFIX: $CI_PROJECT_DIR/.deps/systemc
 
-before_script:
-    # Add the testing repo for SystemC
-    - echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories
-    # Install all dependencies
-    - apk update
-    - apk add --no-cache
-      bash findutils
-      build-base bison flex
-      doxygen graphviz
-      systemc-dev
-    - cp .config.gitlab-ci.mk config.local.mk
+default:
+    before_script:
+        - apt-get update
+        - apt-get install -y --no-install-recommends
+          ca-certificates git g++ cmake ninja-build flex bison
+          python3 python3-venv doxygen graphviz
+        - python3 -m venv /opt/meson
+        - /opt/meson/bin/pip install "meson==${MESON_VERSION}"
+        - export PATH="/opt/meson/bin:$PATH"
+        # No-op when the cache already holds this SystemC commit built by this compiler
+        - utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
+    cache:
+        key: systemc-ubuntu24.04-gcc
+        paths:
+            - .deps/systemc
 
 build:
     stage: build
     script:
-      - make -j$(nproc) bin V=1
-      - make -j$(nproc) lib V=1
+        - meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+        - meson compile -C build
+        # libspx.so is not built by default
+        - meson compile -C build spx
     artifacts:
         paths:
-            - "./specs"
-            - "./libspecs.so"
+            - build/
+        expire_in: 1 week
 
 test:
     stage: test
+    needs: [build]
     script:
-        # Only running a few tests manually for now
-        - ./specs -t wg
-        #- ./specs -t dc
-        #- ./specs -t splitter
-        #- ./specs -t merger
-        #- ./specs -t detector
-        #- ./specs -t phaseshifter
-        # TODO: add other tests (both from -t and the circuit test files)
-    dependencies:
-        - build
+        # The build directory comes from the build job's artifacts; this only re-links if needed
+        - meson test -C build --print-errorlogs
     artifacts:
+        when: always
         paths:
-            - "traces/*.vcd"
+            - build/specs
+            - build/libspx.so
+            - build/meson-logs/
+            - build/traces/*.vcd
 
 doc:
     stage: build
     script:
-        - make doc
+        - meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX" -Dtests=disabled
+        - ninja -C build doc
     artifacts:
         paths:
-            - doc/pcm-doc.tar.xz
-            - doc/html/
+            - build/doc/html/
     only:
         - master
 
-
 pages:
     stage: deploy
+    needs: [doc]
+    before_script: []
+    cache: []
     script:
         - mkdir public
-        - cp -R doc/html/* public
-    dependencies:
-        - doc
+        - cp -R build/doc/html/* public
     artifacts:
         paths:
             - public
     only:
         - master
-
