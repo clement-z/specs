@@ -439,6 +439,18 @@
     "circuits/add_drop_pyspecs.cir"
    ],
    "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file)"
+  },
+  {
+   "id": "err/b017-json-unwritable",
+   "args": [
+    "-n",
+    "--json",
+    "no_such_dir/flat.json",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "B-017: --json to a path that cannot be opened is an error (was: 'Exported ...', exit 0, no file)"
   }
  ]
 }

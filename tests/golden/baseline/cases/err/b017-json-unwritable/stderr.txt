@@ -1,0 +1,2 @@
+Error: cannot open JSON output file "no_such_dir/flat.json"
+

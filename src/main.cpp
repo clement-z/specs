@@ -408,6 +408,11 @@ int sc_main(int argc, char *argv[])
         {
             ofstream outfile;
             outfile.open(json_filename, ios::out | ios::trunc);
+            if (!outfile)
+            {
+                cerr << "Error: cannot open JSON output file \"" << json_filename << "\"" << endl;
+                return 1;
+            }
             outfile << pt.to_json();
             outfile.close();
             cout << "Exported flattened circuit as JSON > " << json_filename << endl;

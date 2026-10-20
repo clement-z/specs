@@ -24,6 +24,7 @@
   "cli/missing-netlist",
   "cli/no-args",
   "cli/unknown-testbench",
+  "err/b017-json-unwritable",
   "err/b064-evlsrc-missing-file",
   "opt/mode-fd",
   "opt/mode-sampled-time",
@@ -109,6 +110,12 @@
    "only": "^gtest",
    "gtest": true,
    "note": "B-020: 3 new OpticalOutputPort error-path unit tests, all PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:01:38Z",
+   "only": "^err/b017-",
+   "gtest": false,
+   "note": "B-017: new regression case"
   }
  ]
 }
