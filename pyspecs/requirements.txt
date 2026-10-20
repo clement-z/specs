@@ -1,0 +1,8 @@
+numpy
+pandas
+matplotlib
+pyDigitalWaveTools>=1.2
+# optional: utils/draw_graph_from_json.py (also needs the Graphviz `dot` binary)
+# graphviz
+# optional: utils/analyze_detector_trace.py
+# scipy
