@@ -32,17 +32,17 @@ public:
     shared_ptr<DirectionalCouplerBase> m_dc1, m_dc2;
     shared_ptr<PhaseShifterBase> m_ps;
 
-    /** Constructor for Waveguide
+    /** Constructor for MZIActive
      *
      * @param name name of the module
-     * @param m_ps_sens_rad_v sensitivity of phase shifter
-     * @param m_length_cm length of the phase-shifter arm
-     * @param m_length_ref_cm length of the reference arm
-     * @param m_attenuation_dB_cm loss per cm of wgs
-     * @param m_neff neff of wgs
-     * @param m_ng ng of wgs
-     * @param m_dc_loss_dB insertion loss of the y-junctions
-     * @param m_ps_loss_dB insertion loss of the phase shifter
+     * @param ps_sens_rad_v sensitivity of phase shifter
+     * @param length_cm length of the phase-shifter arm
+     * @param length_ref_cm length of the reference arm
+     * @param attenuation_dB_cm loss per cm of wgs
+     * @param neff neff of wgs
+     * @param ng ng of wgs
+     * @param dc_loss_dB insertion loss of the y-junctions
+     * @param ps_loss_dB insertion loss of the phase shifter
      * */
     MZIActiveBase(sc_module_name name,
                 double ps_sens_rad_v = 1,
@@ -80,17 +80,17 @@ public:
     virtual void init();
     virtual void connect_submodules();
 
-    /** Constructor for Waveguide
+    /** Constructor for MZIActive
      *
      * @param name name of the module
-     * @param m_ps_sens_rad_v sensitivity of phase shifter
-     * @param m_length_cm length of the phase-shifter arm
-     * @param m_length_ref_cm length of the reference arm
-     * @param m_attenuation_dB_cm loss per cm of wgs
-     * @param m_neff neff of wgs
-     * @param m_ng ng of wgs
-     * @param m_dc_loss_dB insertion loss of the y-junctions
-     * @param m_ps_loss_dB insertion loss of the phase shifter
+     * @param ps_sens_rad_v sensitivity of phase shifter
+     * @param length_cm length of the phase-shifter arm
+     * @param length_ref_cm length of the reference arm
+     * @param attenuation_dB_cm loss per cm of wgs
+     * @param neff neff of wgs
+     * @param ng ng of wgs
+     * @param dc_loss_dB insertion loss of the y-junctions
+     * @param ps_loss_dB insertion loss of the phase shifter
      * */
     MZIActiveUni(sc_module_name name,
                  double ps_sens_rad_v = 1,
@@ -143,17 +143,17 @@ public:
     virtual void init();
     virtual void connect_submodules();
 
-    /** Constructor for Waveguide
+    /** Constructor for MZIActive
      *
      * @param name name of the module
-     * @param m_ps_sens_rad_v sensitivity of phase shifter
-     * @param m_length_cm length of the phase-shifter arm
-     * @param m_length_ref_cm length of the reference arm
-     * @param m_attenuation_dB_cm loss per cm of wgs
-     * @param m_neff neff of wgs
-     * @param m_ng ng of wgs
-     * @param m_dc_loss_dB insertion loss of the y-junctions
-     * @param m_ps_loss_dB insertion loss of the phase shifter
+     * @param ps_sens_rad_v sensitivity of phase shifter
+     * @param length_cm length of the phase-shifter arm
+     * @param length_ref_cm length of the reference arm
+     * @param attenuation_dB_cm loss per cm of wgs
+     * @param neff neff of wgs
+     * @param ng ng of wgs
+     * @param dc_loss_dB insertion loss of the y-junctions
+     * @param ps_loss_dB insertion loss of the phase shifter
      * */
     MZIActiveBi(sc_module_name name,
                  double ps_sens_rad_v = 1,
