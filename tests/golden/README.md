@@ -126,7 +126,6 @@ is visible; re-record when it is fixed on purpose.
 
 * `cir/double_ring`, `cir/triple_ring`, `cir/paul_simple_ring`: parse error
   (legacy netlist syntax, `one 0` at line 4), exit 1.
-* `cir/subckt_test`: parse error (`cwsrc` is not a recognised element), exit 1.
 * `cir/paul_3ring_puf`: the VLSRC values file
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
 * `tb/mesh`: **SIGSEGV** in `SPECSConfig::prepareSimulation()`. It calls

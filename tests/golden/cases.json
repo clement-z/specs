@@ -70,9 +70,7 @@
    "args": [
     "-f",
     "circuits/subckt_test.cir"
-   ],
-   "expect": "fail",
-   "note": "parse error: element 'cwsrc' (line 5) is not a recognised element name"
+   ]
   },
   {
    "id": "cir/subckt_tests",

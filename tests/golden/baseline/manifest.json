@@ -71,6 +71,12 @@
    "only": "^tb/ac_crow$",
    "gtest": false,
    "note": "B-072: CROW children are prefixed with the instance name; stdout child names only (B-065 not landed), VCD unchanged"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:04:05Z",
+   "only": "^cir/subckt_test$",
+   "gtest": false,
+   "note": "B-132: circuits/subckt_test.cir syntax fixed; exit 1 -> 0, no VCD"
   }
  ]
 }
