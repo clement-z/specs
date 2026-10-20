@@ -31,7 +31,11 @@ void DCAnalysis::create() const
     specsGlobalConfig.analysis_type = SPECSConfig::DC;
     specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
 
-    assert(sweep_orders.size() > 0);
+    if (sweep_orders.empty())
+    {
+        cerr << "Error: .dc analysis requires a sweep order (e.g. .dc /cwsrc1/WL start stop step)" << endl;
+        exit(1);
+    }
 
     set<CWSource *>  all_cws = sc_get_all_object_by_type<CWSource>();
     vector<CWSource *>  all_cws_vec(all_cws.begin(), all_cws.end());

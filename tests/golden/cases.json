@@ -133,6 +133,27 @@
    "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
   },
   {
+   "id": "err/b008-dc-bare",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b008-dc-bare.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-008: bare .dc (no sweep order) gives a clean error (was an assert abort, or UB in specs.cpp with NDEBUG)"
+  },
+  {
    "id": "opt/tracefile-o",
    "args": [
     "-o",

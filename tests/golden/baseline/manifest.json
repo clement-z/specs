@@ -24,6 +24,7 @@
   "cli/missing-netlist",
   "cli/no-args",
   "cli/unknown-testbench",
+  "err/b008-dc-bare",
   "err/b017-json-unwritable",
   "err/b018-resolution-below-fs",
   "err/b064-evlsrc-missing-file",
@@ -143,6 +144,12 @@
    "only": "^regress/b131-nrings-crow$",
    "gtest": false,
    "note": "B-131: re-record on top of B-072 (CROW child names prefixed with the instance name)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:08Z",
+   "only": "^err/b008-",
+   "gtest": false,
+   "note": "B-008: new regression case"
   }
  ]
 }
