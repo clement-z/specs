@@ -259,10 +259,9 @@ def check_wl_sweep(top_scope):
     # Need to check that SystemC.analysis_type == 1 (CW sweep)
     for child in top_scope['children']:
         if child['name'] == 'analysis_type':
-            print(child)
+            # SystemC strips leading zeros from the vector: 'b1' = CW_SWEEP, 'b10' = TIME_DOMAIN (AnalysisType, src/specs.h)
             analysis_type = child['data'][0][1]
-            print(f'analysis_type:{analysis_type}')
-            return analysis_type == 'b01'
+            return int(analysis_type[1:], 2) == 1
     raise ValueError('Expected to find key "analysis_type" in VCD trace.')
 
 def vcd_get_data_vector(signal):
