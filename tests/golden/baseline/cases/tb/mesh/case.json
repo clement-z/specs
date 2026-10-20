@@ -3,7 +3,14 @@
   "-t",
   "mesh"
  ],
- "exit": "signal:SIGSEGV",
- "files": {},
+ "exit": 0,
+ "files": {
+  "traces/mesh_tb.vcd": {
+   "bytes": 1649,
+   "kind": "vcd",
+   "sha256": "d5f3c2252011182cf2c11400dd63d7f884689662afbaf2bdd0fe5ef94c6e42d0",
+   "stored": "files/traces/mesh_tb.vcd"
+  }
+ },
  "id": "tb/mesh"
 }

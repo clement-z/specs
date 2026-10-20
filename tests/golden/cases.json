@@ -920,8 +920,7 @@
     "-t",
     "mesh"
    ],
-   "note": "src/tb/alltestbenches.cpp: mesh_tb_run; segfaults (SIGSEGV) in SPECSConfig::prepareSimulation (use-after-free: Clements::init() re-creates children while prepareSimulation iterates over them)",
-   "expect": "crash"
+   "note": "src/tb/alltestbenches.cpp: mesh_tb_run"
   },
   {
    "id": "err/b064-evlsrc-missing-file",

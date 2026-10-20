@@ -129,9 +129,6 @@ is visible; re-record when it is fixed on purpose.
   (legacy netlist syntax, `one 0` at line 4), exit 1.
 * `cir/paul_3ring_puf`: the VLSRC values file
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
-* `tb/mesh`: **SIGSEGV** in `SPECSConfig::prepareSimulation()`. It calls
-  `init()` on every `spx_module`, and `Clements::init()` destroys and
-  re-creates its children while the loop is still iterating over them.
 * `cli/unknown-testbench`, `cli/missing-netlist`, `cli/bad-mode`: exit 1 by design.
 
 `record` warns when a `circuits/*.cir` or a `specs -p` testbench has no case,

@@ -230,6 +230,12 @@
    "only": "^cir-json/",
    "gtest": false,
    "note": "B-154: JSON export wrote the readers count as writers"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:23Z",
+   "only": "^tb/mesh$",
+   "gtest": false,
+   "note": "B-047: specs -t mesh no longer segfaults (double init removed from mesh_tb.cpp)"
   }
  ]
 }
