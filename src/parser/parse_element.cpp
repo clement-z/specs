@@ -225,6 +225,11 @@ sc_module *SplitterElement::create(ParseTreeCreationHelper &pt_helper) const
             exit(1);
         }
     }
+    if (!(obj->m_split_ratio >= 0 && obj->m_split_ratio <= 1))
+    {
+        cerr << "Error (" << name << "): splitter ratio " << obj->m_split_ratio << " is outside [0, 1]" << endl;
+        exit(1);
+    }
     return obj;
 }
 
@@ -326,6 +331,12 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);
         }
+    }
+    if (!(obj->m_dc_through_coupling_power >= 0 && obj->m_dc_through_coupling_power <= 1))
+    {
+        cerr << "Error (" << name << "): coupler through power " << obj->m_dc_through_coupling_power
+             << " is outside [0, 1] (k and t must be in [-1, 1], kp in [0, 1])" << endl;
+        exit(1);
     }
     return obj;
 }

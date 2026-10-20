@@ -1,0 +1,5 @@
+* B-034: COUPLER kp=-0.01 (power) gives a through power > 1 (NaN cross): must be rejected
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in _ c1o1 c1o2 kp=-0.01
+probe1 c1o1
+.op

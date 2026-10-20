@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b034-splitter-ratio-gt-1.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b034-splitter-ratio-gt-1"
+}

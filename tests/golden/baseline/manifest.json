@@ -27,6 +27,9 @@
   "err/b008-dc-bare",
   "err/b017-json-unwritable",
   "err/b018-resolution-below-fs",
+  "err/b034-coupler-k-gt-1",
+  "err/b034-coupler-kp-negative",
+  "err/b034-splitter-ratio-gt-1",
   "err/b064-evlsrc-missing-file",
   "err/b131-nrings-crow-zero",
   "err/b148-crossing-args",
@@ -193,6 +196,12 @@
    "only": "^err/b161-",
    "gtest": false,
    "note": "B-161: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:09:30Z",
+   "only": "^err/b034-",
+   "gtest": false,
+   "note": "B-034: new regression cases"
   }
  ]
 }

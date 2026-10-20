@@ -1,0 +1,5 @@
+* B-034: SPLITTER ratio=1.5 gives sqrt(1-ratio) = NaN and gain on out1: must be rejected
+cwsrc1 in wl=1.55e-6 power=1
+splitter1 in s1o1 s1o2 ratio=1.5
+probe1 s1o1
+.op

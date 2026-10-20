@@ -553,6 +553,69 @@
    "note": "B-161: .ic gives a parse error naming the unsupported directive (was exit 1 with no message)"
   },
   {
+   "id": "err/b034-coupler-k-gt-1",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-coupler-k-gt-1.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: COUPLER k=1.1 is rejected (through power < 0: NaN, silent 0 W with NDEBUG, std::polar abort with assertions)"
+  },
+  {
+   "id": "err/b034-coupler-kp-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-coupler-kp-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: COUPLER kp=-0.01 is rejected (through power > 1: NaN cross output)"
+  },
+  {
+   "id": "err/b034-splitter-ratio-gt-1",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-splitter-ratio-gt-1.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: SPLITTER ratio=1.5 is rejected (was accepted: NaN on out2 and gain on out1)"
+  },
+  {
    "id": "opt/tracefile-o",
    "args": [
     "-o",
