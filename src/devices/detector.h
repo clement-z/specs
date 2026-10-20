@@ -15,8 +15,8 @@ public:
     // Ports
     spx::oa_port_in_type p_in;
     spx::ea_port_out_type p_readout; // TODO: divide into cathode and anode
-    double m_cur_readout;
-    double m_cur_readout_no_interf;
+    double m_cur_readout = 0;
+    double m_cur_readout_no_interf = 0;
 
     // Input memory for multi-wavelength purposes
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in;

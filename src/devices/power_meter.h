@@ -14,7 +14,7 @@ class PowerMeter : public spx_module {
 public:
     // Ports
     spx::oa_port_in_type p_in;
-    double m_cur_power;
+    double m_cur_power = 0;
 
     // Input memory for multi-wavelength purposes
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in;

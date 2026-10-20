@@ -166,13 +166,14 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
 
 * `record --repeat 3`, and two independent `record` runs compared with
   `--rtol 0 --atol 0 --print-slack 0`, are **bit-identical** for every case
-  except `tb/det` and `tb/detector`.
-* `tb/det`, `tb/detector`: `Detector::m_cur_readout` and
-  `m_cur_readout_no_interf` (`src/devices/detector.h:18-19`) are never
-  initialised and are dumped at t=0, for example `r6.92e-310` (stale pointer
-  bits). Their values (`uut.readout*`, `uut2.readout*`) are excluded through
-  `vcd_ignore_values`. The `random_device`-seeded detector noise is *not*
-  exercised: the testbench never enables the detectors.
+  (`tb/det` and `tb/detector` since B-054, see below).
+* `tb/det`, `tb/detector`: until B-054, `Detector::m_cur_readout` and
+  `m_cur_readout_no_interf` (`src/devices/detector.h:18-19`) were never
+  initialised and were dumped at t=0, for example `r6.92e-310` (stale pointer
+  bits), so `uut*.readout*` had to be excluded through `vcd_ignore_values`.
+  They are now initialised to 0 and compared like every other signal. The
+  `random_device`-seeded detector noise is *not* exercised: the testbench
+  never enables the detectors.
 * **Pointer-ordered iteration.** `sc_get_all_object_by_type<T>()` and
   `sc_get_all_module_by_type<T>()` (`src/utils/sysc_utils.h`) return
   `std::set<T*>`, so the following are listed in memory-address order:

@@ -243,6 +243,12 @@
    "only": "^regress/b031-",
    "gtest": false,
    "note": "B-031: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:06:41Z",
+   "only": "^tb/det(ector)?$",
+   "gtest": false,
+   "note": "B-054: detector readouts initialised to 0 (were garbage at t=0); vcd_ignore_values dropped"
   }
  ]
 }

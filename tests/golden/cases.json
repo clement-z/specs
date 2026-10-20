@@ -835,10 +835,7 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run; NONDETERMINISTIC: Detector::m_cur_readout / m_cur_readout_no_interf (src/devices/detector.h:18-19) are never initialised and are dumped at t=0 in the VCD (garbage such as 6.9e-310); these two signals are therefore excluded from the VCD comparison. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
-   "vcd_ignore_values": [
-    "(^|\\.)uut2?\\.readout(_no_interference)?$"
-   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
    "unordered_streams": [
     "stdout"
    ]
@@ -849,10 +846,7 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run; NONDETERMINISTIC: Detector::m_cur_readout / m_cur_readout_no_interf (src/devices/detector.h:18-19) are never initialised and are dumped at t=0 in the VCD (garbage such as 6.9e-310); these two signals are therefore excluded from the VCD comparison. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
-   "vcd_ignore_values": [
-    "(^|\\.)uut2?\\.readout(_no_interference)?$"
-   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
    "unordered_streams": [
     "stdout"
    ]
