@@ -1,0 +1,8 @@
+* A2 repro: a negative waveguide length is accepted and gives a negative group delay.
+* sc_time(-0.00075 ns) wraps to a huge unsigned value; the first event aborts SystemC:
+*   Fatal: (F4) assertion failed: *t==sc_time_stamp()  (sc_event_queue.cpp:95), exit 134
+* Expected: a parse/elaboration error "waveguide length must be >= 0".
+vlsrc1 in values=[[0.1e-9,1,1.55e-6],[0.5e-9,0,1.55e-6]]
+wg1 in out length=-100e-6
+probe1 out
+.tran 1e-9

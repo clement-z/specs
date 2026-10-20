@@ -1,0 +1,7 @@
+* F-A1: ring round-trip delay 13 fs < half a tick (100 fs default) -> rounded to 0, no warning.
+* The whole ring response collapses into delta cycles at t=1 ps (VCD has a single timestamp #10).
+* With length=4e-6 (53 fs) the delay becomes 1 tick = 100 fs (x1.9), again silently.
+vlsrc1 in values=[[1e-12,1,1.55e-6]]
+coupler1 in r1 out r2 k=0.5
+wgr r2 r1 length=1e-6 neff=2.3 ng=4 att=0
+.tran 5e-12

@@ -1,0 +1,7 @@
+* FD sweep, probes without wavelength trace
+cwsrc1 in wl=1.55e-6 power=1
+wg1 in out length=1e-3 neff=2 ng=2
+probe1 in wl=0
+probe2 out wl=0
+.options traceall=0
+.dc /cwsrc1/WL 1.54e-6 1.56e-6 1e-9

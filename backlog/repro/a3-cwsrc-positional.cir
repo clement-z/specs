@@ -1,0 +1,4 @@
+* A3 repro: CWSRC positional args are shifted by one (args[0] ignored)
+* Expected: 1 mW at 1550 nm on 'in'.
+cwsrc1 in 1.55e-6 1e-3
+.op

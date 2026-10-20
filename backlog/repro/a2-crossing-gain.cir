@@ -1,0 +1,11 @@
+* A2 repro: CROSSING is not passive.
+* Two coherent 1 W CW inputs (same wavelength, same phase) into a crossing
+* with att=0 dB and xtalk=-20 dB. Total input power = 2 W.
+* Observed with .op: out1 = out2 = 1.21 W, total 2.42 W (gain).
+* A passive crossing must give out1 + out2 <= 2 W for any input phases.
+cwsrc1 in1 wl=1.55e-6 power=1
+cwsrc2 in2 wl=1.55e-6 power=1
+crossing1 in1 in2 out1 out2 att=0 xtalk=-20
+pwr1 out1
+pwr2 out2
+.op

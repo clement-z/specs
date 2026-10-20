@@ -1,0 +1,10 @@
+* A3 repro: PDET never drives its electrical output net
+* pdet1 sees 1 mW (R = 1 A/W -> 1 mA). vout drives a phase shifter with
+* sensitivity 1000 rad/A, so out2 should show a 1 rad phase once the
+* detector samples. A VLSRC pulse on in2 at 10 ps makes out2 observable.
+cwsrc1 in wl=1.55e-6 power=1e-3
+pdet1 in vout
+vlsrc2 in2 values=[[10e-12,1e-3,1.55e-6]]
+pshift1 in2 out2 vout sensitivity=1000
+probe1 out2
+.tran 50e-12

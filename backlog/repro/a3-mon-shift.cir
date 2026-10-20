@@ -1,0 +1,6 @@
+* A3 repro: with --mon and a 1 fs timescale, the TimeMonitor advances time by
+* 10 fs during initialisation; the VLSRC sample at t=0 is then dropped.
+vlsrc1 in values=[[0,1e-3,1.55e-6],[1e-12,2e-3,1.55e-6]]
+probe1 in
+.options timescale=-15 traceall=0
+.tran 2e-12
