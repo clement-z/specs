@@ -838,6 +838,11 @@ void ParseTree::flatten()
         }
 
         // get subcircuit name
+        if (xelem->args.empty())
+        {
+            cerr << "Error: subcircuit instance " << xelem->name << " has no subcircuit name" << endl;
+            exit(1);
+        }
         string subcircuit_name = xelem->args.back().as_string();
         strutils::toupper(subcircuit_name);
 

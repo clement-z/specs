@@ -41,6 +41,8 @@
   "err/b148-pshift-args",
   "err/b148-pwr-args",
   "err/b148-tran-args",
+  "err/b149-x-kwargs-only",
+  "err/b149-x-noargs",
   "err/b153-abstol-negative",
   "err/b153-reltol-zero",
   "err/b153-resolution-below-one",
@@ -202,6 +204,12 @@
    "only": "^err/b034-",
    "gtest": false,
    "note": "B-034: new regression cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:40Z",
+   "only": "^err/b149-",
+   "gtest": false,
+   "note": "B-149: new regression case"
   }
  ]
 }

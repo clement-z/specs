@@ -89,6 +89,42 @@
    "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
   },
   {
+   "id": "err/b149-x-noargs",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b149-x-noargs.cir"
+   ],
+   "expect": "fail",
+   "note": "B-149: 'x1' without a subcircuit name used to crash; clean error, exit 1"
+  },
+  {
+   "id": "err/b149-x-kwargs-only",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b149-x-kwargs-only.cir"
+   ],
+   "expect": "fail",
+   "note": "B-149: 'x1 L=1' (kwargs only, no subcircuit name) used to crash; clean error, exit 1"
+  },
+  {
    "id": "cir-json/add_drop",
    "args": [
     "-n",
