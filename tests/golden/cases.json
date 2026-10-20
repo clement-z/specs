@@ -154,6 +154,195 @@
    "note": "B-008: bare .dc (no sweep order) gives a clean error (was an assert abort, or UB in specs.cpp with NDEBUG)"
   },
   {
+   "id": "err/b148-tran-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-tran-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: .tran with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-options-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-options-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: .options with a positional arg gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pshift-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pshift-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PSHIFT with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-mzi-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-mzi-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: MZI with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-crossing-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-crossing-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: CROSSING with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-probe-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-probe-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PROBE with 5 positional args gives the existing 'Too many input arguments' error (was an assert abort)"
+  },
+  {
+   "id": "err/b148-mlprobe-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-mlprobe-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: MLPROBE with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pwr-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pwr-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PWR with a positional arg gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pdet-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pdet-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PDET with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
    "id": "opt/tracefile-o",
    "args": [
     "-o",

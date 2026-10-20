@@ -1,0 +1,5 @@
+* B-148: CROSSING with three positional arguments (at most 2)
+cwsrc1 a wl=1.55e-6 power=1e-3
+crossing1 a c b d 1 2 3
+probe1 b
+.tran 1e-11

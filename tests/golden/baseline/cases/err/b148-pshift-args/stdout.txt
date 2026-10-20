@@ -1,0 +1,40 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+4 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/a {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/EVLSRC1 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/e {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":1}]}], }
+ - ROOT/PSHIFT1 (PHASE SHIFTER (bidir)) ROOT/a ROOT/b ROOT/e {1 (INTEGER), 2 (INTEGER), 3 (INTEGER), } {}
+ - ROOT/PROBE1 (PROBE) ROOT/b {} {}
+-----------
+3 named nets
+ - ROOT/a: OANALOG<1>u (1|1)
+ - ROOT/b: OANALOG<1>u (1|1)
+ - ROOT/e: EANALOG<1>u (0|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {1e-11 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/a...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/PSHIFT1 (reason: unidir backlog)
+Warning (ROOT/PSHIFT1): default coupling power for DC currently set to field.
+

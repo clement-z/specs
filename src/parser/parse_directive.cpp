@@ -18,7 +18,11 @@ using spx::ed_bus_type;
 void OPTIONSDirective::create() const
 {
     // Verify number of nodes
-    assert(args.size() == 0);
+    if (args.size() > 0)
+    {
+        cerr << "Error: .options: too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
 
     // Parse keyword arguments
     for (auto &p: kwargs)

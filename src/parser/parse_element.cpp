@@ -393,7 +393,11 @@ sc_module *PhaseShifterElement::create(ParseTreeCreationHelper &pt_helper) const
     INSTANTIATE(pt_helper, bidirectional);
 
     // Verify number of args
-    assert(args.size() <= 2);
+    if (args.size() > 2)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 2)" << endl;
+        exit(1);
+    }
 
     // Parse positional arguments
     if(args.size() > 0)
@@ -489,7 +493,11 @@ sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, bidirectional);
 
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
     // Parse positional arguments
     if(args.size() > 0)
         // convert from cross-coupling field coef
@@ -581,7 +589,11 @@ sc_module *CrossingElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 2);
+    if (args.size() > 2)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 2)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -997,9 +1009,6 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
     // Verify number of nets
     assert(nets.size() == n_nets);
 
-    // Verify number of positional args
-    assert(args.size() <= 4);
-
     // Create signals if they don't exist
     pt_helper.create_signals(this);
 
@@ -1081,7 +1090,11 @@ sc_module *MLProbeElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -1154,7 +1167,11 @@ sc_module *PowerMeterElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() == 0);
+    if (args.size() > 0)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -1272,7 +1289,11 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 2);
+    if (args.size() > 2)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 2)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);

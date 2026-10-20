@@ -29,6 +29,15 @@
   "err/b018-resolution-below-fs",
   "err/b064-evlsrc-missing-file",
   "err/b131-nrings-crow-zero",
+  "err/b148-crossing-args",
+  "err/b148-mlprobe-args",
+  "err/b148-mzi-args",
+  "err/b148-options-args",
+  "err/b148-pdet-args",
+  "err/b148-probe-args",
+  "err/b148-pshift-args",
+  "err/b148-pwr-args",
+  "err/b148-tran-args",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -150,6 +159,12 @@
    "only": "^err/b008-",
    "gtest": false,
    "note": "B-008: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:01:50Z",
+   "only": "^err/b148-",
+   "gtest": false,
+   "note": "B-148: new regression cases"
   }
  ]
 }

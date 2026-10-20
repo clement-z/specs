@@ -88,7 +88,11 @@ void TRANAnalysis::create() const
     specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
     specsGlobalConfig.simulation_mode = OpticalOutputPortMode::TIME_DOMAIN;
 
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error: .tran: too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
 
     if (args.size() >= 1)
     {

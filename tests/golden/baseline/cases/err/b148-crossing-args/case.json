@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b148-crossing-args.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b148-crossing-args"
+}
