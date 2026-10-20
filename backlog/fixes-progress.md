@@ -79,3 +79,6 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 | B-031 | 3a99564 | wave 1 |
 | B-054 | f398a14 | wave 1 |
 | B-036 | fb97125 | wave 1 |
+| B-023 | 33bb8bb | orchestrator (last) |
+
+Done: see FIXES-REPORT.md.
