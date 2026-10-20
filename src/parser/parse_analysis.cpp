@@ -66,7 +66,6 @@ void DCAnalysis::create() const
     set<CWSource *>  all_cws = sc_get_all_object_by_type<CWSource>();
     vector<CWSource *>  all_cws_vec(all_cws.begin(), all_cws.end());
 
-    int i = 0;
     for (const auto &sweep_order: sweep_orders)
     {
         string element_name = parent->name_prefix() + sweep_order.first.first;
@@ -105,7 +104,6 @@ void DCAnalysis::create() const
         auto order = pair<function<void(double)>, vector<double>>(f, values);
         auto order_name = attribute_name + "(" + element_name + ")";
         specsGlobalConfig.cw_sweep_orders.emplace(order_name, order);
-        ++i;
     }
 }
 

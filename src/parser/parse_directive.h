@@ -53,16 +53,3 @@ struct NODESETDirective : public ParseDirective {
     virtual string kind() const
     { return "NODESET"; }
 };
-
-/* IC: specify initial conditions options */
-// Inherit from NODESETDirective as options are the same.
-struct ICDirective : public NODESETDirective {
-    /* Import constructor from ParseDirective */
-    using NODESETDirective::NODESETDirective;
-
-    virtual ParseDirective* clone() const
-    { return new ICDirective(*this); }
-    virtual void create() const;
-    virtual string kind() const
-    { return "IC"; }
-};

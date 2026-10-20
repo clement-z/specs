@@ -46,7 +46,7 @@ using std::string;
 using std::vector;
 using std::deque;
 
-typedef struct {
+struct netlist_content_t {
 	enum type {
 		NETLIST_FILE,
 		STRING
@@ -54,7 +54,7 @@ typedef struct {
 	string description;
 	YY_BUFFER_STATE buf;
     FILE *fp = nullptr;
-} netlist_content_t;
+};
 
 deque<netlist_content_t> netlist_content_fifo;
 
@@ -184,7 +184,6 @@ int yylerror(yyscan_t scanner, const char *p)
 ParseTree *cur_pt = nullptr;
 
 static int internal_subckt_count = 0;
-static size_t delete_me_npos = 0;
 
 template<typename T>
 static T from_string(const string &str)
@@ -272,7 +271,6 @@ string convert_special_char(char c)
     // until the corresponding .ends is reached
     yylval_param->s_ptr = new string;
     internal_subckt_count = 0;
-    delete_me_npos = 0;
     // cout << endl << "going to subckt definition mode" << endl;
     BEGIN(SUBCKT_DEFINITION); //needs BEGIN and not yy_push_state
 }
@@ -315,9 +313,6 @@ string convert_special_char(char c)
 <SUBCKT_DEFINITION>{EOL} {
     /* save characters to buffer */
     *yylval_param->s_ptr += yytext;
-
-    // cout << "found subckt line: " << yylval_param->s_ptr->substr(delete_me_npos);
-    // delete_me_npos = yylval_param->s_ptr->size();
 }
 
 <SUBCKT_DEFINITION><<EOF>> {
@@ -484,20 +479,6 @@ string convert_special_char(char c)
 {ALPHA_PLUS}{ALPHA_PLUS_NUM}* {
     yylval_param->s_ptr = new string(yytext);
 
-    /*
-    if (yylval_param->s_ptr == "null")
-        return T_NONE;
-    if (yylval_param->s_ptr == "true")
-    {
-        yylval_param->b_val = true;
-        return T_BOOL;
-    }
-    if (yylval_param->s_ptr == "false")
-    {
-        yylval_param->b_val = false;
-        return T_BOOL;
-    }
-    */
     return T_STR;
 }
 
@@ -510,8 +491,6 @@ string convert_special_char(char c)
 
 <*>^.*/{EOL} {
     yyset_current_line(yytext, yyscanner);
-    if (false)
-        cout << yytext << endl;
     REJECT;
 }
 
