@@ -44,3 +44,16 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 | B-091 | 956ab10 | D (python) |
 | B-092 | 5e54f9b | D (python) |
 | B-099 | 936f458 | D (python) |
+| B-114 | a066d23 | wave 1 |
+| B-083 | 3a8577c | wave 1 |
+| B-100 | a4cece1 | wave 1 |
+| B-102 | 4371bc3 | wave 1 |
+| B-082 | a968ab8 | wave 1 |
+| B-064 | b4508ef | wave 1 |
+| B-044 | 027cccf | wave 1 |
+| B-072 | 06222d2 | wave 1 |
+| B-132 | 9dbea23 | wave 1 |
+| B-123 | 50bd413 | wave 1 |
+| B-125 | 538d8f8 | wave 1 |
+| B-136 | 1510b75 | wave 1 |
+| B-138 | dd26ddc | wave 1 |
