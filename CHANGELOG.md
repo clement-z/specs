@@ -21,8 +21,39 @@
   * Asserts stay enabled by default (`b_ndebug=false`); `-Db_ndebug=true` matches the old CMake Release
 * CI: GitHub Actions and GitLab CI on Ubuntu 24.04 with Meson (gcc and clang, golden check);
   `install.sh` rewritten for Meson
-* The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed); the unfinished
-  `Waveguide.OperatingPoint` check is a known failure
+* The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed)
+* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 80 `specs` cases
+  (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
+* Paper reference (ECOC 2023, hal-04302200) in the README and `doc/papers/`
+
+### Fixed
+
+Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT.md`).
+
+* Crashes: bidirectional active MZI elaboration (B-031), `specs -t mesh` segfault (B-047), `-o ""` (B-006),
+  `X1` without a subcircuit name (B-149), `--vci` on CROW (B-036), output-port error paths (B-020)
+* Bad input now gives a clean error instead of an assert/core dump: positional-argument and config checks
+  (B-148, B-018), bare `.dc` (B-008), bad `.options` values (B-153), out-of-range coupler `k`/`kp`/`t` and
+  splitter ratio (B-034), stray `.op`/`.dc` arguments (B-165), `.ic` (B-161), unwritable `--json` path (B-017);
+  file-open errors name the file (B-064)
+* Parser: `.include` inside `.subckt` (B-150), files opened by `.include` are closed (B-156), memory leaks (B-170)
+* `--nrings_crow` sets the number of CROW rings (B-131); CROW children are prefixed with the instance name (B-072)
+* Detector readouts start at 0 instead of uninitialised memory (B-054); BitstreamSource saturation message (B-044)
+* JSON export writes the writers count, not the readers count (B-154)
+* The optical field is labelled √W, not V/m (B-023)
+* `circuits/subckt_test.cir` parses again (B-132)
+* pyspecs: works with pandas 3 and detects `.dc` sweeps (B-076, B-077); default output name, directory joins,
+  error reporting, dependency manifest, notebook binary path, value shortening, bitstream helpers
+  (B-085..B-089, B-091, B-092, B-099)
+* Docs: Doxygen config/mainpage and stale `@param`/`@sa` references (B-083, B-100, B-102); KiCad symbol
+  templates (B-082); `.gitignore` no longer hides new `circuits/*.cir` (B-114); flex/bison warnings (B-109, B-177)
+* gtest fork harness: pipe deadlock above 64 KiB, escaping assertions/exceptions (B-125); angle check (B-123)
+
+### Removed
+
+* Dead code (see `backlog/cleanup/REPORT.md`): `do_circuit`/`raphael_main`, the unused `Ring`,
+  `PowerProbe` and `PhaseProbe` devices, dead output-port and parser code, the duplicate
+  `utils/draw_graph_from_json.py`, leftover debug prints on stdout
 
 ## v0.1.0
 
