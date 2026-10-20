@@ -1,8 +1,5 @@
-#include <ctime>
-#include <iomanip>
 #include <sstream>
 #include <chrono>
-#include <deque>
 
 #include <systemc.h>
 #include <args.hxx>
@@ -19,11 +16,8 @@
 #include "parser/parser_state.h"
 #include <utils/version.h>
 
-class OpticalOutputPort;
-
 using namespace std;
 using namespace std::chrono;
-using namespace literals;
 
 #include "parser.h"
 #include "scanner.h"
@@ -60,84 +54,6 @@ int do_test(const string &testname)
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     std::cout << "Total runtime: " << duration.count()/1000.0 << " ms" << std::endl;
-    return 0;
-}
-
-int do_circuit(const string &filename, bool is_dry_run = false, const string& json_filename = "")
-{
-    // Check whether the file exists
-    FILE *f;
-    if (filename == "-"s) {
-        f = NULL;
-    } else if (!(f = fopen(filename.c_str(), "r"))) {
-        cerr << "Error: File not found \"" << filename << "\"" << endl;
-        return 1;
-    }
-
-    cout << "╔═══════════════════╗" << endl;
-    cout << "║  PARSING CIRCUIT  ║" << endl;
-    cout << "╚═══════════════════╝" << endl;
-
-    yyscan_t scanner;
-    ParserState *parser_state = new ParserState;
-    YY_BUFFER_STATE buf;
-
-    yylex_init_extra(parser_state, &scanner);
-    buf = yy_create_buffer(f, YY_BUF_SIZE, scanner);
-    yy_switch_to_buffer(buf, scanner);
-
-    ParseTree pt("ROOT");
-    int parsing_result = yyparse(scanner, &pt);
-
-    //yy_delete_buffer(buf, scanner);
-    yylex_destroy(scanner);
-    delete parser_state;
-
-    // Close the file
-    if (f)
-        fclose(f);
-
-    // Return if unsuccessful
-    if (parsing_result != 0) {
-        return parsing_result;
-    }
-
-    pt.print();
-
-    cout << "╔══════════════════════╗" << endl;
-    cout << "║   BUILDING CIRCUIT   ║" << endl;
-    cout << "╚══════════════════════╝" << endl;
-
-    pt.build_circuit();
-
-    if (!json_filename.empty())
-    {
-        ofstream outfile;
-        outfile.open(json_filename, ios::out | ios::trunc);
-        outfile << pt.to_json();
-        outfile.close();
-        cout << "Exported flattened circuit as JSON > " << json_filename << endl;
-    }
-
-    if (!is_dry_run)
-    {
-        cout << "╔══════════════════════╗" << endl;
-        cout << "║      SIMULATION      ║" << endl;
-        cout << "╚══════════════════════╝" << endl;
-
-        specsGlobalConfig.runAnalysis();
-    }
-    else
-    {
-        cout << "╔══════════════════════╗" << endl;
-        cout << "║  SIMULATION SKIPPED  ║" << endl;
-        cout << "╚══════════════════════╝" << endl;
-    }
-
-    cout << "╔═══════════════════╗" << endl;
-    cout << "║        DONE       ║" << endl;
-    cout << "╚═══════════════════╝" << endl;
-
     return 0;
 }
 
@@ -186,10 +102,6 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
 
     return 0;
 }
-
-int raphael_main() { cout<< "Hello world" << endl; return 0; }
-
-int tests_module_registry_access();
 
 int sc_main(int argc, char *argv[])
 {

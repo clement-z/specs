@@ -89,11 +89,10 @@ public:
 
     // Hold simulation objects
     vector<shared_ptr<sc_object>> additional_objects;
-    map<string, pair<sc_signal<OpticalSignal, SC_MANY_WRITERS> *, OpticalSignal>> ic_orders;
     map<string, pair<sc_signal<OpticalSignal, SC_MANY_WRITERS> *, OpticalSignal>> nodeset_orders;
 
     // Simulation options
-    EngineTimescale engine_timescale = ONE_FS;
+    EngineTimescale engine_timescale = HUNDRED_FS;
     OpticalOutputPortMode simulation_mode;
     AnalysisType analysis_type;
     map<string, pair<function<void(double)>, vector<double>>> cw_sweep_orders;
@@ -113,15 +112,14 @@ public:
     bool trace_all_optical_nets = 1;
 
     // other
+    // Unused since ws-cleanup C-01; kept because removing it shifts the printed
+    // OpticalSignal IDs (heap layout, B-016): delete it together with B-016.
     sc_signal<bool, SC_MANY_WRITERS> drop_all_events;
     bool verbose_component_initialization = false;
 
     SPECSConfig(sc_module_name name);
 
     ~SPECSConfig() {}
-
-    virtual void before_end_of_elaboration()
-    {}
 
     void runAnalysis();
     void runOPAnalysis();
@@ -133,7 +131,6 @@ public:
         sc_set_time_resolution(std::pow(10, 15+engine_timescale), SC_FS);
     }
     void applyDefaultOpticalOutputPortConfig();
-    void traceSettings();
     void applyDefaultTraceFileToAllSignals();
     void verifyConfig()
     {

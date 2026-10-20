@@ -101,15 +101,9 @@ public:
     // we might need to review this as well
     bool operator==(const OpticalSignal &rhs) const
     {
-#if 0
-        // Work with ID
-        return rhs.m_id == m_id
-            || (isnan(rhs.m_wavelength) && isnan(m_wavelength));
-#else
         // Work with field value
         return rhs.m_field == m_field
             && rhs.m_wavelength_id == m_wavelength_id;
-#endif
     }
 
     bool operator!=(const OpticalSignal &rhs) const
@@ -135,10 +129,6 @@ public:
 
         advancePhaseByPhase(phase_rad);
     }
-
-    static OpticalSignal sumSignals(
-        OpticalSignal s0,
-        OpticalSignal s1);
 
     operator field_type() const {
         return m_field;

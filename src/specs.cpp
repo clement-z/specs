@@ -130,7 +130,7 @@ void SPECSConfig::runDCAnalysis()
         mlprobe->enable = sc_logic(0);
     }
 
-    // Enable photodetectors
+    // Disable photodetectors
     for (auto pdet: all_photodetectors) {
         // Remark: Photodetectors could in fact be left enabled ?
         // Would that serve any purpose though...?
@@ -165,19 +165,8 @@ void SPECSConfig::runDCAnalysis()
 
         // Reset OOP and set internal signals to new wavelength
         for (auto oop: all_oop) {
-            #if 1 // reset OOP
             oop->reset();
             // TODO: also reset photodetectors?
-            #elif 0 // remove previous wavelengths from OOP but keep value
-            if (wavelengths_vector.size() >= 2)
-            {
-                oop->swap_wavelengths(wavelengths_vector.size()-1, wavelengths_vector.size()-2);
-                oop->delete_wavelength(wavelengths_vector.size()-2);
-                oop->m_skip_next_convergence_check = true;
-            }
-            #else
-            // do nothing
-            #endif
         }
 
         // run simulation and advance one tick
@@ -204,12 +193,6 @@ void SPECSConfig::runTRANAnalysis()
 
     // Run OP analysis
     runOPAnalysis();
-
-    // Set values of signals according to IC directive
-    for (auto &ic_order : ic_orders)
-    {
-        //ic_order.second.first->write(ic_order.second.second);
-    }
 
     // Enable probes
     for (auto probe: all_probes) {
@@ -271,12 +254,6 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
     for (auto p: all_probes) {
         p->setTraceFile(default_trace_file);
     }
-
-    // auto all_mlprobes = sc_get_all_object_by_type<MLambdaProbe>();
-    // for (auto p: all_mlprobes) {
-    //     p->m_Tf = default_trace_file;
-    //     p->prepare();
-    // }
 
     auto all_mlambda_probes = sc_get_all_object_by_type<MLambdaProbe>();
     for (auto p: all_mlambda_probes) {

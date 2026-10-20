@@ -3,10 +3,6 @@
 #include <string>
 
 
-inline bool sc_object_is_module(const sc_object &obj) {
-    return strcmp(obj.kind(), "sc_module") == 0;
-}
-
 // Return vector containing all children objects (expanded) of obj
 set<sc_object *> sc_collect_children_object(sc_object* obj)
 {

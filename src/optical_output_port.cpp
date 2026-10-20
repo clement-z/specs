@@ -23,39 +23,9 @@ OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
 {
     SC_HAS_PROCESS(OpticalOutputPort);
 
-    // SC_THREAD(on_data_ready);
-    // sensitive << m_event_queue;
-
     SC_THREAD(on_data_ready);
     sensitive << m_event_queue;
-
-    // SC_THREAD(on_data_ready_fd);
-    // sensitive << m_event_queue_fd;
-
-    // SC_THREAD(drop_all_events);
-    // sensitive << specsGlobalConfig.drop_all_events;
 }
-
-// void OpticalOutputPort::drop_all_events() {
-//     while(true)
-//     {
-//         wait();
-//         cout << name() << ": dropping all events!" << endl;
-//         while (!isempty())
-//         {
-//             cout << name() << ": dropping all events" << endl;
-//             m_event_queue.cancel_all();
-//             m_queue = queue_type();
-//             m_emitted_val = OpticalSignal(0);
-//             m_queue_td = queue_type();
-//             m_emitted_val = OpticalSignal(0);
-//             m_queue_fd = queue_type();
-//             m_emitted_val = OpticalSignal(0);
-//             m_cur_val = OpticalSignal(0);
-//             wait(SC_ZERO_TIME);
-//         }
-//     }
-// }
 
 inline bool OpticalOutputPort::check_emit_by_abstol(const OpticalSignal::field_type &desired,
                                                     const OpticalSignal::field_type &last)
@@ -79,7 +49,6 @@ void OpticalOutputPort::applyConfig() {
         cerr << "Found OpticalOutputPort without configuration. ";
         cerr << "Did you forget to run prepareSimulation() ?" << endl;
         exit(1);
-        //m_config = make_shared<OpticalOutputPortConfig>();
     }
 
     m_temporal_resolution = sc_time::from_value(m_config->m_timestep_value);
@@ -102,8 +71,6 @@ void OpticalOutputPort::on_data_ready()
 
         // Check if output queue is empty (would be a bug)
         if (m_queue.size() == 0) {
-            if (specsGlobalConfig.drop_all_events)
-                continue;
             cerr << "error: write cancelled, because no values are present" << endl;
             sc_stop();
             continue;
@@ -169,7 +136,7 @@ void OpticalOutputPort::on_data_ready()
 
         // cout << "emit: " << emit_signal << endl;
         // Emit the desired output value if its stars are aligned
-        if (emit_signal || m_skip_next_convergence_check || m_skip_convergence_check)
+        if (emit_signal || m_skip_next_convergence_check)
         {
             // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
             // cout << " emitting " << m_desired_fields[wlid] << endl;
@@ -182,117 +149,6 @@ void OpticalOutputPort::on_data_ready()
             m_port->write(spx::oa_value_type(desired, wlid));
         }
     }
-}
-
-// Should be removed
-void OpticalOutputPort::on_data_ready_fd()
-{
-    cerr << "Using deprecated function: " << __FUNCTION__ << endl;
-    exit(1);
-#if 0
-    // Initialize output queue
-    m_queue_fd = queue_type();
-
-    m_cur_val_fd = OpticalSignal(0);
-    m_emitted_val_fd = OpticalSignal(0);
-
-    // Current error between cur_val and emitted_val
-    double err_abs_power = 0;
-    double err_abs_phase = 0;
-
-    while (true) {
-        // Wait for data ready notification
-        wait();
-
-        // Check if output queue is empty (would be a bug)
-        if (m_queue_fd.size() == 0) {
-            if (specsGlobalConfig.drop_all_events)
-                continue;
-            cerr << "error: write cancelled, because no values are present" << endl;
-            if (true) sc_stop();
-            else      continue;
-        }
-
-        // Get current time
-        sc_time now = sc_time_stamp();
-
-        // Get the next queue item and pop it from the queue
-        auto tuple = m_queue_fd.top();
-        m_queue_fd.pop();
-
-        // Assign to more readable names
-        const auto &t = tuple.first;
-        const auto &s = tuple.second;
-
-        // Check whether the signal should indeed be emitted now (if not, it's a bug)
-        if (t != now)
-        {
-            cerr << "error: desync in optical output port" << endl;
-            cerr << "\t - expected time:" << t.to_seconds() << endl;
-            cerr << "\t - current time:" << now.to_seconds() << endl;
-            if (true) sc_stop();
-            else      continue;
-        }
-
-        // If the new desired signal has NaN wavelength, ignore it
-        if (isnan(s.getWavelength()))
-        {
-            continue;
-        }
-
-        // Check if wavelength is the same as stored signal
-        bool wavelength_nan = isnan(m_emitted_val_fd.getWavelength());
-        bool wavelength_same = s.m_wavelength_id == m_emitted_val_fd.m_wavelength_id;
-        bool wavelength_greater = s.getWavelength() > m_emitted_val_fd.getWavelength();
-        bool wavelength_ok = wavelength_same || wavelength_nan || wavelength_greater;
-
-        // Check signal error to decice whether to emit signal
-        bool emit_signal = false;
-        bool pass_abstol = false;
-        bool pass_reltol = false;
-
-        // If new wavelength should not be emitted, don't do anything and
-        // wait for the next signal
-        if (!wavelength_ok)
-            continue;
-
-        // Here we know s can be emitted. Update the desired output value
-        if (m_use_deltas)
-            m_cur_val_fd += s;
-        else
-            m_cur_val_fd = s;
-
-        // If previous wavelength was NaN or smaller than current wavelength, emit new signal
-        if (wavelength_nan || wavelength_greater)
-        {
-            emit_signal = true;
-        }
-
-        // If same wavelength, decide whether to emit signal or not based on tolerances
-        if (wavelength_same)
-        {
-            pass_abstol = check_emit_by_abstol(m_cur_val_fd, m_emitted_val_fd);
-            pass_reltol = check_emit_by_reltol(m_cur_val_fd, m_emitted_val_fd);
-
-            // Only emits when passes both tests
-            emit_signal = pass_abstol && pass_reltol;
-
-            // Emit zeros instead of signals smaller than 10 abstol
-            if (emit_signal && (abs(m_cur_val_fd.m_field) < 10*m_abstol))
-                m_cur_val_fd.m_field = complex<double>(0,0);
-        }
-
-        // Emit the desired output value if its stars are aligned
-        if (emit_signal)
-        {
-            // Replace the stored emitted output value
-            m_emitted_val_fd = m_cur_val_fd;
-
-            // Write the value to the port
-            m_port->write(m_cur_val_fd);
-        }
-    }
-#endif
 }
 
 sc_time OpticalOutputPort::snap_to_next_valid_time(const sc_time &t, const unsigned int resolution_multiplier)
@@ -367,9 +223,6 @@ void OpticalOutputPort::delayedWriteSampledTime(const OpticalSignal &value, cons
 
 void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value)
 {
-#if 1
-    //if (specsGlobalConfig.drop_all_events)
-    //    return;
     //if (value.power() <= m_abs_tol_power && m_emitted_val_fd.power() <= m_abs_tol_power)
     //    return;
 
@@ -396,9 +249,6 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
             m_event_queue.notify(SC_ZERO_TIME);
         }
     }
-#else
-    cerr << "Using implemented function: " << __FUNCTION__ << endl;
-#endif
 }
 
 void OpticalOutputPort::delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier)
@@ -413,6 +263,7 @@ void OpticalOutputPort::delayedWrite(const OpticalSignal &value, const sc_time &
         case OpticalOutputPortMode::FREQUENCY_DOMAIN:
             //delayedWriteEventDriven(value, SC_ZERO_TIME, 1);
             immediateWriteFrequencyDomain(value);
+            break;
         default:
             break; // throw here
     }
