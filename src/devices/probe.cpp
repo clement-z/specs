@@ -1,6 +1,5 @@
 #include <ios>
 #include "devices/probe.h"
-#include <cstdlib> // system()
 
 #define __modname(SUFFIX, IDX) \
     ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
@@ -41,35 +40,8 @@ void Probe::on_port_in_changed()
             if (m_trace_phase)
                 m_trace_sig_phase.write(s.phase());
             if (m_trace_wavelength)
-                // m_trace_sig_wavelength.write(299792458.0 / s.m_wavelength);
                 m_trace_sig_wavelength.write(s.getWavelength());
         }
-    }
-}
-
-void PowerProbe::on_port_in_changed()
-{
-    //m_trace_sig.write(0);
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-        auto &s = p_in->read();
-        if (!isnan(s.getWavelength()))
-            m_trace_sig_power.write(s.power());
-    }
-}
-
-void PhaseProbe::on_port_in_changed()
-{
-    //m_trace_sig.write(0);
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-        auto &s = p_in->read();
-        if (!isnan(s.getWavelength()))
-            m_trace_sig_phase.write(s.phase());
     }
 }
 
@@ -90,9 +62,6 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
     for(const auto &wl : m_lambdas)
     {
         stringstream ss;
-        // int wl_nm = floor(wl*1e9);
-        // int wl_sub_nm = round((wl*1e9 - wl_nm) * 1e6);
-        // ss << wl_nm << "nm" << wl_sub_nm;
         ss << setprecision(6) << std::fixed << wl*1e9;
         string wl_str = ss.str();
         // Necessary because '.' is interpreted by traces as the hierarchical separator
@@ -112,8 +81,6 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".phase@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
-        //m_lambda_signals[m_lambdas[i]] = std::move(temp_vector);
-        //or
         m_lambda_signals.insert({wl, std::move(temp_vector)});
 
         ++i;
@@ -121,8 +88,6 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
 }
 void MLambdaProbe::on_port_in_changed()
 {
-    // std::map< int, std::vector< unique_ptr<sc_signal<double> > > > wl_map;
-
     if (specsGlobalConfig.verbose_component_initialization)
     {
         cout << name() << " ready (";

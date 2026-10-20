@@ -1,6 +1,5 @@
 #include "specs.h"
 #include "devices/detector.h"
-#include <cstdlib> // system()
 #include <random>
 #include <complex>
 
@@ -78,8 +77,6 @@ void Detector::on_time_tick()
         m_cur_readout = photocurrent + (!m_noiseBypass)*noise_gen(photocurrent) + m_darkCurrent_A;
         m_cur_readout_no_interf = total_power * m_responsivity_A_W + (!m_noiseBypass)*noise_gen(photocurrent) + m_darkCurrent_A;
 
-
-        //m_cur_readout = total_field.real();
         // Write to output port
         //p_readout->write(m_cur_readout);
     }
@@ -109,24 +106,6 @@ double Detector::noise_gen(const double &noiseless_readout)
     // mean = noiseless, std = sqrt(variance)
     // the second element of the product is the gaussian(0,1)
     return sqrt(inoise_rms) * m_rngDist(m_rngGen);
-}
-
-/*
-To be implemented in the future, user can specify the wavelength response
-of the photodiode
-*/
-double Detector::wavelength_dependent_responsivity(const double &wavelength)
-{
-    (void)wavelength;
-    if(true)
-    {
-        return m_responsivity_A_W;
-    }
-    else
-    {
-        // custom responsivity curve
-        return 0; // should return the new responsivity
-    }
 }
 
 void Detector::init()

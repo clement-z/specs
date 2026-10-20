@@ -1,7 +1,6 @@
 #pragma once
 
 #include <systemc.h>
-#include <fstream>
 #include <random>
 
 #include "optical_output_port.h"
@@ -45,7 +44,6 @@ public:
 
     // Function that generates the noise applied to the output of this module
     double noise_gen(const double &noiseless_readout);
-    double wavelength_dependent_responsivity(const double &wavelength);
 
     // Processes
     void on_port_in_changed();
