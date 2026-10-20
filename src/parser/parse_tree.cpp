@@ -242,7 +242,6 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
             circuit_signals[net_name].clear(); // will delete the net through the destructor
             circuit_signals[net_name] = pt->nets.at(net_name).create(net_name);
         }
-        cout << "\t" << circuit_signals[net_name][0]->name() << "," << circuit_signals[net_name][1]->name() << endl;
     }
 }
 

@@ -239,7 +239,6 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_reltol.Get();
         ss >> reltol_val;
-        cout << reltol_val << endl;
         //cout << ss.good() << " " << ss.eof() << " " << ss.fail() << " " << ss.bad() << endl;
         if (!ss.eof() || ss.fail() || reltol_val <= 0) {
             cerr << "Invalid reltol value" << endl;

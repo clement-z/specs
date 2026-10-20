@@ -151,7 +151,6 @@ void GenericTransmissionDevice::input_on_i_output_on_j(size_t i, size_t j)
     //auto &p_out = (*ports_out[j]);
     auto &p_out_writer = (*ports_out_writers[j]);
     const bool active = TM.isActive(i, j);
-    cout << i << ", " << j << " is active" << endl;
 
     // Block if non active
     while (!active) { wait(); }

@@ -59,7 +59,6 @@ public:
             ss.str(std::string());
             ss << i;
             _i = ss.str();
-            cout << _i << endl;
             S_TL.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_TL_" + _i).c_str()));
             S_BL.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_BL_" + _i).c_str()));
             S_TR.push_back(make_shared<sc_signal<OpticalSignal>>((string(name()) + "_S_TR_" + _i).c_str()));
@@ -71,7 +70,6 @@ public:
         ss.str(std::string());
         ss << N;
         _i = ss.str();
-        cout << _i << endl;
         dc.push_back(make_shared<DirectionalCoupler>((string(name()) + "_dc_" + _i).c_str()));
         connect_submodules();
     }

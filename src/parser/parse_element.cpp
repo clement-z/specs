@@ -386,8 +386,6 @@ sc_module *PhaseShifterElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
 
-    cout << "Warning (" << name << "): default coupling power for DC currently set to field." << endl;
-
     // Verify number of nodes
     assert(nets.size() == n_nets);
 
@@ -486,8 +484,6 @@ INSTANTIATE_AND_CONNECT_BI(MZIElement, pt_helper)
 sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
-
-    cout << "Warning (" << name << "): default coupling power for DC currently set to field." << endl;
 
     // Verify number of nodes
     assert(nets.size() == n_nets);
@@ -1070,7 +1066,6 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
             exit(1);
         }
     }
-    cout<< "created " << obj->name() << endl;
     return obj;
 }
 
@@ -1267,7 +1262,6 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         cerr << "PCM Cell needs values for both Emelt and Nstates" << endl;
         exit(1);
     }
-    cout << "-----" << endl;
     return obj;
 }
 

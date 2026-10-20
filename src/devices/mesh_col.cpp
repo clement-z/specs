@@ -170,7 +170,6 @@ void MeshCol::init_N_even_j_odd()
 */
 void MeshCol::init_N_odd_j_even()
 {
-    cout << "odd-even" << endl;
     for(size_t i = 0; i < m_N/2; i++)
     {
         m_mzi.push_back(make_unique<MZI>(spx_child_name(this, "_MZI_", i).c_str(),
@@ -214,7 +213,6 @@ void MeshCol::init_N_odd_j_even()
 */
 void MeshCol::init_N_odd_j_odd()
 {
-    cout << "odd-odd" << endl;
     // Zero neff so it doesn't add any phase
     m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(),
                 m_length_cm, m_attenuation_wg_dB_cm,
