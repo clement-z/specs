@@ -46,6 +46,8 @@ bidirectional net.
 ## Related
 B-145 (same slot convention), B-176 (elaboration order depends on pointer order), A2's bidir findings.
 
+- B-147 (crossing outputs AS_READER) must land with or after this fix; B-145 shares the slot convention. Prototype covering B-144 and B-145 for WG: `backlog/repro/v7-bidir-slots-prototype.diff`.
+
 - Review ids: F-A4-01.
 ## Verification
 Ran the 4 repros on `/tmp/ws-review-build/specs` and on the patched scratch build. Ran the golden check

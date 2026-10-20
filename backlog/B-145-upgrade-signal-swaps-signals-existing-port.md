@@ -15,10 +15,17 @@ writer" in the reader branch.
 ## Expected
 The reader receives the bidir device's forward output: `out = 1.341 mW`, as in the reference.
 ## Suggested fix
-Remove the `swap(...)` at :234: the reader stays on `[0]`, which the bidir device writes when
-`m_connect_writer_count == 0`. Keep `m_writers_count++` and fix the comment. With this candidate (plus B-144),
-`a4-upgrade-reader` gives `c = 4 mW`, `out = 1.341 mW`. Needs-design for the same reason as B-144: fix both
-together under one documented slot convention.
+**Do not simply remove the swap** (the original suggestion): the second check showed that it breaks a case that works
+today, where the upgrading bidirectional device *reads* the net and the net's uni writer is created later
+(`backlog/repro/v7-upgrade-reader-case2.cir`, reference `v7-upgrade-reader-case2-ref.cir`: 1.341 mW today, 0.5 mW with
+the swap removed).
+
+Make the swap depend on the upgrading device's role on that net: add a `bool device_writes_net` parameter to
+`upgrade_signal()`. Swap only when the device reads the net (today's behaviour); when the device writes the net
+(WG `nets[1]`; DC/MZI/crossing `nets[2..3]`; PS `nets[1]`), keep the existing reader on slot 0. Fix the "if a writer"
+comment. A WG-only prototype, combined with the B-144 fix, is in `backlog/repro/v7-bidir-slots-prototype.diff`: it gives
+1.341 mW on both `a4-upgrade-reader.cir` and `v7-upgrade-reader-case2.cir`, golden unchanged. Decide the slot convention
+together with B-144.
 ## Golden impact
 None (candidate checked with the golden harness).
 ## Related
@@ -35,3 +42,5 @@ The problem is real. Base `a4-upgrade-reader` gives c = 0, c:1 = 4 mW and out = 
 **The suggested fix breaks a case that works today.** The swap exists for the case where the upgrading bidir device *reads* the net and the net's uni writer is created later. `/tmp/ws-review-V7/run/v7-upgrade-reader-case2.cir` is that case: merger1 reads c and is created first, `wg1 c e&` reads c, and `cwsrc3 c` is listed after wg1. Base gives out = 1.341 mW, correct and equal to its no-`&` reference. With the swap removed it gives out = 0.5 mW: the light is lost. This happens with or without B-144.
 Replace the suggested fix with: "Make the swap depend on the upgrading device's role on that net. Add `bool device_writes_net` to `upgrade_signal()`. Swap only when the device reads the net (keep today's behaviour). When the device writes the net (WG nets[1]; DC/MZI/crossing nets[2..3]; PS nets[1]), keep the existing reader on [0]. Fix the 'if a writer' comment."
 I prototyped this for WG only, together with B-144 (`/tmp/ws-review-V7/f01-alt02.diff`). It gives a4-upgrade-reader out = 1.341 mW and case2 out = 1.341 mW, and the golden check is unchanged. Add case2 as a second repro. The rest stands: needs-design, severity high, location 230-237 with the swap at :234.
+
+**Orchestrator:** Suggested fix replaced (role-dependent swap) after the second check found a regression in the original one.

@@ -1,0 +1,66 @@
+diff --git a/src/parser/parse_element.cpp b/src/parser/parse_element.cpp
+index e776fe6..9031760 100644
+--- a/src/parser/parse_element.cpp
++++ b/src/parser/parse_element.cpp
+@@ -52,8 +52,8 @@ INSTANTIATE_AND_CONNECT_BI(WGElement, pt_helper)
+         (*pt_helper.nets)[nets[1]].m_readers_count++;
+ 
+     // Bidirectional waveguide needs all nets as bidir
+-    for (const auto &net : nets)
+-        pt_helper.upgrade_signal(net);
++    pt_helper.upgrade_signal(nets[0], false);
++    pt_helper.upgrade_signal(nets[1], true);
+ 
+     // connect ports
+     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
+diff --git a/src/parser/parse_tree.cpp b/src/parser/parse_tree.cpp
+index cd3afc3..f67e677 100644
+--- a/src/parser/parse_tree.cpp
++++ b/src/parser/parse_tree.cpp
+@@ -174,7 +174,7 @@ void ParseTreeCreationHelper::create_signals(const ParseElement *elem)
+     }
+ }
+ 
+-void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
++void ParseTreeCreationHelper::upgrade_signal(const string &net_name, bool device_writes_net)
+ {
+     // Upgrade even if: net.bidirectional() is false
+ 
+@@ -231,7 +231,8 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
+             {
+                 // if a writer, then the next port needs to reverse its order.
+                 // for this we swap signal:0 and signal:1
+-                swap(circuit_signals[net_name][0], circuit_signals[net_name][1]);
++                if (!device_writes_net)
++                    swap(circuit_signals[net_name][0], circuit_signals[net_name][1]);
+                 // then we need to update the number of "writers" connected to the net
+                 pt->nets[net_name].m_writers_count++;
+             }
+diff --git a/src/parser/parse_tree.h b/src/parser/parse_tree.h
+index 5cc5be5..d4f625f 100644
+--- a/src/parser/parse_tree.h
++++ b/src/parser/parse_tree.h
+@@ -780,7 +780,7 @@ struct ParseTreeCreationHelper {
+     vector<ParseElement *>::iterator next_fresh_element_bound_to(const string &net_name, const set<const ParseElement *> &excludes = {});
+ 
+     // upgrade a signal to bidirectional
+-    void upgrade_signal(const string &name);
++    void upgrade_signal(const string &name, bool device_writes_net = false);
+ 
+     // Create signals connected to a given element
+     void create_signals(const ParseElement *elem);
+@@ -825,10 +825,10 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
+             exit(2);
+         }
+ 
+-        int i_write = pt->nets.at(net_name).m_connect_writer_count;
+-        i_write = max(i_write, 1);// If there are already 2 writers, act as a reader for the second one (imitate the second writer but only as a reader)
+-        int i_read = (i_write + 1) % 2;
+-        int i = as_writer ? i_write : i_read;
++        int n_writers = pt->nets.at(net_name).m_connect_writer_count;
++        // a writer takes the next free slot; a reader reads the slot of the first writer
++        int i_read = (max(n_writers, 1) + 1) % 2;
++        int i = as_writer ? n_writers : i_read;
+ 
+         sig_raw = circuit_signals.at(net_name)[i].get();
+         sig = dynamic_cast<signal_type *>(sig_raw);

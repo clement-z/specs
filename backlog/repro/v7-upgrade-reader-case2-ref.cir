@@ -1,0 +1,11 @@
+* V7: reference for case2 without '&' (wg1 unidirectional)
+cwsrc1 s1 wl=1.55e-6 power=1e-3
+wga s1 a length=1e-4
+cwsrc2 s2 wl=1.55e-6 power=1e-3
+wgb s2 a length=1e-4
+merger1 c a out
+wg1 c e length=1e-4
+cwsrc3 c wl=1.55e-6 power=4e-3
+probe1 out
+probe2 e
+.tran 1e-11

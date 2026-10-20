@@ -16,6 +16,8 @@ circuit with `coupler1 a b c d k=0` instead of the crossing gives `ROOT/e:0 = 1 
 `nets[3], AS_WRITER`.
 
 Classified `needs-human` only because the fix changes the results of netlists that run today (with wrong results). The change itself is mechanical; a maintainer sign-off is enough.
+
+**Dependency (from the second check): apply only together with or after B-144.** Applied alone, AS_WRITER breaks circuits that work today, where a crossing output `c&` is read by a uni device (`backlog/repro/v7-xing-v4.cir`, `v7-xing-v5.cir`: 0.5 mW becomes 0), and it does not fix `v7-xing-v3.cir`. With B-144 and this fix together, every variant is correct.
 ## Golden impact
 None (no golden case has a crossing; verified with the harness). For crossings whose output is on a bidirectional
 net, the result changes from "output silently lost" to the coupler-equivalent value. This is wiring, not modelling.
@@ -39,3 +41,5 @@ Changes needed:
 - Golden impact None is confirmed.
 - AS_WRITER is the only correct binding for the uni variant. Instantiating CrossingBi when a net is bidirectional (as DC does, B-159) is a separate design option.
 Location lines 539-540 are correct.
+
+**Orchestrator:** Dependency on B-144 recorded; kept needs-human.

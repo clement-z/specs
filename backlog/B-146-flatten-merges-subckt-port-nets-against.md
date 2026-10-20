@@ -1,5 +1,5 @@
 # B-146: Flatten merges subckt port nets against the pre-flatten map (E115, lost type check)
-severity: high | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED
 location: src/parser/parse_tree.cpp:899, src/parser/parse_tree.cpp:902, src/parser/parser.y:513-541
 ## Problem
 `flatten()` looks up the external net in `nets` (the parent map before flattening), not in `nets_flat`. X-element
@@ -7,6 +7,8 @@ nets are never registered in the parent (`element.x.with_args` uses `net_name_ba
 instances share a net that no plain element uses, the second instance overwrites the first one's reader/writer
 counts and no type check runs. A net with two subckt drivers stays unidirectional (E115). A net that is optical in
 one instance and electrical in another is accepted, and elaboration then fails with a cryptic message.
+
+Refinement from the second check: a net with two subckt drivers stays unidirectional. It gives E115 when both write in the same delta, and otherwise **runs silently with last-write-wins** (`backlog/repro/v7-x-shared-delayed.cir`, flat equivalent `v7-x-shared-delayed-flat.cir`).
 ## Evidence
 - `backlog/repro/a4-x-shared-net.cir` (`x1 in1 mid s`, `x2 in2 mid s`): rc 1,
   `Error: (E115) sc_signal<T> cannot have more than one driver: signal ROOT/mid ... ROOT/X2/WG1 ... ROOT/X1/WG1`.
@@ -23,9 +25,10 @@ Same behaviour as the flat netlist.
 -                bool ok = sub_pt.nets[internal_net_name].combine_with(nets.at(external_net_name));
 +                bool ok = sub_pt.nets[internal_net_name].combine_with(nets_flat.at(external_net_name));
 ```
+
+Classified `needs-human` only because the fix changes the results of netlists that run today (with wrong results). The change itself is mechanical; a maintainer sign-off is enough.
 ## Golden impact
-None. Verified: `ROOT/out` in subckt_tests (an X-to-X net) changes from (w0,r1) to (w1,r1), which is still
-unidirectional, and its JSON `readers` is unchanged.
+None for the golden cases (`--json` and stdout of `subckt_tests`, `add_drop`, `add_drop_sub` are byte-identical). It changes results wherever two or more subckt instances share a port net: reader/writer counts and the `&` flag now accumulate as in the flat netlist. For example, `v7-x-shared-delayed.cir` runs today (rc 0, mid = 2 mW last-write-wins) and after the fix matches its flat equivalent (mid:0 = 1 mW, mid:1 = 2 mW).
 ## Related
 B-152 (unused port crash in the same loop), B-155 (the "Wrong signal type for 0" message).
 
@@ -46,3 +49,5 @@ Changes needed:
 - Problem text: "a net with two subckt drivers stays unidirectional: E115 if both write in the same delta, otherwise it runs silently with last-write-wins".
 - Golden impact: "None for golden cases. It changes results only where ≥2 subckt instances share a port net: writer and reader counts and the `&` flag now accumulate as in the flat netlist."
 The fix itself is unique and local, and the location lines are correct.
+
+**Orchestrator:** Reclassified easy-unattended -> needs-human: the fix (correctly) changes the results of netlists that run today.

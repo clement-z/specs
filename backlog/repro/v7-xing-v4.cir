@@ -1,0 +1,6 @@
+* V7: crossing output c explicitly bidir, read only by a unidirectional splitter
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=1e-3
+crossing1 a b c& d
+splitter1 c z1 z2
+.op
