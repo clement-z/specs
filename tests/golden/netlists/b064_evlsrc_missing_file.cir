@@ -1,0 +1,4 @@
+* B-064: an EVLSRC values file that does not exist must be named in the error
+.assign filename = "no_such_evlsrc_values.csv"
+evlsrc1 e values={filename}
+.tran 1e-9

@@ -24,6 +24,7 @@
   "cli/missing-netlist",
   "cli/no-args",
   "cli/unknown-testbench",
+  "err/b064-evlsrc-missing-file",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -51,5 +52,19 @@
   "tb/wg"
  ],
  "gtest": "gtest/unit_tests",
- "note": "Recorded on sprint/2026-10 @ 26bf92c with the CMake Release build (GCC 11.5, -std=gnu++20 -O3 -DNDEBUG -march=native on an i5-6600K, SystemC 3.0.1 built as C++20). gtest results come from an out-of-tree PATCHED copy of src/test, because the in-tree unit_tests does not compile: utils.h:81 static_assert(false) removed, and EXPECT_ANGLE_EQ rewritten as EXPECT_PRED2 with a lambda calling angleIsEqual(a.m_field, b)."
+ "note": "Recorded on sprint/2026-10 @ 26bf92c with the CMake Release build (GCC 11.5, -std=gnu++20 -O3 -DNDEBUG -march=native on an i5-6600K, SystemC 3.0.1 built as C++20). gtest results come from an out-of-tree PATCHED copy of src/test, because the in-tree unit_tests does not compile: utils.h:81 static_assert(false) removed, and EXPECT_ANGLE_EQ rewritten as EXPECT_PRED2 with a lambda calling angleIsEqual(a.m_field, b).",
+ "rerecords": [
+  {
+   "recorded_at_utc": "2026-10-20T07:00:30Z",
+   "only": "^err/b064-",
+   "gtest": false,
+   "note": "B-064: new regression case (EVLSRC missing values file named in error)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:00:30Z",
+   "only": "^cir/paul_3ring_puf$",
+   "gtest": false,
+   "note": "B-064: error message names the missing values file"
+  }
+ ]
 }

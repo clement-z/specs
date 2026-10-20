@@ -54,7 +54,7 @@
     "circuits/paul_3ring_puf.cir"
    ],
    "expect": "fail",
-   "note": "VLSRC values file 'paul_puf_bitstream_158b_3wl.csv' is not in the repo ('Error: Cannot open the file.')"
+   "note": "VLSRC values file 'paul_puf_bitstream_158b_3wl.csv' is not in the repo ('Error: Cannot open the file \"paul_puf_bitstream_158b_3wl.csv\".')"
   },
   {
    "id": "cir/paul_simple_ring",
@@ -359,6 +359,24 @@
    ],
    "note": "src/tb/alltestbenches.cpp: mesh_tb_run; segfaults (SIGSEGV) in SPECSConfig::prepareSimulation (use-after-free: Clements::init() re-creates children while prepareSimulation iterates over them)",
    "expect": "crash"
+  },
+  {
+   "id": "err/b064-evlsrc-missing-file",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b064_evlsrc_missing_file.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "expect": "fail",
+   "note": "B-064: the error names the missing EVLSRC values file"
   },
   {
    "id": "cli/help",
