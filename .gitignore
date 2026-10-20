@@ -21,7 +21,6 @@ detector_trace.txt
 **/.clangd/**
 detector_traces/**
 .vimrc.local
-config.local.mk
 specs
 libspecs.so
 gmon.out
