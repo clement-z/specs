@@ -1,0 +1,408 @@
+{
+ "format": 1,
+ "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines).",
+ "defaults": {
+  "timeout": 120,
+  "setup": {
+   "copy": [
+    "circuits"
+   ],
+   "mkdir": [
+    "traces"
+   ]
+  }
+ },
+ "gtest": {
+  "timeout": 600
+ },
+ "cases": [
+  {
+   "id": "cir/add_drop",
+   "args": [
+    "-f",
+    "circuits/add_drop.cir"
+   ]
+  },
+  {
+   "id": "cir/add_drop_pyspecs",
+   "args": [
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ]
+  },
+  {
+   "id": "cir/add_drop_sub",
+   "args": [
+    "-f",
+    "circuits/add_drop_sub.cir"
+   ],
+   "note": "subcircuit definition only: nothing to simulate, no trace file is produced"
+  },
+  {
+   "id": "cir/double_ring",
+   "args": [
+    "-f",
+    "circuits/double_ring.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: legacy netlist syntax ('one 0' at line 4) not supported by the current grammar"
+  },
+  {
+   "id": "cir/paul_3ring_puf",
+   "args": [
+    "-f",
+    "circuits/paul_3ring_puf.cir"
+   ],
+   "expect": "fail",
+   "note": "VLSRC values file 'paul_puf_bitstream_158b_3wl.csv' is not in the repo ('Error: Cannot open the file.')"
+  },
+  {
+   "id": "cir/paul_simple_ring",
+   "args": [
+    "-f",
+    "circuits/paul_simple_ring.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+  },
+  {
+   "id": "cir/subckt_test",
+   "args": [
+    "-f",
+    "circuits/subckt_test.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: element 'cwsrc' (line 5) is not a recognised element name"
+  },
+  {
+   "id": "cir/subckt_tests",
+   "args": [
+    "-f",
+    "circuits/subckt_tests.cir"
+   ]
+  },
+  {
+   "id": "cir/triple_ring",
+   "args": [
+    "-f",
+    "circuits/triple_ring.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+  },
+  {
+   "id": "cir-json/add_drop",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "cir-json/add_drop_pyspecs",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "cir-json/add_drop_sub",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/add_drop_sub.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "cir-json/subckt_tests",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/subckt_tests.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "opt/tracefile-o",
+   "args": [
+    "-o",
+    "traces/custom",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "-o overrides the default trace file name"
+  },
+  {
+   "id": "opt/tol-resolution-overrides",
+   "args": [
+    "--abstol",
+    "1e-10",
+    "--reltol",
+    "1e-5",
+    "-R",
+    "-14",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "command-line options are appended as a .options footer and take priority over the netlist"
+  },
+  {
+   "id": "opt/mode-sampled-time",
+   "args": [
+    "-m",
+    "sampled-time",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ]
+  },
+  {
+   "id": "opt/mode-fd",
+   "args": [
+    "-m",
+    "fd",
+    "-f",
+    "circuits/add_drop.cir"
+   ]
+  },
+  {
+   "id": "opt/multi-file",
+   "args": [
+    "-f",
+    "circuits/common_definitions.def",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "several -f files are concatenated"
+  },
+  {
+   "id": "opt/vci",
+   "args": [
+    "--vci",
+    "-f",
+    "circuits/subckt_tests.cir"
+   ],
+   "note": "verbose component initialisation"
+  },
+  {
+   "id": "tb/wg",
+   "args": [
+    "-t",
+    "wg"
+   ],
+   "note": "src/tb/alltestbenches.cpp: wg_tb_run"
+  },
+  {
+   "id": "tb/waveguide",
+   "args": [
+    "-t",
+    "waveguide"
+   ],
+   "note": "src/tb/alltestbenches.cpp: wg_tb_run"
+  },
+  {
+   "id": "tb/merg",
+   "args": [
+    "-t",
+    "merg"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Merger_tb_run"
+  },
+  {
+   "id": "tb/merger",
+   "args": [
+    "-t",
+    "merger"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Merger_tb_run"
+  },
+  {
+   "id": "tb/dc",
+   "args": [
+    "-t",
+    "dc"
+   ],
+   "note": "src/tb/alltestbenches.cpp: DirectionalCoupler_tb_run"
+  },
+  {
+   "id": "tb/directional_coupler",
+   "args": [
+    "-t",
+    "directional_coupler"
+   ],
+   "note": "src/tb/alltestbenches.cpp: DirectionalCoupler_tb_run"
+  },
+  {
+   "id": "tb/spli",
+   "args": [
+    "-t",
+    "spli"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Splitter_tb_run"
+  },
+  {
+   "id": "tb/splitter",
+   "args": [
+    "-t",
+    "splitter"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Splitter_tb_run"
+  },
+  {
+   "id": "tb/det",
+   "args": [
+    "-t",
+    "det"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run; NONDETERMINISTIC: Detector::m_cur_readout / m_cur_readout_no_interf (src/devices/detector.h:18-19) are never initialised and are dumped at t=0 in the VCD (garbage such as 6.9e-310); these two signals are therefore excluded from the VCD comparison. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
+   "vcd_ignore_values": [
+    "(^|\\.)uut2?\\.readout(_no_interference)?$"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ]
+  },
+  {
+   "id": "tb/detector",
+   "args": [
+    "-t",
+    "detector"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run; NONDETERMINISTIC: Detector::m_cur_readout / m_cur_readout_no_interf (src/devices/detector.h:18-19) are never initialised and are dumped at t=0 in the VCD (garbage such as 6.9e-310); these two signals are therefore excluded from the VCD comparison. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
+   "vcd_ignore_values": [
+    "(^|\\.)uut2?\\.readout(_no_interference)?$"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ]
+  },
+  {
+   "id": "tb/pcm",
+   "args": [
+    "-t",
+    "pcm"
+   ],
+   "note": "src/tb/alltestbenches.cpp: PCMElement_tb_run"
+  },
+  {
+   "id": "tb/mzi",
+   "args": [
+    "-t",
+    "mzi"
+   ],
+   "note": "src/tb/alltestbenches.cpp: MZI_tb_run"
+  },
+  {
+   "id": "tb/ring",
+   "args": [
+    "-t",
+    "ring"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Ring_tb_run"
+  },
+  {
+   "id": "tb/ac_add_drop",
+   "args": [
+    "-t",
+    "ac_add_drop"
+   ],
+   "note": "src/tb/alltestbenches.cpp: freqsweep_tb_run_add_drop"
+  },
+  {
+   "id": "tb/ac_crow",
+   "args": [
+    "-t",
+    "ac_crow"
+   ],
+   "note": "src/tb/alltestbenches.cpp: crow_tb_run"
+  },
+  {
+   "id": "tb/lambda",
+   "args": [
+    "-t",
+    "lambda"
+   ],
+   "note": "src/tb/alltestbenches.cpp: lambda_tb_run"
+  },
+  {
+   "id": "tb/phaseshifter",
+   "args": [
+    "-t",
+    "phaseshifter"
+   ],
+   "note": "src/tb/alltestbenches.cpp: ps_tb_run"
+  },
+  {
+   "id": "tb/ps",
+   "args": [
+    "-t",
+    "ps"
+   ],
+   "note": "src/tb/alltestbenches.cpp: ps_tb_run"
+  },
+  {
+   "id": "tb/mesh",
+   "args": [
+    "-t",
+    "mesh"
+   ],
+   "note": "src/tb/alltestbenches.cpp: mesh_tb_run; segfaults (SIGSEGV) in SPECSConfig::prepareSimulation (use-after-free: Clements::init() re-creates children while prepareSimulation iterates over them)",
+   "expect": "crash"
+  },
+  {
+   "id": "cli/help",
+   "args": [
+    "-h"
+   ]
+  },
+  {
+   "id": "cli/no-args",
+   "args": [],
+   "note": "prints help, exit 1"
+  },
+  {
+   "id": "cli/list-testbenches",
+   "args": [
+    "-p"
+   ],
+   "note": "guards the testbench registry (BUILD_TB)"
+  },
+  {
+   "id": "cli/unknown-testbench",
+   "args": [
+    "-t",
+    "nonexistent"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "cli/missing-netlist",
+   "args": [
+    "-f",
+    "does_not_exist.cir"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "cli/bad-mode",
+   "args": [
+    "-m",
+    "bogus",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail"
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/detector_tb.vcd)
+uut
+uut2
+0 s:
+	IN: [0006]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	READOUT:  0
+	READOUT2:  0
+	COUNT: 1
+100 ms:
+	IN: [0011]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	READOUT:  0
+	READOUT2:  0
+	COUNT: 2
+-----------------/! \---------------
+Failure!
+Expected 1A as both output currents!
+-----------------/! \---------------
+200 ms:
+	IN: [0016]  @ 1551 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	READOUT:  0
+	READOUT2:  0
+	COUNT: 3
+
+
+.vcd trace file: traces/detector_tb
+Total runtime: <DURATION> ms
+

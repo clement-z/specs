@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "circuits/add_drop_sub.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "cir/add_drop_sub"
+}

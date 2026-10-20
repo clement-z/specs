@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "ac_crow"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/crow_tb.vcd": {
+   "bytes": 145450,
+   "kind": "vcd",
+   "sha256": "6bf301d4412d009e21e940fdfe7693d1c32a753cf41bcfd944ed6154826ee9fc",
+   "stored": "files/traces/crow_tb.vcd"
+  }
+ },
+ "id": "tb/ac_crow"
+}

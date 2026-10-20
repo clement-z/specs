@@ -1,0 +1,8 @@
+{
+ "args": [
+  "-p"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "cli/list-testbenches"
+}

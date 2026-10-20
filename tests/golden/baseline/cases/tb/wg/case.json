@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "wg"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/waveguide_tb.vcd": {
+   "bytes": 1754,
+   "kind": "vcd",
+   "sha256": "9b20af9f1606c763fbe7c2d2b1c5e64f54ff102e060233b0144adb97fdc19cf1",
+   "stored": "files/traces/waveguide_tb.vcd"
+  }
+ },
+ "id": "tb/wg"
+}

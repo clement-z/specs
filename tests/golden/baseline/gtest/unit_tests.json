@@ -1,0 +1,9 @@
+{
+ "exit": 1,
+ "id": "gtest/unit_tests",
+ "tests": {
+  "A.B": "PASS",
+  "Waveguide.Instantiation": "PASS",
+  "Waveguide.OperatingPoint": "FAIL"
+ }
+}

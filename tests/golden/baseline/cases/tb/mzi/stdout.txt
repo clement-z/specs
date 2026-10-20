@@ -1,0 +1,75 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/mzi_tb.vcd)
+0 s:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 0
+	OUT1: [0007]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	OUT2: [0010]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+0 s:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 0
+	OUT1: [0147]  @ 1550 nm (0.500000 V.m⁻¹, 0.250000 W, 3.1416 rad)
+	OUT2: [0149]  @ 1550 nm (0.500000 V.m⁻¹, 0.250000 W, 1.5708 rad)
+0 s:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 0
+	OUT1: [0175]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	OUT2: [0177]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 1.5708 rad)
+1 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 1.5708
+	OUT1: [0175]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	OUT2: [0177]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 1.5708 rad)
+1 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 1.5708
+	OUT1: [0231]  @ 1550 nm (0.707107 V.m⁻¹, 0.500000 W, 2.3562 rad)
+	OUT2: [0233]  @ 1550 nm (0.707107 V.m⁻¹, 0.500000 W, 2.3562 rad)
+2 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 3.14159
+	OUT1: [0231]  @ 1550 nm (0.707107 V.m⁻¹, 0.500000 W, 2.3562 rad)
+	OUT2: [0233]  @ 1550 nm (0.707107 V.m⁻¹, 0.500000 W, 2.3562 rad)
+2 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 0
+	THETA: 3.14159
+	OUT1: [0287]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 3.1416 rad)
+	OUT2: [0289]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+3 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 1
+	THETA: 3.14159
+	OUT1: [0287]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 3.1416 rad)
+	OUT2: [0289]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+3 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 1
+	THETA: 3.14159
+	OUT1: [0399]  @ 1550 nm (0.877583 V.m⁻¹, 0.770151 W, -2.6416 rad)
+	OUT2: [0401]  @ 1550 nm (0.479426 V.m⁻¹, 0.229849 W, -2.6416 rad)
+3 ns:
+	IN:  [0037]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	PHI: 1
+	THETA: 3.14159
+	OUT1: [0427]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, -2.1416 rad)
+	OUT2: [0429]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+
+
+.vcd trace file: traces/mzi_tb
+Total runtime: <DURATION> ms
+

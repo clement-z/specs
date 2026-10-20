@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "circuits/paul_simple_ring.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cir/paul_simple_ring"
+}

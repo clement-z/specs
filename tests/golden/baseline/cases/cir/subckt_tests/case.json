@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "circuits/subckt_tests.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 35170,
+   "kind": "vcd",
+   "sha256": "0fb6b160647882ea4cdf14afc8b00709cb89408aa3d10e6b5dd69e648007a776",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "cir/subckt_tests"
+}

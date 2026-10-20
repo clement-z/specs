@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "circuits/subckt_test.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cir/subckt_test"
+}

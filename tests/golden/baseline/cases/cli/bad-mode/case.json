@@ -1,0 +1,11 @@
+{
+ "args": [
+  "-m",
+  "bogus",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cli/bad-mode"
+}

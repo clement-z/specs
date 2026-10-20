@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "ring"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/ring_tb.vcd": {
+   "bytes": 52832,
+   "kind": "vcd",
+   "sha256": "8968e14332939d1d4f665ce2c9ebaec733efeff1fafe582becadfc16769aaefc",
+   "stored": "files/traces/ring_tb.vcd"
+  }
+ },
+ "id": "tb/ring"
+}

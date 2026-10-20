@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "det"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/detector_tb.vcd": {
+   "bytes": 1430,
+   "kind": "vcd",
+   "sha256": "3ccf7bee61579a0b53adb83c02314deb6ab2dc91fbf9c5c2d4b999b6abcdc250",
+   "stored": "files/traces/detector_tb.vcd"
+  }
+ },
+ "id": "tb/det"
+}

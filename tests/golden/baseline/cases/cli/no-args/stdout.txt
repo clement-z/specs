@@ -1,0 +1,38 @@
+  specs {OPTIONS}
+
+    The Scalable Photonic Event-driven Circuit Simulator.
+
+  OPTIONS:
+
+      -f[circuit...],
+      --file=[circuit...]               Simulate from circuit file
+      -R[set_timescale],
+      --resolution=[set_timescale]      Set the engine timescale (as
+                                        log10(timestep/1s))(0: seconds, -3: ms,
+                                        -6:µs, ..., -15: fs)
+      -m[set_simulator_mode],
+      --mode=[set_simulator_mode]       Set simulator mode. Possible values:
+                                         - time-domain, event-driven, td
+                                        (default)
+                                         - sampled-time
+                                         - frequency-domain, fd
+      -T, --run-manual-test             Run manual test function
+      -o[set_tracefile],
+      --output=[set_tracefile]          Set the default trace file
+      --json=[export_json]              Export json of completed circuit to file
+      --version                         Output version information and exit
+      -n, --dryrun                      Do not run simulation directives
+      --reltol=[set_reltol]             Set the value of the relative tolerance
+                                        parameter for field
+      --abstol=[set_abstol]             Set the value of the absolute tolerance
+                                        parameter for field
+      --nrings_crow=[set_nrings_crow]   temporary
+      --vci, --verbose_ci               Print components detail before starting
+                                        simulation
+      -p, --list-testbenches            List available testbenches
+      --mon                             Monitor simulation status
+      -t[test_name],
+      --testbench=[test_name]           Run the specified testbench (use -p to
+                                        list available testbenches)
+      -h, --help                        Display this help menu
+

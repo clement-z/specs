@@ -1,0 +1,44 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/ps_tb.vcd)
+0 s:
+	IN1:  [0030]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0028]  @ 1660 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0007]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	COUNT: 1
+0 s:
+	IN1:  [0030]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0028]  @ 1660 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0099]  @ 1550 nm (0.630210 V.m⁻¹, 0.397164 W, 1.0000 rad)
+	COUNT: 2
+0 s:
+	IN1:  [0030]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0028]  @ 1660 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0105]  @ 1660 nm (0.630210 V.m⁻¹, 0.397164 W, 1.0000 rad)
+	COUNT: 3
+100 ms:
+	IN1:  [0030]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0028]  @ 1660 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0134]  @ 1550 nm (0.630210 V.m⁻¹, 0.397164 W, 2.0000 rad)
+	COUNT: 4
+100 ms:
+	IN1:  [0030]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0028]  @ 1660 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0140]  @ 1660 nm (0.630210 V.m⁻¹, 0.397164 W, 2.0000 rad)
+	COUNT: 5
+-----------------/! \---------------
+Test finished!
+Success rate: 3/3
+-----------------/! \---------------
+
+
+.vcd trace file: traces/ps_tb
+Total runtime: <DURATION> ms
+

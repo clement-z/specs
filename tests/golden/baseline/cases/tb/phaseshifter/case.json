@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "phaseshifter"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/ps_tb.vcd": {
+   "bytes": 1377,
+   "kind": "vcd",
+   "sha256": "84d68fe0be190eb68796c5ff43a433f40a6d8e30916a35db024e3d06bfea9c6e",
+   "stored": "files/traces/ps_tb.vcd"
+  }
+ },
+ "id": "tb/phaseshifter"
+}

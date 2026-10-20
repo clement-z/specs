@@ -1,0 +1,22 @@
+{
+ "args": [
+  "--abstol",
+  "1e-10",
+  "--reltol",
+  "1e-5",
+  "-R",
+  "-14",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 26313,
+   "kind": "vcd",
+   "sha256": "ef2a45f4e1e5f984307d27434a18f44334d743ea4d082fbab8b5481a4c1b405a",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "opt/tol-resolution-overrides"
+}

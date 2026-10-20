@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "ac_add_drop"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/freqsweep_tb.vcd": {
+   "bytes": 23420,
+   "kind": "vcd",
+   "sha256": "db2345069333b1e6679599f898ca7f4c47df508d1b3fb86737441c2e737be510",
+   "stored": "files/traces/freqsweep_tb.vcd"
+  }
+ },
+ "id": "tb/ac_add_drop"
+}

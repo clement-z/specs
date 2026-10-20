@@ -1,0 +1,18 @@
+{
+ "args": [
+  "-f",
+  "circuits/common_definitions.def",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 26332,
+   "kind": "vcd",
+   "sha256": "306c4520d19ed260dafd56ebc924cd8751f4099650d170d75185e905a496fd08",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "opt/multi-file"
+}

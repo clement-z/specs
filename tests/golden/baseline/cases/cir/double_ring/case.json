@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "circuits/double_ring.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cir/double_ring"
+}

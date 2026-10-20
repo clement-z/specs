@@ -1,0 +1,49 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/merger_tb.vcd)
+0 s:
+	IN1:  [0014]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0004]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	OUT: [0007]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	COUNT: 1
+0 s:
+	IN1:  [0014]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0004]  @ 1550 nm (0.000000 V.m⁻¹, 0.000000 W, 0.0000 rad)
+	OUT: [0029]  @ 1550 nm (0.707107 V.m⁻¹, 0.500000 W, 0.0000 rad)
+	COUNT: 2
+100 ms:
+	IN1:  [0014]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0034]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0029]  @ 1550 nm (0.707107 V.m⁻¹, 0.500000 W, 0.0000 rad)
+	COUNT: 3
+100 ms:
+	IN1:  [0014]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	IN2:  [0034]  @ 1550 nm (1.000000 V.m⁻¹, 1.000000 W, 0.0000 rad)
+	OUT: [0049]  @ 1550 nm (1.414214 V.m⁻¹, 2.000000 W, 0.0000 rad)
+	COUNT: 4
+200 ms:
+	IN1:  [0059]  @ 1550 nm (1.414214 V.m⁻¹, 2.000000 W, 0.0000 rad)
+	IN2:  [0057]  @ 1550 nm (1.414214 V.m⁻¹, 2.000000 W, 0.0000 rad)
+	OUT: [0049]  @ 1550 nm (1.414214 V.m⁻¹, 2.000000 W, 0.0000 rad)
+	COUNT: 5
+200 ms:
+	IN1:  [0059]  @ 1550 nm (1.414214 V.m⁻¹, 2.000000 W, 0.0000 rad)
+	IN2:  [0057]  @ 1550 nm (1.414214 V.m⁻¹, 2.000000 W, 0.0000 rad)
+	OUT: [0079]  @ 1550 nm (2.000000 V.m⁻¹, 4.000000 W, 0.0000 rad)
+	COUNT: 6
+-----------------/! \---------------
+Test finished!
+Success rate: 4/4
+-----------------/! \---------------
+
+
+.vcd trace file: traces/merger_tb
+Total runtime: <DURATION> ms
+

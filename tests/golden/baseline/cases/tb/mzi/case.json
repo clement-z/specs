@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "mzi"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/mzi_tb.vcd": {
+   "bytes": 1795,
+   "kind": "vcd",
+   "sha256": "8d6401ebcf9a6ff34303cc9800a38417c7e9464a92741c24a0ffbdcf4b5d0f8e",
+   "stored": "files/traces/mzi_tb.vcd"
+  }
+ },
+ "id": "tb/mzi"
+}

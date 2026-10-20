@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "lambda"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/lambda_tb.vcd": {
+   "bytes": 5405,
+   "kind": "vcd",
+   "sha256": "2d8498904ba614a71bdbd82619ee3dddfaac4bae6a3c2ac49e1b3dcc48f57acd",
+   "stored": "files/traces/lambda_tb.vcd"
+  }
+ },
+ "id": "tb/lambda"
+}

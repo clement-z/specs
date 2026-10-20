@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-t",
+  "merger"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/merger_tb.vcd": {
+   "bytes": 1108,
+   "kind": "vcd",
+   "sha256": "9ef73382d9a8ef47955e69c2d12e2188ea953522b128eb584e55b2688c579d47",
+   "stored": "files/traces/merger_tb.vcd"
+  }
+ },
+ "id": "tb/merger"
+}
