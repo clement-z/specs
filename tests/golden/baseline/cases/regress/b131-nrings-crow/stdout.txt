@@ -1,12 +1,3 @@
-0
-1
-2
-crow_wg_top_0
-crow_wg_bot_0
-crow_dc_0
-crow_wg_top_1
-crow_wg_bot_1
-crow_dc_1
 Current SPECS config:
 - simulation mode: Event-driven time-domain
 - analysis type: TIME DOMAIN
