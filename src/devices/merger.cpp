@@ -6,7 +6,6 @@ using namespace std;
 void Merger::on_port_in1_changed()
 {
     const double transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
-    m_memory_in1[0] = 0; // initializing for nan wavelength
 
     if (specsGlobalConfig.verbose_component_initialization)
     {
@@ -44,7 +43,6 @@ void Merger::on_port_in1_changed()
 void Merger::on_port_in2_changed()
 {
     const double transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
-    m_memory_in2[0] = 0; // initializing for nan wavelength
 
     OpticalSignal p_in2_read;
 

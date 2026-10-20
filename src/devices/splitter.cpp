@@ -11,7 +11,7 @@ void Splitter::on_port_in_changed()
     {
         cout << name() << ":" << endl;
         cout << "transmission = " << pow(transmission, 2) << " W/W" << endl;
-        cout << "splitting ratio_power = 0.5" << " W/W" << endl;
+        cout << "splitting ratio_power = " << m_split_ratio << " W/W" << endl;
         cout << "\t    " << port_channel_name(p_out1) << endl;
         cout << port_channel_name(p_in)  << " -->" << endl;
         cout << "\t    " << port_channel_name(p_out2);

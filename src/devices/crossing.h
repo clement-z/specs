@@ -27,7 +27,7 @@ public:
 
     // Constructor with crosstalk
     // Attenuation relates to out1/in1 when there's nothing in in2
-    // Crosstalk relates to out2/in1 when there's nothing in in1
+    // Crosstalk relates to out2/in1 when there's nothing in in2
     CrossingBase(sc_module_name name,
                        double attenuation_power_dB = 0,
                        double crosstalk_power_dB = NAN)
@@ -55,7 +55,7 @@ public:
 
     // Constructor with crosstalk
     // Attenuation relates to out1/in1 when there's nothing in in2
-    // Crosstalk relates to out2/in1 when there's nothing in in1
+    // Crosstalk relates to out2/in1 when there's nothing in in2
     CrossingUni(sc_module_name name,
                        double attenuation_power_dB = 0,
                        double crosstalk_power_dB = NAN)
@@ -95,7 +95,7 @@ public:
 
     // Constructor with crosstalk
     // Attenuation relates to out1/in1 when there's nothing in in2
-    // Crosstalk relates to out2/in1 when there's nothing in in1
+    // Crosstalk relates to out2/in1 when there's nothing in in2
     CrossingBi(sc_module_name name,
                        double attenuation_power_dB = 0,
                        double crosstalk_power_dB = NAN)

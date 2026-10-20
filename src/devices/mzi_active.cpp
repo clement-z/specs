@@ -116,7 +116,7 @@ void MZIActiveBi::connect_submodules()
 {
     // Parametrizing the instances
 
-    // cast as unidirectional devices
+    // cast as bidirectional devices
     WaveguideBi * const wg1 = dynamic_cast<WaveguideBi *>(m_wg1.get());
     WaveguideBi * const wg2 = dynamic_cast<WaveguideBi *>(m_wg2.get());
     WaveguideBi * const wg3 = dynamic_cast<WaveguideBi *>(m_wg3.get());

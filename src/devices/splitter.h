@@ -43,11 +43,6 @@ public:
      * */
     double m_split_ratio;
 
-    /** The delay for an output to propagate to the outputs in ns.
-     *
-     * The delay is the same for both outputs.
-     * */
-    // static double m_delay_ns;
     /** The attenuation of the signal in dB.
      *
      * The attenuation is applied before the split (although it does not really make a
