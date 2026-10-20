@@ -26,7 +26,7 @@ void BitstreamSource::runner()
 
     for(const auto &val : m_values) {
         auto val_saturated = val;
-        if (m_current_value > max_val)
+        if (val > max_val)
             val_saturated = max_val;
 
         for (unsigned int iBit = 0; iBit < m_bits_per_value; ++iBit) {
