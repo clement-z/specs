@@ -20,7 +20,7 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | done, merged |
 | 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (7787aed) |
 | 2 | Easy fixes (unattended) | paseo `ws-fixes` (agent 3f7955bf, branch `ws/fixes`) | Opus 5.5 xhigh orch. | done, re-verified, merged (6a207b1) |
-| 3 | Easy cleanup | paseo `ws-cleanup` (branch `ws/cleanup`) | Opus high → Sonnet → Opus | running |
+| 3 | Easy cleanup | paseo `ws-cleanup` (agent 0a71856a, branch `ws/cleanup`) | Opus high → Sonnet → Opus | done, re-verified, merged (f076b00) |
 
 ## Rules for all workstreams
 - Every behavioural change is validated with `tests/golden/run_golden.py check`.
@@ -51,3 +51,17 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
   81/81 at `--atol 0`; every fixed ID was easy-unattended pre-phase; all 32 changed legacy cases map to a re-record
   note; B-023's 30-case change verified label-only (`V.m⁻¹` → `√W`). Leftover: 7 implementer worktrees under the main
   checkout's `.claude/worktrees/` (all commits cherry-picked; removal needs maintainer OK). Phase 3 launched.
+- 2026-10-20 — ws-cleanup merged: 22 items in 8 batches, src/ −1482/+149 lines, unique GCC warnings 12 → 4; only golden
+  change is 88 debug lines removed from 28 stdouts (deletion-only). Re-verified with fresh gcc + clang builds.
+- 2026-10-20 — **sprint complete.** `sprint/2026-10` tip: fresh build OK, `meson test` 11/11, golden 81/81
+  (`--atol 0 --strict`). 110 commits ahead of `master`; nothing pushed.
+
+## Open items for the maintainer
+- Decide the 24 `needs-human` and 84 `needs-design` backlog items (`backlog/SUMMARY.md` has the recommended order),
+  incl. the reviewer's rule that fixes changing results of today-valid netlists are `needs-human`
+  (B-052, B-146, B-147, B-035, B-009) and the field-vs-power meaning of coupler `k`.
+- Meson items tagged **[review]** in `discover/meson/DECISIONS.md`; CI has never run on real runners.
+- Feature roadmap: `discover/scout/FEATURES.md`.
+- Housekeeping (not done, needs approval): 7 cherry-picked implementer worktrees + `worktree-agent-*` branches under
+  the main checkout's `.claude/worktrees/`; paseo workspaces `ws-meson/review/scout/fixes/cleanup` and `ws/*` branches
+  (all merged); scratch under `/tmp/specs-sprint`, `/tmp/ws-*`.
