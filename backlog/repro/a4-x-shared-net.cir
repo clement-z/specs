@@ -1,0 +1,9 @@
+* Two subckt instances drive the same net "mid" (flat equivalent works)
+.subckt s a b
+wg1 a b length=1e-4
+.ends
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2 wl=1.55e-6 power=1e-3
+x1 in1 mid s
+x2 in2 mid s
+.tran 1e-11

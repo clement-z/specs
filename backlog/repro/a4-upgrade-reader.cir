@@ -1,0 +1,12 @@
+* Net c is unidirectional (written by wg1, read by merger1). merger1 is created first
+* (it sits on bidirectional net a), then wg1 (bidirectional because of e&) upgrades c.
+cwsrc1 s1 wl=1.55e-6 power=1e-3
+wga s1 a length=1e-4
+cwsrc2 s2 wl=1.55e-6 power=1e-3
+wgb s2 a length=1e-4
+merger1 c a out
+cwsrc3 f wl=1.55e-6 power=4e-3
+wge f e length=1e-4
+wg1 e& c length=1e-4
+probe1 out
+.tran 1e-11

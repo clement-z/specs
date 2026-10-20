@@ -1,0 +1,3 @@
+* F-A1: no wavelength registered -> OP printout calls exit(1) "Wavelength not found in global vector."
+wg1 a b length=1e-6 neff=2 ng=4
+.op

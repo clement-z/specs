@@ -1,0 +1,7 @@
+* V7: crossing output c explicitly bidir, read by a bidir waveguide
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=1e-3
+crossing1 a b c& d
+wg1 c e length=1e-4
+splitter1 e z1 z2
+.op

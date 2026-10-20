@@ -1,0 +1,12 @@
+* circuits/subckt_test.cir with the three syntax errors fixed: `cwsrc` -> `cwsrc1`, `WG` -> `WG1`
+* (element names need at least one character after the prefix: parser.l:411,369 use ^PREFIX(...)+), `pow=` -> `power=`.
+* run: specs -f a5-subckt-test-fixed.cir   -> exit 0; ROOT/out = 1 W @ 1550 nm, phase -0.8107 rad
+.subckt AAA 1 2 len=3
+WG1 1 2 length={len} neff=1 ng=1 att=0
+.ends
+
+cwsrc1 in power=1 wl=1.55e-6
+X1 in out AAA
+;probe out type=power
+
+.op

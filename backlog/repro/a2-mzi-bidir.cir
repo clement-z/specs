@@ -1,0 +1,12 @@
+* A2 repro: an MZI element on a bidirectional net instantiates MZIActiveBi.
+* The '&' on the dangling in2 net forces the bidirectional variant
+* (a plain 'in&' also triggers the crash).
+* Before fix: elaboration aborts, exit 1:
+*   Error: (E107) bind interface to port failed: interface already bound to port:
+*   port 'ROOT/MZI1/PS1.port_0' (sc_port)
+* With only the double bind removed: out1:0 = out2:0 = 0.5 W (arms mixed, wrong).
+* After full fix: identical to the unidirectional MZI (drop the '&'):
+*   out1:0 = 0.605467 W (0.5371 rad), out2:0 = 0.394301 W (-2.6045 rad).
+cwsrc1 in wl=1.55e-6 power=1
+mzi1 in d& out1 out2 v length=10e-6 length_ref=10.2e-6 att=1
+.op

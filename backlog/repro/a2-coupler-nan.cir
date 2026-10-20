@@ -1,0 +1,9 @@
+* A2 repro: out-of-range coupling / split ratio silently produces NaN fields.
+* COUPLER k=1.1 (field) -> through power 1-k^2 = -0.21 -> log10(<0) = NaN
+* SPLITTER ratio=1.5 -> sqrt(1-1.5) = NaN
+* Expected: an error at elaboration ("k must be in [0,1]"); observed: NaN on c1o1, c1o2, s1o2.
+cwsrc1 in wl=1.55e-6 power=1
+splitter0 in a b
+coupler1 a _ c1o1 c1o2 k=1.1
+splitter1 b s1o1 s1o2 ratio=1.5
+.op

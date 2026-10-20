@@ -1,0 +1,6 @@
+* A3 repro: a dark photodetector (noise bypassed) writes a different random
+* readout (~1e-40 A) at every 1 ps sample: VCD differs between two runs.
+vlsrc1 in values=[[100e-12,0,1.55e-6]]
+pdet1 in v1
+.options traceall=0
+.tran 100e-12

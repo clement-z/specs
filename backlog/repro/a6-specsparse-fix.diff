@@ -1,0 +1,105 @@
+--- a/pyspecs/specsparse.py	2026-10-20 03:20:43.946769389 +0200
++++ b/pyspecs/specsparse.py	2026-10-20 03:49:09.443950140 +0200
+@@ -56,41 +56,44 @@
+     # print(f'top level probes: {[x["name"] for x in probes]}')
+ 
+     is_wl_sweep = check_wl_sweep(top_scope)
+-    has_wl = False
+-    save_wl = False
+ 
+     df_probes = pd.DataFrame()
+     if len(probes) > 0:
+-        for i,probe in enumerate(probes):
++        signal_dfs = []
++        wl_signal = None
++        for probe in probes:
+             probe_name = probe['name']
+-            for j,signal in enumerate(probe['children']):
++            for signal in probe['children']:
+                 signal_name = signal['name']
+-                full_name = probe_name + '/' + signal_name
+-
+-                save_wl = is_wl_sweep and not has_wl
+-                if (not signal_name=='wavelength' or (signal_name=='wavelength' and save_wl)):
+-                    current_signal_df = pd.DataFrame()
+-                    current_signal_df['tick'] = vcd_get_ticks_vector(signal)
+-
+-                    if signal_name=='wavelength':
+-                        has_wl = False # this variable set to true will save WL vector only once
+-                        full_name = signal_name # wavelength should be saved independent of probe
+-
+-                    current_signal_df[full_name] = vcd_get_data_vector(signal)
++                if signal_name == 'wavelength':
++                    # Only needed as the x axis of a wavelength sweep. A net that
++                    # carries no light never changes its wavelength, so keep the
++                    # most complete wavelength vector and ignore the others.
++                    if is_wl_sweep and (wl_signal is None or len(signal['data']) > len(wl_signal['data'])):
++                        wl_signal = signal
++                    continue
++                current_signal_df = pd.DataFrame()
++                current_signal_df['tick'] = vcd_get_ticks_vector(signal)
++                current_signal_df[probe_name + '/' + signal_name] = vcd_get_data_vector(signal)
++                signal_dfs.append(current_signal_df)
+ 
+-                if i==0 and j==0:
+-                    df_probes = current_signal_df
+-                else:
+-                    df_probes = df_probes.merge(current_signal_df, how='outer')
++        if is_wl_sweep:
++            if wl_signal is None:
++                raise RuntimeError(f'No traced wavelength in the wavelength sweep of {filename}: enable wl=1 on at least one probe')
++            wl_df = pd.DataFrame()
++            wl_df['tick'] = vcd_get_ticks_vector(wl_signal)
++            wl_df['wavelength'] = vcd_get_data_vector(wl_signal)
++            signal_dfs.insert(0, wl_df)
++
++        df_probes = signal_dfs[0]
++        for current_signal_df in signal_dfs[1:]:
++            df_probes = df_probes.merge(current_signal_df, on='tick', how='outer')
+ 
+         df_probes = df_probes.sort_values('tick')
+         df_probes = df_probes.reset_index(drop=True)
+ 
+         if not is_wl_sweep: # making sure that time goes first
+             df_probes.insert(0, 'time', df_probes['tick'] * vcd_get_multiplier(vcd))
+-        else: # making sure that wl goes first
+-            first_column = df_probes.pop('wavelength')
+-            df_probes.insert(0, 'wavelength', first_column)
+ 
+         # we don't need ticks anymore
+         df_probes = df_probes.drop(columns=['tick'])
+@@ -98,10 +101,9 @@
+         # getting rid of the NaNs: for time domain we repeat the last valid value,
+         #                          for freq domain we interpolate linearly
+         if is_wl_sweep:
+-            df_probes = df_probes.drop(df_probes.loc[df_probes['wavelength']== 0].index.values)
+             df_probes = df_probes.interpolate()
+         else:
+-            df_probes = df_probes.fillna(method='ffill')
++            df_probes = df_probes.ffill()
+ 
+     # Same with pdetectors
+     df_pdet = pd.DataFrame()
+@@ -143,7 +145,7 @@
+         df_pdet = df_pdet.drop(columns=['tick'])
+ 
+         # getting rid of the NaNs: for time domain we repeat the last valid value,
+-        df_pdet = df_pdet.fillna(method='ffill')
++        df_pdet = df_pdet.ffill()
+ 
+ 
+     print('--- Contents of simulation ---')
+@@ -259,10 +261,10 @@
+     # Need to check that SystemC.analysis_type == 1 (CW sweep)
+     for child in top_scope['children']:
+         if child['name'] == 'analysis_type':
+-            print(child)
++            # Value of the 32-bit vector as written by SystemC: leading zeros are
++            # stripped ('b1' for CW_SWEEP, 'b10' for TIME_DOMAIN, see AnalysisType in src/specs.h)
+             analysis_type = child['data'][0][1]
+-            print(f'analysis_type:{analysis_type}')
+-            return analysis_type == 'b01'
++            return int(analysis_type[1:], 2) == 1
+     raise ValueError('Expected to find key "analysis_type" in VCD trace.')
+ 
+ def vcd_get_data_vector(signal):

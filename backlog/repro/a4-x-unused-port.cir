@@ -1,0 +1,7 @@
+* Port "b" of subckt s is not used in its body
+.subckt s a b
+probe1 a
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in out s
+.tran 1e-11
