@@ -1,5 +1,5 @@
 # B-086: `simulator_directory` needs a trailing slash (string concatenation instead of a path join)
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 33fc498
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 30f6820
 location: pyspecs/specs.py:231-232
 ## Problem
 `[simulator_directory + simulator_name]` turns `"../build"` into `"../buildspecs"`.

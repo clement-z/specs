@@ -1,5 +1,5 @@
 # B-121: Misc dead or fragile CMake code (misnamed BUILD_TB option, ctest, network gtest, unrequired BISON/FLEX, dead coverage.cmake)
-severity: low | category: build | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: obsolete (meson migration, b86a745: CMake code removed; the gtest download is now a Meson wrap, see DECISIONS.md #20)
+severity: low | category: build | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: obsolete (meson migration, 8b7733a: CMake code removed; the gtest download is now a Meson wrap, see DECISIONS.md #20)
 location: CMakeLists.txt:5-6, src/test/CMakeLists.txt:1,5,27, cmake/googletest.cmake:6-16, src/parser/CMakeLists.txt:10-11,34-38, cmake/coverage.cmake, src/tb/CMakeLists.txt:5-35
 ## Problem
 obsoleted-by-meson: yes for all (PLAN.md:85-91,125 replaces them with `-Dtests`/`-Dold_tb`, WrapDB gtest, `meson test`, `-Db_coverage`; `cmake/` is deleted). Listed so the port keeps the behaviour that matters:

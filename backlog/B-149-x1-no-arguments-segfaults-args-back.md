@@ -1,5 +1,5 @@
 # B-149: `X1` with no arguments segfaults (args.back() on empty vector)
-severity: med | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 30cdd55
+severity: med | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 9c13e71
 location: src/parser/parse_tree.cpp:841
 ## Problem
 `xelem->args.back()` is called without checking that `args` is non-empty. `x1` alone or `x1 L=1` (kwargs only)

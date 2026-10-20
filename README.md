@@ -13,7 +13,7 @@ git clone --recursive https://github.com/clement-z/specs && cd specs
 ./install.sh                       # SystemC -> .deps/systemc, then builds and tests build/specs
 ```
 
-or by hand, with a SystemC 3.0.1 built as **C++20** (a C++17 build fails to link):
+or by hand, with a SystemC 3.0.2 built as **C++20** (a C++17 build fails to link):
 
 ```sh
 meson setup build -Dcmake_prefix_path=/path/to/systemc/prefix   # release build by default

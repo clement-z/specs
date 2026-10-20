@@ -25,6 +25,9 @@
 * Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 80 `specs` cases
   (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
 * Paper reference (ECOC 2023, hal-04302200) in the README and `doc/papers/`
+* `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
+  Meson: `utils/git-version.sh`, `src/utils/meson.build`)
+* SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
 
 ### Fixed
 

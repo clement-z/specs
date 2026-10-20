@@ -1,6 +1,6 @@
 # Cleanup phase (ws-cleanup) — plan
 
-Sprint 2026-10, phase 3. Branch `ws/cleanup` from `sprint/2026-10` @ adab6b9. Brief:
+Sprint 2026-10, phase 3. Branch `ws/cleanup` from `sprint/2026-10` @ 8928f8f. Brief:
 `discover/orchestration/ws-cleanup.md`. Report: [`REPORT.md`](REPORT.md).
 
 ## Scope
@@ -16,7 +16,7 @@ shifts printed IDs), the cross-λ branches of `OpticalSignal::operator+=/-=` (B-
 (changes 5 golden stdouts, not a debug print), the `ptrough` probe name (VCD scope name), the wildcard import in
 `pyspecs/specs.py` (public API), the OCTANE/GTD family (B-069, `needs-human`).
 
-## Baseline (ws/cleanup @ adab6b9, clean GCC 11.5 build, `-Dold_tb=true`)
+## Baseline (ws/cleanup @ 8928f8f, clean GCC 11.5 build, `-Dold_tb=true`)
 - Compiler warnings: 18 lines, **12 unique**: `generic_2x2_coupler.h:35 lambda0`, `generic_transmission_device.cpp:221
   delay maybe-uninitialized`, `specs.cpp:209 ic_order`, `specs.cpp:392-395` strict-aliasing ×4,
   `freqsweep_tb.cpp:60-62` ×3, `lambda_tb.cpp:21-22` ×2.

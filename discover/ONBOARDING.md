@@ -17,7 +17,7 @@ SystemC device modules exchanging per-wavelength complex optical fields, and run
 | Layer | Technology | Version / notes |
 |---|---|---|
 | Language | C++ | C++20 (`gnu++20`) |
-| Kernel | SystemC | 3.0.1 (submodule `thirdparty/systemc`, built with `CMAKE_CXX_STANDARD=20`) |
+| Kernel | SystemC | 3.0.2 (submodule `thirdparty/systemc`, built as C++20) |
 | CLI | taywee/args | submodule `thirdparty/args`, header-only |
 | Parser | flex + bison | reentrant scanner, caseless; generated into the build dir |
 | Build | **Meson** ≥1.3 (+ Ninja) | replaced CMake and the Makefile in sprint 2026-10 (`discover/meson/`) |

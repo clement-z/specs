@@ -1,5 +1,5 @@
 # B-036: --vci printing segfaults when a port's channel is not spx::oa/ea_signal_type
-severity: low | category: bug | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in fb97125
+severity: low | category: bug | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 898552a
 location: src/devices/waveguide.cpp:44-46, src/devices/directional_coupler.cpp:31-38, src/devices/crossing.cpp:25-31, src/devices/phaseshifter.cpp:17-22, src/devices/merger.cpp:15-17, src/devices/splitter.cpp:15-17, src/devices/pcm_device.cpp:23-25, src/devices/probe.cpp:14, src/devices/cw_source.cpp:14, src/devices/value_list_source.cpp:22, src/devices/electrical_value_list_source.cpp:22, src/devices/bitstream_source.cpp:37
 ## Problem
 Every verbose print does `(dynamic_cast<spx::oa_signal_type *>(p.get_interface()))->name()`: 51 sites in 11 device

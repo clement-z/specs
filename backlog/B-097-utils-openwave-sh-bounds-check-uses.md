@@ -1,5 +1,5 @@
 # B-097: `utils/openwave.sh` bounds check uses the length of the first path; shebang is not portable
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in a77cd9f (ws-cleanup C-06)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 5a8b0f2 (ws-cleanup C-06)
 location: utils/openwave.sh:34, :1
 ## Problem
 `${#configs}` is the string length of `configs[0]`, not the number of configs. With three configs in `cfg/` (path length 10) entering 9 passes the check and runs `gtkwave -a "" t.vcd`. The shebang `#!/bin/env bash` does not exist on systems without `/bin` -> `/usr/bin` merge (macOS, older Debian); the file is mode 100644 and the Makefile calls `bash utils/openwave.sh`, so it is currently unused, but breaks if someone `chmod +x`.

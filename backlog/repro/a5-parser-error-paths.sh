@@ -1,5 +1,5 @@
 #!/bin/sh
-# Error-path netlists with the exit status and distinctive message observed on 26bf92c+ (Release build).
+# Error-path netlists with the exit status and distinctive message observed on 60a9df7+ (Release build).
 # usage: sh a5-parser-error-paths.sh /path/to/specs        (prints one line per case: name expected-rc observed-rc)
 SPECS=${1:?specs binary}
 W=$(mktemp -d); trap 'rm -rf "$W"' EXIT; cd "$W"; mkdir traces

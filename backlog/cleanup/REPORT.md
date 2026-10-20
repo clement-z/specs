@@ -1,6 +1,6 @@
 # Cleanup phase (ws-cleanup) — report
 
-Sprint 2026-10, phase 3. Branch `ws/cleanup` from `sprint/2026-10` @ adab6b9. Brief:
+Sprint 2026-10, phase 3. Branch `ws/cleanup` from `sprint/2026-10` @ 8928f8f. Brief:
 `discover/orchestration/ws-cleanup.md`; plan: [`PLAN.md`](PLAN.md). Nothing was pushed.
 
 ## Outcome
@@ -10,7 +10,7 @@ header). Three items are only partly done, for reasons found during implementati
 golden change is the planned one: 88 debug-print lines deleted from 28 stored stdouts (C-08). Output files and exit
 codes stayed byte-identical.
 
-| | before (adab6b9) | after |
+| | before (8928f8f) | after |
 |---|---|---|
 | GCC 11.5 warnings, unique (clean build, `-Dold_tb=true`) | 12 | **4** (the `specs.cpp` strict-aliasing ones, B-029) |
 | clang 19 warnings, unique | 47 | **37** (36 are `SC_HAS_PROCESS`, B-030; plus generated `yynerrs`) |
@@ -32,17 +32,17 @@ integration build plus a strict golden check after each wave.
 
 | batch | commit | items | extra evidence |
 |---|---|---|---|
-| C-01 engine/CLI | c108018 | B-026 (all but the print), B-027, B-028 utils, B-073 specs.cpp, X-1, X-2 | −446 lines; `drop_all_events` bisected (below) |
-| C-02 passive devices | 39e7734 | B-041, B-043, B-045 devices, B-067, B-111 header, B-073 cw_source.h | `--vci` netlist with SPLITTER 0.3 + PSHIFT: exactly the 2 intended lines differ |
-| C-03 probes, Ring | bb043ec | B-068, B-073 devices | `-t lambda` and `add_drop_pyspecs`: stdout and VCD identical |
-| C-04 parser | 4880c3d | B-110, B-112, B-174, B-173 comments/TRACEALL, B-045 parse_element | `-n --json` on 40 netlists: rc/stderr/JSON identical; 13 syntax edge cases identical; bison 199 → 198 states (T_NONE) |
-| C-05 tb + gtest | 6bba225 | B-111 tb, B-141, B-142 | 14 gtests pass with `DOUBLE_EQ`; `-t ac_crow -m fd` identical except the now-unstuck `Total runtime` format |
-| C-06 Python/scripts | a77cd9f | B-090, B-094, B-097 | 32 baseline VCDs parsed by old vs new `specsparse`: identical DataFrames and stdout; openwave repro fixed |
-| C-07 helper | 537b2f0 | B-178, B-075, B-028 devices | `sc_object` name dump identical: `-t mesh` 1003 names, lambda 86, mzi 119, add_drop_pyspecs 152; OCTANE/GTD by call-site reading |
-| C-08 debug prints | bbce9e2 | B-065, B-173 prints, B-026 reltol echo | proof below |
-| C-08 baseline | 7866df4 | — | baseline −88 lines, 0 added |
+| C-01 engine/CLI | 39500e1 | B-026 (all but the print), B-027, B-028 utils, B-073 specs.cpp, X-1, X-2 | −446 lines; `drop_all_events` bisected (below) |
+| C-02 passive devices | 3c2b444 | B-041, B-043, B-045 devices, B-067, B-111 header, B-073 cw_source.h | `--vci` netlist with SPLITTER 0.3 + PSHIFT: exactly the 2 intended lines differ |
+| C-03 probes, Ring | 88fb960 | B-068, B-073 devices | `-t lambda` and `add_drop_pyspecs`: stdout and VCD identical |
+| C-04 parser | d7dbf98 | B-110, B-112, B-174, B-173 comments/TRACEALL, B-045 parse_element | `-n --json` on 40 netlists: rc/stderr/JSON identical; 13 syntax edge cases identical; bison 199 → 198 states (T_NONE) |
+| C-05 tb + gtest | 80184f0 | B-111 tb, B-141, B-142 | 14 gtests pass with `DOUBLE_EQ`; `-t ac_crow -m fd` identical except the now-unstuck `Total runtime` format |
+| C-06 Python/scripts | 5a8b0f2 | B-090, B-094, B-097 | 32 baseline VCDs parsed by old vs new `specsparse`: identical DataFrames and stdout; openwave repro fixed |
+| C-07 helper | 8d5551f | B-178, B-075, B-028 devices | `sc_object` name dump identical: `-t mesh` 1003 names, lambda 86, mzi 119, add_drop_pyspecs 152; OCTANE/GTD by call-site reading |
+| C-08 debug prints | 3494312 | B-065, B-173 prints, B-026 reltol echo | proof below |
+| C-08 baseline | 931128b | — | baseline −88 lines, 0 added |
 
-Also: 665cc0f (plan), 607d6a0 (proof script `check_print_removal.py`).
+Also: 342c82b (plan), c7701e6 (proof script `check_print_removal.py`).
 
 ### C-08 proof (the single re-record exception)
 `backlog/cleanup/C-08-proof.txt`: (1) a full recording with the binary before C-08 against one with the binary after
@@ -83,8 +83,8 @@ it went into this commit under the same proof.
 - `crow_tb` FD mode resets `cout`'s `fixed`/precision after the sweep (B-141). Only `-t ac_crow -m fd` is
   affected, and it is not a golden case.
 - Worktrees left in `/tmp/ws-cleanup-wt/`: `C-01` … `C-08` (branches `cleanup-wip/C-01` … `C-08`; everything in
-  them is cherry-picked, except C-08's second commit, which was reworked as 7866df4), `base-src` (detached at
-  adab6b9, used for the clang baseline). Build dirs `base-build`, `base-clang`, `final-{gcc,clang,ndebug}`,
+  them is cherry-picked, except C-08's second commit, which was reworked as 931128b), `base-src` (detached at
+  8928f8f, used for the clang baseline). Build dirs `base-build`, `base-clang`, `final-{gcc,clang,ndebug}`,
   recordings `pre-c08-keep`, `c08-new`, `old-baseline`. Remove them with `git worktree remove` / `rm -rf`.
 
 ## Verification of `ws/cleanup` HEAD

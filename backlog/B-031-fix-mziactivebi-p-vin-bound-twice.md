@@ -1,5 +1,5 @@
 # B-031: Fix MZIActiveBi: p_vin bound twice (elaboration abort) and arms miswired
-severity: high | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3a99564
+severity: high | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 913dbcd
 location: src/devices/mzi_active.cpp:165,192 (double bind), src/devices/mzi_active.cpp:172,175,199,202 (arm wiring), src/devices/mzi_active.cpp:100 (wire name)
 ## Problem
 An `MZI*` netlist element instantiates `MZIActiveBi` as soon as its first or second optical net is bidirectional

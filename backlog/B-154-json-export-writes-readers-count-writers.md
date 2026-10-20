@@ -1,5 +1,5 @@
 # B-154: JSON export writes the readers count as "writers"
-severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 96262f1
+severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 97339bd
 location: src/parser/parse_tree.cpp:573
 ## Problem
 `ParseNet::to_json` emits `"writers":` followed by `m_readers_count`. `draw_graph_from_json.py` and any `--json`

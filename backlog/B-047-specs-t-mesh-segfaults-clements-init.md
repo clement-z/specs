@@ -1,5 +1,5 @@
 # B-047: `specs -t mesh` segfaults: Clements is init()'d twice (use-after-free)
-severity: med | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 302e640
+severity: med | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 4369a7d
 location: src/tb/mesh_tb.cpp:91, src/specs.cpp:358-361, src/devices/mzi.cpp:10-25, src/devices/mesh_col.cpp:53-69,85-98
 ## Problem
 `mesh_tb_run()` calls `mesh1.init()` (mesh_tb.cpp:91), and then `SPECSConfig::prepareSimulation()` calls `init()` a second time on every `spx_module`. It first takes a snapshot of them in a `std::set<spx_module*>`, ordered by pointer value (specs.cpp:359-361). The second pass re-enters the composite inits:

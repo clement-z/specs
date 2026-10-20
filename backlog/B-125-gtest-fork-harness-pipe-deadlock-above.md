@@ -1,5 +1,5 @@
 # B-125: gtest fork harness: pipe deadlock above 64 KiB, ASSERT_* / non-std exceptions escape the footer, dead stderr pipe, ignored return values
-severity: med | category: test-gap | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 538d8f8
+severity: med | category: test-gap | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 7ab418c
 location: src/test/utils.h:28-76 (lines 30-32, 40-41, 44-49, 56-60, 63, 68-76)
 ## Problem
 1. The parent calls `waitpid` (line 40) before draining the pipe and before closing its own write end (line 41). A child that writes more than the pipe capacity (64 KiB) blocks forever in `write`: the test hangs.

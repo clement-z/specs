@@ -50,7 +50,7 @@ issue received a second, independent check (a fresh agent tried to reproduce or 
 there.
 
 ## Conventions used in issue files
-- Line numbers refer to the tree at the commit that added the issue (base: `sprint/2026-10` @ a9e5799). They drift
+- Line numbers refer to the tree at the commit that added the issue (base: `sprint/2026-10` @ b66dc53). They drift
   as fixes land; search for the quoted code if a line moved.
 - Repro commands assume a Release build at `build/specs` and a cwd that contains `circuits/` and an empty
   `traces/` dir, e.g. `mkdir -p /tmp/r/traces && cp -r circuits backlog/repro /tmp/r && cd /tmp/r &&

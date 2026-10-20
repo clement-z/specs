@@ -1,5 +1,5 @@
 # B-161: `.ic` exits with code 1 and no message (and swallows any `.ic*` keyword)
-severity: low | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 313a0cf
+severity: low | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 8903599
 location: src/parser/parser.l:469, src/parser/parse_directive.cpp:128-131
 ## Problem
 `^\.IC { exit(1); }` stops the program silently. `.icfoo` also matches (prefix). `ICDirective::create`

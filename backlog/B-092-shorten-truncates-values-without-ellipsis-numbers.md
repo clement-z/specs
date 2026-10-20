@@ -1,5 +1,5 @@
 # B-092: `shorten()` truncates values without an ellipsis: numbers lose their exponent and look like different numbers
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 5e54f9b
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 9d68f74
 location: utils/draw_graph_from_json.py:6-13
 ## Problem
 `s[:length-3]` was meant to leave room for "..." but nothing is appended, so kwargs displayed in the graph are silently wrong.

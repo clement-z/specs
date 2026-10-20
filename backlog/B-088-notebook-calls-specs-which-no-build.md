@@ -1,5 +1,5 @@
 # B-088: Notebook calls `../specs`, which no build produces any more (CMake and the planned Meson build put it in `build/`)
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 7def19f
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 0e8db9c
 location: pyspecs/pyspecs_example.ipynb (cell 0 source, cells 2-3 calls)
 ## Problem
 Cell 0 uses one variable for two things: `path_to_specs = "../"` is both the `sys.path` root for `import pyspecs` and the `simulator_directory`. The binary is `build/specs` since the CMake switch (the `./specs` of the old Makefile layout is git-ignored and gone); the committed output of cell 2 still shows `Command: ../specs -f ../circuits/add_drop_pyspecs.cir ...`. Cells 2-3 also pin `abstol=1e-8, reltol=1e-4` (see B-079). The notebook output file `../traces/delete_me` overwrites the tracked placeholder `traces/delete_me.vcd` (B-007). Kernel metadata says Python 3.8.10 and the stored outputs include a PNG.

@@ -1,11 +1,11 @@
 # SPECS — project instructions
 
-Scalable Photonic Event-driven Circuit Simulator: C++20 on SystemC 3.0.1, a flex/bison SPICE-like netlist
+Scalable Photonic Event-driven Circuit Simulator: C++20 on SystemC 3.0.2, a flex/bison SPICE-like netlist
 parser, and a Python wrapper (`pyspecs/`). Paper: `doc/papers/zrounba2023-specs-ecoc.pdf` (ECOC 2023).
 Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known issues in `backlog.md`.
 
 ## Build & run
-- Deps: SystemC 3.0.1 **built as C++20** and taywee/args. On this machine they are prebuilt in
+- Deps: SystemC 3.0.2 **built as C++20** and taywee/args. On this machine they are prebuilt in
   `~/.local/opt/specs-deps`; otherwise use the submodules (`git submodule update --init --recursive`).
 - Build (Meson, release by default):
   `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps && meson compile -C build`

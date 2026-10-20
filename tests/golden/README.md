@@ -151,7 +151,9 @@ baseline/gtest/unit_tests.json      per-test PASS/FAIL
 ```
 
 The current baseline was recorded with the CMake Release build (GCC 11.5,
-`-std=gnu++20 -O3 -march=native`, SystemC 3.0.1). Cases re-recorded or added
+`-std=gnu++20 -O3 -march=native`, SystemC 3.0.1). It passes unchanged (`--atol 0
+--strict`) with SystemC 3.0.2 and args 6.4.7, the versions on upstream `dev` the sprint was
+rebased onto; only `cli/help` and `cli/no-args` gained the upstream `--version` flag. Cases re-recorded or added
 since then (the `rerecords` list of `manifest.json`) come from the Meson GCC
 build with its default options. The largest file is about 400 kB, so nothing is
 gzipped or summarised.

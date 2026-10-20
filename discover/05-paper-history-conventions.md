@@ -1,7 +1,7 @@
 # 05 — Paper, history & conventions (discovery probe 5/5)
 
 Scope: intent (ECOC 2023 paper), docs, git history/workflow, code style, licensing.
-Repo: worktree `sprint/2026-10` @ 26bf92c. Method: static reading + `clang-format --dry-run` + parse-only/benchmark runs of the pre-built
+Repo: worktree `sprint/2026-10` @ 60a9df7. Method: static reading + `clang-format --dry-run` + parse-only/benchmark runs of the pre-built
 `/home/czrounba/cernbox/perso/git/specs/build/specs` (Feb 2025, dev branch, **unoptimised build**). All scratch files in `/tmp`, deleted at the end.
 
 ---
@@ -180,7 +180,7 @@ Repo: worktree `sprint/2026-10` @ 26bf92c. Method: static reading + `clang-forma
 
 | Doc | Content | Status |
 |---|---|---|
-| `README.md` | 1 paragraph: points to external docs `demo.zrounba.fr/specs/doc` + web demo; contributing → `todo.txt`; citation (added in 26bf92c); "Copyright INL" | **Thin**. No build, usage or licence section in the repo. The external site was not checked (offline) |
+| `README.md` | 1 paragraph: points to external docs `demo.zrounba.fr/specs/doc` + web demo; contributing → `todo.txt`; citation (added in 60a9df7); "Copyright INL" | **Thin**. No build, usage or licence section in the repo. The external site was not checked (offline) |
 | `CHANGELOG.md` | `[unreleased]`: CMake switch ("Makefile should still function"); `v0.1.0` initial | **Stale**: omits SystemC 3.0.1, C++20, gtest, `libspx` target, multi-file netlists (13c2d1a), CLI-over-netlist priority, PWR element, PDET noise params, PCM update. The tag is `v0.1`, not `v0.1.0` |
 | `todo.txt` | 4 items: general S-matrix device, non-linear WG, dispersion pulse flattening, parallelisation | Current but short. The longer pre-ECOC list was deleted in ce91d2d (see §10 feature seeds) |
 | `doc/mainpage.md` | "Introduction TODO"; links `readme.html`, `quickstart.html` | **Stale/broken**: QUICKSTART.md deleted in e6da8de |
@@ -189,7 +189,7 @@ Repo: worktree `sprint/2026-10` @ 26bf92c. Method: static reading + `clang-forma
 | `doc/resources/cheatsheet.pdf` (Jun 2023) | Signal model; directives `.op/.tran/.dc WL()`; options `timescale reltol abstol traceall`; elements CWSRC, VLSRC, EVLSRC, PROBE, COUPLER, WG, PSHIFT, SPLITTER, MERGER, MLPROBE, PD | **Partly stale**: `.dc WL()` does not parse; shows `pd 1 2` but the prefix is `PDET`; merger lists both `il` and `loss`; PSHIFT shows a stray comma. Missing: `kp`/`t` coupler args, `L` alias, VLSRC `file=`/`scale=`, PWR, PCMCELL, CROSSING, MZI, X/.subckt/.include/.param/.assign/.nodeset, `resolution`/`ts` options, CLI flags |
 | `doc/resources/gdrsoc_poster.pdf` (Jun 2023) | Same as paper, plus "SPICE-like standalone or SystemC library" | Consistent with paper |
 | `doc/resources/delayedwriter.svg`, `signals.svg` | UML of `DelayedWriter<T>` and `OpticalSignal{Type NONE/WRITE/ERASE/READOUT, parameter union}` | **Obsolete**: both classes have been replaced (`OpticalOutputPort`, field + wavelength_id). `waveguide.h` still has `@sa DelayedWriter` |
-| `doc/papers/zrounba2023-specs-ecoc.pdf` | Paper (added 26bf92c) | New |
+| `doc/papers/zrounba2023-specs-ecoc.pdf` | Paper (added 60a9df7) | New |
 | Deleted `QUICKSTART.md` (in history at `e6da8de^`) | Build with make, C++14/17, flex/bison, **SystemC 2.3.3**, `./sim -f`, GitLab URL `gitlab.inl90.ec-lyon.fr:czrounba/systemc-pcm-matrix-multiplication-simulator` | Confirms the project's pre-history (PCM matrix-multiplication simulator at INL GitLab, history squashed into "Initial release") |
 | `.gitlab-ci.yml` | alpine + `systemc-dev` from edge/testing, `make bin lib`, test `./specs -t wg` only, doxygen + pages on master | **Dead on GitHub** (remote is `github.com/clement-z/specs`, no `.github/`). Uses the Makefile with C++17; artifact `doc/pcm-doc.tar.xz` is no longer produced |
 | `install.sh` | Submodules → build SystemC (`build/install`) → `cmake .. -DBUILD_TB=1` | Does **not** build `thirdparty/args`, which `CMakeLists.txt:15` requires; no build type → -O0 |
@@ -208,7 +208,7 @@ Repo: worktree `sprint/2026-10` @ 26bf92c. Method: static reading + `clang-forma
   | `master` = `origin/master` | `60dc3ab Merge branch 'dev'` | Jan 2025 |
   | `origin/dev` | `68785d4` | — |
   | **local `dev`** | `252a7f4` "Finally got gtest unit cases really working" | **1 ahead, not pushed**; checked out in the main worktree `/home/czrounba/cernbox/perso/git/specs` |
-  | `sprint/2026-10` (this worktree) | `26bf92c` | = dev + paper commit |
+  | `sprint/2026-10` (this worktree) | `60a9df7` | = dev + paper commit |
   | `plan-repo-discovery-meson-migration-backlog-fixes` | `68785d4` | Local only, no commits of its own. The name hints at a planned Meson migration (unknown) |
 
 - **Branch model**: day-to-day work on `dev`; releases via no-ff `Merge branch 'dev'` into `master`. No feature branches or PRs in the history. One annotated tag `v0.1` ("Public release", 2023-09-30).

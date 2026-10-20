@@ -1,5 +1,5 @@
 # B-141: legacy testbenches: unused variables (compiler warnings), dead code, copy-paste message bugs, sticky stream flags
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 6bba225 (ws-cleanup C-05)
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 80184f0 (ws-cleanup C-05)
 location: src/tb/freqsweep_tb.cpp:60-62,66,148-213; src/tb/freqsweep_tb.h:32; src/tb/lambda_tb.cpp:6,21-22; src/tb/crow_tb.cpp:21-30,42-50,113,120-121,138-157,178-190; src/tb/merger_tb.cpp:73; src/tb/phase_shifter_tb.cpp:48-60; src/tb/pcm_device_tb.cpp:11; src/tb/directional_coupler_tb.cpp:6,82; src/tb/wg_tb.cpp:6; src/tb/mesh_tb.cpp (double init: reviewer A3)
 ## Problem
 `g++ -Wall -Wextra` on src/tb reports `unused variable` for freqsweep_tb.cpp:60,61,62 (`event_counter`, `success_counter`, `test_number` in a `monitor()` whose body is `wait(); continue;`) and lambda_tb.cpp:21,22. Other items:

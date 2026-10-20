@@ -4,7 +4,7 @@
 The GCC builds are **bit-identical** to the CMake baseline: shipped defaults, `-Db_ndebug=true`, and the
 SystemC-from-submodule fallback.
 
-Final run (step 6) on the final tree, `ws/meson` at fdca066 plus this file and DECISIONS.md, with fresh
+Final run (step 6) on the final tree, `ws/meson` at fd25b64 plus this file and DECISIONS.md, with fresh
 build dirs `/tmp/ws-meson-final-*`. Script: `/tmp/ws-meson-validate.sh` (the commands are reproduced
 below). Run on 2026-10-20 on the sprint host:
 - i5-6600K, 4 cores, under heavy load from the other workstreams (load average about 12);
@@ -23,7 +23,7 @@ GOLDEN="python3 -I tests/golden/run_golden.py check --baseline tests/golden/base
 
 ## Source edits outside the build system
 
-Only one, the minimal fix PLAN.md §1 allows: commit 9493407 `build: make unit_tests compile (minimal patch)`.
+Only one, the minimal fix PLAN.md §1 allows: commit 9493407 (dropped when rebasing onto upstream dev: superseded by upstream b7d6fff) `build: make unit_tests compile (minimal patch)`.
 It applies exactly `discover/meson/unit-tests-minimal.patch` to `src/test/utils.h`:
 - removes the `static_assert(false, …)`;
 - `EXPECT_ANGLE_EQ` → `EXPECT_PRED2`.
@@ -127,7 +127,7 @@ under load. Meson reports `systemc` not found (pkg-config) and `systemclanguage`
 C++20 (shared, QuickThreads) and links it. `specs` has rpath `$ORIGIN/thirdparty/systemc`.
 `meson test`: green; golden: bit-exact (see c).
 
-The first attempts uncovered three problems, all fixed in fa555b6 (DECISIONS #16b, #17):
+The first attempts uncovered three problems, all fixed in cefe98f (DECISIONS #16b, #17):
 - the CMake *user package registry* had found a stale SystemC build tree;
 - a static SystemC could not be linked into `libspx.so`;
 - the cmake translation put `-xassembler-with-cpp` on `qt.c`, and `--no-undefined` broke on `sc_main`.
@@ -160,8 +160,8 @@ The first attempts uncovered three problems, all fixed in fa555b6 (DECISIONS #16
   **0.32 s**, Meson `-Db_ndebug=true` **0.32 s**. Wall time is 0.6–0.9 s, dominated by VCD I/O and host
   load. The three VCDs (minus `$date`) are byte-identical.
 - **CI steps, run locally**, twice:
-  - in a clean `git clone` of the branch: `/tmp/ws-meson-ciclone` at b59c818, and `/tmp/ws-meson-ciclone2`
-    at fdca066 (the final commit) with the SystemC "cache" restored;
+  - in a clean `git clone` of the branch: `/tmp/ws-meson-ciclone` at 39f5a68, and `/tmp/ws-meson-ciclone2`
+    at fd25b64 (the final commit) with the SystemC "cache" restored;
   - the GitHub gcc-leg shell steps verbatim: `utils/build-systemc.sh` (a real SystemC build from the
     submodule on the first run; a stamp-file no-op on cache hit, including `c++` vs `g++`),
     `meson setup build -Dnative=false [-Dspx=true] -Dcmake_prefix_path=$SYSTEMC_PREFIX`, `meson compile`,

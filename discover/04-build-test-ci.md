@@ -326,7 +326,7 @@ Nothing is excluded. Expected-failure cases are kept and documented:
 * 3 CLI error cases.
 
 **Baseline provenance:**
-* `specs` comes from the CMake Release build at 26bf92c.
+* `specs` comes from the CMake Release build at 60a9df7.
 * **gtest results come from the patched out-of-tree copy**, because in-tree `unit_tests` doesn't compile.
   This is noted in `manifest.json`.
 

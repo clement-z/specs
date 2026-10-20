@@ -1,5 +1,5 @@
 # B-077: `fillna(method='ffill')` is removed in pandas 3: every time-domain parse raises TypeError
-severity: high | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 1abd047
+severity: high | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 859242d
 location: pyspecs/specsparse.py:104, pyspecs/specsparse.py:146
 ## Problem
 Both forward-fill calls use the `method=` keyword. It is deprecated since pandas 2.1 (FutureWarning on every parse today) and removed in pandas 3.0, which a fresh `pip install pandas` now installs on Python >= 3.11 (3.0.6 is current). `parse_vcd_dataframe` then fails for every time-domain trace (line 104) and every trace with photodetectors (line 146).

@@ -1,5 +1,5 @@
 # B-114: `.gitignore` silently ignores new circuits/*.cir and the unanchored `specs` hits any directory named specs
-severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in a066d23
+severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 4c44c8d
 location: .gitignore:25,26,31
 ## Problem
 `*.cir` (line 31) ignores every netlist repo-wide; all 9 files under `circuits/` and `traces/delete_me.vcd` are tracked only because they were force-added (`git ls-files -ci --exclude-standard` lists exactly those 10). A contributor adding `circuits/new.cir` gets no `git status` entry, so the example is silently uncommitted (CLAUDE.md documents `git add -f` as the workaround). Also `specs` and `libspecs.so` (lines 25-26) are unanchored: a package directory such as `pyspecs/specs/` or `src/specs/` would be ignored too. Survives the migration (the Meson port only adds build-dir entries).

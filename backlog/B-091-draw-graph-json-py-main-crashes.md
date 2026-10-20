@@ -1,5 +1,5 @@
 # B-091: `draw_graph_from_json.py main()` crashes with UnboundLocalError when called without arguments
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 956ab10
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in c12a08c
 location: utils/draw_graph_from_json.py:125-142 (and the duplicate in pyspecs/, see F-A6-15)
 ## Problem
 Missing `argv[1]` prints a message but continues; `json_file + ".png"` then raises. `main()` also duplicates the body of `draw_graph()` (lines 115-123), which nothing calls.

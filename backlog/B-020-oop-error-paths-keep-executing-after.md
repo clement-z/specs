@@ -1,5 +1,5 @@
 # B-020: OOP error paths keep executing after `sc_stop()`; queue reset at thread start
-severity: low | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in d3478a9
+severity: low | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 126969f
 location: src/optical_output_port.cpp:97-98,107-113,119,131-139
 ## Problem
 (a) On an empty queue the thread prints an error, calls `sc_stop()` (which does not return control) and falls
