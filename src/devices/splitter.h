@@ -26,12 +26,12 @@ private:
     // Timed ports writers
     /** Timed writer to the first output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_out1_writer;
     /** Timed writer to the second output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_out2_writer;
 
