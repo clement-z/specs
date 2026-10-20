@@ -18,7 +18,7 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | 0e | Onboarding guide + CLAUDE.md | here | Opus 5.5 | done |
 | 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | running |
 | 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | running |
-| 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | running |
+| 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (7787aed) |
 | 2 | Easy fixes (unattended) | paseo `ws-fixes` | Opus 5.5 xhigh orch. | pending |
 | 3 | Easy cleanup | paseo `ws-cleanup` | Opus high → Sonnet → Opus | pending |
 
@@ -35,3 +35,7 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
   (baseline gtest recorded with `discover/meson/unit-tests-minimal.patch`); `tb/mesh` segfaults (recorded as-is);
   detector traces read uninitialised memory at t=0 (4 signals excluded).
 - 2026-10-20 — phase 1 launched: ws-meson, ws-review, ws-scout (all paseo `auto` mode, worktrees under `~/.paseo/worktrees/31cq0kv6/ws-*`).
+- 2026-10-20 — all agents paused by the account session limit (~05:00–06:40 Paris); resumed via `paseo send`.
+- 2026-10-20 — ws-scout merged: 30 ranked features, 15 briefs, bench evidence (paper plateau reproduced; `.dc` matches
+  closed-form add-drop to 1e-6). Top 5: F-01 reproducible runs, F-02 sweeps/Monte-Carlo, F-03 S-parameter device,
+  F-04 receiver chain, F-05 outputs/tracing. ws-review: B-001..B-122 committed, parser/tests areas + verification ongoing.
