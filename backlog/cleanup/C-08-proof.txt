@@ -2,7 +2,7 @@
 #   --allow '\d+' --allow '.*(wg_top|wg_bot|dc)_\d+' --allow 'odd-even' --allow 'odd-odd' --allow 'created .*' \
 #   --allow=----- --allow 'Warning \(.*\): default coupling power for DC currently set to field\.' \
 #   --allow '	[^,]+,[^,]+' --allow 'uut2?' --allow '1e-05' --allow '\d+, \d+ is active'
-# old = check --keep of ws/cleanup@8d5551f binary; new = record of ab110fb binary (stdout of 28 cases lost only these lines)
+# old = check --keep of ws/cleanup@e1b7e9a binary; new = record of ab110fb binary (stdout of 28 cases lost only these lines)
 OK   cir-json/add_drop_pyspecs: stdout.txt -3 lines (pure deletion)
 OK   cir/add_drop_pyspecs: stdout.txt -3 lines (pure deletion)
 OK   err/b148-mzi-args: stdout.txt -1 lines (pure deletion)

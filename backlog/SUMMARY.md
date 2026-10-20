@@ -1,6 +1,6 @@
 # SPECS review — summary (sprint 2026-10)
 
-In-depth review of the whole repository at `sprint/2026-10` @ b66dc53, done on branch `ws/review`. The index is
+In-depth review of the whole repository at `sprint/2026-10` @ 184041a, done on branch `ws/review`. The index is
 [`../backlog.md`](../backlog.md), the schema is in [`README.md`](README.md), and the disposition of every discovery
 seed is in [`SEEDS.md`](SEEDS.md).
 

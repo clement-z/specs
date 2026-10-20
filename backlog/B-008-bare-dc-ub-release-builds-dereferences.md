@@ -1,5 +1,5 @@
 # B-008: Bare `.dc` is UB in Release builds (dereferences `begin()` of an empty map)
-severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 9917667
+severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in ff391b2
 location: src/specs.cpp:149, src/parser/parse_analysis.cpp:34
 ## Problem
 `.dc` without a sweep order leaves `cw_sweep_orders` empty. The only guard is an `assert`, which Release

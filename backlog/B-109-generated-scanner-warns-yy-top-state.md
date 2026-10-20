@@ -1,5 +1,5 @@
 # B-109: Generated scanner warns `yy_top_state defined but not used`; one flex option removes it
-severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 23b5f0f
+severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in c712d3f
 location: src/parser/parser.l:30
 ## Problem
 `%option stack` makes flex emit `yy_top_state()`; the grammar only uses `yy_push_state`/`yy_pop_state` (parser.l:244,263,309,334,473). GCC (`-Wunused-function`) and clang both warn on every build of `scanner.cpp`. The warning survives the Meson migration (same generated file, `warning_level=2`).

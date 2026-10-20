@@ -87,7 +87,7 @@
   "tb/wg"
  ],
  "gtest": "gtest/unit_tests",
- "note": "Recorded on sprint/2026-10 @ 60a9df7 with the CMake Release build (GCC 11.5, -std=gnu++20 -O3 -DNDEBUG -march=native on an i5-6600K, SystemC 3.0.1 built as C++20). gtest results come from an out-of-tree PATCHED copy of src/test, because the in-tree unit_tests does not compile: utils.h:81 static_assert(false) removed, and EXPECT_ANGLE_EQ rewritten as EXPECT_PRED2 with a lambda calling angleIsEqual(a.m_field, b).",
+ "note": "Recorded on sprint/2026-10 @ d9eb1e6 with the CMake Release build (GCC 11.5, -std=gnu++20 -O3 -DNDEBUG -march=native on an i5-6600K, SystemC 3.0.1 built as C++20). gtest results come from an out-of-tree PATCHED copy of src/test, because the in-tree unit_tests does not compile: utils.h:81 static_assert(false) removed, and EXPECT_ANGLE_EQ rewritten as EXPECT_PRED2 with a lambda calling angleIsEqual(a.m_field, b).",
  "rerecords": [
   {
    "recorded_at_utc": "2026-10-20T07:00:30Z",

@@ -1,5 +1,5 @@
 # B-017: `--json` to an unwritable path reports success and exits 0
-severity: low | category: cli | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 41bc091
+severity: low | category: cli | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 28adebe
 location: src/main.cpp:397-405
 ## Problem
 The `ofstream` open failure is ignored. The program prints "Exported flattened circuit as JSON > …" and exits 0.

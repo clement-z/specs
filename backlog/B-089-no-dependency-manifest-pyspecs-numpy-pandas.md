@@ -1,5 +1,5 @@
 # B-089: No dependency manifest for pyspecs (numpy, pandas, matplotlib, pyDigitalWaveTools)
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 6da7886
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in b63f02f
 location: pyspecs/ (missing file), pyspecs/pyspecs_example.ipynb cell 0 comment, pyspecs/draw_graph_from_json.py:4, utils/analyze_detector_trace.py:8
 ## Problem
 The Python side declares its dependencies only in a notebook comment and in the external manual (`pip install numpy matplotlib pandas pyDigitalWaveTools`). `import pyspecs.specs` fails without pandas, matplotlib and pyDigitalWaveTools (specs.py imports them and the wildcard import pulls in specsparse). `draw_graph_from_json.py` needs `graphviz` plus the Graphviz `dot` binary, `analyze_detector_trace.py` needs scipy. `pyspecs` is not installable as a package.

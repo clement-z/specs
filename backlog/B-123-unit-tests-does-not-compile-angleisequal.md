@@ -1,5 +1,5 @@
 # B-123: unit_tests does not compile; angleIsEqual is wrong even once it compiles
-severity: high | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed upstream in b7d6fff (sprint commit 2be107d re-records the gtest baseline)
+severity: high | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed upstream in b7d6fff (sprint commit eb7ca0e re-records the gtest baseline)
 location: src/test/utils.h:21-25, src/test/utils.h:79-107, src/test/devices/waveguide.cpp:166, src/test/CMakeLists.txt:7-11, install.sh:28-29
 ## Problem
 `unit_tests` cannot be built. `utils.h:81` has an unconditional `static_assert(false, ...)`. Behind it, `EXPECT_ANGLE_EQ` (utils.h:21-22) passes a 2-argument, bool-returning `angleIsEqual` to `EXPECT_PRED_FORMAT2`, which needs `(const char*, const char*, T1, T2) -> AssertionResult`. The target is in `all` when the CMake option `BUILD_TB` is ON (the default), so `ninja`/`make` of everything fails (CLAUDE.md "known"), and `install.sh:28-29` (`cmake .. -DBUILD_TB=1; make -j`) fails too.

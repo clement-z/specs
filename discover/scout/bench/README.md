@@ -10,7 +10,7 @@ into the build; `tests/golden/` is the regression harness.
 | `bench_crow.py` | Runs a small matrix of generated CROWs (scaling in N, auto-probe tracing on/off, no tracing, WDM channel count, 1 fs resolution, tighter tolerances) and records wall/user time, VCD size and `Simulated` time. | `python3 -I bench_crow.py --specs build/specs --out results.json` |
 | `add_drop_oracle.py` | Runs `circuits/add_drop.cir` (`.dc` wavelength sweep) and compares `PROBE{ROOT/out}` / `PROBE{ROOT/drop}` against the closed-form add-drop ring response (Yariv 2002) using the VCD parser from `tests/golden/run_golden.py`. | `python3 -I add_drop_oracle.py --specs build/specs --repo .` |
 
-Results of the runs made on 2026-10-20 (Release build of b66dc53, i5-6600K, machine shared with two other
+Results of the runs made on 2026-10-20 (Release build of 184041a, i5-6600K, machine shared with two other
 sprint workstreams, so wall times are noisy and **user time** is the figure to read) are in `RESULTS.md`.
 
 Prefix for every generated/compared netlist is the repository root: `.include` paths and `traces/` are

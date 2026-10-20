@@ -1,5 +1,5 @@
 # B-156: Files opened by `.include` are never closed (fd exhaustion, misleading "not found")
-severity: med | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in af92c25
+severity: med | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 00556f2
 location: src/parser/parser.l:248, src/parser/parser.l:539-550
 ## Problem
 The include rule `fopen`s into `yyin` and pushes a buffer. `yypop_buffer_state` frees the buffer but never closes

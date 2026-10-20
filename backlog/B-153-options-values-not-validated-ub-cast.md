@@ -1,5 +1,5 @@
 # B-153: `.options` values are not validated (UB cast, out-of-range timescale, non-positive tolerances)
-severity: med | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 93df9a1
+severity: med | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in d90348d
 location: src/parser/parse_directive.cpp:30-37
 ## Problem
 - `RESOLUTION` stores a double into the `uint64` `default_resolution_multiplier`. Negative or huge values are UB, and

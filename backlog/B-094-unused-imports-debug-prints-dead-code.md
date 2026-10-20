@@ -1,5 +1,5 @@
 # B-094: Unused imports, debug prints and dead code in pyspecs; wildcard import re-exports third-party names
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 5a8b0f2 (ws-cleanup C-06)
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in fb4de99 (ws-cleanup C-06)
 location: pyspecs/specs.py:1-3,6,8-16,90,102,108; pyspecs/specsparse.py:4-5,24,129-137
 ## Problem
 `pyflakes`: specs.py imports numpy, pandas and matplotlib without using them (forcing matplotlib for a call that only runs a subprocess and slowing `import pyspecs.specs`); specsparse.py imports `matplotlib.pyplot` and `json` unused, assigns `simulation_data_df` (line 24) never used and contains an `if False:` block (lines 129-137) plus commented prints. specs.py has a pseudo-docstring "Ideas" string after the imports, commented-out `spec_env`/`Popen` lines (102, 108) and a reference to a non-existent `par_run()` (line 90). `from .specsparse import *` (no `__all__`) exports `np`, `pd`, `plt`, `json`, `VcdParser` and the internals as `specs.*`.

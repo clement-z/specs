@@ -1,5 +1,5 @@
 # B-119: `install.sh` cannot succeed on a fresh clone (args never installed, `all` builds the non-compiling unit_tests)
-severity: low | category: build | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: obsolete (meson migration, 8b7733a: install.sh rewritten for Meson, validated end to end in discover/meson/VALIDATION.md)
+severity: low | category: build | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: obsolete (meson migration, 57714e7: install.sh rewritten for Meson, validated end to end in discover/meson/VALIDATION.md)
 location: install.sh:9-29, CMakeLists.txt:15
 ## Problem
 obsoleted-by-meson: yes (PLAN.md:95 rewrites `install.sh`; do not fix separately).

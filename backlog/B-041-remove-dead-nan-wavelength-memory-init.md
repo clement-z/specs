@@ -1,5 +1,5 @@
 # B-041: Remove dead "nan wavelength" memory init in DirectionalCoupler and Merger
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3c2b444 (ws-cleanup C-02)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in ad6ea4f (ws-cleanup C-02)
 location: src/devices/directional_coupler.cpp:11, src/devices/directional_coupler.cpp:75, src/devices/directional_coupler.cpp:119, src/devices/directional_coupler.cpp:193, src/devices/directional_coupler.cpp:237, src/devices/directional_coupler.cpp:281, src/devices/merger.cpp:9, src/devices/merger.cpp:47
 ## Problem
 `m_memory_inX[0] = 0; // initializing for nan wavelength` refers to a "NaN wavelength" id that does not exist: id 0

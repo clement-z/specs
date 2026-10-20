@@ -1,5 +1,5 @@
 # B-043: Verbose prints show wrong values (splitter ratio "0.5", PS "@1.55)")
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3c2b444 (ws-cleanup C-02)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in ad6ea4f (ws-cleanup C-02)
 location: src/devices/splitter.cpp:14, src/devices/phaseshifter.cpp:16, src/devices/phaseshifter.cpp:91
 ## Problem
 With `--vci`:

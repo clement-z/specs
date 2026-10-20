@@ -1,5 +1,5 @@
 # B-165: `.op` and `.dc` silently ignore stray positional and keyword arguments
-severity: low | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in b50ced3
+severity: low | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 91dc39f
 location: src/parser/parse_analysis.cpp:23-27, src/parser/parse_analysis.cpp:29-80
 ## Problem
 `.op 5 foo=1` and `.dc /cwsrc1/WL a b c 7 foo=1` are accepted and the extras are ignored. `.tran` rejects kwargs

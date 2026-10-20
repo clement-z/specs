@@ -1,5 +1,5 @@
 # B-027: Dead engine code in OOP, SPECSConfig and OpticalSignal
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 39500e1 (ws-cleanup C-01), except the `drop_all_events` member: now unused but kept, removing it shifts printed signal IDs in regress/b031-mzi-bidir (B-016)
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 0cf731f (ws-cleanup C-01), except the `drop_all_events` member: now unused but kept, removing it shifts printed signal IDs in regress/b031-mzi-bidir (B-016)
 location: src/optical_output_port.h:59-68,78-80,130-170, src/optical_output_port.cpp:26-58,82,108-109,190-299,402-404,416-420, src/specs.h:92,96,116,123-124,136, src/specs.cpp:24,162-174,202-206, src/optical_signal.cpp:66-109, src/devices/time_monitor.cpp:126-149
 ## Problem
 Things that are never used, never set, or always exit:
@@ -36,7 +36,7 @@ Additional evidence (independent report F-A7-05, A7 reviewer):
 ## Expected
 none of the above.
 ## Suggested fix
-Delete only the following (line numbers at b66dc53, corrected by the second check). Keep
+Delete only the following (line numbers at 184041a, corrected by the second check). Keep
 `m_skip_next_convergence_check` (B-003 needs it), the `nodeset_orders` map and the NODESET apply loop at
 specs.cpp:73-77, and the cross-λ branches of `operator+=`/`-=`.
 - `optical_output_port.h`: 59-60 and 62-68 (commented-out members; **keep :61 `sc_event_queue m_event_queue;`**);

@@ -1,5 +1,5 @@
 # B-045: Remove misleading comments and dead code in passive-device files
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3c2b444, d7dbf98 (ws-cleanup C-02, C-04)
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in ad6ea4f, 8b8a88a (ws-cleanup C-02, C-04)
 location: src/devices/mzi.h:14, src/devices/mzi.h:43, src/devices/mzi.cpp:3-4, src/devices/mzi_active.h:35, src/devices/mzi_active.h:44, src/devices/mzi_active.cpp:119, src/devices/crossing.h:30, src/devices/splitter.h:46-50, src/devices/waveguide.cpp:39, src/devices/generic_2x2_coupler.h:35, src/parser/parse_element.cpp:295, src/parser/parse_element.cpp:495
 ## Problem
 The following changes are all comment edits or dead-code removal. They change no output.

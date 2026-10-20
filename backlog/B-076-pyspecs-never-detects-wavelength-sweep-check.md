@@ -1,5 +1,5 @@
 # B-076: pyspecs never detects a wavelength sweep: `check_wl_sweep` compares to 'b01' but SPECS writes 'b1'
-severity: high | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in a8e85a5
+severity: high | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 286bd34
 location: pyspecs/specsparse.py:258-266 (also :262,:264 debug prints)
 ## Problem
 `check_wl_sweep` tests `analysis_type == 'b01'`. SystemC writes the 32-bit `analysis_type` vector without leading zeros and pyDigitalWaveTools returns it verbatim, so CW_SWEEP (=1, `src/specs.h:75-80`) is `'b1'` and TIME_DOMAIN (=2) is `'b10'`. `'b01'` matches nothing, so every `.dc` VCD is parsed as time-domain: no `wavelength` column, the x axis `time` is `sweep_index * 1 fs`, and `verify_wl_sweep(df)` returns False (the notebook then plots a sweep against `time`). The whole FD branch of `parse_vcd_dataframe` is dead code. It also prints two debug lines (`print(child)`, `print(f'analysis_type:...')`) on every call.

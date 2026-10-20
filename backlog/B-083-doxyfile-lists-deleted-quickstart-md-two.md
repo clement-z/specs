@@ -1,5 +1,5 @@
 # B-083: Doxyfile lists the deleted QUICKSTART.md and two obsolete tags; mainpage links to pages that do not exist
-severity: med | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in b918231
+severity: med | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in bfba715
 location: doc/Doxyfile:832-835, :270, :1134; doc/mainpage.md:9-14
 ## Problem
 `INPUT` still has `QUICKSTART.md` (deleted in e6da8de), `TCL_SUBST` and `COLS_IN_ALPHA_INDEX` are obsolete, and `mainpage.md` links `readme.html` / `quickstart.html`. Doxygen names the README page `md__r_e_a_d_m_e.html`, so even the Readme link is dead. Together with the rest of the code this yields 77 warnings.

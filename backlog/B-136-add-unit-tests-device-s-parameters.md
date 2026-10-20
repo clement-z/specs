@@ -1,5 +1,5 @@
 # B-136: add unit tests for device S-parameters (waveguide loss/phase/delay, coupler, splitter, merger)
-severity: low | category: test-gap | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 542dfde
+severity: low | category: test-gap | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 84d087e
 location: new file src/test/devices/models.cpp (source: backlog/repro/a5-test-devices.cpp), src/test/CMakeLists.txt:7-11
 ## Problem
 The only device test (`src/test/devices/waveguide.cpp`) checks the phase of a zero-slope waveguide only. Loss, group delay, coupler S-matrix and unitarity, splitter and merger are covered only by the testbenches (which cannot fail the process, see B-019).

@@ -1,5 +1,5 @@
 # B-111: Six unused local variables in two legacy testbenches and Generic2x2Coupler
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3c2b444, 80184f0 (ws-cleanup C-02, C-05)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in ad6ea4f, 089c19b (ws-cleanup C-02, C-05)
 location: src/tb/freqsweep_tb.cpp:60-62, src/tb/lambda_tb.cpp:21-22, src/devices/generic_2x2_coupler.h:35
 ## Problem
 `-Wunused-variable` (GCC 11, every build): `event_counter`, `success_counter`, `test_number` in `freqsweep_tb::monitor()` (the whole body is `while(true){wait();continue;}`), `success_counter`, `test_number` in `lambda_tb::monitor()`, and `lambda0` in `Generic2x2Coupler::prepareTM()` (the real lambda0 lives in `TM.lambda0`, unrelated). The header warning is emitted by every TU that includes it. Survives the migration.

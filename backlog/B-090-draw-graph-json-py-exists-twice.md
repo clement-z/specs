@@ -1,5 +1,5 @@
 # B-090: `draw_graph_from_json.py` exists twice, byte for byte
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 5a8b0f2 (ws-cleanup C-06)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in fb4de99 (ws-cleanup C-06)
 location: pyspecs/draw_graph_from_json.py, utils/draw_graph_from_json.py
 ## Problem
 Two identical copies (same blob `78a3c64`), referenced from nowhere (not by the Makefile, docs, the `pyspecs` package or the notebook). Fixes (B-091..18) would have to be applied twice.

@@ -1,5 +1,5 @@
 # B-044: BitstreamSource saturation print tests m_current_value instead of val
-severity: low | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in c0766e5
+severity: low | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in f6ec1c5
 location: src/devices/bitstream_source.cpp:29
 ## Problem
 In the bit dump loop over `m_values` (:26-35), saturation tests the wrong variable:

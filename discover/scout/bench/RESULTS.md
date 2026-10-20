@@ -1,6 +1,6 @@
 # Feasibility measurements (2026-10-20)
 
-Binary: CMake Release build of b66dc53 (`-O3 -march=native -DNDEBUG`, gnu++20, SystemC 3.0.1) in
+Binary: CMake Release build of 184041a (`-O3 -march=native -DNDEBUG`, gnu++20, SystemC 3.0.1) in
 `/tmp/ws-scout-build`. Host: Intel i5-6600K (4 cores), shared with two other sprint workstreams, so **wall
 time is noisy; read the user-time column**. Scripts: `crow_gen.py`, `bench_crow.py`, `add_drop_oracle.py`
 (this directory). Raw JSON: `results.json`.

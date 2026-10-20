@@ -1,5 +1,5 @@
 # B-138: golden harness never runs the frequency-domain mode of the `ac_*` testbenches
-severity: low | category: test-gap | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 7b43d7c
+severity: low | category: test-gap | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 6fa8c9e
 location: tests/golden/cases.json:315-330 (tb/ac_add_drop, tb/ac_crow), src/tb/freqsweep_tb.cpp:45-53 (usage comment), src/tb/crow_tb.cpp:21-30
 ## Problem
 Both testbenches are documented as `-t ac_add_drop -m fd`, but cases.json only runs them in the default event-driven mode, which exercises the pulse branch (`run_1` else-branch / `run_td`). The sweep branches (`run_1` FD branch, `crow_tb::run_fd`) are never executed by the golden suite although they are the main purpose of the testbenches.

@@ -1,5 +1,5 @@
 # B-118: No default CMAKE_BUILD_TYPE: `install.sh` and plain `cmake` give an unoptimised binary
-severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: obsolete (meson migration, 8b7733a: Meson defaults to buildtype=release; install.sh uses it)
+severity: low | category: build | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: obsolete (meson migration, 57714e7: Meson defaults to buildtype=release; install.sh uses it)
 location: CMakeLists.txt:1-12, install.sh:28
 ## Problem
 `CMAKE_BUILD_TYPE` is empty by default, so no `-O` flag is passed at all; the documented `install.sh` build is therefore unoptimised (S5.01 measured CROW N=3 at 2.3 s for 20 ns). obsoleted-by-meson: yes (`buildtype=release` in `default_options`, PLAN.md:60); fix on the CMake side only if the merge slips. CLAUDE.md already tells users to always pass a build type.

@@ -2,7 +2,7 @@
 
 Scope: *which missing features would add the most value to SPECS's users (photonic-circuit researchers) and to
 its adoption, at reasonable cost?* Bugs are out of scope here (the review workstream owns `backlog.md`); where a
-feature is blocked by a known defect the defect is named. Everything below is grounded in the code at b66dc53,
+feature is blocked by a known defect the defect is named. Everything below is grounded in the code at 184041a,
 the ECOC 2023 paper, the five discovery reports, four web-research strands (`SOURCES.md`, 288 sources) and
 measurements on a Release build (`bench/RESULTS.md`). Design notes for the top features are in `F-NN-*.md`.
 
@@ -123,7 +123,7 @@ F-04 receiver chain (sampled island already exists in Detector)
 
 ## 4. Method and limits
 
-Code anchors were checked against the worktree at b66dc53 (`src/`, `pyspecs/`, `utils/`, `circuits/`,
+Code anchors were checked against the worktree at 184041a (`src/`, `pyspecs/`, `utils/`, `circuits/`,
 `tests/golden/`); measurements used `/tmp/ws-scout-build/specs` (CMake Release). Web facts come from the four
 strands in `SOURCES.md`; items the strands could not verify are marked there. The backlog being written in
 parallel (`ws-review`) owns the defects referenced here (detector output never driven, MZI bidirectional

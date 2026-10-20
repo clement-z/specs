@@ -1,5 +1,5 @@
 # B-065: Remove unconditional debug prints from my devices and elements
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3494312, baseline 931128b (ws-cleanup C-08)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 4a95b53, baseline 09d5304 (ws-cleanup C-08)
 location: src/devices/crow.h:62,74, src/devices/crow.cpp:33,39,45, src/devices/mesh_col.cpp:176,220, src/devices/generic_transmission_device.cpp:157, src/parser/parse_element.cpp:1058,1247, src/specs.cpp:303-304,310-311
 ## Problem
 Leftover debug output on stdout:

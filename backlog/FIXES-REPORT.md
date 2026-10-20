@@ -1,6 +1,6 @@
 # Fix phase (ws-fixes) — report
 
-Sprint 2026-10, phase 2. Branch `ws/fixes`, from `sprint/2026-10` @ c4dd3ef. Instructions:
+Sprint 2026-10, phase 2. Branch `ws/fixes`, from `sprint/2026-10` @ 3b94976. Instructions:
 `discover/orchestration/ws-fixes.md`; working log: [`fixes-progress.md`](fixes-progress.md). Nothing was pushed.
 
 ## Outcome
@@ -33,60 +33,60 @@ Commits are on `ws/fixes`. Golden "none" means no existing case changed (new cas
 
 | ID | outcome | commit | tests added | golden impact |
 |---|---|---|---|---|
-| B-006 | fixed | 2b812c6 | `regress/b006-empty-output` | none |
-| B-008 | fixed | 9917667 | `err/b008-dc-bare` | none |
-| B-017 | fixed | 41bc091 | `err/b017-json-unwritable` | none |
-| B-018 | fixed | 9ef2a5d | gtest `src/test/specs_config.cpp` (2 tests), `err/b018-resolution-below-fs` | gtest +2 PASS |
-| B-020 | fixed | 126969f | gtest `src/test/optical_output_port.cpp` (3 tests) | gtest +3 PASS |
-| B-023 | fixed | 773dd69 | the stdout of every case that prints a signal | stdout label `V.m⁻¹` → `√W` in 30 cases (the 25 predicted + 5 that print signals since this phase); label only, verified bit-exact |
-| B-031 | fixed | 913dbcd | `regress/b031-mzi-bidir` (Bi vs Uni MZI side by side, both directions) | none |
-| B-034 | fixed | 50fe059 | 3 × `err/b034-*` | none |
-| B-036 | fixed | 898552a | `regress/b036-vci-crow` | none |
-| B-044 | fixed | c0766e5 | none feasible (class never instantiated) | none |
-| B-047 | fixed | 4369a7d | `tb/mesh` now runs; `mesh` added to the meson `tb` suite | `tb/mesh`: SIGSEGV → exit 0 with `traces/mesh_tb.vcd` |
-| B-054 | fixed | 122fa88 | `tb/det`, `tb/detector` now compare the readout signals | t=0 VCD values of 3 detector signals: garbage → 0; `vcd_ignore_values` dropped |
-| B-064 | fixed | 417c053 | `err/b064-evlsrc-missing-file` | `cir/paul_3ring_puf` stderr names the missing file |
-| B-072 | fixed | 4bb350e | `tb/ac_crow` stdout | `tb/ac_crow` stdout: CROW child names prefixed (`crow_wg_top_0`, …); VCD unchanged |
-| B-076 | fixed | a8e85a5 | scripted check (no pyspecs suite: B-096) | none |
-| B-077 | fixed | 859242d | scripted check on pandas 2.3 and 3.0 | none |
-| B-082 | fixed | f9ea7f7 | templates checked by running their netlists | none |
-| B-083 | fixed | b918231 | doxygen warning count (78 → 74) | none |
-| B-085 | fixed | 3eb4088 | scripted check | none |
-| B-086 | fixed | 30f6820 | scripted check | none |
-| B-087 | fixed | e6785a4 | scripted check | none |
-| B-088 | fixed | 0e8db9c | notebook cells executed in a scratch tree | none |
-| B-089 | fixed | 6da7886 | `pip install -r` in fresh venvs (py3.9/pandas 2, py3.12/pandas 3) | none |
-| B-091 | fixed | c12a08c | scripted check | none |
-| B-092 | fixed | 9d68f74 | scripted check | none |
-| B-099 | fixed | 6590a7e | scripted check | none |
-| B-100 | fixed | 3892f9a | doxygen output (links resolve) | none |
-| B-102 | fixed | 9b2422b | doxygen warning count (74 → 47) | none |
-| B-109 | fixed | 23b5f0f | build warning gone | none |
-| B-114 | fixed | 4c44c8d (+ 65da416, CLAUDE.md note) | `git status --ignored` before/after | none |
-| B-123 | fixed upstream (b7d6fff); 2be107d re-records the baseline | `Waveguide.OperatingPoint` enforced in the `unit` suite | gtest `Waveguide.OperatingPoint` FAIL → PASS |
-| B-125 | fixed | 7ab418c | harness probes run locally (64 KiB output, ASSERT escape, non-std throw), not committed | none |
-| B-131 | fixed | 11339e9 | `regress/b131-nrings-crow`, `err/b131-nrings-crow-zero` | none |
-| B-132 | fixed | 65f9286 | `cir/subckt_test` | `cir/subckt_test`: parse error → exit 0 (no VCD) |
-| B-136 | fixed | 542dfde | gtest `src/test/devices/models.cpp` (6 tests; coupler phase sign not pinned) | gtest +6 PASS |
-| B-138 | fixed | 7b43d7c | `tb/ac_add_drop-fd` | one new case |
-| B-148 | fixed | 3e55eb3 | 9 × `err/b148-*` (one per converted assert) | none |
-| B-149 | fixed | 9c13e71 | `err/b149-x-noargs`, `err/b149-x-kwargs-only` | none |
-| B-150 | fixed | c89946f | `regress/b150-include-in-subckt` | none |
-| B-153 | fixed | 93df9a1 | 5 × `err/b153-*` | none |
-| B-154 | fixed | 97339bd | the `cir-json/*` cases | exactly the 10 predicted `writers` values in 3 `cir-json/*` cases |
-| B-156 | fixed | af92c25 | `regress/b156-many-includes` (110 includes under a 64-fd limit; new case key `rlimit_nofile`) | none |
-| B-161 | fixed | 8903599 | `err/b161-ic-unsupported` | none |
-| B-165 | fixed | b50ced3 | 4 × `err/b165-*` | none |
-| B-170 | fixed | e2f0768 | valgrind before/after (1,450 B → 0 definitely lost), not committed | none (heap-layout "reordered" notes) |
-| B-177 | fixed | 77d87b6 | bison warnings gone; LALR tables identical | none |
-| B-117, B-118 | obsolete | — | — | — (CMake removed in 8b7733a) |
+| B-006 | fixed | eee3be8 | `regress/b006-empty-output` | none |
+| B-008 | fixed | ff391b2 | `err/b008-dc-bare` | none |
+| B-017 | fixed | 28adebe | `err/b017-json-unwritable` | none |
+| B-018 | fixed | b588268 | gtest `src/test/specs_config.cpp` (2 tests), `err/b018-resolution-below-fs` | gtest +2 PASS |
+| B-020 | fixed | 2f69dc5 | gtest `src/test/optical_output_port.cpp` (3 tests) | gtest +3 PASS |
+| B-023 | fixed | 5ea38e4 | the stdout of every case that prints a signal | stdout label `V.m⁻¹` → `√W` in 30 cases (the 25 predicted + 5 that print signals since this phase); label only, verified bit-exact |
+| B-031 | fixed | 2d1e116 | `regress/b031-mzi-bidir` (Bi vs Uni MZI side by side, both directions) | none |
+| B-034 | fixed | 2408b9f | 3 × `err/b034-*` | none |
+| B-036 | fixed | a8600c3 | `regress/b036-vci-crow` | none |
+| B-044 | fixed | f6ec1c5 | none feasible (class never instantiated) | none |
+| B-047 | fixed | aa0e1c6 | `tb/mesh` now runs; `mesh` added to the meson `tb` suite | `tb/mesh`: SIGSEGV → exit 0 with `traces/mesh_tb.vcd` |
+| B-054 | fixed | 2997ba2 | `tb/det`, `tb/detector` now compare the readout signals | t=0 VCD values of 3 detector signals: garbage → 0; `vcd_ignore_values` dropped |
+| B-064 | fixed | 7caf561 | `err/b064-evlsrc-missing-file` | `cir/paul_3ring_puf` stderr names the missing file |
+| B-072 | fixed | 9939a3e | `tb/ac_crow` stdout | `tb/ac_crow` stdout: CROW child names prefixed (`crow_wg_top_0`, …); VCD unchanged |
+| B-076 | fixed | 286bd34 | scripted check (no pyspecs suite: B-096) | none |
+| B-077 | fixed | 601c777 | scripted check on pandas 2.3 and 3.0 | none |
+| B-082 | fixed | 907abee | templates checked by running their netlists | none |
+| B-083 | fixed | bfba715 | doxygen warning count (78 → 74) | none |
+| B-085 | fixed | a921bc0 | scripted check | none |
+| B-086 | fixed | d22213b | scripted check | none |
+| B-087 | fixed | ef0ea37 | scripted check | none |
+| B-088 | fixed | 685edc0 | notebook cells executed in a scratch tree | none |
+| B-089 | fixed | b63f02f | `pip install -r` in fresh venvs (py3.9/pandas 2, py3.12/pandas 3) | none |
+| B-091 | fixed | aacfde1 | scripted check | none |
+| B-092 | fixed | a20b67a | scripted check | none |
+| B-099 | fixed | 5c29fbb | scripted check | none |
+| B-100 | fixed | b3f1719 | doxygen output (links resolve) | none |
+| B-102 | fixed | acc890d | doxygen warning count (74 → 47) | none |
+| B-109 | fixed | c712d3f | build warning gone | none |
+| B-114 | fixed | 427873a (+ abeaa4b, CLAUDE.md note) | `git status --ignored` before/after | none |
+| B-123 | fixed upstream (b7d6fff); eb7ca0e re-records the baseline | `Waveguide.OperatingPoint` enforced in the `unit` suite | gtest `Waveguide.OperatingPoint` FAIL → PASS |
+| B-125 | fixed | 60972ff | harness probes run locally (64 KiB output, ASSERT escape, non-std throw), not committed | none |
+| B-131 | fixed | 449d63c | `regress/b131-nrings-crow`, `err/b131-nrings-crow-zero` | none |
+| B-132 | fixed | 093f890 | `cir/subckt_test` | `cir/subckt_test`: parse error → exit 0 (no VCD) |
+| B-136 | fixed | 84d087e | gtest `src/test/devices/models.cpp` (6 tests; coupler phase sign not pinned) | gtest +6 PASS |
+| B-138 | fixed | 6fa8c9e | `tb/ac_add_drop-fd` | one new case |
+| B-148 | fixed | 2310bdd | 9 × `err/b148-*` (one per converted assert) | none |
+| B-149 | fixed | bc74a11 | `err/b149-x-noargs`, `err/b149-x-kwargs-only` | none |
+| B-150 | fixed | 89db4c4 | `regress/b150-include-in-subckt` | none |
+| B-153 | fixed | d90348d | 5 × `err/b153-*` | none |
+| B-154 | fixed | 0dcfda3 | the `cir-json/*` cases | exactly the 10 predicted `writers` values in 3 `cir-json/*` cases |
+| B-156 | fixed | 00556f2 | `regress/b156-many-includes` (110 includes under a 64-fd limit; new case key `rlimit_nofile`) | none |
+| B-161 | fixed | c12ea44 | `err/b161-ic-unsupported` | none |
+| B-165 | fixed | 91dc39f | 4 × `err/b165-*` | none |
+| B-170 | fixed | 86f2707 | valgrind before/after (1,450 B → 0 definitely lost), not committed | none (heap-layout "reordered" notes) |
+| B-177 | fixed | 2a4df67 | bison warnings gone; LALR tables identical | none |
+| B-117, B-118 | obsolete | — | — | — (CMake removed in 57714e7) |
 | B-026, B-027, B-028, B-041, B-043, B-045, B-065, B-067, B-068, B-073, B-075, B-090, B-094, B-097, B-110, B-111, B-112, B-141, B-142, B-173, B-174, B-178 | deferred to ws-cleanup | — | — | — |
 
 ## Decisions taken (unattended)
 1. **Pure `style/maintainability` items deferred** to ws-cleanup (22), including the warning-only ones
    (B-075, B-110, B-111, B-112) and B-142, which SUMMARY.md lists in step 1. The ws-cleanup brief covers them.
    B-044, B-072 and B-170 (category bug/memory, listed under cleanup in SUMMARY.md) were fixed here.
-2. **Golden harness** (9a53213): `record --only --note` used to drop the note; it is now appended to
+2. **Golden harness** (b1f333f): `record --only --note` used to drop the note; it is now appended to
    `manifest.json` → `rerecords`, so every partial re-record says which B-ID caused it. B-156 added a case key
    `rlimit_nofile`. It runs specs via `sh -c 'ulimit -S -n N; exec …'`, not a `preexec_fn`, because cases run
    in threads.

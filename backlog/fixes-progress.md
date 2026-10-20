@@ -1,6 +1,6 @@
 # ws-fixes — progress log (working file; the final report is `FIXES-REPORT.md`)
 
-Orchestrator: Opus 5.5 on branch `ws/fixes` (from `sprint/2026-10` @ c4dd3ef). Instructions:
+Orchestrator: Opus 5.5 on branch `ws/fixes` (from `sprint/2026-10` @ 3b94976). Instructions:
 `discover/orchestration/ws-fixes.md`. If this run is interrupted, resume from the tables below: an item is done
 when its `fix(B-NNN)` commit is on `ws/fixes`.
 
@@ -9,13 +9,13 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 - **Deferred to the cleanup phase (ws-cleanup)**, as the orchestration rules ask for pure `style/maintainability` items
   (22): B-026, B-027, B-028, B-041, B-043, B-045, B-065, B-067, B-068, B-073, B-075, B-090, B-094, B-097, B-110,
   B-111, B-112, B-141, B-142, B-173, B-174, B-178.
-- **Obsolete (Meson migration, 8b7733a)**: B-117, B-118 (CMake files removed; Meson uses explicit source lists and
+- **Obsolete (Meson migration, 57714e7)**: B-117, B-118 (CMake files removed; Meson uses explicit source lists and
   defaults to `buildtype=release`). Also bookkept, though not `easy-unattended`: B-119, B-120, B-121.
 - **B-023** (field label `V.m⁻¹` → `√W`) re-records the stdout of ~25 cases, so it is done last, on top of every
   other fix (B-047, B-132 add stdout that also carries the label).
 - B-044, B-072, B-170 are listed under "cleanup" in `SUMMARY.md` but are categorised bug / memory, so they are
   taken here.
-- Golden harness: `record --only --note` now keeps the note (`manifest.json` → `rerecords`, 9a53213). Test-only
+- Golden harness: `record --only --note` now keeps the note (`manifest.json` → `rerecords`, b1f333f). Test-only
   netlists go in `tests/golden/netlists/`; new case ids are `err/bNNN-*` (clean rejection) or `regress/bNNN-*`.
 - "Reordered" notes (heap-layout dependent stdout order, B-016) are accepted and not re-recorded per item.
 
@@ -34,51 +34,51 @@ when its `fix(B-NNN)` commit is on `ws/fixes`.
 ## Merged into ws/fixes
 | ID | commit | note |
 |---|---|---|
-| B-076 | a8e85a5 | D (python) |
-| B-077 | 859242d | D (python) |
-| B-085 | 3eb4088 | D (python) |
-| B-086 | 30f6820 | D (python) |
-| B-087 | e6785a4 | D (python) |
-| B-088 | 0e8db9c | D (python) |
-| B-089 | 6da7886 | D (python) |
-| B-091 | c12a08c | D (python) |
-| B-092 | 9d68f74 | D (python) |
-| B-099 | 6590a7e | D (python) |
-| B-114 | 4c44c8d | wave 1 |
-| B-083 | b918231 | wave 1 |
-| B-100 | 3892f9a | wave 1 |
-| B-102 | 9b2422b | wave 1 |
-| B-082 | f9ea7f7 | wave 1 |
-| B-064 | 417c053 | wave 1 |
-| B-044 | c0766e5 | wave 1 |
-| B-072 | 4bb350e | wave 1 |
-| B-132 | 65f9286 | wave 1 |
-| B-123 | 2be107d | wave 1 |
-| B-125 | 7ab418c | wave 1 |
-| B-136 | 542dfde | wave 1 |
-| B-138 | 7b43d7c | wave 1 |
-| B-006 | 2b812c6 | wave 1 |
-| B-020 | 126969f | wave 1 |
-| B-017 | 41bc091 | wave 1 |
-| B-018 | 9ef2a5d | wave 1 |
-| B-131 | 11339e9 | wave 1 |
-| B-008 | 9917667 | wave 1 |
-| B-148 | 3e55eb3 | wave 1 |
-| B-165 | b50ced3 | wave 1 |
-| B-153 | 93df9a1 | wave 1 |
-| B-161 | 8903599 | wave 1 |
-| B-034 | 50fe059 | wave 1 |
-| B-149 | 9c13e71 | wave 1 |
-| B-150 | c89946f | wave 1 |
-| B-156 | af92c25 | wave 1 |
-| B-154 | 97339bd | wave 1 |
-| B-170 | e2f0768 | wave 1 |
-| B-109 | 23b5f0f | wave 1 |
-| B-177 | 77d87b6 | wave 1 |
-| B-047 | 4369a7d | wave 1 |
-| B-031 | 913dbcd | wave 1 |
-| B-054 | 122fa88 | wave 1 |
-| B-036 | 898552a | wave 1 |
-| B-023 | 773dd69 | orchestrator (last) |
+| B-076 | 286bd34 | D (python) |
+| B-077 | 601c777 | D (python) |
+| B-085 | a921bc0 | D (python) |
+| B-086 | d22213b | D (python) |
+| B-087 | ef0ea37 | D (python) |
+| B-088 | 685edc0 | D (python) |
+| B-089 | b63f02f | D (python) |
+| B-091 | aacfde1 | D (python) |
+| B-092 | a20b67a | D (python) |
+| B-099 | 5c29fbb | D (python) |
+| B-114 | 427873a | wave 1 |
+| B-083 | bfba715 | wave 1 |
+| B-100 | b3f1719 | wave 1 |
+| B-102 | acc890d | wave 1 |
+| B-082 | 907abee | wave 1 |
+| B-064 | 7caf561 | wave 1 |
+| B-044 | f6ec1c5 | wave 1 |
+| B-072 | 9939a3e | wave 1 |
+| B-132 | 093f890 | wave 1 |
+| B-123 | eb7ca0e | wave 1 |
+| B-125 | 60972ff | wave 1 |
+| B-136 | 84d087e | wave 1 |
+| B-138 | 6fa8c9e | wave 1 |
+| B-006 | eee3be8 | wave 1 |
+| B-020 | 2f69dc5 | wave 1 |
+| B-017 | 28adebe | wave 1 |
+| B-018 | b588268 | wave 1 |
+| B-131 | 449d63c | wave 1 |
+| B-008 | ff391b2 | wave 1 |
+| B-148 | 2310bdd | wave 1 |
+| B-165 | 91dc39f | wave 1 |
+| B-153 | d90348d | wave 1 |
+| B-161 | c12ea44 | wave 1 |
+| B-034 | 2408b9f | wave 1 |
+| B-149 | bc74a11 | wave 1 |
+| B-150 | 89db4c4 | wave 1 |
+| B-156 | 00556f2 | wave 1 |
+| B-154 | 0dcfda3 | wave 1 |
+| B-170 | 86f2707 | wave 1 |
+| B-109 | c712d3f | wave 1 |
+| B-177 | 2a4df67 | wave 1 |
+| B-047 | aa0e1c6 | wave 1 |
+| B-031 | 2d1e116 | wave 1 |
+| B-054 | 2997ba2 | wave 1 |
+| B-036 | a8600c3 | wave 1 |
+| B-023 | 5ea38e4 | orchestrator (last) |
 
 Done: see FIXES-REPORT.md.

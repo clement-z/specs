@@ -1,5 +1,5 @@
 # B-132: circuits/subckt_test.cir fails to parse: three trivial syntax errors
-severity: low | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 65f9286
+severity: low | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 093f890
 location: circuits/subckt_test.cir:2,5, tests/golden/cases.json:69-77
 ## Problem
 Element names need at least one character after the prefix (parser.l uses `^CWSRC({ALPHA_PLUS_NUM})+`, `^WG(...)+`), so the bare names `cwsrc` (line 5) and `WG` (line 2) are not elements, and `pow=1` is not a CWSRC parameter (`power=`). `specs -f circuits/subckt_test.cir` exits 1 ("Parsing error ... :5: syntax error"). Fixing only line 5 exposes the next errors one by one (syntax error in the subcircuit body at flatten time, then `Unknown keyword: pow`).

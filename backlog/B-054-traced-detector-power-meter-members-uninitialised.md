@@ -1,5 +1,5 @@
 # B-054: Traced detector/power-meter members are uninitialised (garbage at t=0 in the VCD)
-severity: med | category: determinism | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 122fa88
+severity: med | category: determinism | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 2997ba2
 location: src/devices/detector.h:18-19, src/devices/power_meter.h:17, src/specs.cpp:301-313
 ## Problem
 `Detector::m_cur_readout`, `m_cur_readout_no_interf` and `PowerMeter::m_cur_power` are plain `double` members with no initialiser. They are registered with `sc_trace` in `applyDefaultTraceFileToAllSignals()` (specs.cpp:301-313) and dumped in `$dumpvars` before anything writes them.

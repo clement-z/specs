@@ -1,5 +1,5 @@
 # B-170: Parser memory leaks (scan-string copies, .param pairs, ParserState, sub-tree subcircuits)
-severity: low | category: memory/UB | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in e2f0768
+severity: low | category: memory/UB | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 86f2707
 location: src/parser/parser.l:133-142, src/parser/parser.y:186-194, src/main.cpp:146, src/parser/parse_tree.h:726-739, src/parser/parse_tree.cpp:342-352
 ## Problem
 - `yy_add_content_from_string` `new[]`s a copy that `yy_scan_string` copies again, and never frees it.

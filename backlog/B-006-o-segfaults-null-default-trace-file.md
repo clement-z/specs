@@ -1,5 +1,5 @@
 # B-006: `-o ""` segfaults (null `default_trace_file` dereferenced)
-severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 2b812c6
+severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in eee3be8
 location: src/specs.cpp:366-369
 ## Problem
 With an empty `trace_filename`, no VCD is created, but line 369 calls `default_trace_file->set_time_unit(...)`

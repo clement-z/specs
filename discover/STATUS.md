@@ -12,15 +12,15 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | # | Phase | Where | Model | State |
 |---|-------|-------|-------|-------|
 | 0a | Sprint branch, deps, meson, skill | here | Opus 5.5 | done |
-| 0b | Paper → `doc/papers/`, README citation | here | Opus 5.5 | done (60a9df7) |
+| 0b | Paper → `doc/papers/`, README citation | here | Opus 5.5 | done (d9eb1e6) |
 | 0c | Discovery (5 probes) → `discover/0*.md` | here (subagents) | Opus 5.5 | done |
 | 0d | Golden-output baseline → `tests/golden/` (45 cases) | here (probe 4) | Opus 5.5 | done, independently re-verified |
 | 0e | Onboarding guide + CLAUDE.md | here | Opus 5.5 | done |
-| 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | done, re-verified, merged (8b7733a) |
+| 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | done, re-verified, merged (57714e7) |
 | 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | done, merged |
-| 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (aab5280) |
-| 2 | Easy fixes (unattended) | paseo `ws-fixes` (agent 3f7955bf, branch `ws/fixes`) | Opus 5.5 xhigh orch. | done, re-verified, merged (86d595b) |
-| 3 | Easy cleanup | paseo `ws-cleanup` (agent 0a71856a, branch `ws/cleanup`) | Opus high → Sonnet → Opus | done, re-verified, merged (5e00353) |
+| 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (b1db343) |
+| 2 | Easy fixes (unattended) | paseo `ws-fixes` (agent 3f7955bf, branch `ws/fixes`) | Opus 5.5 xhigh orch. | done, re-verified, merged (994dc26) |
+| 3 | Easy cleanup | paseo `ws-cleanup` (agent 0a71856a, branch `ws/cleanup`) | Opus high → Sonnet → Opus | done, re-verified, merged (c8dd957) |
 
 ## Rules for all workstreams
 - Every behavioural change is validated with `tests/golden/run_golden.py check`.

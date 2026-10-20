@@ -1,5 +1,5 @@
 # B-068: Delete unconstructible dead classes: `Ring`, `PowerProbe`, `PhaseProbe`
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 88fb960 (ws-cleanup C-03)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 5e577f9 (ws-cleanup C-03)
 location: src/devices/ring.h, src/devices/ring.cpp, src/devices/alldevices.h:33, src/devices/probe.h:82-90, src/devices/probe.cpp:50-74
 ## Problem
 `Ring` cannot be used.

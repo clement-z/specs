@@ -1,5 +1,5 @@
 # B-026: main.cpp dead code, debug print, unused includes, ParserState leak
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 39500e1, 3494312 (ws-cleanup C-01, C-08; the ParserState leak by B-170)
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 0cf731f, 4a95b53 (ws-cleanup C-01, C-08; the ParserState leak by B-170)
 location: src/main.cpp:1-5,21,25,65-141,146,187,189,319
 ## Problem
 `do_circuit` (65-141), `raphael_main` (187) and the never-defined `tests_module_registry_access` declaration (189)

@@ -1,5 +1,5 @@
 # B-028: Dead helpers in utils and device base classes
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 39500e1, 8d5551f (ws-cleanup C-01, C-07)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 0cf731f, e1b7e9a (ws-cleanup C-01, C-07)
 location: src/utils/sysc_utils.h:11, src/utils/sysc_utils.cpp:6-8, src/utils/general_utils.cpp:1, src/devices/spx_module.h:22-31, src/devices/subcircuit_instance.h:15-17
 ## Problem
 - `sc_object_is_module` is declared in the header but defined `inline` in the .cpp (unusable elsewhere) and unused.

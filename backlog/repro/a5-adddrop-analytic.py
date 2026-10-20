@@ -9,7 +9,7 @@ waveguide phase = 2*pi*L*neff(l)/l with neff(l)=neff+(neff-ng)/1.55e-6*(l-1.55e-
   h = t*exp(j*phi)                (one half ring)
   T_through = r - k^2 r h^2 /(1 - r^2 h^2)
   T_drop    = -k^2 h /(1 - r^2 h^2),  r = sqrt(1-k^2)
-Observed on 60a9df7+: max |P_sim - P_model| = 1.4e-6 W over the 30 swept points (netlist reltol=1e-6) -> suggested tolerance 1e-5.
+Observed on d9eb1e6+: max |P_sim - P_model| = 1.4e-6 W over the 30 swept points (netlist reltol=1e-6) -> suggested tolerance 1e-5.
 """
 import sys, cmath, math
 

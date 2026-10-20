@@ -1,5 +1,5 @@
 # B-072: CROW children are not prefixed with the instance name; dead `m_converger` store
-severity: low | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 4bb350e
+severity: low | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 9939a3e
 location: src/devices/crow.h:63-69,75, src/devices/crow.cpp:96
 ## Problem
 - `CROW::init()` names its signals and submodules `S_TL_i`, `wg_top_i`, `dc_i`, and so on, without the instance name. A second CROW in the same simulation produces W505 duplicate-name warnings and auto-renamed objects.
