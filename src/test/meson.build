@@ -12,6 +12,7 @@ if gtest_dep.found()
       'devices/models.cpp',
       'devices/waveguide.cpp',
       'main.cpp',
+      'optical_output_port.cpp',
     ),
     cpp_args: ['-pedantic'],
     dependencies: [gtest_dep, systemc_dep],

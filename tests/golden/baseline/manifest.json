@@ -103,6 +103,12 @@
    "only": "^regress/b006-",
    "gtest": false,
    "note": "B-006: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:09:08Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-020: 3 new OpticalOutputPort error-path unit tests, all PASS"
   }
  ]
 }
