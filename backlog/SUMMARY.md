@@ -52,8 +52,9 @@ Effort: {'XS': 80, 'S': 76, 'M': 22}  Verdict: {'CONFIRMED': 175, 'PLAUSIBLE': 3
 easy-unattended by effort: {'XS': 54, 'S': 16}
 
 ## Headline
-- **Nothing is `critical`.** The shipped examples that run (`add_drop*.cir`, `subckt_tests.cir`) give correct
-  results: `add_drop.cir` matches the closed-form add-drop transfer function to 1.4e-6 W (B-137). The serious bugs
+- **Nothing is `critical`.** The main shipped example is right: `add_drop.cir` matches the closed-form add-drop
+  transfer function to 1.4e-6 W (B-137). Only 4 of the 9 examples run (B-132 to B-135), and `subckt_tests.cir`
+  relies on a NaN from a negative source power (B-135). The serious bugs
   are on less-travelled paths:
   - bidirectional (`&`) nets;
   - subcircuits that share nets;
@@ -67,8 +68,8 @@ easy-unattended by effort: {'XS': 54, 'S': 16}
   the *line order* of the netlist (B-144, B-145, B-147). Two subcircuit instances that share a net either abort or
   silently keep only the last write (B-146).
 - **Several fixes that look easy change results**, so they need a sign-off even though the patch is mechanical:
-  B-052, B-146, B-147, B-035. The second check moved them out of `easy-unattended` after showing that netlists
-  which run today would produce different numbers.
+  B-052, B-146, B-147, B-035. Netlists that run today would produce different numbers with these fixes, so they
+  are classed `needs-human` (the second check showed this for B-052, B-146 and B-035).
 
 ## Top 10
 | # | Issue(s) | Why it matters | Class |
@@ -155,7 +156,7 @@ listed further below change golden outputs and must re-record the baseline in th
 2. Crash and abort fixes: B-031, B-047, B-006, B-008, B-149, B-150, B-036, B-020, B-156.
 3. Input validation: B-148, B-153, B-018, B-034, B-165, B-161, B-017, B-064, B-131.
 4. Output correctness with a predictable golden change: B-154 (JSON writers), B-054 (detector init), B-132
-   (`subckt_test.cir`).
+   (`subckt_test.cir`), B-023 (field unit label: re-records 25 stdout baselines, so do it after B-129).
 5. Python and docs:
    - B-076, B-077, B-085 to B-092, B-097, B-099;
    - B-082 (CRLF file: use line-targeted edits);

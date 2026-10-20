@@ -25,6 +25,10 @@ IDs are sequential (`B-001`, `B-002`, …) and never reused. If an issue turns o
     (unless the current result is a crash/abort).
   - `needs-design`: several reasonable fixes, so an API or behaviour decision is needed.
   - `needs-human`: physics/numerics/modelling questions, or changes to results of valid simulations.
+  - Interpretation used in this backlog: a fix that changes the results of a netlist that **runs today** is
+    `needs-human`, even when today's result is clearly wrong and the patch is mechanical (e.g. B-052, B-146, B-147).
+    Such issues say "a maintainer sign-off is enough" in their *Suggested fix*. Turning a crash or abort into a clean
+    error, or rejecting input that has no valid meaning (NaN-producing parameters), stays `easy-unattended`.
 - **verdict**: `CONFIRMED` (reproduced by running, or proven by unambiguous code reading with a cited line) or
   `PLAUSIBLE` (strong suspicion, not proven). Anything weaker was dropped.
 
