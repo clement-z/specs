@@ -19,8 +19,8 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 | 1a | Meson migration (replace CMake + Make, GitLab CI + GitHub Actions) | paseo `ws-meson` (agent 7eac146d, branch `ws/meson`) | Opus 5.5 high | done, re-verified, merged (b86a745) |
 | 1b | In-depth review → `backlog.md` + `backlog/` | paseo `ws-review` (agent ca28f59e, branch `ws/review`) | Opus 5.5 xhigh orch. | done, merged |
 | 1c | Feature scout → `discover/scout/` | paseo `ws-scout` (agent b2f5bd43, branch `ws/scout`) | Fable 5.1 xhigh | done, merged (7787aed) |
-| 2 | Easy fixes (unattended) | paseo `ws-fixes` (branch `ws/fixes`) | Opus 5.5 xhigh orch. | running |
-| 3 | Easy cleanup | paseo `ws-cleanup` | Opus high → Sonnet → Opus | pending |
+| 2 | Easy fixes (unattended) | paseo `ws-fixes` (agent 3f7955bf, branch `ws/fixes`) | Opus 5.5 xhigh orch. | done, re-verified, merged (6a207b1) |
+| 3 | Easy cleanup | paseo `ws-cleanup` (branch `ws/cleanup`) | Opus high → Sonnet → Opus | running |
 
 ## Rules for all workstreams
 - Every behavioural change is validated with `tests/golden/run_golden.py check`.
@@ -46,3 +46,8 @@ Coordinator: main session (Opus 5.5) in `~/.paseo/worktrees/31cq0kv6/gigantic-do
 - 2026-10-20 — ws-review merged: 178 issues (0 critical, 15 high), 70 easy-unattended; 85 independent second checks
   (61 confirmed, 24 corrected, 0 refuted). Reviewer rule needing maintainer sign-off: any fix that changes results of a
   netlist that runs today is `needs-human` even if mechanical (B-052, B-146, B-147, B-035, B-009). Phase 2 launched.
+- 2026-10-20 — ws-fixes merged: 46 fixed, 5 obsolete (Meson), style items deferred to cleanup. Golden 44 → 80 specs
+  cases, unit tests 3 → 14. Coordinator re-verification: fresh build (warnings 23 → 18), `meson test` 11/11, golden
+  81/81 at `--atol 0`; every fixed ID was easy-unattended pre-phase; all 32 changed legacy cases map to a re-record
+  note; B-023's 30-case change verified label-only (`V.m⁻¹` → `√W`). Leftover: 7 implementer worktrees under the main
+  checkout's `.claude/worktrees/` (all commits cherry-picked; removal needs maintainer OK). Phase 3 launched.
