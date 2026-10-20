@@ -1,0 +1,304 @@
+[
+ {
+  "label": "A-scaling N=3 probes=2",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "0",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 0.416,
+  "maxrss_mb": 13.6,
+  "vcd_mb": 7.54,
+  "simulated": "20 ns",
+  "user_s": 0.374,
+  "sys_s": 0.007
+ },
+ {
+  "label": "A-scaling N=10 probes=2",
+  "gen_args": [
+   "10",
+   "--traceall",
+   "0",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 4.178,
+  "maxrss_mb": 13.6,
+  "vcd_mb": 32.2,
+  "simulated": "20 ns",
+  "user_s": 3.791,
+  "sys_s": 0.05
+ },
+ {
+  "label": "A-scaling N=30 probes=2",
+  "gen_args": [
+   "30",
+   "--traceall",
+   "0",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 12.537,
+  "maxrss_mb": 13.6,
+  "vcd_mb": 15.38,
+  "simulated": "20 ns",
+  "user_s": 5.715,
+  "sys_s": 0.079
+ },
+ {
+  "label": "A-scaling N=100 probes=2",
+  "gen_args": [
+   "100",
+   "--traceall",
+   "0",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 11.349,
+  "maxrss_mb": 13.6,
+  "vcd_mb": 15.38,
+  "simulated": "20 ns",
+  "user_s": 5.751,
+  "sys_s": 0.078
+ },
+ {
+  "label": "A-scaling N=300 probes=2",
+  "gen_args": [
+   "300",
+   "--traceall",
+   "0",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 12.706,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 15.38,
+  "simulated": "20 ns",
+  "user_s": 6.093,
+  "sys_s": 0.118
+ },
+ {
+  "label": "B-traceall N=3",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "1",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 3.451,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 65.46,
+  "simulated": "20 ns",
+  "user_s": 1.341,
+  "sys_s": 0.073
+ },
+ {
+  "label": "B-traceall N=10",
+  "gen_args": [
+   "10",
+   "--traceall",
+   "1",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 37.181,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 729.36,
+  "simulated": "20 ns",
+  "user_s": 15.069,
+  "sys_s": 0.667
+ },
+ {
+  "label": "B-traceall N=30",
+  "gen_args": [
+   "30",
+   "--traceall",
+   "1",
+   "--probes",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 32.679,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 1003.27,
+  "simulated": "20 ns",
+  "user_s": 21.872,
+  "sys_s": 0.844
+ },
+ {
+  "label": "C-notrace N=3",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "0",
+   "--probes",
+   "0"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 0.243,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 0.0,
+  "simulated": "20 ns",
+  "user_s": 0.223,
+  "sys_s": 0.002
+ },
+ {
+  "label": "C-notrace N=30",
+  "gen_args": [
+   "30",
+   "--traceall",
+   "0",
+   "--probes",
+   "0"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 5.984,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 0.0,
+  "simulated": "20 ns",
+  "user_s": 4.941,
+  "sys_s": 0.025
+ },
+ {
+  "label": "D-wdm N=3 nwl=1",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "0",
+   "--probes",
+   "1",
+   "--nwl",
+   "1"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 0.485,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 7.54,
+  "simulated": "20 ns",
+  "user_s": 0.386,
+  "sys_s": 0.01
+ },
+ {
+  "label": "D-wdm N=3 nwl=4",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "0",
+   "--probes",
+   "1",
+   "--nwl",
+   "4"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 1.533,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 8.46,
+  "simulated": "20 ns",
+  "user_s": 1.31,
+  "sys_s": 0.009
+ },
+ {
+  "label": "D-wdm N=3 nwl=16",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "0",
+   "--probes",
+   "1",
+   "--nwl",
+   "16"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 8.192,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 10.75,
+  "simulated": "20 ns",
+  "user_s": 6.895,
+  "sys_s": 0.057
+ },
+ {
+  "label": "D-wdm N=10 nwl=4",
+  "gen_args": [
+   "10",
+   "--traceall",
+   "0",
+   "--probes",
+   "1",
+   "--nwl",
+   "4"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 19.949,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 37.17,
+  "simulated": "20 ns",
+  "user_s": 18.171,
+  "sys_s": 0.141
+ },
+ {
+  "label": "E-tscale N=3 1fs",
+  "gen_args": [
+   "3",
+   "--traceall",
+   "0",
+   "--probes",
+   "1",
+   "--tscale",
+   "-15"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 128.844,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 1129.0,
+  "simulated": "20 ns",
+  "user_s": 88.017,
+  "sys_s": 1.314
+ },
+ {
+  "label": "F-tol N=10 abstol=1e-10",
+  "gen_args": [
+   "10",
+   "--traceall",
+   "0",
+   "--probes",
+   "1",
+   "--abstol",
+   "1e-10",
+   "--reltol",
+   "1e-6"
+  ],
+  "status": "ok",
+  "rc": 0,
+  "wall_s": 4.245,
+  "maxrss_mb": 26.8,
+  "vcd_mb": 34.97,
+  "simulated": "20 ns",
+  "user_s": 3.907,
+  "sys_s": 0.059
+ }
+]
