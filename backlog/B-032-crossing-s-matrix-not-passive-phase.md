@@ -49,3 +49,19 @@ None. No golden case uses CROSSING. The OCTANE crossings use the default xtalk=N
 - Review ids: F-A2-02.
 ## Verification
 Ran `a2-crossing-gain.cir` and the two single-input variants on the stock binary. The outputs are quoted above.
+
+**Independent second check (V4, of F-A2-02): CONFIRMED.** Method: Reproduced with my own netlists on the stock binary (1310 nm, keyword args), and read crossing.cpp:6-18 and :59-74.
+
+- Single input:
+  - `xtalk=15` (isolation written as positive): 1 W in gives 31.62 W on out2.
+  - `att=0.5 xtalk=-10`, 2 W in: 1.7825 + 0.2 W. That case is still lossy, so gain needs 10^(-att/10)+10^(xtalk/10) > 1.
+- Two 0.5 W coherent inputs:
+  - `att=0 xtalk=-30`: 1.064 W out. Gain appears even at -30 dB crosstalk.
+  - `att=0 xtalk=-10`, in phase: 1.732 W out.
+  - `att=0 xtalk=-10`, anti-phase: 0.468 W out.
+  So the S-matrix is not passive or unitary.
+- This is physics and needs-human.
+- Golden impact "None" is correct:
+  - no golden netlist or tb uses CROSSING;
+  - OCTANE (octane_matrix.cpp:90) builds `Crossing(name, loss)` with xtalk = NaN, so x = 0, and both proposed formulas leave t unchanged when x = 0.
+- Side observation, not part of this finding: negative positional numbers are a parse error (`crossing1 a b o1 o2 0 -30` gives "offending token -"). Keyword args work.

@@ -26,6 +26,8 @@ exit=1
 I then built a scratch copy with only line :192 removed and ran `.op` (V=0, length=10e-6, length_ref=10.2e-6, att=1).
 The result was `out1:0 = 0.5 W (0.7854 rad)` and `out2:0 = 0.5 W (0.7854 rad)`. The same netlist without `&`
 (MZIActiveUni) gives `out1 = 0.605467 W (0.5371 rad)` and `out2 = 0.394301 W (-2.6045 rad)`.
+
+Correction from the second check: fixing only the double bind gives 0.785/0.214 W in their run, not the 0.5/0.5 W quoted above (and in the header comment of `backlog/repro/a2-mzi-bidir.cir`); either way the result is wrong until the arms are rewired.
 ## Expected
 MZIActiveBi should give, in the forward direction, the same transfer as MZIActiveUni. It should be reciprocal in the
 backward direction.
@@ -62,3 +64,15 @@ None. No golden case instantiates MZIActive: there is no `MZI` netlist element i
 
 The fix is safe because it only changes bindings inside MZIActiveBi, which currently cannot elaborate. The rename
 only changes an internal signal name.
+
+**Independent second check (V4, of F-A2-01): CONFIRMED.** Method: stock binary repro: E107, exit 1. Applied the 5 binding edits and the rename, rebuilt. Compared Uni and Bi forward results and Bi backward reciprocity (op and tran). Golden check: 44/44 PASS.
+
+- Stock `/tmp/ws-review-build/specs -f a2-mzi-bidir.cir` fails with `E107 ... interface already bound to port: port 'ROOT/MZI1/PS1.port_0'`, exit 1.
+- Fix applied exactly as suggested.
+- Forward `.op`, source on in1: Bi gives out1:0 = 0.605467 W / 0.5371 rad and out2:0 = 0.394301 W / -2.6045 rad, identical to Uni.
+- Forward `.op`, source on in2 (`mzi1 d& in ...`): Bi gives 0.394301 W / -2.6045 rad and 0.605467 W / -2.6045 rad, identical to Uni.
+- Tran with EVLSRC driving V=1.3 V at sensitivity=0.7: Bi is again identical to Uni for both input ports (0.178928 W / 0.9921 rad and 0.820839 W / -2.1495 rad).
+- Backward (Bi, source on out1, then on out2): S(in_i <- out_j) = S(out_j <- in_i) for all 4 pairs, in both op and tran with V != 0. So the device is reciprocal.
+- The fix is unique. The intended topology follows from MZIActiveUni (PS on the top arm, WG3 alone on the bottom arm into DC2 in2). The only unbound wires are `m_dc2_p1_in` and `m_dc2_p1_out` (named DC2_in2_0 and DC2_in2_1). Deleting :165 instead of :192 would be equivalent.
+- MZIActive is used only by MZIElement (parse_element.h:85). The Bi variant always aborts at elaboration today, so no currently-valid result changes.
+- Minor inaccuracy: with only :192 removed I got out1:0 = 0.785498 W and out2:0 = 0.214329 W, not the 0.5/0.5 W quoted in the finding and in the a2-mzi-bidir.cir header comment. It is wrong either way. If the repro is promoted to a golden case, fix that header comment.

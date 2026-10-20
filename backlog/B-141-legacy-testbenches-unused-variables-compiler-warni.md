@@ -22,6 +22,12 @@ No warnings, no dead blocks, accurate messages.
 Delete the unused variables and dead blocks listed above; fix the two message strings and the duplicate check (remove the second); add `std::cout.unsetf(std::ios::fixed); std::cout << std::setprecision(6);` (default flags) after the sweep in `crow_tb::run_fd`, or use a local `std::ostringstream`. Do NOT rename `ptrough` (changes VCD scope names) and do not touch mesh_tb (A3).
 
 Exclude the unused variables at `freqsweep_tb.cpp:60-62` and `lambda_tb.cpp:21-22`: they are already covered by B-111. Whichever lands first, the other skips those lines.
+
+Corrections from the second check (apply them):
+- **Keep** the unused `IN3`/`IN4` signals in `directional_coupler_tb.cpp:82`: removing them shifts the printed OpticalSignal IDs, so `tb/dc` and `tb/directional_coupler` fail (only the unused include may go).
+- **Keep both** phase-shifter checks (`phase_shifter_tb.cpp:48` and `:60`): they test the 1550 nm and the 1660 nm outputs, not the same event; removing one turns `Success rate: 3/3` into `2/3` in `tb/ps` and `tb/phaseshifter`. Only fix the message strings.
+- The `"ptrough"` strings are at `freqsweep_tb.cpp:120` and `:173` (still do not rename them).
+- With those two items dropped, everything else was verified golden-neutral at zero tolerance. The issue bundles about 15 independent edits: one commit is fine, but rebuild and run the golden check once at the end.
 ## Golden impact
 none: all golden cases run the event-driven path and none of the edited strings is printed in a passing run. Verify with `run_golden.py check` (the stdout of tb/ac_crow in default mode is unaffected; the sticky flags only act in FD mode).
 ## Related
@@ -30,3 +36,9 @@ B-019 (check helper makes most of the duplicated blocks disappear).
 - Review ids: F-A5-21.
 ## Verification
 Compiler output above; read every file. Safe because every removed item is unreferenced or overwritten before use.
+
+**Independent second check (V6, of F-A5-21): ADJUST.** Method: applied every listed edit on the scratch copy (rebuilt, -Wall -Wextra before/after, golden check with --atol 0 --rtol 0 --print-slack 0, ac_crow -m fd old vs new), then tested the two suspicious items separately
+
+Confirmed: original `-Wall -Wextra` warns for freqsweep_tb.cpp:60-62, lambda_tb.cpp:21-22 (and generic_2x2_coupler.h:35 via the unused include); after the edits there are no warnings in src/tb. freqsweep_tb_run_crow has no definition or use anywhere (safe to drop the declaration). Unused includes in directional_coupler_tb.cpp/wg_tb.cpp/lambda_tb.cpp compile fine without. crow_tb cleanup (header comment, single `lambda = 1553e-9`, `if (true || ...)` collapse, dead monitor() body and `if (false) sensitive`, overwritten lines 179-184, sticky-flag reset) is golden-neutral: 44/44 pass at zero tolerance; `-t ac_crow -m fd` output is identical to the old binary apart from the per-step timing lines and "Total runtime" now printing `10699.5 ms` instead of `12350.67200000000048021320 ms`. TWO ITEMS MUST BE REMOVED from the fix because they change golden output (the finding says golden impact none): (1) directional_coupler_tb.cpp:82 "unused IN3, IN4": the signals are not warned about and removing them shifts the printed OpticalSignal IDs (`[0031]` -> `[0025]` etc.), so `tb/dc` and `tb/directional_coupler` FAIL; keep IN3/IN4 (only the include may go). (2) phase_shifter_tb.cpp:48 vs :60 "same check, remove the second": events 4 and 5 are the same expression on two different events (the 1550 nm and the 1660 nm outputs after V_PS=2.0, see baseline stdout COUNT 4 / COUNT 5), not a duplicate; removing it lowers coverage and changes `Success rate: 3/3` to `2/3` in `tb/ps` and `tb/phaseshifter` (tested: 2 golden FAIL). Keep both checks; only fix the message strings (:44 "W" -> V/m, optional :68). Minor: the `"ptrough"` lines are 120 and 173 in freqsweep_tb.cpp (not 153/156); still do not rename. The finding bundles ~15 independent edits; if it stays easy-unattended, give the agent the explicit list above rather than "dead blocks listed above".
+
+**Orchestrator:** Two golden-changing items removed from the easy fix.

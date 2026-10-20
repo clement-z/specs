@@ -23,3 +23,11 @@ B-049, B-056 (random dark field also forces a write every Ts), B-059.
 - Review ids: F-A3-04.
 ## Verification
 I ran both repros with `/tmp/ws-review-build/specs` and observed the timeout, the 292 MB VCD and the entry counts above.
+
+**Independent second check (V1, of F-A3-04): CONFIRMED.** Method: ran a3-pdet-two-hang.cir and a one-PDET variant with /tmp/ws-review-build/specs
+
+- **Two PDETs:** `timeout 20` kills the run (exit 124). On this loaded machine the VCD had reached 55 MB at sim time #19788120, and it was still growing.
+- **One PDET (pdet2 deleted):** "Simulated 1 ns", exit 0, 37 kB VCD.
+- **Code:** detector.cpp:48-57 uses `sc_pending_activity()` as the liveness test, as described.
+- The ulp jitter is confirmed by the B-049 VCD.
+- **Severity and class:** high (non-terminating run, unbounded output) and needs-design are justified. The absolute VCD size and sim time depend on machine load.

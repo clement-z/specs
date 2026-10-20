@@ -11,6 +11,8 @@ The shipped example runs.
 circuits/subckt_test.cir: line 2 `WG` -> `WG1`; line 5 `cwsrc in pow=1 wl=1.55e-6` -> `cwsrc1 in power=1 wl=1.55e-6`. (Optionally uncomment `probe1 out`.) Update the golden note at cases.json:69-77.
 ## Golden impact
 cir/subckt_test: exit 1 -> 0 with new stdout and VCD; re-record that case only.
+
+Correction from the second check: the fixed netlist produces **no VCD**; `cir/subckt_test` changes to exit 0 with new stdout (63 lines) and empty stderr. When re-recording (`record --only 'cir/subckt_test$'`), also remove `"expect": "fail"` and the stale note from `tests/golden/cases.json` for that case.
 ## Related
 B-133, B-134.
 
@@ -18,3 +20,9 @@ B-133, B-134.
 - Review ids: F-A5-12.
 ## Verification
 Ran the fixed netlist. Safe: example file only.
+
+**Independent second check (V6, of F-A5-12): ADJUST.** Method: ran the original netlist (exit 1, "Parsing error ... :5"), isolated each of the three errors, applied the fix in a scratch circuits/ and ran the golden harness from the scratch tree against the committed baseline, then `record --only` into a copy of the baseline
+
+Reproduced: `cwsrc` -> parse error; with only that fixed, `WG 1 2` -> "Parsing error (:1): syntax error ... offending token WG" at flatten time; with both fixed, `Unknown keyword: pow`. `att` (dB/cm) and `power` are valid keywords (parse_element.cpp), so the intended content is unambiguous (`pow` = `power`); fixed netlist exits 0 with `ROOT/out = 1 W @ 1550 nm, phase -0.8107 rad`. Golden: only `cir/subckt_test` changes (exit 1 -> 0); `cir/subckt_tests` etc. unchanged. Text corrections: (1) the fixed case produces NO VCD (recorded `files: {}`), so say "new stdout (63 lines), empty stderr, exit 0" instead of "new stdout and VCD"; (2) when updating cases.json:69-77 also remove `"expect": "fail"` (it is only informational in run_golden.py) and replace the stale note; re-record with `record --only 'cir/subckt_test$'` (merge mode verified; afterwards `check` is 44/44 pass). Note: *.cir is git-ignored, so the edit to circuits/subckt_test.cir is a tracked file already (no `git add -f` needed, it exists in HEAD).
+
+**Orchestrator:** Golden-impact text corrected (no VCD; update cases.json expect/note).

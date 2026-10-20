@@ -24,3 +24,10 @@ B-042 (same pattern in PhaseShifter, but not neutral for golden stdout). Discove
 - Review ids: F-A2-11.
 ## Verification
 Golden check with the removal: 42 PASS, 2 FAIL (PS only, IDs only). Code reading confirms no other use.
+
+**Independent second check (V4, of F-A2-11): CONFIRMED.** Method: Deleted the 8 lines (DC :11/:75/:119/:193/:237/:281, Merger :9/:47), rebuilt. Golden check with --atol 0 --print-slack 0 --strict-order: 44/44 PASS.
+
+- The maps are `std::map<uint32_t, complex>` (directional_coupler.h:48-49 and :98-101, merger.h:28-29). They are only accessed with `operator[](cur_wavelength_id)`, which value-initialises to 0, and never iterated.
+- Each map is written only by its own thread, and there is no dont_initialize.
+- So the change is strictly neutral.
+- The 3 PhaseShifter lines (B-042) were left untouched.

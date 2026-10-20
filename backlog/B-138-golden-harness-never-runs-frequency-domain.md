@@ -17,3 +17,7 @@ B-137, B-141 (crow_tb sticky stream state affects only the FD output).
 - Review ids: F-A5-18.
 ## Verification
 Ran both in FD mode; the case would be deterministic (same Release binary reproduces it).
+
+**Independent second check (V6, of F-A5-18): CONFIRMED.** Method: ran `-t ac_add_drop -m fd` vs default, added the case to a scratch cases.json, `record --only 'tb/ac_add_drop-fd' --repeat 3` into a baseline copy, then full `check`
+
+Default mode prints 18 lines, `-m fd` prints 522 lines (501 sweep points), 0.25 s; the FD branch is not covered by any existing case (opt/mode-fd runs a netlist, not the testbench). The new case is deterministic (3 recordings identical; only `Total runtime` differs and is normalised), record merges into the existing manifest (`--only` path), and `check` afterwards is clean for the case. Baseline grows by ~128 kB (case dir with one freqsweep_tb.vcd). The cases.json insertion is mechanical (json.dumps(indent=1) round-trips the file byte-for-byte, so the 10-line diff is exactly the new entry).

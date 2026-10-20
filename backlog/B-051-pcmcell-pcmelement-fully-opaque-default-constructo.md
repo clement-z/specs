@@ -24,3 +24,14 @@ B-060 (PCM model), B-069 (OCTANE composites are unreachable today), B-052 (posit
 - Review ids: F-A3-05.
 ## Verification
 I ran the repro with and without tc/ta using the release binary.
+
+**Independent second check (V1, of F-A3-05): CONFIRMED.** Method: ran a3-pcm-opaque.cir with and without tc/ta using the release binary, and read pcm_device.h
+
+- **Without tc/ta:** OP `ROOT/out` = 0.000000 W.
+- **With `tc=0.85 ta=0.95`:** 0.000850 W.
+- **Code:**
+  - pcm_device.h:26-27 has member defaults Tc=0 and Ta=1.
+  - The constructor defaults at :53-54 are Tc=0 and Ta=0 and override them.
+  - octane_cell.cpp:32 and :77 pass no Tc/Ta.
+- **Class:** needs-human is correct, because this is a physics default.
+- **Severity:** high is defensible (silent all-zero output). PCMCELL is undocumented and not used by any golden case, so med would also be reasonable.

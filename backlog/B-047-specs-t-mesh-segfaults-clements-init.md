@@ -1,5 +1,5 @@
 # B-047: `specs -t mesh` segfaults: Clements is init()'d twice (use-after-free)
-severity: high | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: med | category: memory/UB | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
 location: src/tb/mesh_tb.cpp:91, src/specs.cpp:358-361, src/devices/mzi.cpp:10-25, src/devices/mesh_col.cpp:53-69,85-98
 ## Problem
 `mesh_tb_run()` calls `mesh1.init()` (mesh_tb.cpp:91), and then `SPECSConfig::prepareSimulation()` calls `init()` a second time on every `spx_module`. It first takes a snapshot of them in a `std::set<spx_module*>`, ordered by pointer value (specs.cpp:359-361). The second pass re-enters the composite inits:
@@ -41,3 +41,23 @@ I patched a copy (`/tmp/ws-review-A3/exp`, Release build) and ran `specs -t mesh
 - At 167 ps OUT1..OUT5 = 1 W each, from 5 x 1 W inputs, so power is conserved.
 
 This is safe because the only effect of line 91 is the redundant first init. `prepareSimulation()` is always called by the tb (mesh_tb.cpp:121).
+
+**Independent second check (V1, of F-A3-01): CONFIRMED.** Method: reproduced the crash with /tmp/ws-review-build/specs, applied the fix on the scratch copy, rebuilt and ran the golden check (default and --atol 0): only tb/mesh changes
+
+- **Before:** `specs -t mesh` gives exit 139 (core dump) after 81 W505 warnings.
+- **After deleting mesh_tb.cpp:91:**
+  - Exit 0 with 0 W505, and a new `traces/mesh_tb.vcd`.
+  - At 167 ps OUT1..OUT5 = 1 W each from 5 x 1 W inputs, so power is conserved.
+  - Stdout and VCD were identical over 3 runs (md5), so the output is deterministic.
+- **Golden:** 43 pass. tb/mesh fails only with "exit status 'signal:SIGSEGV' != 0", stdout 249 -> 46 lines, and the unexpected file traces/mesh_tb.vcd. This is exactly the claimed impact.
+- **Is it the right minimal fix:**
+  - prepareSimulation() is the only init point in the netlist flow. Nothing in src/ calls init() on an spx_module before it, except mesh_tb.cpp:91.
+  - crow_tb's `pc->init()` is safe because CROW is a plain sc_module. The OCTANE composites are sc_module too.
+  - Clements::init() also does `m_mesh_cols.clear()`, so a second init of any composite frees objects that are in the snapshot. The fix does not hide this: B-061 already tracks the re-entry hardening. The fix stays local to the testbench.
+- **Name check:** I instrumented both builds to dump all sc_object names after prepareSimulation. The mesh has 1003 objects and they are correctly named and created once.
+- **Severity:** high is acceptable (UB/crash of a testbench listed by `specs -p`). It could arguably be med, because no netlist path reaches Clements.
+- **Minor:**
+  - With this fix alone, the debug "odd-even/odd-odd" lines in tb/mesh stdout drop from 6 to 5.
+  - The cases.json note for tb/mesh should also be removed or replaced when re-recording.
+
+**Orchestrator:** Severity lowered high -> med: the crash is in a legacy testbench (`specs -t mesh`); Clements is not reachable from netlists. The `prepareSimulation()` re-entry hazard itself is B-061.

@@ -30,3 +30,13 @@ B-055, B-056 (other detector nondeterminism).
 - Review ids: F-A3-08.
 ## Verification
 I patched the detector part in my experimental build and the golden check passed. The fix is safe because the only observable change is the t=0 value of a variable that is read before being written today.
+
+**Independent second check (V1, of F-A3-08): CONFIRMED.** Method: applied the fix on the scratch copy and ran the golden check (default and --atol 0: 44/44 pass with the existing vcd_ignore_values). I then made a cases.json copy without the vcd_ignore_values for tb/det and tb/detector, recorded twice and compared the two recordings
+
+- **Baseline:** the tb/det VCD has `uut2.readout` = 6.905e-310 and `readout_no_interference` = 2.47e-323 at #0.
+- **After the fix:**
+  - Both are 0. Two recordings compare identical at --atol 0.
+  - Against the current baseline without the ignore, tb/det and tb/detector fail at --atol 0 on exactly these t=0 values. They pass at the default atol 1e-12, because the garbage here happens to be denormal.
+  - So the claimed impact holds: the comparison is unchanged now, and a re-record is needed to drop the ignores.
+- **Initial value:** 0 is the neutral choice, and no equation or tolerance changes. Nothing reads these members before writing them except sc_trace.
+- **Minor:** the constructor range is detector.h:61-88, not 61-79.

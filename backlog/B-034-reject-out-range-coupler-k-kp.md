@@ -55,3 +55,18 @@ None. Every golden coupler uses k = 0.15 or 0.85, and no golden netlist sets a s
 - Code reading: the check runs after all positional and keyword assignments, so it covers `k`, `kf`, `kp`, `t` and
   positional `k`.
 - Safe because only previously garbage-producing inputs are affected.
+
+**Independent second check (V4, of F-A2-04): CONFIRMED.** Method: Applied both checks, rebuilt, swept edge values before and after. Golden check: 44/44 PASS. Repro now exits 1 with the message.
+
+- Endpoints are accepted and give the same output as before:
+  - coupler: k=0, k=1, k=-1, k=-0.3, kp=0, kp=1, t=0, t=1, t=-1, positional 0.5;
+  - splitter: default, ratio=0, ratio=1, ratio=0.3, positional 0.7.
+- Out-of-range values are rejected (rc=1). All of them gave silent 0 W (NaN gated) or gain before:
+  - coupler: k=1.0000001, kp=1.01, kp=-0.01, t=1.01, positional 1.5;
+  - splitter: ratio=1.5, ratio=-0.1, positional 1.2, ratio=1.0000001.
+  - The splitter cases gave 1.5 W or 1.1 W out of 1 W in.
+- I agree it fits easy-unattended. These inputs are undefined: log10 of a negative number gives NaN, sqrt of a negative number gives NaN. No valid input changes, and the range is unambiguous with closed endpoints.
+- No golden case, circuits/ netlist, discover/ example or pyspecs file uses out-of-range values. The circuits use k = 0.15, k={k}, default dc, and a default SPLITTER.
+- Two optional cosmetic notes:
+  - The message prints at the default 6-digit precision. ratio=1.0000001 reports "splitter ratio 1 is outside [0, 1]", and k=1.0000001 reports "through power -2e-07".
+  - The check is on the final value, so a later valid keyword masks an earlier invalid one (`k=1.2 kp=0.3` is accepted). That is harmless.

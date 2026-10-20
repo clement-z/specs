@@ -21,3 +21,10 @@ B-065, B-071.
 - Review ids: F-A3-26.
 ## Verification
 Code reading and inspection of the baseline VCD scopes for tb/ac_crow (only `pcross`/`pthrough`). This is safe because only object names change and nothing looks them up.
+
+**Independent second check (V1, of F-A3-26): CONFIRMED.** Method: prefixed the 8 names (S_TL/S_BL/S_TR/S_BR/wg_bot/wg_top/dc x2) with `string(name()) + "_..._"`, deleted crow.cpp:96, rebuilt and ran the golden check
+
+- Only tb/ac_crow fails, and only in stdout lines 5-13: `wg_top_0` -> `crow_wg_top_0`, and so on. The VCD is unchanged (only empty `pcross`/`pthrough` scopes).
+- `m_converger` appears only at optical_output_port.h:78 and in this store.
+- Nothing looks objects up by name (no sc_find_object).
+- So the impact is "none if B-065 lands first, otherwise these stdout names change", exactly as claimed.

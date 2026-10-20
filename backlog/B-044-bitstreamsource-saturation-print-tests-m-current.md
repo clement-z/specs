@@ -20,3 +20,9 @@ B-043. Cross-area: bitstream_source.cpp:37 uses the same `--vci`-style cast (inc
 - Review ids: F-A2-14.
 ## Verification
 Code reading.
+
+**Independent second check (V4, of F-A2-14): CONFIRMED.** Method: Applied the one-line edit, rebuilt (no new warning). Golden check: 44/44 PASS. Checked usage by grep.
+
+- Line 29 tests m_current_value (= values[0]) instead of val inside the dump loop, so the bug is real.
+- BitstreamSource is never instantiated. Only specs.cpp:1 and alldevices.h:24 include the header, and there is no parser element or tb.
+- So the change is neutral for all current outputs.

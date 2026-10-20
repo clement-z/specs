@@ -16,6 +16,8 @@ No dead code; per-process temp trace files; double-precision macros usable as st
 - trace file: `specsGlobalConfig.trace_filename = testing::TempDir() + "specs_test_" + std::to_string(getpid());` (used in `backlog/repro/a5-test-devices.cpp`);
 - delete waveguide.cpp:15-78, change :131 to `tb.b_out`, delete :167 and the `<sys/wait.h>` include;
 - apply `backlog/repro/a5-test-utils-macros.patch` (DOUBLE_EQ in `do { } while (0)` with parenthesised arguments; applies after the angle and harness patches).
+
+Correction from the second check: **do not delete `sc_main`** from `src/test/main.cpp`: `libsystemc.so` references it and the link fails. Replace the body with a stub, e.g. `int sc_main(int, char*[]) { return 0; } // required by libsystemc, never called: GTest::gtest_main supplies main()`. Note that per-PID trace files (`specs_test_<pid>.vcd`) accumulate in `testing::TempDir()`. Depends on B-123.
 ## Golden impact
 none (test names and results unchanged; `A.B` kept).
 ## Related
@@ -25,3 +27,9 @@ B-123, B-125.
 - Review ids: F-A5-22.
 ## Verification
 Built the macros patch together with the other two and ran `Waveguide.*`: PASS. The b_out check passes at instantiation (default value is zero).
+
+**Independent second check (V6, of F-A5-22): ADJUST.** Method: applied all bullets on the scratch copy incl. the macros patch, rebuilt unit_tests, ran it and the golden check
+
+Bullet 1 is WRONG and breaks the build: deleting `sc_main` from src/test/main.cpp gives `ld: libsystemc.so.3.0.1: undefined reference to 'sc_main'` (libsystemc.so defines `main` and needs `sc_main`; `nm -D` shows `T main` / `U sc_main`). The function is never called (the binary prints "Running main() from .../gtest_main.cc"), but a definition is required: replace the body with a stub, e.g. `int sc_main(int, char*[]) { return 0; }` with a comment "required by libsystemc, never called: GTest::gtest_main supplies main()" (verified: links, 9/9 tests pass). The other bullets work and keep the result set: delete waveguide.cpp `#if 0` block (lines 15-78) and `<sys/wait.h>`, `tb.b_out` at :131 (passes), drop the debug cout, trace_filename = testing::TempDir() + "specs_test_" + std::to_string(getpid()) (getpid comes via utils.h <unistd.h>), macros patch applies cleanly after angle+harness patches and compiles (also with `std::complex(0,0)` args and in unbraced if/else, -Wall -Wextra -pedantic clean). Side effect to mention: one `specs_test_<pid>.vcd` per test per run accumulates in TempDir() (previously one shared file). Golden: unchanged apart from the B-123 gtest notes; A.B kept.
+
+**Orchestrator:** sc_main must be stubbed, not deleted (link failure).

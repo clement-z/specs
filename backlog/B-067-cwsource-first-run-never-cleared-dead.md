@@ -24,3 +24,7 @@ B-066 (the print at :33).
 - Review ids: F-A3-21.
 ## Verification
 Code reading. Behaviour is identical because `!first_run` is the constant `false`.
+
+**Independent second check (V1, of F-A3-21): CONFIRMED.** Method: applied the fix on the scratch copy and ran the golden check: 44/44 pass, also with --atol 0
+
+`first_run` is declared at cw_source.cpp:18 and used only at :36, never written. The rewrite is identical in behaviour.

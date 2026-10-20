@@ -32,6 +32,8 @@ Then replace the 51 sites mechanically:
 sed -i -E 's/\(dynamic_cast<spx::[oe]a_signal_type \*>\(([A-Za-z0-9_]+)\.get_interface\(\)\)\)->name\(\)/port_channel_name(\1)/g' src/devices/*.cpp
 ```
 Finally, hand-edit bitstream_source.cpp:37 to `port_channel_name(p_out)`.
+
+Correction from the second check: `bitstream_source.cpp` includes neither `specs.h` nor `sysc_utils.h`, so the fix must also add `#include "utils/sysc_utils.h"` there; otherwise it does not compile. With it, `--vci -t ac_crow` goes from exit 139 to 0 and all other `--vci` outputs are unchanged.
 ## Golden impact
 None. The printed text is identical whenever the cast succeeded. opt/vci is unchanged.
 ## Related
@@ -45,3 +47,15 @@ In a scratch build I applied the helper and the sed (51 replacements):
 - The full golden check gives 44/44 PASS.
 
 The fix is behaviour-neutral: it only replaces a null dereference.
+
+**Independent second check (V4, of F-A2-06): ADJUST.** Method: Applied the helper, the sed (51 replacements in 11 files, count matches) and the bitstream hand-edit. The build FAILED. After adding an include it built; then ran golden, `--vci -t ac_crow`, and `--vci` on all 19 tbs before and after.
+
+- The suggested fix does not compile as written: `bitstream_source.cpp:37: error: 'port_channel_name' was not declared in this scope`. bitstream_source.cpp/.h include only systemc.h, optical_output_port.h and optical_signal.h. None of them includes specs.h or sysc_utils.h, so the claim "included everywhere via specs.h" is false for that file.
+- Required change to the suggested fix: when hand-editing bitstream_source.cpp:37, also add `#include "utils/sysc_utils.h"` to bitstream_source.cpp, after `#include "devices/bitstream_source.h"`. The other 11 files already get it through specs.h, directly or via their headers.
+- With that include, results:
+  - `specs --vci -t ac_crow`: exit 139 before, exit 0 after. The first 34 output lines are identical; the rest is new output, starting with `S_BR_0 --> S_BL_0`.
+  - All other 18 tbs with `--vci` give identical stdout apart from "Total runtime".
+  - Golden check (incl. opt/vci, with --print-slack 0): 44/44 PASS.
+- The fix is behaviour-neutral.
+
+**Orchestrator:** Missing include added to the suggested fix.

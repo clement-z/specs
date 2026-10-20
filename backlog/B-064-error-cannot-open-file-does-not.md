@@ -22,3 +22,9 @@ B-053.
 - Review ids: F-A3-18.
 ## Verification
 Code reading. This is safe because it only touches the text of an error path.
+
+**Independent second check (V1, of F-A3-18): CONFIRMED.** Method: applied the fix on the scratch copy and ran the golden check
+
+- Only cir/paul_3ring_puf fails, with stderr `Error: Cannot open the file.` -> `Error: Cannot open the file "paul_puf_bitstream_158b_3wl.csv".`. This is exactly the claimed text.
+- `filename` is in scope in both setValues overloads.
+- Also update the cases.json note for cir/paul_3ring_puf (line 57), which quotes the old message. It is documentation only.

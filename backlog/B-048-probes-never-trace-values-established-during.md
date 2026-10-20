@@ -32,3 +32,14 @@ B-057 (probe semantics on WDM nets), B-062 (MLPROBE).
 - Review ids: F-A3-02.
 ## Verification
 With the patched binary, the same netlist dumps `r0.001` (power), `r0.0316` (abs), `r-0.405` (phase) and `r1.55e-06` at t=0 for PROBE1 and `PROBE{ROOT/out}`.
+
+**Independent second check (V1, of F-A3-02): CONFIRMED.** Method: ran backlog/repro/a3-probe-cw-tran.cir with the release binary; applied the suggested minimal fix (remove `continue` in Probe and MLambdaProbe) on the scratch copy and ran the golden check
+
+- **Before:**
+  - Stdout OP shows `ROOT/out ... 0.001000 W`.
+  - In the VCD all 12 probe signals are r0 in $dumpvars and are never written again (69-line VCD).
+- **Code:** probe.cpp:27-31 and :143-148 do `wait(enable.posedge_event()); continue;`.
+- **With the minimal fix:**
+  - The VCD $dumpvars has power 0.001, abs 0.0316, phase -0.405 and wl 1.55e-06 for PROBE1 and PROBE{ROOT/out}.
+  - Golden 44/44 pass, also with --atol 0, so the claimed golden impact "None" holds.
+- **Severity and class:** high (a silently wrong trace for every CW + .tran netlist) and needs-design are justified.

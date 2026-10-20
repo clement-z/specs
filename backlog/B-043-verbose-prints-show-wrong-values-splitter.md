@@ -24,3 +24,11 @@ The bitstream part of S2.26 is B-044.
 ## Verification
 Code reading. I checked the element lists of circuits/subckt_tests.cir and add_drop_sub.cir, and grepped
 tests/golden/baseline/cases/opt/vci/stdout.txt (0 matches).
+
+**Independent second check (V4, of F-A2-13): CONFIRMED.** Method: Applied the 3 print edits, rebuilt. Golden check (--print-slack 0, --strict-order): 44/44 PASS. Diffed `--vci` output.
+
+- A netlist with `splitter ratio=0.3` plus `pshift` under `--vci` now prints `splitting ratio_power = 0.3 W/W` and `initial phase delay = 0 rad`.
+- tb ps and tb phaseshifter with `--vci` differ only in that line.
+- tb spli and tb splitter are unchanged, because they use ratio 0.5.
+- verbose_component_initialization is only set by the CLI flag (main.cpp:338), never by a tb.
+- The opt/vci baseline does not contain "splitting ratio_power" or "initial phase delay". Its 5 "@1.55)" hits are waveguide "phase delay" lines, which this fix does not touch.

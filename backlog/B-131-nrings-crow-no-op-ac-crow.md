@@ -25,8 +25,10 @@ if (set_nrings_crow) {
 }
 ```
 and change the help text "temporary" to "Number of rings of the CROW testbench (-t ac_crow), default 3". Do not touch the paper-parameter mismatch here (a documentation note or a separate benchmark netlist generator is a design decision).
+
+Correction from the second check: **leave the help string ("temporary") unchanged** in this issue; then the golden impact really is none. Changing the help text fails `cli/help` and `cli/no-args` (the string is in their stdout baseline); if a maintainer wants the new text, re-record those two cases in the same commit (`run_golden.py record ... --only '^cli/(help|no-args)$'`). The help-text rewording belongs to B-025 anyway.
 ## Golden impact
-none (no golden case passes `--nrings_crow`).
+None if the help text is left unchanged (verified: `--nrings_crow 3` output equals today's default; 0, -1 and 1025 are rejected with exit 1).
 ## Related
 B-141 (crow_tb dead code).
 
@@ -34,3 +36,9 @@ B-141 (crow_tb dead code).
 - Review ids: F-A5-11.
 ## Verification
 Built the one-line change in /tmp/ws-review-A5/repo and ran the matrix above. Upper bound 1024 is arbitrary (paper max is 512); safe because the flag was inert before.
+
+**Independent second check (V6, of F-A5-11): ADJUST.** Method: applied the suggested src/main.cpp change plus help-text change on the scratch copy, rebuilt specs, ran the --nrings_crow matrix and the golden check
+
+Functionally correct: N=1/3/7 give 1/3/7 `wg_top_*` names (old binary: `--nrings_crow 7` output identical to default); `--nrings_crow 3` output equals the old default; 0, -1 (parses as 2^64-1), 1025 are rejected with exit 1 and the message; 1024 runs (35 s in default td mode, under the 60 s limit); the BUILD_TB macro is defined in this build, so the `#if` branch is active. The upper bound 1024 is an arbitrary but harmless constant (a bound is needed because `-1` wraps to SIZE_MAX). WRONG CLAIM: "Golden impact: none". The help text is part of the golden stdout: `cli/help` and `cli/no-args` FAIL (`--nrings_crow=[set_nrings_crow]   temporary` is in tests/golden/baseline/cases/cli/{help,no-args}/stdout.txt:28, and the longer text wraps and shifts the following lines; golden check: 42 passed, 2 failed). Fix the finding text to either (a) leave the help string "temporary" untouched, then golden impact is really none, or (b) change the help text AND re-record those two cases in the same commit (`run_golden.py record --specs ... --out tests/golden/baseline --only '^cli/(help|no-args)$' --note "B-xxx help text for --nrings_crow"`; `record --only` merges into the existing baseline). Everything else in the finding stands.
+
+**Orchestrator:** Help-text change removed from the easy fix (it fails cli/help and cli/no-args).

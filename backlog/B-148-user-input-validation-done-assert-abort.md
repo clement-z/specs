@@ -44,12 +44,9 @@ Replace each `assert(args.size() <= N);` (and `== 0`) with
 - `:87`: the same pattern with `.tran:`.
 - `parse_directive.cpp:21`: `.options: unexpected positional argument`.
 
-Skip `parse_analysis.cpp:34` (bare `.dc`): it is handled by B-008.
-
-Corrections from the second check (apply them):
-- **PCMCELL (:1202) must use `if (args.size() > 4)` ("expected at most 4")**, not 2: four positional args (Emelt N Tc Ta) work in Release today (`backlog/repro/a3-pcm-positional.cir`).
-- Bounds once B-052 is applied: PSHIFT 2, MZI 1, CROSSING 2, CWSRC 3 (wl, power, phi), VLSRC/EVLSRC 1 (file), MLPROBE 1, PWR 0, PDET 2, PROBE 4 (existing switch default).
-- **Ordering:** land B-052 first, or in the same commit. Landed alone, this fix would reject a 4-arg CWSRC (today the only positional way to set phi) and 2-arg VLSRC/EVLSRC, which load a file in Release today. If this lands first, B-052 must edit the new `if` bounds instead of the asserts.
+Scope and corrections (orchestrator, after the second check):
+- **Skip** `parse_analysis.cpp:34` (bare `.dc`, handled by B-008) and the CWSRC (`:637`), VLSRC (`:705`), EVLSRC (`:858`) and PCMCELL (`:1202`) asserts, which are converted by B-052 together with its index fix. This makes this issue independent of B-052.
+- Remaining bounds: PSHIFT 2, MZI 1, CROSSING 2, MLPROBE 1, PWR 0, PDET 2, PROBE (delete the assert; the switch default already reports it), `.tran` and `.options` as given above.
 - Keep the `nets.size() == n_nets` asserts: they are grammar-guaranteed.
 ## Golden impact
 None (verified on a scratch build with all conversions).
@@ -68,4 +65,4 @@ Required change to the suggested fix: PCMCELL (:1202) must use `if (args.size() 
 Ordering with B-052: land B-052 first or in the same commit. If F-A4-06 lands alone, (a) a 4-arg CWSRC (today the only positional way to set phi) is rejected before the index fix exists, and (b) VLSRC/EVLSRC cannot load a file positionally at all: 1 arg is still ignored and 2 args (which load args[0] in Release today) are rejected. B-052's fix text edits `assert(args.size() <= 2)` -> `<= 4`. If F-A4-06 lands first, that assert no longer exists, so B-052 must change the bound of the new `if` instead.
 Golden-impact text "None" is correct. Locations are correct. The `nets.size() == n_nets` asserts are grammar-guaranteed: keeping them is right.
 
-**Orchestrator:** PCMCELL bound corrected to 4 and ordering dependency on B-052 recorded.
+**Orchestrator:** Scope narrowed: the four positional-arg element sites moved to B-052 (V8 found that PCMCELL needs bound 4 and that CWSRC/VLSRC/EVLSRC bounds depend on the index fix).

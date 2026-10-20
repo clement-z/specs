@@ -28,3 +28,15 @@ B-050, B-054, B-069 (OCTANE uses `p_readout`).
 - Review ids: F-A3-03.
 ## Verification
 I ran the repro with the release binary and with a patched build: the `out2` phase is 0 versus 1 rad. I ran `specs -t det` with the patched build: still "Failure!", with READOUT 0.
+
+**Independent second check (V1, of F-A3-03): CONFIRMED.** Method: ran a3-pdet-readout.cir with the release binary; uncommented detector.cpp:84 on the scratch copy, rebuilt, ran the golden check, the repro and `specs -t det`
+
+- **Before:** `ROOT/PDET1.readout` = 0.001 from #10, but `PROBE{ROOT/out2}.phase` stays 0.
+- **Code:**
+  - parse_element.cpp:1261 binds p_readout AS_WRITER.
+  - detector.cpp:84 is commented out.
+- **With the write restored:**
+  - The out2 phase = 0.9999999999999999 rad.
+  - Golden 44/44 pass (also with --atol 0), so the "None" impact holds.
+  - `specs -t det` still prints "Failure!": detector_tb.cpp never touches `enable`.
+- **Severity and class:** high and needs-design are justified. The readout jitter is also visible: 0.0009999999999999998 / 0.001 / 0.0009999999999999996.
