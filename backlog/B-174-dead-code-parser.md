@@ -1,5 +1,5 @@
 # B-174: Dead code in the parser
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style); main.cpp ParserState leak done by B-170
 location: src/parser/parse_tree.h:460-463, :519-520, :563, :675-680, :702-722, :392-401, src/parser/parse_element.h:47, :74, src/parser/parse_directive.h:57-68, src/parser/parse_directive.cpp:69-125, :128-131, src/parser/parser.y:56-57, :70, :216-220, :430-431, :476-477, :481-495, :517-518, :522-536, :570-571, :697-724, :760-768, :826-829, :865-877, src/parser/parser.l:192, :280, :324-325, :518-519, :566-579, src/parser/parse_tree.cpp:922-924, :953-971, src/main.cpp:65-141, :187
 ## Problem
 Unused or unreachable code:

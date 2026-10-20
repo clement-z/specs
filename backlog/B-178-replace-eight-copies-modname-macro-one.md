@@ -1,5 +1,5 @@
 # B-178: Replace the eight copies of the `__modname` macro with one helper in spx_module.h
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style); unblocked (B-047 landed)
 location: src/devices/probe.cpp, src/devices/octane_cell.cpp, src/devices/octane_segment.cpp, src/devices/octane_matrix.cpp, src/devices/clements.cpp, src/devices/mesh_col.cpp, src/devices/mzi.cpp, src/devices/generic_transmission_device.cpp, src/devices/spx_module.h
 ## Problem
 The `__modname` macro (child-object name builder) is redefined in 8 `.cpp` files (76 call sites). Identifiers with a

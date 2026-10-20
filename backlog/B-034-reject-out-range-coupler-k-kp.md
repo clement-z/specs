@@ -1,5 +1,5 @@
 # B-034: Reject out-of-range COUPLER k/kp/t and SPLITTER ratio (silent 0 W / gain)
-severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: med | category: bug | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 3f7eb1c
 location: src/parser/parse_element.cpp:303-330, src/parser/parse_element.cpp:209-228, src/devices/directional_coupler.cpp:8-9, src/devices/splitter.cpp:7-8
 ## Problem
 Nothing checks the coupling or split values:

@@ -1,5 +1,5 @@
 # B-150: `.include` inside a `.subckt` body is executed at definition time and breaks the body capture
-severity: med | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: med | category: parser | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in f597031
 location: src/parser/parser.l:243-260
 ## Problem
 The `.include` rule is active in the exclusive `SUBCKT_DEFINITION` state. It opens the file immediately and

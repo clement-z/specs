@@ -1,5 +1,5 @@
 # B-018: Config validation is assert-only (gone in Release), and `-R` has no lower bound
-severity: low | category: cli | effort: S | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: cli | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 587c4de
 location: src/specs.h:138-146, src/specs.cpp:43-44,363, src/main.cpp:351
 ## Problem
 `verifyConfig()` is only `assert`s, so Release accepts `.options abstol=-1 reltol=0` silently. `-R` only rejects

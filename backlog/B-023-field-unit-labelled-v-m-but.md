@@ -1,5 +1,5 @@
 # B-023: Field unit is labelled V/m but is √W
-severity: low | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 33bb8bb
 location: src/optical_signal.h:26,234
 ## Problem
 `power() = |E|²` is printed in W, and `CWSource` sets `|E| = sqrt(P)`. The field is therefore √W, but the comment

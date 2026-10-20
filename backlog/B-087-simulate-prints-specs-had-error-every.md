@@ -1,5 +1,5 @@
 # B-087: `simulate()` prints "SPECS had an error" for every verbose run and validates input with `assert`
-severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: python | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 94921a3
 location: pyspecs/specs.py:110-122, :204
 ## Problem
 `if (not rc == 0) or verbose:` prints "SPECS had an error. Here is the full output:" even when `rc == 0`. `p.wait()` after `communicate()` is redundant and `specs_stderr` is always None (stderr is merged into stdout). `assert((netlist_file is not None) or (custom_arguments is not None))` is the user-input validation CLAUDE.md says not to do with assert (it vanishes under `python -O`).

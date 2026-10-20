@@ -1,5 +1,5 @@
 # B-027: Dead engine code in OOP, SPECSConfig and OpticalSignal
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style); crow.cpp:96 already deleted by B-072
 location: src/optical_output_port.h:59-68,78-80,130-170, src/optical_output_port.cpp:26-58,82,108-109,190-299,402-404,416-420, src/specs.h:92,96,116,123-124,136, src/specs.cpp:24,162-174,202-206, src/optical_signal.cpp:66-109, src/devices/time_monitor.cpp:126-149
 ## Problem
 Things that are never used, never set, or always exit:

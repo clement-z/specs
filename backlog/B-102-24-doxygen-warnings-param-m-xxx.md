@@ -1,5 +1,5 @@
 # B-102: 27 Doxygen warnings from wrong `@param m_xxx` names and "Constructor for Waveguide" titles in mzi_active.h
-severity: low | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 4371bc3
 location: src/devices/mzi_active.h:38-45, :86-93, :149-156 (title also "Constructor for Waveguide" at :36, :84, :147)
 ## Problem
 The three constructor comments document the members (`@param m_length_cm`) instead of the parameters (`length_cm`), so Doxygen emits 24 "argument ... of command @param is not found" warnings and drops the descriptions.

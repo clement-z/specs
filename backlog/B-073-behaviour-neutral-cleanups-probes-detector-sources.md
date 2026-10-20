@@ -1,5 +1,5 @@
 # B-073: Behaviour-neutral cleanups in probes, detector, sources and specs.cpp
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style); after B-068
 location: src/devices/probe.h:107-109,115, src/devices/probe.cpp:3,35,44,52,58,65,71,76,93-95,115-117,124, src/devices/detector.h:4,48, src/devices/detector.cpp:3,82,114-130, src/devices/power_meter.h:4-5,10, src/devices/power_meter.cpp:3-4, src/devices/cw_source.h:4, src/devices/value_list_source.cpp:14-19, src/devices/electrical_value_list_source.cpp:14-19, src/specs.cpp:132-136,269-273, src/devices/{probe,octane_cell,octane_segment,octane_matrix,clements,mesh_col,mzi,generic_transmission_device}.cpp (`__modname`)
 ## Problem
 Dead code and noise in my area:

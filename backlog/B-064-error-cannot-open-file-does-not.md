@@ -1,5 +1,5 @@
 # B-064: "Error: Cannot open the file." does not name the file
-severity: low | category: cli | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: cli | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in b4508ef
 location: src/devices/value_list_source.h:58-61, src/devices/electrical_value_list_source.h:55-58
 ## Problem
 A missing values file aborts with a generic message, which makes failures like `cir/paul_3ring_puf` opaque.

@@ -1,5 +1,5 @@
 # B-082: KiCad MZI template maps 4 of its 5 pins and the EVLSRC list template has three columns instead of two
-severity: med | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: med | category: docs | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in a968ab8
 location: utils/specs.kicad_sym:1120 (MZI Sim.Pins), :799 (ELECTRIC_V_SOURCE_LIST Sim.Params)
 ## Problem
 1. `MZI` has 5 pins (pin 5 at the top, `utils/specs.kicad_sym:1461-1463`) and `MZIElement` requires 5 nets (`DECLARE_BIDIR_ELEMENT(MZIElement, ..., 5)`, parse_element.h:85) but `Sim.Pins` is `1=1 2=2 3=3 4=4`; KiCad exports only 4 nets and the line fails to parse.

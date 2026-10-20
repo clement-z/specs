@@ -1,5 +1,5 @@
 # B-075: `double delay;` may be used uninitialised in GenericTransmissionDevice (-Wmaybe-uninitialized)
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style)
 location: src/devices/generic_transmission_device.cpp:163, :221
 ## Problem
 `delay` is assigned only inside the `while (!init_done)` loop (line 183); `init_done` is `volatile`, so GCC cannot prove the loop runs and warns at line 221 (`sc_time(delay, SC_SEC)`). In practice the second loop is reachable only after `init_done = true`, which is set after `delay = Tij.tau`, so this is a false positive, but it shows up in every Release build.
