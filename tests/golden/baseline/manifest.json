@@ -31,6 +31,7 @@
   "opt/tol-resolution-overrides",
   "opt/tracefile-o",
   "opt/vci",
+  "regress/b006-empty-output",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -96,6 +97,12 @@
    "only": "^tb/ac_add_drop-fd$",
    "gtest": false,
    "note": "B-138: new case tb/ac_add_drop-fd (frequency sweep branch of freqsweep_tb)"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:58:43Z",
+   "only": "^regress/b006-",
+   "gtest": false,
+   "note": "B-006: new regression case"
   }
  ]
 }

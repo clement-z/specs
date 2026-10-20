@@ -429,6 +429,16 @@
     "circuits/add_drop.cir"
    ],
    "expect": "fail"
+  },
+  {
+   "id": "regress/b006-empty-output",
+   "args": [
+    "-o",
+    "",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file)"
   }
  ]
 }

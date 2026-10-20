@@ -366,7 +366,8 @@ void SPECSConfig::prepareSimulation() {
         if (!default_trace_file && trace_filename.size())
             default_trace_file = sc_create_vcd_trace_file(trace_filename.c_str());
 
-        default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
+        if (default_trace_file)
+            default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
     }
 
     applyDefaultOpticalOutputPortConfig();
