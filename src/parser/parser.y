@@ -53,8 +53,6 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
     int                     i_val;
     char                    c_val;
     string                 *s_ptr;
-    char                   *c_ptr;
-    vector<double>         *vec_d_ptr;
     pair<string, Variable> *assig_ptr;
     Variable               *variable_ptr;
     vector<Variable>       *vec_var_ptr;
@@ -67,7 +65,6 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 
 %token <d_val> T_NUM
 %token <i_val> T_INT
-%token <i_val> T_NONE
 %token <s_ptr> T_STR
 %token <s_ptr> T_ASSIGN_ID
 %token <s_ptr> T_ELEM_CWSRC T_ELEM_VLSRC T_ELEM_EVLSRC
@@ -121,8 +118,6 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <s_ptr> net.oa.in
 %type <s_ptr> net.oa.out
 
-//%type <s_ptr> bus_name bus bus.oanalog bus.eanalog bus.edigital
-
 // Rules related to subcircuits
 %type <i_val> subcircuit
 %type <i_val> subcircuit.with_ports
@@ -146,7 +141,6 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <assig_ptr> assignment
 %type <variable_ptr> variable variable_base variable_or_empty
 %type <variable_ptr> variable.free_expr variable.delimited_expr
-//%type <variable_ptr> variable.str_without_quotes
 %type <netval_assign_ptr> netval_assignment
 %type <elemattr_ptr> element_attribute
 
@@ -214,11 +208,6 @@ subcircuit.with_ports: T_DIRECTIVE_SUBCKT T_STR
                     }
                 | subcircuit.with_ports port_name
                     {
-                        if (!cur_pt->subcircuits[$1]->kwargs.empty())
-                        {
-                            cerr << "Expected keyword assignment in subcircuit declaration but got: " << *$2 << endl;
-                            exit(1);
-                        }
                         // cout << *$2 << endl;
                         cur_pt->subcircuits[$1]->register_port(*$2);
                         $$ = $1;
@@ -428,8 +417,6 @@ directive.with_args:
   directive.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->directives[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->directives[$1]->args.emplace_back(*$2);
                 $$ = $1;
                 delete $2;
@@ -474,8 +461,6 @@ element.with_args:
   element.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->elements[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->elements[$1]->args.emplace_back(*$2);
                 $$ = $1;
 
@@ -487,13 +472,6 @@ element.with_args:
                 // and therefore added to the element's nets array and discarded from args
                 // this will ensure that args will contain only [sub_name]
                 // for this to work, the X element cannot have args beyond sub_name (only kwargs)
-                if (cur_pt->elements[$1]->args.size() == 2)
-                {
-                    // check if the args[0] is a valid net name
-                    // create net with name args[0] (by default with type NONE)
-                    // add args[0] to nets
-                    // delete args[0] from args
-                }
 
                 delete $2;
             }
@@ -515,8 +493,6 @@ element.x.with_args:
   element.x.with_args net_name_base
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->elements[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->elements[$1]->args.emplace_back(Variable(*$2));
                 $$ = $1;
 
@@ -528,13 +504,6 @@ element.x.with_args:
                 // and therefore added to the element's nets array and discarded from args
                 // this will ensure that args will contain only [sub_name]
                 // for this to work, the X element cannot have args beyond sub_name (only kwargs)
-                if (cur_pt->elements[$1]->args.size() == 2)
-                {
-                    // check if the args[0] is a valid net name
-                    // create net with name args[0] (by default with type NONE)
-                    // add args[0] to nets
-                    // delete args[0] from args
-                }
 
                 delete $2;
             }
@@ -568,8 +537,6 @@ analysis.with_args:
   analysis.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->analyses[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->analyses[$1]->args.emplace_back(*$2);
                 $$ = $1;
                 delete $2;
@@ -670,34 +637,6 @@ net.eanalog: net_name
                 }
 ;
 
-/* --------- BUS type parsing ----------- */
-
-/*
-bus.oanalog: bus_name
-                {
-                    cur_pt->nets[*$1].m_type = ParseNet::OANALOG;
-                    $$ = $1;
-                }
-;
-
-bus.eanalog: bus_name
-                {
-                    cur_pt->nets[*$1].m_type = ParseNet::EANALOG;
-                    $$ = $1;
-                }
-;
-
-bus.edigital: bus_name
-                {
-                    cur_pt->nets[*$1].m_type = ParseNet::EDIGITAL;
-                    $$ = $1;
-                }
-;
-bus: bus.oanalog { $$ = $1; }
-   | bus.eanalog { $$ = $1; }
-   | bus.edigital { $$ = $1; }
-;
-*/
 /* --------- NET and BUS name parsing ----------- */
 
 net_name.base.str:
@@ -733,15 +672,6 @@ net_name: net_name_base
             }
 ;
 
-/*
-bus_name: net_name { $$ = $1; }
-        | net_name_base '<' T_INT '>'
-            {
-                $$ = new string(cur_pt->get_or_create_net(*$1, $3));
-                delete $1;
-            }
-;
-*/
 port_name: net_name_base { $$ = $1; }
 ;
 
@@ -799,10 +729,6 @@ variable_base:
             {
                 $$ = new Variable($1);
             }
-        | T_NONE
-            {
-                $$ = new Variable(Variable::NONE);
-            }
         | '{' T_STR '}'
             {
                 $$ = new Variable(cur_pt->get_variable(*$2));
@@ -837,20 +763,6 @@ variable.free_expr:
 variable:
   variable.free_expr
 ;
-
-/*
-variable.str_without_quotes:
-  T_STR
-    {
-        if (*$1 == "None")
-            $$ = new Variable(Variable::NONE);
-        else
-            $$ = new Variable(*$1);
-        delete $1;
-    }
-| variable;
-;
-*/
 
 variable_or_empty:
   variable

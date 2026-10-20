@@ -58,13 +58,10 @@ Done creating ROOT/COUPLER2
 Creating ROOT/WG_RING_R (reason: unidir backlog)
 Done creating ROOT/WG_RING_R
 Creating ROOT/PROBE1 (reason: unidir backlog)
-created ROOT/PROBE1
 Done creating ROOT/PROBE1
 Creating ROOT/PROBE2 (reason: unidir backlog)
-created ROOT/PROBE2
 Done creating ROOT/PROBE2
 Creating ROOT/PROBE3 (reason: unidir backlog)
-created ROOT/PROBE3
 Done creating ROOT/PROBE3
 Done (elaborating network of ROOT/N00001)
 Exported flattened circuit as JSON > flat.json

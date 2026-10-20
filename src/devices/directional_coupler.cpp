@@ -8,8 +8,6 @@ void DirectionalCouplerUni::on_port_in1_changed()
     m_through_power_dB = 10*log10(m_dc_through_coupling_power) - m_dc_loss;
     m_cross_power_dB = 10*log10(1.0 - m_dc_through_coupling_power) - m_dc_loss;
 
-    m_memory_in1[0] = 0; // initializing for nan wavelength
-
     const double transmission_through = pow(10.0, m_through_power_dB / 20.0);
     const double transmission_cross = pow(10.0, m_cross_power_dB / 20.0);
 
@@ -72,8 +70,6 @@ void DirectionalCouplerUni::on_port_in2_changed()
     m_through_power_dB = 10*log10(m_dc_through_coupling_power) - m_dc_loss;
     m_cross_power_dB = 10*log10(1.0 - m_dc_through_coupling_power) - m_dc_loss;
 
-    m_memory_in2[0] = 0; // initializing for nan wavelength
-
     const double transmission_through = pow(10.0, m_through_power_dB / 20.0);
     const double transmission_cross = pow(10.0, m_cross_power_dB / 20.0);
 
@@ -115,8 +111,6 @@ void DirectionalCouplerBi::on_p0_in_changed()
 {
     m_through_power_dB = 10*log10(m_dc_through_coupling_power) - m_dc_loss;
     m_cross_power_dB = 10*log10(1.0 - m_dc_through_coupling_power) - m_dc_loss;
-
-    m_memory_in0[0] = 0; // initializing for nan wavelength
 
     const double transmission_through = pow(10.0, m_through_power_dB / 20.0);
     const double transmission_cross = pow(10.0, m_cross_power_dB / 20.0);
@@ -190,8 +184,6 @@ void DirectionalCouplerBi::on_p1_in_changed()
     m_through_power_dB = 10*log10(m_dc_through_coupling_power) - m_dc_loss;
     m_cross_power_dB = 10*log10(1.0 - m_dc_through_coupling_power) - m_dc_loss;
 
-    m_memory_in1[0] = 0; // initializing for nan wavelength
-
     const double transmission_through = pow(10.0, m_through_power_dB / 20.0);
     const double transmission_cross = pow(10.0, m_cross_power_dB / 20.0);
 
@@ -234,8 +226,6 @@ void DirectionalCouplerBi::on_p2_in_changed()
     m_through_power_dB = 10*log10(m_dc_through_coupling_power) - m_dc_loss;
     m_cross_power_dB = 10*log10(1.0 - m_dc_through_coupling_power) - m_dc_loss;
 
-    m_memory_in2[0] = 0; // initializing for nan wavelength
-
     const double transmission_through = pow(10.0, m_through_power_dB / 20.0);
     const double transmission_cross = pow(10.0, m_cross_power_dB / 20.0);
 
@@ -277,8 +267,6 @@ void DirectionalCouplerBi::on_p3_in_changed()
 {
     m_through_power_dB = 10*log10(m_dc_through_coupling_power) - m_dc_loss;
     m_cross_power_dB = 10*log10(1.0 - m_dc_through_coupling_power) - m_dc_loss;
-
-    m_memory_in3[0] = 0; // initializing for nan wavelength
 
     const double transmission_through = pow(10.0, m_through_power_dB / 20.0);
     const double transmission_cross = pow(10.0, m_cross_power_dB / 20.0);

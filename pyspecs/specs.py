@@ -1,20 +1,14 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 import os
 import subprocess
 import time
 from .specsparse import *
 
-"""
-Ideas:
-    - generate value files
-    - generate netlists based on graph representations
-    - simulate
-    - paralel run
-    - others?
-
-"""
+# Ideas:
+#     - generate value files
+#     - generate netlists based on graph representations
+#     - simulate
+#     - paralel run
+#     - others?
 
 default_settings = {
     "o": "traces/delete_me",
@@ -83,7 +77,7 @@ def run_and_time(simulator_command, arguments, verbose):
     """Function that runs SPECS and times it.
 
     This is BLOCKING execution, so not intended for paralel
-    usage. For this case, use par_run().
+    usage.
 
     Args:
         simulator_command (str):
@@ -100,13 +94,10 @@ def run_and_time(simulator_command, arguments, verbose):
 
     print("Executing SPECS from python. . .")
 
-    #spec_env = {"SC_COPYRIGHT_MESSAGE":"DISABLE"}
-
     process_call = simulator_command + arguments
 
     tic_ns = time.perf_counter_ns()
     print("Command: ", ' '.join(process_call))
-    #p = subprocess.Popen(process_call, env=spec_env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     p = subprocess.Popen(process_call, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     specs_stdout, _ = p.communicate()
     toc_ns = time.perf_counter_ns()

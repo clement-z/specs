@@ -1,8 +1,6 @@
 from pyDigitalWaveTools.vcd.parser import VcdParser
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import json
 
 def parse_vcd_dataframe(filename):
     """Parses a SPECS VCD file and returns simulation data as a DataFrame.
@@ -19,9 +17,6 @@ def parse_vcd_dataframe(filename):
         vcd = VcdParser()
         vcd.parse(vcd_file)
         data = vcd.scope.toJson()
-
-    # print(json.dumps(data, indent=4, sort_keys=True))
-    simulation_data_df = pd.DataFrame() # initialize empty dataframe
 
     top_level_name = 'SystemC'
     top_scope = None
@@ -50,10 +45,6 @@ def parse_vcd_dataframe(filename):
                 pdets.append(child)
         else:
             values.append(child)
-
-    # print(f'top level values: {[x["name"] for x in values]}')
-    # print(f'top level scopes: {[x["name"] for x in scopes]}')
-    # print(f'top level probes: {[x["name"] for x in probes]}')
 
     is_wl_sweep = check_wl_sweep(top_scope)
     has_wl = False
@@ -126,15 +117,6 @@ def parse_vcd_dataframe(filename):
 
         df_pdet = df_pdet.sort_values('tick')
         df_pdet = df_pdet.reset_index(drop=True)
-        if False:
-            # Add a point next to first value from photodetector
-            # to ensure 'step' appearance (as its more correct)
-            print(df_pdet.head())
-            df_pdet.loc[-1] = df_pdet.loc[0]
-            df_pdet.loc[0, 'tick'] = df_pdet.loc[1]['tick']
-            df_pdet = df_pdet.sort_values('tick')
-            df_pdet = df_pdet.reset_index(drop=True)
-            print(df_pdet.head())
 
         # making sure that time goes first
         df_pdet.insert(0, 'time', df_pdet['tick'] * vcd_get_multiplier(vcd))

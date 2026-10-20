@@ -1,8 +1,5 @@
 #include "devices/mzi.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
 using namespace std;
 
 void MZI::init()

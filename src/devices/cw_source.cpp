@@ -15,8 +15,6 @@ void CWSource::runner()
         cout << endl;
     }
 
-    bool first_run = true;
-
     while (true) {
         // Wait for enable signal
         if (! enable.read().to_bool())
@@ -33,7 +31,7 @@ void CWSource::runner()
         cout << name() << " emitted: " << s << endl;
 
         // Wait for reset
-        if ( !first_run || !reset.read().to_bool())
+        if (!reset.read().to_bool())
         {
             // cout << name() << " waiting for reset" << endl;
             wait(reset.posedge_event());

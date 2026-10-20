@@ -79,16 +79,6 @@ public:
     }
 };
 
-class PowerProbe : public Probe {
-public:
-    virtual void on_port_in_changed();
-};
-
-class PhaseProbe : public Probe {
-public:
-    virtual void on_port_in_changed();
-};
-
 class MLambdaProbe : public spx_module {
 public:
     // Ports
@@ -104,15 +94,10 @@ public:
     sc_signal<sc_logic> enable;
     sc_trace_file *m_Tf;
 
-    sc_signal<double> m_trace_sig_power;
-    sc_signal<double> m_trace_sig_modulus;
-    sc_signal<double> m_trace_sig_phase;
-
     std::set<double> m_lambdas;
     std::map< double, std::vector< unique_ptr<sc_signal<double> > > > m_lambda_signals;
 
     void setTraceFile(sc_trace_file *Tf);
-    void prepare();
 
     // Constructor
     MLambdaProbe(sc_module_name name, set<double> lambdas = {})

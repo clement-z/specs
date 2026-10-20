@@ -36,5 +36,4 @@ Elaborating network of ROOT/a...
 Creating ROOT/CWSRC1 (reason: connection to unidir net)
 Done creating ROOT/CWSRC1
 Creating ROOT/PSHIFT1 (reason: unidir backlog)
-Warning (ROOT/PSHIFT1): default coupling power for DC currently set to field.
 

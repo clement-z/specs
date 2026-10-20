@@ -1,5 +1,5 @@
 # B-142: gtest sources: dead `sc_main`, fixed /tmp trace path, duplicate/dead code, FLOAT_EQ on doubles, non-statement macros
-severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style); B-123/B-125 rewrote the utils.h macros, recheck what remains
+severity: low | category: style/maintainability | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 6bba225 (ws-cleanup C-05), except the `sc_main` stub: under Meson `sc_main` is what runs the tests (no gtest_main), so it stays
 location: src/test/main.cpp:9-15; src/test/devices/waveguide.cpp:15-78,122,130-131,142,167; src/test/utils.h:13-19,79
 ## Problem
 - `sc_main` (main.cpp:9-15) is never called: `GTest::gtest_main` supplies `main` ("Running main() from .../gtest_main.cc" is printed by the binary).

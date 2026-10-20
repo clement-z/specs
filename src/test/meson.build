@@ -21,8 +21,8 @@ if gtest_dep.found()
     implicit_include_directories: false,
   )
 
-  # The tests write the fixed path /tmp/specs_test2.vcd, so they must not run concurrently
-  # (with each other or with the golden suite, which also runs unit_tests).
+  # Kept serial (conservative): the golden suite also runs unit_tests. Trace files are per-process
+  # since B-142 (testing::TempDir() + specs_test_<pid>), so the old shared /tmp path is no longer a reason.
   test('unit', unit_tests_exe,
     protocol: 'gtest',
     suite: 'unit',

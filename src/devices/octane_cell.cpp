@@ -1,8 +1,5 @@
 #include "devices/octane_cell.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
 void OctaneCell::init()
 {
     if(m_isCompact)
@@ -22,16 +19,16 @@ void OctaneCell::init_full()
     double length_for_2pi = 100*lambda/(neff);
 
     // Constructing the instances
-    m_wg1 = make_unique<Waveguide>(__modname("WG_", 0), length_for_2pi, loss_per_cm, neff, ng);
-    m_wg2 = make_unique<Waveguide>(__modname("WG_", 1), length_for_2pi, loss_per_cm, neff, ng);
-    m_wg3 = make_unique<Waveguide>(__modname("WG_", 2), length_for_2pi, loss_per_cm, neff, ng);
-    m_wg4 = make_unique<Waveguide>(__modname("WG_", 3), length_for_2pi, loss_per_cm, neff, ng);
+    m_wg1 = make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(), length_for_2pi, loss_per_cm, neff, ng);
+    m_wg2 = make_unique<Waveguide>(spx_child_name(this, "_WG_", 1).c_str(), length_for_2pi, loss_per_cm, neff, ng);
+    m_wg3 = make_unique<Waveguide>(spx_child_name(this, "_WG_", 2).c_str(), length_for_2pi, loss_per_cm, neff, ng);
+    m_wg4 = make_unique<Waveguide>(spx_child_name(this, "_WG_", 3).c_str(), length_for_2pi, loss_per_cm, neff, ng);
 
-    m_merger = make_unique<Merger>(__modname("Y_", 0), loss_merger);
+    m_merger = make_unique<Merger>(spx_child_name(this, "_Y_", 0).c_str(), loss_merger);
 
-    m_pcm = make_unique<PCMElement>(__modname("PCM_", 0), m_meltEnergy, m_nStates, 0);
+    m_pcm = make_unique<PCMElement>(spx_child_name(this, "_PCM_", 0).c_str(), m_meltEnergy, m_nStates, 0);
 
-    m_pd = make_unique<Detector>(__modname("PD_", 0));
+    m_pd = make_unique<Detector>(spx_child_name(this, "_PD_", 0).c_str());
 
     // Connecting
     m_wg1->p_in(p_in_r);
@@ -72,11 +69,11 @@ void OctaneCell::init_compact()
     (void)loss_per_cm;
     (void)length_for_2pi;
 
-    m_merger = make_unique<Merger>(__modname("Y_", 0), loss_merger);
+    m_merger = make_unique<Merger>(spx_child_name(this, "_Y_", 0).c_str(), loss_merger);
 
-    m_pcm = make_unique<PCMElement>(__modname("PCM_", 0), m_meltEnergy, m_nStates, 0);
+    m_pcm = make_unique<PCMElement>(spx_child_name(this, "_PCM_", 0).c_str(), m_meltEnergy, m_nStates, 0);
 
-    m_pd = make_unique<Detector>(__modname("PD_", 0));
+    m_pd = make_unique<Detector>(spx_child_name(this, "_PD_", 0).c_str());
 
     // Connecting
     m_merger->p_in1(p_in_r);

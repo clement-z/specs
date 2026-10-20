@@ -66,40 +66,6 @@ void TimeMonitor::on_trigger() {
         // Report if it's time to do it
         if (elapsed_seconds.count() >= m_wallclock_period)
         {
-            #if 0
-            double error_sum = 0;
-            double max_error = 0;
-            double emitted_power_sum = 0;
-            double max_emitted_power = 0;
-            string max_error_name;
-            complex<double> culprit_emitted;
-            double culprit_emitted_pow = 0.0;
-            complex<double> culprit_wanted;
-            vector<bool> is_empty(oops.size(), false);
-            int i = 0;
-            int max_i = 0;
-            for (const auto &oop : oops)
-            {
-                is_empty[i] = oop->isempty();
-                error_sum += oop->current_err_fd();
-                max_error = max(max_error, oop->current_err_fd());
-                if (max_error == oop->current_err_fd())
-                // if (strcmp(oop->name(), "crow.dc_0.out1_delayed_writer") == 0)
-                {
-                    max_error_name = oop->name();
-                    // deprecated following lines on 05/04:
-                    // culprit_emitted = oop->m_emitted_val_fd;
-                    // culprit_emitted_pow = oop->m_emitted_val_fd.power();
-                    culprit_wanted = oop->m_cur_val_fd;
-                    max_i = i;
-                }
-                // deprecated following lines on 05/04:
-                // emitted_power_sum += oop->m_emitted_val_fd.power();
-                // max_emitted_power = max(max_emitted_power, oop->m_emitted_val_fd.power());
-                i++;
-            }
-            #endif
-
             std::chrono::duration<double> elapsed_seconds_since_start = now - first;
             last = now;
             auto t = sc_time_stamp().to_seconds();
@@ -122,31 +88,6 @@ void TimeMonitor::on_trigger() {
             //<< "\tCumulated power output of all ports: " << emitted_power_sum << endl
             //<< "\tMax port power output: " << max_emitted_power << endl
             << "\tSimulation speed (NS/s): " << t*1e9 / elapsed_seconds_since_start.count() << endl;
-
-            // if (max_error < specsGlobalConfig.oop_configs[0]->m_abs_tol_power)
-            if (false)
-            {
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // DOES NOT WORK IF CODE IS COMPILED WITH -O3 ???
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                specsGlobalConfig.drop_all_events = true;
-                wait(SC_ZERO_TIME);
-                while (true) {
-                    volatile bool isempty = true;
-                    for (const auto &oop : oops) {
-                        isempty &= oop->isempty();
-                        if (oop->isempty())
-                        {
-                            cout << oop->name() << " didnt empty its queue" << endl;
-                        }
-                    }
-                    if (isempty)
-                        break;
-                    wait(SC_ZERO_TIME);
-                }
-                specsGlobalConfig.drop_all_events = false;
-                wait(sc_time::from_value(1));
-            }
         }
     }
 }

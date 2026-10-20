@@ -847,10 +847,7 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised."
   },
   {
    "id": "tb/detector",
@@ -858,10 +855,7 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised. The detector names printed by SPECSConfig::applyDefaultTraceFileToAllSignals come out in pointer order (uut/uut2 swap between -O0 and -O3), so stdout is compared order-insensitively.",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised."
   },
   {
    "id": "tb/pcm",

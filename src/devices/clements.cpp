@@ -1,8 +1,5 @@
 #include "devices/clements.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
 void Clements::init_ports()
 {
     // --------------------------------------------------------------------------//
@@ -14,8 +11,8 @@ void Clements::init_ports()
     p_out.clear();
     for(size_t i = 0; i < m_N; i++)
     {
-        p_in.push_back(make_unique<spx::oa_port_in_type>(__modname("IN_", i)));
-        p_out.push_back(make_unique<spx::oa_port_out_type>(__modname("OUT_", i)));
+        p_in.push_back(make_unique<spx::oa_port_in_type>(spx_child_name(this, "_IN_", i).c_str()));
+        p_out.push_back(make_unique<spx::oa_port_out_type>(spx_child_name(this, "_OUT_", i).c_str()));
     }
 
     // --------------------------------------------------------------------------//
@@ -29,8 +26,8 @@ void Clements::init_ports()
     size_t num_of_electrical_ports = (m_N * (m_N - 1) / 2);
     for(size_t i = 0; i < num_of_electrical_ports; i++)
     {
-        p_vphi.push_back(make_unique<sc_in<double>>(__modname("VPHI_", i)));
-        p_vtheta.push_back(make_unique<sc_in<double>>(__modname("VTHETA_", i)));
+        p_vphi.push_back(make_unique<sc_in<double>>(spx_child_name(this, "_VPHI_", i).c_str()));
+        p_vtheta.push_back(make_unique<sc_in<double>>(spx_child_name(this, "_VTHETA_", i).c_str()));
     }    
 }
 
@@ -49,7 +46,7 @@ void Clements::init()
     // --------------------------------------------------------------------------//
     for(size_t j = 0; j < num_cols; j++)
     {
-        m_mesh_cols.push_back(make_unique<MeshCol>(__modname("COL_", j),
+        m_mesh_cols.push_back(make_unique<MeshCol>(spx_child_name(this, "_COL_", j).c_str(),
                             m_N, j, m_length_cm, m_attenuation_wg_dB_cm,
                             m_attenuation_coupler_dB, m_attenuation_ps_dB,
                             m_neff, m_ng));
@@ -62,7 +59,7 @@ void Clements::init()
     // --------------------------------------------------------------------------//
     // --------------------------------------------------------------------------//
     for(size_t i = 0; i < num_wires; i++)
-        m_optical_connect.push_back(make_unique<spx::oa_signal_type>(__modname("W_", i)));
+        m_optical_connect.push_back(make_unique<spx::oa_signal_type>(spx_child_name(this, "_W_", i).c_str()));
     
     // --------------------------------------------------------------------------//
     // --------------------------------------------------------------------------//

@@ -3,7 +3,6 @@
 #include "tb/directional_coupler_tb.h"
 
 #include "utils/general_utils.h"
-#include "devices/generic_2x2_coupler.h"
 
 void DirectionalCoupler_tb::run_1()
 {

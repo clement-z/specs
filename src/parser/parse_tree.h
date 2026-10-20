@@ -389,16 +389,6 @@ struct ParseSubcircuit {
         if ( !kwargs.empty() )
             cout << "\b\b";
         cout << "}" << endl;
-        if (false)
-        {
-            cout << "###########################" << endl;
-            cout << "## Start netlist of " << name << endl;
-            cout << "###########################" << endl;
-            cout << netlist;
-            cout << "###########################" << endl;
-            cout << "## End netlist of " << name << endl;
-            cout << "###########################" << endl;
-        }
     }
     string to_json() const;
     string kind() const
@@ -457,10 +447,6 @@ struct ParseNet {
         return m_bidirectional || (m_writers_count == 2);
         //return m_bidirectional || (m_writers_count == 2) || (m_readers_count == 2);
     }
-    bool validate() const
-    {
-        return m_writers_count <= 2 && m_ports_count <= 2;
-    }
 
     /* setters */
     inline bool setType(Type type, bool force = false) {
@@ -516,9 +502,6 @@ struct ParseElement {
     vector<Variable> args; // list of non-keyword arguments found on netlist
     map<string, Variable> kwargs; // list of kw arguments found on netlist
 
-    const int n_nets = 0;
-    const bool bidirectionalable = false;
-
     ParseElement(const string &name)
     : name(name)
     {}
@@ -560,7 +543,6 @@ struct ParseElement {
     }
 
     virtual string kind() const { return "UNDEFINED"; }
-    virtual bool bidir_capable() const { return false; }                            \
 
     virtual ~ParseElement() {}
 
@@ -672,13 +654,6 @@ struct ParseTree {
         local_assignments[name] = val;
     }
 
-    template <typename T>
-    void set_global_variable(string &name, T val)
-    {
-        // will throw a compile error if type T is not supported by Variable
-        global_assignments[name] = val;
-    }
-
     Variable get_variable(string &name)
     {
         // try to find variable in locals table first
@@ -699,27 +674,6 @@ struct ParseTree {
     void print() const;
     string to_json() const;
 
-    ParseTree *clone() const
-    {
-        ParseTree *clone = new ParseTree(name);
-
-        clone->parent = nullptr;
-        clone->ports = ports;
-        clone->nets = nets;
-        clone->local_assignments = local_assignments;
-        clone->unnamed_net_count = unnamed_net_count;
-
-        for (const auto &x : elements)
-            clone->elements.push_back(x->clone());
-        for (const auto &x : analyses)
-            clone->analyses.push_back(x->clone());
-        for (const auto &x : directives)
-            clone->directives.push_back(x->clone());
-        for (const auto &x : subcircuits)
-            clone->subcircuits.push_back(x->clone());
-
-        return clone;
-    }
     void build_circuit();
     void flatten();
 

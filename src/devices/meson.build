@@ -20,7 +20,6 @@ core_sources += files(
   'phaseshifter.cpp',
   'power_meter.cpp',
   'probe.cpp',
-  'ring.cpp',
   'splitter.cpp',
   'time_monitor.cpp',
   'value_list_source.cpp',

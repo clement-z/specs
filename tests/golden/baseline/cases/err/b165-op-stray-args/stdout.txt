@@ -32,7 +32,6 @@ Elaborating network of ROOT/a...
 Creating ROOT/CWSRC1 (reason: connection to unidir net)
 Done creating ROOT/CWSRC1
 Creating ROOT/PROBE1 (reason: unidir backlog)
-created ROOT/PROBE1
 Done creating ROOT/PROBE1
 Done (elaborating network of ROOT/a)
 

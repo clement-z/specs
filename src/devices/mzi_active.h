@@ -41,7 +41,7 @@ public:
      * @param attenuation_dB_cm loss per cm of wgs
      * @param neff neff of wgs
      * @param ng ng of wgs
-     * @param dc_loss_dB insertion loss of the y-junctions
+     * @param dc_loss_dB insertion loss of the directional couplers
      * @param ps_loss_dB insertion loss of the phase shifter
      * */
     MZIActiveBase(sc_module_name name,
@@ -89,7 +89,7 @@ public:
      * @param attenuation_dB_cm loss per cm of wgs
      * @param neff neff of wgs
      * @param ng ng of wgs
-     * @param dc_loss_dB insertion loss of the y-junctions
+     * @param dc_loss_dB insertion loss of the directional couplers
      * @param ps_loss_dB insertion loss of the phase shifter
      * */
     MZIActiveUni(sc_module_name name,
@@ -152,7 +152,7 @@ public:
      * @param attenuation_dB_cm loss per cm of wgs
      * @param neff neff of wgs
      * @param ng ng of wgs
-     * @param dc_loss_dB insertion loss of the y-junctions
+     * @param dc_loss_dB insertion loss of the directional couplers
      * @param ps_loss_dB insertion loss of the phase shifter
      * */
     MZIActiveBi(sc_module_name name,

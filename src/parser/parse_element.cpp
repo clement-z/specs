@@ -297,7 +297,7 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
     bool bidirectional = false;
     for (const auto &net : nets)
     {
-        // for waveguide, if any net is bidir, module has to be bidir
+        // for coupler, if any net is bidir, module has to be bidir
         bidirectional |= pt_helper.nets->at(net).bidirectional();
     }
 
@@ -320,10 +320,10 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
             // convert from cross-coupling field coef
             obj->m_dc_through_coupling_power = 1 - pow(p.second.as_double(), 2);
         else if (kw == "KP" || kw == "KPOW" || kw == "KPOWER")
-            // convert from cross-coupling field coef
+            // power cross-coupling coefficient
             obj->m_dc_through_coupling_power = 1 - p.second.as_double();
         else if (kw == "T")
-            // convert from cross-coupling field coef
+            // through field coefficient
             obj->m_dc_through_coupling_power = pow(p.second.as_double(), 2);
         else if (kw == "LOSS")
             obj->m_dc_loss = p.second.as_double();
@@ -385,8 +385,6 @@ INSTANTIATE_AND_CONNECT_BI(PhaseShifterElement, pt_helper)
 sc_module *PhaseShifterElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
-
-    cout << "Warning (" << name << "): default coupling power for DC currently set to field." << endl;
 
     // Verify number of nodes
     assert(nets.size() == n_nets);
@@ -487,8 +485,6 @@ sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
 
-    cout << "Warning (" << name << "): default coupling power for DC currently set to field." << endl;
-
     // Verify number of nodes
     assert(nets.size() == n_nets);
 
@@ -511,7 +507,6 @@ sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
     }
     // Parse positional arguments
     if(args.size() > 0)
-        // convert from cross-coupling field coef
         obj->m_ps_sens_rad_v = args[0].as_double();
     // TODO: other positional args
 
@@ -521,7 +516,6 @@ sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "SENSITIVITY")
-            // convert from cross-coupling field coef
             obj->m_ps_sens_rad_v = p.second.as_double();
         else if (kw == "LENGTH")
             obj->m_length_cm = 100 * p.second.as_double();
@@ -667,7 +661,6 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
     // Parse positional arguments
     if(args.size() > 1)
-        // convert from cross-coupling field coef
         obj->setWavelength(args[1].as_double());
     if(args.size() > 2)
         obj->setPower(args[2].as_double());
@@ -680,10 +673,8 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "WL" || kw == "WAVELENGTH")
-            // convert from cross-coupling field coef
             obj->setWavelength(p.second.as_double());
         else if (kw == "POWER")
-            // convert from cross-coupling field coef
             obj->setPower(p.second.as_double());
         else if (kw == "PHI")
             continue; // handle it after all power commands are executed
@@ -1075,7 +1066,6 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
             exit(1);
         }
     }
-    cout<< "created " << obj->name() << endl;
     return obj;
 }
 
@@ -1272,7 +1262,6 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         cerr << "PCM Cell needs values for both Emelt and Nstates" << endl;
         exit(1);
     }
-    cout << "-----" << endl;
     return obj;
 }
 

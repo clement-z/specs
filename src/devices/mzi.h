@@ -11,7 +11,7 @@
 #include "devices/phaseshifter.h"
 #include "devices/waveguide.h"
 
-/** A unidirectional waveguide module. */
+/** A Mach-Zehnder interferometer module. */
 class MZI : public spx_module {
 public:
     // Ports
@@ -40,7 +40,7 @@ public:
     spx::oa_signal_type w1, w2, w3, w4, w5, w6;
 
     unique_ptr<PhaseShifter> PS1, PS2;
-    unique_ptr<Waveguide> WG1, WG2, WG3;
+    unique_ptr<Waveguide> WG1, WG2;
     unique_ptr<DirectionalCoupler> DC1,DC2;
 
     virtual void init();

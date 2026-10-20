@@ -214,7 +214,7 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
 
             // first determine if the connected port was writing or reading the signal
             bool has_writer = pt->nets[net_name].m_connect_writer_count;
-            bool has_reader = pt->nets[net_name].m_connect_reader_count;
+            [[maybe_unused]] bool has_reader = pt->nets[net_name].m_connect_reader_count;
 
             // only one should be true since the net was unidirectional
             assert(has_writer ^ has_reader);
@@ -242,7 +242,6 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
             circuit_signals[net_name].clear(); // will delete the net through the destructor
             circuit_signals[net_name] = pt->nets.at(net_name).create(net_name);
         }
-        cout << "\t" << circuit_signals[net_name][0]->name() << "," << circuit_signals[net_name][1]->name() << endl;
     }
 }
 
@@ -927,11 +926,6 @@ void ParseTree::flatten()
             sub_pt.nets.erase(internal_net_name);
         } // for (size_t i = 0; i < subcircuit->ports.size(); ++i)
 
-        // show result of translation
-        if (false)
-            for (const auto &p : net_names_translations)
-                cout << p.first << " <==> " << p.second << endl;
-
         // translate internal net names by modifying the elements within the
         // subcircuit which are bound to them
         for (auto subelem : sub_pt.elements)
@@ -957,27 +951,6 @@ void ParseTree::flatten()
         delete elem;
         elem = nullptr;
     } // for (auto elem : elements)
-
-    // Print new list of elements and nets
-    if (false)
-    {
-        cout << "-----------" << endl;
-        cout << elements_flat.size() << " elements" << endl;
-        for (const auto &x : elements_flat)
-        {
-            cout << " - ";
-            x->print();
-        }
-
-        cout << "-----------" << endl;
-        cout << nets_flat.size() << " named nets" << endl;
-        for (const auto &x : nets_flat)
-            cout << " - " << x.first << ": " << x.second.type_str()
-            << "<" << x.second.size() << ">"
-            << (x.second.bidirectional() ? "b" : "u")
-            << " (" << x.second.m_writers_count << "|" << x.second.m_readers_count << ")"
-            << endl;
-    }
 
     // move to flattened nets and elements
     nets = nets_flat;

@@ -8,8 +8,6 @@
 using std::vector;
 using std::set;
 
-bool sc_object_is_module(const sc_object &obj);
-
 // Return vector containing all children objects (expanded) of obj
 set<sc_object *> sc_collect_children_object(sc_object* obj);
 

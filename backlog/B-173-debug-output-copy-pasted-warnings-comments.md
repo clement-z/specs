@@ -1,5 +1,5 @@
 # B-173: Debug output, copy-pasted warnings and comments, duplicate TRACEALL branch
-severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: deferred to ws-cleanup (style)
+severity: low | category: style/maintainability | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 4880c3d, bbce9e2, baseline 7866df4 (ws-cleanup C-04, C-08)
 location: src/parser/parse_element.cpp:378, :475, :1058, :1247, :304, :315, :318, :321, :495, :505, :647, :660, :663, src/parser/parse_tree.cpp:245, src/parser/parse_directive.cpp:38-39, src/parser/parse_analysis.h:65-66
 ## Problem
 - PSHIFT (:378) and MZI (:475) print `default coupling power for DC currently set to field.`, copy-pasted from the

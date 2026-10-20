@@ -130,7 +130,7 @@ void SPECSConfig::runDCAnalysis()
         mlprobe->enable = sc_logic(0);
     }
 
-    // Enable photodetectors
+    // Disable photodetectors
     for (auto pdet: all_photodetectors) {
         // Remark: Photodetectors could in fact be left enabled ?
         // Would that serve any purpose though...?
@@ -165,19 +165,8 @@ void SPECSConfig::runDCAnalysis()
 
         // Reset OOP and set internal signals to new wavelength
         for (auto oop: all_oop) {
-            #if 1 // reset OOP
             oop->reset();
             // TODO: also reset photodetectors?
-            #elif 0 // remove previous wavelengths from OOP but keep value
-            if (wavelengths_vector.size() >= 2)
-            {
-                oop->swap_wavelengths(wavelengths_vector.size()-1, wavelengths_vector.size()-2);
-                oop->delete_wavelength(wavelengths_vector.size()-2);
-                oop->m_skip_next_convergence_check = true;
-            }
-            #else
-            // do nothing
-            #endif
         }
 
         // run simulation and advance one tick
@@ -204,12 +193,6 @@ void SPECSConfig::runTRANAnalysis()
 
     // Run OP analysis
     runOPAnalysis();
-
-    // Set values of signals according to IC directive
-    for (auto &ic_order : ic_orders)
-    {
-        //ic_order.second.first->write(ic_order.second.second);
-    }
 
     // Enable probes
     for (auto probe: all_probes) {
@@ -272,12 +255,6 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
         p->setTraceFile(default_trace_file);
     }
 
-    // auto all_mlprobes = sc_get_all_object_by_type<MLambdaProbe>();
-    // for (auto p: all_mlprobes) {
-    //     p->m_Tf = default_trace_file;
-    //     p->prepare();
-    // }
-
     auto all_mlambda_probes = sc_get_all_object_by_type<MLambdaProbe>();
     for (auto p: all_mlambda_probes) {
         p->setTraceFile(default_trace_file);
@@ -306,15 +283,11 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
     // TODO: refactor ↓
     auto all_pdets = sc_get_all_object_by_type<Detector>();
     for (auto &pdet: all_pdets) {
-        string detname = pdet->name();
-        cout << detname << endl;
         pdet->trace(default_trace_file);
     }
 
     auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
     for (auto &pwr_meter: all_pwr_meters) {
-        string pwr_meter_name = pwr_meter->name();
-        cout << pwr_meter_name << endl;
         pwr_meter->trace(default_trace_file);
     }
 }

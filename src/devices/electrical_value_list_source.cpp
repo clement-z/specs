@@ -11,12 +11,6 @@ void EVLSource::runner()
     {
         cout << name() << ":" << endl;
         cout << "value list (" << m_values_queue.size() << " values)";
-        if (false)
-        {
-            cout << ":" << endl;
-            for (const auto& val : m_values_queue)
-                cout << "\t" << "@" << sc_time(val.first, SC_SEC) << ": " << val.second << endl;
-        }
         cout << endl;
         cout << "--> " <<
             port_channel_name(p_out) << endl;

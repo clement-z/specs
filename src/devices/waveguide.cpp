@@ -36,7 +36,6 @@ void WaveguideUni::on_port_in_changed()
         cout << "ng = " << m_ng << "" << endl;
         cout << "transmission_power = " << pow(transmission, 2) << " W/W" << endl;
         cout << "group delay = " << group_delay_ns << " ns" << endl;
-        // cout << "dneff/dlambda = " << dneff_dlambda*1e-6 << " um^-1" << endl;
         cout << "phase delay = " << 1e9 * m_length_cm * 1e-2 / (c / m_neff) << " ns";
         cout << " ("
                 << fmod((2 * M_PI * m_neff / 1.55e-6) * m_length_cm * 1e-2, 2 * M_PI)
@@ -134,7 +133,6 @@ void WaveguideBi::on_p0_in_changed()
         cout << "ng = " << m_ng << "" << endl;
         cout << "transmission_power = " << pow(transmission, 2) << " W/W" << endl;
         cout << "group delay = " << group_delay_ns << " ns" << endl;
-        // cout << "dneff/dlambda = " << dneff_dlambda*1e-6 << " um^-1" << endl;
         cout << "phase delay = " << 1e9 * m_length_cm * 1e-2 / (c / m_neff) << " ns";
         cout << " ("
                 << fmod((2 * M_PI * m_neff / 1.55e-6) * m_length_cm * 1e-2, 2 * M_PI)

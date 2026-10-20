@@ -13,7 +13,7 @@ void PhaseShifterUni::on_port_in_changed()
         cout << name() << ":" << endl;
         cout << "transmission_power = " << pow(transmission_field,2) << " W/W" << endl;
         cout << "sensitivity = " << m_sensitivity << " rad/V" << endl;
-        cout << "initial phase delay = " << m_phaseshift_rad << " rad @1.55)" << endl;
+        cout << "initial phase delay = " << m_phaseshift_rad << " rad" << endl;
         cout << port_channel_name(p_in);
         cout << " --> ";
         cout << port_channel_name(p_out);
@@ -88,7 +88,7 @@ void PhaseShifterBi::on_p0_in_changed()
         cout << name() << ":" << endl;
         cout << "transmission_power = " << pow(transmission_field,2) << " W/W" << endl;
         cout << "sensitivity = " << m_sensitivity << " rad/V" << endl;
-        cout << "initial phase delay = " << m_phaseshift_rad << " rad @1.55)" << endl;
+        cout << "initial phase delay = " << m_phaseshift_rad << " rad" << endl;
         cout << port_channel_name(p0_in);
         cout << " --> ";
         cout << port_channel_name(p1_out);

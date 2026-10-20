@@ -1,13 +1,11 @@
 #pragma once
 
 #include <systemc.h>
-#include <fstream>
-#include <random>
 
 #include "optical_output_port.h"
 #include "optical_signal.h"
 #include "specs.h"
-#include "spx_module.h"
+#include "devices/spx_module.h"
 
 /* Power meter (DC component only) */
 class PowerMeter : public spx_module {

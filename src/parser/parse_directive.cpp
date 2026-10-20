@@ -75,8 +75,6 @@ void OPTIONSDirective::create() const
             }
             specsGlobalConfig.default_resolution_multiplier = v;
         }
-        else if (kw == "TRACEALL")
-            specsGlobalConfig.trace_all_optical_nets = p.second.as_double();
         else if (kw == "TEST_VARIABLE")
             cout << kw << "(" << p.second.kind() << "): " << p.second.get_str() << endl;
         else {
@@ -105,68 +103,5 @@ void NODESETDirective::print() const
 void NODESETDirective::create() const
 {
     cerr << "NODESET is disabled pending bugfixes" << endl;
-    exit(1);
-#if 0
-    map<string, pair<spx::oa_signal_type *, oa_value_type>> ic_map;
-    auto &signals = parent->circuit_nets;
-    for (const auto &x : net_assignments)
-    {
-        const auto &key = x.first;
-        if (signals.count(key) == 0)
-        {
-            cerr << "Net not found " << key << endl;
-            exit(1);
-        }
-        if (ic_map.count(key) == 0)
-        {
-            //FIXME:
-            auto sig = dynamic_cast<oa_signal_type *>(signals[key].get());
-            auto initial_val = sig->read();
-            auto sig_address = dynamic_cast<oa_signal_type *>(signals[key].get());
-            pair<oa_signal_type *, oa_value_type> assignment{sig_address, initial_val};
-            ic_map.emplace(key, assignment);
-        }
-        oa_value_type signal_val = ic_map[key].second;
-        for (const auto &assignment: x.second)
-        {
-            string attribute_name = assignment.first;
-            strutils::toupper(attribute_name);
-            const Variable &value = assignment.second;
-
-            // cout << attribute_name << endl;
-            if (attribute_name == "P" || attribute_name == "POW" || attribute_name == "POWER")
-            {
-                signal_val.m_field = polar(sqrt(value.as_double()), arg(signal_val.m_field));
-                // cout << "################" << endl;
-                // cout << signal_val << endl;
-            }
-            else if (attribute_name == "PHASE" || attribute_name == "PHI")
-            {
-                signal_val.m_field = polar(abs(signal_val.m_field), value.as_double());
-                // cout << "################" << endl;
-                // cout << signal_val << endl;
-            }
-            else if (attribute_name == "WL" || attribute_name == "LAMBDA" || attribute_name == "WAVELENGTH")
-            {
-                signal_val.setWavelength(value.as_double());
-                // cout << "################" << endl;
-                // cout << signal_val << endl;
-            }
-            else
-            {
-                cerr << "Unknown attribute" << endl;
-                exit(1);
-            }
-        }
-        specsGlobalConfig.nodeset_orders[key] = pair<oa_signal_type *, oa_value_type>(
-            dynamic_cast<oa_signal_type *>(signals[key].get())
-            , signal_val);
-    }
-#endif
-}
-
-void ICDirective::create() const
-{
-    cerr << "IC directive is not implemented" << endl;
     exit(1);
 }
