@@ -144,7 +144,8 @@ int do_circuit(const string &filename, bool is_dry_run = false, const string& js
 int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer="")
 {
     yyscan_t scanner;
-    yylex_init_extra(new ParserState(), &scanner);
+    ParserState *parser_state = new ParserState();
+    yylex_init_extra(parser_state, &scanner);
 
     for(const auto &fname: filenames)
         yy_add_content_from_file(fname, scanner);
@@ -168,6 +169,7 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
 
     //yy_delete_buffer(buf, scanner);
     yylex_destroy(scanner);
+    delete parser_state;
 
     // Return if unsuccessful
     if (parsing_result != 0) {

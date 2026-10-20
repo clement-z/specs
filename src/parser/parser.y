@@ -186,10 +186,12 @@ line: %empty
 local_assignment: T_LOCAL_ASSIGNMENT assignment
                     {
                         cur_pt->set_local_variable($2->first, $2->second);
+                        delete $2;
                     }
                 | local_assignment assignment
                     {
                         cur_pt->set_local_variable($2->first, $2->second);
+                        delete $2;
                     }
 ;
 

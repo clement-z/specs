@@ -128,18 +128,12 @@ int yy_load_next_buf(yyscan_t scanner)
 
 void yy_add_content_from_string(const string &str, const string &desc, yyscan_t &scanner)
 {
-    // Allocate memory for the string (c-style)
-    // necessary as flex will delete the buffer
-    char* cstr = new char[str.size() + 1];
-
-    // Copy the contents of the std::string to the new memory
-    std::strcpy(cstr, str.c_str());
-
     netlist_content_t netlist_content;
 
     netlist_content.type = netlist_content_t::STRING;
     netlist_content.description = desc;
-    netlist_content.buf = yy_scan_string(cstr, scanner);
+    // yy_scan_string copies the string into a buffer owned by flex
+    netlist_content.buf = yy_scan_string(str.c_str(), scanner);
     netlist_content.fp = nullptr;
     netlist_content_fifo.push_back(netlist_content);
 }

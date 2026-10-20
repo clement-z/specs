@@ -342,12 +342,16 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     if (directives.size() > 0)
     {
         cerr << name << ": found a directive in subcircuit, ignoring." << endl;
+        for (const auto &x : directives)
+            delete x;
         directives.clear();
     }
 
     if (analyses.size() > 0)
     {
         cerr << name << ": found an analysis in subcircuit, ignoring." << endl;
+        for (const auto &x : analyses)
+            delete x;
         analyses.clear();
     }
     // print();
