@@ -152,12 +152,14 @@ The current baseline was recorded with the CMake Release build (GCC 11.5,
 `-std=gnu++20 -O3 -march=native`, SystemC 3.0.1). The largest file is about
 400 kB, so nothing is gzipped or summarised.
 
-**gtest provenance:** the in-tree `unit_tests` target does not compile
-(`src/test/utils.h:81` contains `static_assert(false, "Work in progress…")`, and
-`EXPECT_ANGLE_EQ` misuses `EXPECT_PRED_FORMAT2`). The gtest baseline was
-recorded from an out-of-tree copy with exactly those two spots patched. Result:
-`A.B` PASS, `Waveguide.Instantiation` PASS, `Waveguide.OperatingPoint` FAIL
-(the angle check is unfinished).
+**gtest provenance:** the gtest baseline is recorded from the in-tree
+`unit_tests` (Meson: `<builddir>/src/test/unit_tests`) and re-recorded on its
+own with `record --only '^gtest' --unit-tests ...` (the `rerecords` list of
+`manifest.json` says when and why). Every test PASSes, `Waveguide.OperatingPoint`
+included since the angle check in `src/test/utils.h` was finished upstream
+(b7d6fff; B-123). The first
+baseline came from an out-of-tree patched copy, because `unit_tests` did not
+compile then; it had `Waveguide.OperatingPoint` FAIL.
 
 `tests/golden/.gitignore` re-includes `*.vcd`/`*.json`/`baseline/**`, because
 the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.

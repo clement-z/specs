@@ -77,6 +77,12 @@
    "only": "^cir/subckt_test$",
    "gtest": false,
    "note": "B-132: circuits/subckt_test.cir syntax fixed; exit 1 -> 0, no VCD"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T06:59:45Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-123: in-tree unit_tests with the angle check finished upstream (b7d6fff, CmpHelperAngleEQ); Waveguide.OperatingPoint FAIL -> PASS"
   }
  ]
 }
