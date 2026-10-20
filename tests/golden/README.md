@@ -31,6 +31,13 @@ python3 -I tests/golden/run_golden.py compare --baseline DIR_A --candidate DIR_B
 python3 -I tests/golden/run_golden.py list
 ```
 
+With Meson, `check` (default tolerances, `-j 4`, `--unit-tests` when the unit
+tests are built) is also registered as a test (`tests/golden/meson.build`):
+
+```sh
+meson test -C <builddir> --suite golden --print-errorlogs
+```
+
 Useful options (all sub-commands that compare):
 
 | option | default | meaning |
@@ -177,7 +184,10 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   * CMake Release (GCC, `-O3`),
   * CMake Debug (`-O0`),
   * the legacy Makefile build (`-std=c++20 -O2 -g`, bit-identical to Release),
-  * a clang Release build.
+  * a clang Release build;
+  * the Meson builds (2026-10, `discover/meson/VALIDATION.md`): GCC default
+    and `-Db_ndebug=true` are bit-identical (`--rtol 0 --atol 0
+    --print-slack 0`); clang and `-Dnative=false` pass with `--atol 0`.
 
   The largest numeric deviation was 1.1e-13 relative. All of them also pass
   with `--atol 0`.
