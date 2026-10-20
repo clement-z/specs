@@ -1,4 +1,5 @@
 #include "devices/bitstream_source.h"
+#include "utils/sysc_utils.h"
 
 #include <random>
 #include <cstdlib>
@@ -34,7 +35,7 @@ void BitstreamSource::runner()
             cout << bit;
         }
     }
-    cout << " --> " << (dynamic_cast<sc_signal<OpticalSignal> *>(p_out.get_interface()))->name();
+    cout << " --> " << port_channel_name(p_out);
     cout << endl;
     cout << endl;
 

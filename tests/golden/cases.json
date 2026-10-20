@@ -766,6 +766,18 @@
    "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward"
   },
   {
+   "id": "regress/b036-vci-crow",
+   "args": [
+    "--vci",
+    "-t",
+    "ac_crow"
+   ],
+   "ignore_files": [
+    "traces/crow_tb.vcd"
+   ],
+   "note": "B-036: --vci printing used to segfault (exit 139) on ports bound to a channel that is not an spx::oa_signal_type (CROW uses sc_signal<OpticalSignal>). The VCD is that of tb/ac_crow (apart from verbose_component_initialization), so it is not stored"
+  },
+  {
    "id": "tb/wg",
    "args": [
     "-t",

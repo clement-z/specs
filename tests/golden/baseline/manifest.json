@@ -61,6 +61,7 @@
   "opt/vci",
   "regress/b006-empty-output",
   "regress/b031-mzi-bidir",
+  "regress/b036-vci-crow",
   "regress/b131-nrings-crow",
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
@@ -249,6 +250,18 @@
    "only": "^tb/det(ector)?$",
    "gtest": false,
    "note": "B-054: detector readouts initialised to 0 (were garbage at t=0); vcd_ignore_values dropped"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:14:07Z",
+   "only": "^regress/b036-",
+   "gtest": false,
+   "note": "B-036: new regression case"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:19:30Z",
+   "only": "^regress/b036-vci-crow$",
+   "gtest": false,
+   "note": "B-036: re-record on top of B-072 (CROW child names prefixed with the instance name)"
   }
  ]
 }

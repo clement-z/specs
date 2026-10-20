@@ -65,3 +65,12 @@ set<T *> sc_get_all_object_by_type() {
     }
     return all_requested;
 }
+
+// Name of the channel bound to a port, or "<unbound>" (--vci printing).
+// The channel need not be an spx::oa/ea_signal_type (e.g. sc_signal<OpticalSignal> in CROW).
+template<typename P>
+inline const char *port_channel_name(P &port)
+{
+    auto *obj = dynamic_cast<const sc_object *>(port.get_interface());
+    return obj ? obj->name() : "<unbound>";
+}

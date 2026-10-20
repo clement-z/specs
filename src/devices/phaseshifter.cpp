@@ -14,12 +14,12 @@ void PhaseShifterUni::on_port_in_changed()
         cout << "transmission_power = " << pow(transmission_field,2) << " W/W" << endl;
         cout << "sensitivity = " << m_sensitivity << " rad/V" << endl;
         cout << "initial phase delay = " << m_phaseshift_rad << " rad @1.55)" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name();
+        cout << port_channel_name(p_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name();
+        cout << port_channel_name(p_out);
         cout << endl << "\t^" << endl;
         cout << "\t|" << endl << "\t";
-        cout << (dynamic_cast<spx::ea_signal_type *>(p_vin.get_interface()))->name();
+        cout << port_channel_name(p_vin);
         cout << endl;
         cout << endl;
     }
@@ -89,16 +89,16 @@ void PhaseShifterBi::on_p0_in_changed()
         cout << "transmission_power = " << pow(transmission_field,2) << " W/W" << endl;
         cout << "sensitivity = " << m_sensitivity << " rad/V" << endl;
         cout << "initial phase delay = " << m_phaseshift_rad << " rad @1.55)" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_in.get_interface()))->name();
+        cout << port_channel_name(p0_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_out.get_interface()))->name();
+        cout << port_channel_name(p1_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_out.get_interface()))->name();
+        cout << port_channel_name(p0_out);
         cout << " <-- ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_in.get_interface()))->name();
+        cout << port_channel_name(p1_in);
         cout << endl << "\t^" << endl;
         cout << "\t|" << endl << "\t";
-        cout << (dynamic_cast<spx::ea_signal_type *>(p_vin.get_interface()))->name();
+        cout << port_channel_name(p_vin);
         cout << endl;
         cout << endl;
     }

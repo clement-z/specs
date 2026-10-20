@@ -22,13 +22,13 @@ void CrossingUni::on_input_changed()
         cout << name() << ":" << endl;
         cout << "transmission_power = " << norm(S13) << " W/W" << endl;
         cout << "crosstalk_power = " << norm(S14)<< " W/W" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in1.get_interface()))->name();
+        cout << port_channel_name(p_in1);
         cout << " ---   ---> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out1.get_interface()))->name();
+        cout << port_channel_name(p_out1);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in2.get_interface()))->name();
+        cout << port_channel_name(p_in2);
         cout << " ---   ---> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out2.get_interface()))->name();
+        cout << port_channel_name(p_out2);
         cout << endl;
 
         cout << endl;
@@ -78,21 +78,21 @@ void CrossingBi::on_input_changed()
         cout << name() << ":" << endl;
         cout << "transmission_power = " << norm(through) << " W/W" << endl;
         cout << "crosstalk_power = " << norm(cross)<< " W/W" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_in.get_interface()))->name();
+        cout << port_channel_name(p0_in);
         cout << " ---   ---> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p2_out.get_interface()))->name();
+        cout << port_channel_name(p2_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_in.get_interface()))->name();
+        cout << port_channel_name(p1_in);
         cout << " ---   ---> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p3_out.get_interface()))->name();
+        cout << port_channel_name(p3_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p2_in.get_interface()))->name();
+        cout << port_channel_name(p2_in);
         cout << " ---   ---> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_out.get_interface()))->name();
+        cout << port_channel_name(p0_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p3_in.get_interface()))->name();
+        cout << port_channel_name(p3_in);
         cout << " ---   ---> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_out.get_interface()))->name();
+        cout << port_channel_name(p1_out);
         cout << endl;
 
         cout << endl;
