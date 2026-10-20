@@ -126,20 +126,14 @@ def main():
     try:
         json_file = sys.argv[1]
     except IndexError:
-        print('First and only argument should be a JSON description of the circuit')
+        print('usage: draw_graph_from_json.py circuit.json [output.png]', file=sys.stderr)
+        sys.exit(2)
     try:
         out_file = sys.argv[2]
     except IndexError:
         out_file = json_file + ".png"
 
-    with open(json_file) as f:
-        description = json.load(f)
-
-    dot_src = generate_graph(description)
-    # print(dot_src)
-    graph = graphviz.Source(dot_src)
-    graph.render(outfile=out_file)
-    print(f'Results written to {out_file}')
+    draw_graph(json_file, out_file)
 
 if __name__ == '__main__':
     main()
