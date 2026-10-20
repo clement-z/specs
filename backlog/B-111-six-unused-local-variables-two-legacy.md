@@ -24,3 +24,7 @@ B-027, B-112, B-075 (other warnings from the same log; may be one "fix: silence 
 - Review ids: F-A7-04.
 ## Verification
 Applied on a scratch copy; `g++ -fsyntax-only -Wall -Wextra` of freqsweep_tb.cpp, lambda_tb.cpp, directional_coupler_tb.cpp: 3+2+1 warnings before, 0 after. Pure deletion of unused locals.
+
+**Independent second check (V2, of F-A7-04): CONFIRMED.** Method: deleted the six lines (freqsweep_tb.cpp:60-62, lambda_tb.cpp:21-22, generic_2x2_coupler.h:35), rebuilt, compared warnings, golden check (the `lambda` and `directional_coupler` testbench cases exercise two of the edited files)
+
+Baseline had exactly these 6 warnings (freqsweep_tb 60/61/62, lambda_tb 21/22, generic_2x2_coupler.h:35); after the fix all 6 are gone and nothing new appears. grep confirms the variables have no other references (lambda_tb keeps `event_counter`, which is used). Minor wording nit: the header warning is emitted once, not "by every TU", because only tb/directional_coupler_tb.cpp includes generic_2x2_coupler.h. Golden 44/44 at atol=rtol=0.

@@ -46,3 +46,7 @@ B-020, B-028.
 - Review ids: F-A1-27, F-A7-05.
 ## Verification
 Grepped every symbol listed. All removals are of unreachable code or members that are never read.
+
+**Independent second check (V2, of F-A7-05): CONFIRMED.** Method: replaced specs.cpp:202-206 by the TODO comment, rebuilt, compared warnings, golden check
+
+Baseline `specs.cpp:203:16: unused variable 'ic_order'` disappears; the other specs.cpp warnings (strict-aliasing, lines 385-388 -> 381-384 after the line removal) are pre-existing and unchanged. `ic_orders` is never filled (git grep: only specs.h:92 and the loop) and `ICDirective::create()` (parse_directive.cpp:128-132) prints "IC directive is not implemented" and exits, so the loop was dead. Golden 44/44 at atol=rtol=0.

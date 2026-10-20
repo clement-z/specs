@@ -27,3 +27,7 @@ B-119, B-108.
 - Review ids: F-A7-15.
 ## Verification
 Applied to a scratch copy: `ninja -t commands specs` shows `-O3 -DNDEBUG`.
+
+**Independent second check (V2, of F-A7-15): CONFIRMED.** Method: applied the suggested block after `project(...)`, configured with no build type, with `-DCMAKE_BUILD_TYPE=Debug`, and with "Ninja Multi-Config"; inspected `ninja -t commands`
+
+Without the fix `CMAKE_BUILD_TYPE:STRING=` and the compile line has no -O flag (reproduced). With the fix the cache gets `Release` and compile commands show `-O3 -DNDEBUG` (same flags the golden baseline was recorded with, and the same as my Release golden build, 44/44 pass). An explicit `-DCMAKE_BUILD_TYPE=Debug` is still honoured (`-g`), Multi-Config generators are unaffected (`CMAKE_CONFIGURATION_TYPES` set, guard skips). Caveats to record, none blocking: (1) Release defines NDEBUG, so `assert`s (e.g. DCAnalysis `assert(sweep_orders.size() > 0)`, `upgrade_signal`) are now compiled out for `install.sh` users, as they already are in the documented golden build; (2) install.sh:17 builds SystemC itself with a bare `cmake ..` (no build type), which this fix does not cover; (3) Release vs RelWithDebInfo as the default is a (small) choice, justified by CLAUDE.md and the golden baseline. obsoleted-by-meson as stated.

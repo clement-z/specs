@@ -21,3 +21,7 @@ B-113 (remaining flex/bison diagnostics), B-110.
 - Review ids: F-A7-02.
 ## Verification
 Regenerated `scanner.cpp` with and without the option (flex 2.6.4), diffed; compiled the patched scanner with `g++ -fsyntax-only -Wall -Wextra`: 0 warnings (was 1). Safe: an unused static function is removed.
+
+**Independent second check (V2, of F-A7-02): CONFIRMED.** Method: applied `%option noyy_top_state` after `%option stack` on scratch copy, rebuilt (ninja -j2) with flex 2.6.4, compared build logs, golden check bit-exact (--atol 0 --rtol 0)
+
+Baseline log has `scanner.cpp:3247:16: warning: 'int yy_top_state(yyscan_t)' defined but not used [-Wunused-function]`. After the fix flex regenerates scanner.cpp without `yy_top_state` (grep count 0; diff of old/new generated scanner ignoring `#line` = the 2-line prototype + 6-line body, nothing else, same as a7-flex-top-state.sh) and the warning is gone; the only other output of the rebuild is the pre-existing parse_tree.cpp:217 warning (different finding). The two flex "dangerous trailing context" diagnostics are unchanged (line 483 -> 484). Golden: 44/44 pass, also at atol=rtol=0. No design choice.

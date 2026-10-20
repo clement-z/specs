@@ -21,3 +21,7 @@ B-109 (same file, can be one commit "fix(parser): scanner warnings").
 - Review ids: F-A7-03.
 ## Verification
 Applied both edits to a scratch copy, regenerated, compiled with `g++ -fsyntax-only` and `clang++ -fsyntax-only`: no errors, the clang warning is gone (only the flex-skeleton `-Wmisleading-indentation` remains, see B-113).
+
+**Independent second check (V2, of F-A7-03): CONFIRMED.** Method: applied `typedef struct {` -> `struct netlist_content_t {` and `} netlist_content_t;` -> `};`, rebuilt with g++ (full), compiled generated scanner.cpp with clang++ 19.1.7 -fsyntax-only before/after, golden check
+
+g++ build: no errors, no new warnings (`enum type {...} type;` member inside the now-named struct is accepted; uses `netlist_content_t::STRING`, `deque<netlist_content_t>` compile unchanged). clang++ on the baseline-generated scanner: `parser.l:48:15: warning: anonymous non-C-compatible type given name for linkage purposes by typedef declaration [-Wnon-c-typedef-for-linkage]`; after the fix that warning is gone (remaining clang output: flex-skeleton `-Wmisleading-indentation` and, until B-109 is applied, `unused function yy_top_state`). Golden 44/44 at atol=rtol=0. Unique, local fix.
