@@ -28,6 +28,7 @@ EOL {EOL_PORTABLE}
 %option reentrant
 %option bison-bridge
 %option stack
+%option noyy_top_state
 %option extra-type="void *"
 
 %{
