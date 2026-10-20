@@ -532,6 +532,27 @@
    "note": "B-153: .options reltol=0 is rejected (verifyConfig assert / accepted with NDEBUG)"
   },
   {
+   "id": "err/b161-ic-unsupported",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b161-ic-unsupported.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-161: .ic gives a parse error naming the unsupported directive (was exit 1 with no message)"
+  },
+  {
    "id": "opt/tracefile-o",
    "args": [
     "-o",

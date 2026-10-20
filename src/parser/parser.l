@@ -466,7 +466,7 @@ string convert_special_char(char c)
 
 ^\.OPTIONS { return T_DIRECTIVE_OPTIONS; }
 ^\.NODESET { return T_DIRECTIVE_NODESET; }
-^\.IC { exit(1); }
+^\.IC { yylerror(yyscanner, "the .ic directive is not supported"); exit(1); }
 ^\.SUBCKT {
     /* Subcircuit declaration */
     // enter new parser state

@@ -1,0 +1,5 @@
+* B-161: .ic is not supported and must give a parse error with a message
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.ic /a/P=1
+.op
