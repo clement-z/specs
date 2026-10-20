@@ -326,6 +326,16 @@
    "note": "src/tb/alltestbenches.cpp: crow_tb_run"
   },
   {
+   "id": "tb/ac_add_drop-fd",
+   "args": [
+    "-t",
+    "ac_add_drop",
+    "-m",
+    "fd"
+   ],
+   "note": "B-138: frequency sweep branch of freqsweep_tb"
+  },
+  {
    "id": "tb/lambda",
    "args": [
     "-t",

@@ -32,6 +32,7 @@
   "opt/tracefile-o",
   "opt/vci",
   "tb/ac_add_drop",
+  "tb/ac_add_drop-fd",
   "tb/ac_crow",
   "tb/dc",
   "tb/det",
@@ -89,6 +90,12 @@
    "only": "^gtest",
    "gtest": true,
    "note": "B-136: 6 new device S-parameter unit tests (src/test/devices/models.cpp), all PASS"
+  },
+  {
+   "recorded_at_utc": "2026-10-20T07:04:59Z",
+   "only": "^tb/ac_add_drop-fd$",
+   "gtest": false,
+   "note": "B-138: new case tb/ac_add_drop-fd (frequency sweep branch of freqsweep_tb)"
   }
  ]
 }
