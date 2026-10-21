@@ -8,7 +8,7 @@ The `status` column was added by the fix phase (`ws/fixes`, see [backlog/FIXES-R
 
 | ID | title | severity | category | effort | fix-class | verdict | status | file:line |
 |---|---|---|---|---|---|---|---|---|
-| [B-001](backlog/B-001-fd-write-merges-only-queue-top.md) | FD write merges only with the queue top: stale per-λ value wins in multi-λ OP/DC | high | bug | XS | needs-human | CONFIRMED | | `src/optical_output_port.cpp:371-405` |
+| [B-001](backlog/B-001-fd-write-merges-only-queue-top.md) | FD write merges only with the queue top: stale per-λ value wins in multi-λ OP/DC | high | bug | XS | needs-human | CONFIRMED | fixed in b2bd836 (sprint 2026-10b P2) | `src/optical_output_port.cpp:371-405` |
 | [B-031](backlog/B-031-fix-mziactivebi-p-vin-bound-twice.md) | Fix MZIActiveBi: p_vin bound twice (elaboration abort) and arms miswired | high | bug | XS | easy-unattended | CONFIRMED | fixed in 2d1e116 | `src/devices/mzi_active.cpp:165` |
 | [B-032](backlog/B-032-crossing-s-matrix-not-passive-phase.md) | Crossing S-matrix is not passive (in-phase crosstalk, \|t\|²+\|x\|² > 1, signed xtalk) | high | physics | S | needs-human | CONFIRMED | | `src/devices/crossing.cpp:9-18` |
 | [B-048](backlog/B-048-probes-never-trace-values-established-during.md) | Probes never trace values established during the OP, so constant (CW) nets show 0 in .tran | high | bug | XS | needs-design | CONFIRMED | | `src/devices/probe.cpp:26-31` |
