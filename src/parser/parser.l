@@ -6,6 +6,8 @@ ALPHA_PLUS_NUM {ALPHA}|[_]|{DIGIT}
 D {DIGIT}
 
 DOUBLE (({D}+)|({D}*\.{D}+))([eE][-+]?[0-9]+)?
+/* SPICE scale suffixes (caseless: M is milli, MEG is mega) */
+SI_SUFFIX (f|p|n|u|m|k|meg|g|t)
 
 BIDIR_SPECIFIER [&]
 BIN_OPERATOR [,=\*/\+\-\^]
@@ -32,6 +34,8 @@ EOL {EOL_PORTABLE}
 %option extra-type="void *"
 
 %{
+#include <algorithm> // for std::clamp
+#include <cstdlib> // for strtol
 #include <string>
 #include <sstream> // for conversions of numbers from str
 #include <cstring> // for strcpy
@@ -196,6 +200,45 @@ static T from_string(const string &str)
     return ret;
 }
 
+// Number with a scale suffix ("1.55u", "1.5e3k", "1meg"): the suffix is added to the
+// decimal exponent before the conversion, so "1.55u" gives the same double as "1.55e-6".
+static double from_si_suffixed_string(string str)
+{
+    long suffix_exp = 0;
+    size_t suffix_len = 1;
+    if (str.size() > 3 && strutils::iequals(str.substr(str.size() - 3), "meg"))
+    {
+        suffix_exp = 6; // meg
+        suffix_len = 3;
+    }
+    else
+    {
+        switch (str.back())
+        {
+            case 'f': case 'F': suffix_exp = -15; break;
+            case 'p': case 'P': suffix_exp = -12; break;
+            case 'n': case 'N': suffix_exp = -9; break;
+            case 'u': case 'U': suffix_exp = -6; break;
+            case 'm': case 'M': suffix_exp = -3; break;
+            case 'k': case 'K': suffix_exp = 3; break;
+            case 'g': case 'G': suffix_exp = 9; break;
+            case 't': case 'T': suffix_exp = 12; break;
+        }
+    }
+    str.erase(str.size() - suffix_len);
+
+    long exp = 0;
+    size_t exp_pos = str.find_first_of("eE");
+    if (exp_pos != string::npos)
+    {
+        exp = strtol(str.c_str() + exp_pos + 1, nullptr, 10);
+        str.erase(exp_pos);
+    }
+    // keep the sum in range (any exponent beyond +-1e5 overflows or underflows anyway)
+    exp = std::clamp(exp, -100000L, 100000L) + suffix_exp;
+    return from_string<double>(str + "e" + std::to_string(exp));
+}
+
 string convert_special_char(char c)
 {
     stringstream ss;
@@ -341,6 +384,12 @@ string convert_special_char(char c)
 {DOUBLE} {
     /* signed floating point number */
     yylval_param->d_val = from_string<double>(yytext);
+    return T_NUM;
+}
+
+{DOUBLE}{SI_SUFFIX} {
+    /* number with a scale suffix (always a double, also for an integer mantissa) */
+    yylval_param->d_val = from_si_suffixed_string(yytext);
     return T_NUM;
 }
 

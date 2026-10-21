@@ -2514,6 +2514,64 @@
    ],
    "expect": "fail",
    "note": "F-28: specs --maxiter abc is rejected before parsing (decimal integer), exit 1"
+  },
+  {
+   "id": "regress/f12-si-suffixes",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "tests/golden/netlists/f12-si-suffixes.cir"
+   ],
+   "note": "F-12 (B-160): scale suffixes f p n u m k meg g t on numbers (SPICE, caseless: M is milli, MEG mega), dry run with JSON export: each pair of elements/.params gives equal values with the suffix and the exponent form (1.55u = 1.55e-6, 1k = 1000 as a DOUBLE, 1M = 1e-3, 1.5e3k = 1.5e6, {2*775n} in a positional expression, a .param with a suffix); the rel_* .params check that the suffixed value is the correctly rounded double of the exponent form (exactly 0)"
+  },
+  {
+   "id": "regress/f12-si-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-si-op.cir"
+   ],
+   "note": "F-12 (B-160): .op with scale suffixes in element kwargs (wl=1.55u power=1m length=500u), positional arguments (1.31u 2m) and .options (abstol=1p reltol=10u); expected values in the netlist header"
+  },
+  {
+   "id": "err/f12-si-unit-letters",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-si-unit-letters.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12 (B-160): unit letters after the scale suffix are not accepted: wl=1.55um lexes as 1.55u followed by the identifier m, a syntax error (offending token \"m\"), exit 1"
   }
  ]
 }

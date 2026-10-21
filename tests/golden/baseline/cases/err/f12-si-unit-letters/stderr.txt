@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/f12-si-unit-letters.cir:3): syntax error
+-- offending token: "m"
+-- while parsing line: "cwsrc1 a wl=1.55um power=1m"
+

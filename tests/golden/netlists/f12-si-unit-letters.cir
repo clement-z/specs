@@ -1,0 +1,5 @@
+* F-12 (B-160): unit letters after a scale suffix are not accepted (out of scope):
+* "1.55um" lexes as the number 1.55u followed by the identifier "m": syntax error, exit 1
+cwsrc1 a wl=1.55um power=1m
+probe1 a
+.op

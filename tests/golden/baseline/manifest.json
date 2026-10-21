@@ -73,6 +73,7 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f12-si-unit-letters",
   "err/f28-lossless-ring-dc",
   "err/f28-lossless-ring-op",
   "err/f28-lossless-ring-tran",
@@ -144,6 +145,8 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f12-si-op",
+  "regress/f12-si-suffixes",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
   "tb/ac_add_drop",
@@ -487,6 +490,12 @@
    "only": "^(cli/help|cli/no-args|err/f28-.*|regress/f28-.*|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-28: .op/.dc iteration cap (--maxiter in the help; new f28 cases; gtest FixedPoint.*)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:00:59Z",
+   "only": "^(regress/f12-si-.*|err/f12-si-.*)$",
+   "gtest": false,
+   "note": "F-12 (B-160): SI suffix cases"
   }
  ]
 }
