@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f01-pdet-noise.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1478,
+   "kind": "vcd",
+   "sha256": "7c3d94aa0b56eb96ab08c02d7619e3562256a6c08a8e3847f0fbc1b6ffc1eb0a",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f01-pdet-noise-default-seed"
+}

@@ -3,6 +3,7 @@ core_sources = files(
   'optical_output_port.cpp',
   'optical_signal.cpp',
   'specs.cpp',
+  'utils/rng.cpp',
   'utils/sysc_utils.cpp',
 )
 main_source = files('main.cpp')

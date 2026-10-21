@@ -206,11 +206,12 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   `m_cur_readout_no_interf` (`src/devices/detector.h`) were never
   initialised and were dumped at t=0, for example `r6.92e-310` (stale pointer
   bits). Since B-049/B-050 the testbench's detectors are enabled and write
-  their readout, with the `random_device`-seeded noise ON: the readout values
-  (`READOUT`, `uut*.readout*`) differ from run to run and are excluded through
-  `vcd_ignore_values`, and the testbench prints them with 3 decimals (far
-  above the noise), so its stdout, self-checks included, is reproducible.
-  Reproducible seeds are planned (P4, F-01).
+  their readout, with noise ON. Until F-01 (sprint 2026-10b P4) the noise came
+  from `random_device` seeds and the readout values (`READOUT`,
+  `uut*.readout*`) were excluded through `vcd_ignore_values`; now each detector
+  draws from a stream derived from the master seed (default 0) and its name,
+  so the values are reproducible and compared. The testbench still prints
+  them with 3 decimals.
 * **Name-ordered iteration (F-01, sprint 2026-10b P4).** Until then,
   `sc_get_all_object_by_type<T>()` / `sc_get_all_module_by_type<T>()`
   (`src/utils/sysc_utils.h`) returned `std::set<T*>` and the parser created

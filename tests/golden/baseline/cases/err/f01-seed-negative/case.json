@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--seed",
+  "-1",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f01-seed-negative"
+}

@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/detector_tb.vcd": {
-   "bytes": 1616,
+   "bytes": 1615,
    "kind": "vcd",
-   "sha256": "5f9cb071082ce02e2e6f59d2057fcffc002ddf501cbb935f12adba805f619d28",
+   "sha256": "7c415bcac1db5a35a750c227ee6d6edf81b40c9627aa668dc224372ef81b866e",
    "stored": "files/traces/detector_tb.vcd"
   }
  },

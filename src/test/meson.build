@@ -17,6 +17,7 @@ if gtest_dep.found()
       'devices/waveguide.cpp',
       'main.cpp',
       'optical_output_port.cpp',
+      'rng.cpp',
       'specs_config.cpp',
       'sysc_utils.cpp',
       'tran_start.cpp',

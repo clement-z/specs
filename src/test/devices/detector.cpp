@@ -1,12 +1,19 @@
 // Event-driven photodetector (B-049, B-050): the readout is written to p_readout on input events and
 // at an enable; periodic Ts samples only while >= 2 non-zero wavelengths beat, gated by the tolerance.
 // Noise is bypassed and the dark current is 0 (Detector defaults), so the readouts are deterministic.
-// No test lets a detector compute with a zero total field (the dark-field injection is random).
+// Noise and dark field (F-01, B-055, B-056): the random draws come from the stream
+// spx::rng_for(specsGlobalConfig.seed, name()), so they are reproducible and do not depend on the
+// other devices; the tests at the end check this against spx::Rng and across runs (run_in_child()).
 #include <gtest/gtest.h>
 #include <systemc.h>
 
 #include <cmath>
 #include <complex>
+#include <cstdint>
+#include <cstring>
+#include <functional>
+#include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -14,6 +21,7 @@
 #include "devices/detector.h"
 #include "optical_output_port.h"
 #include "specs.h"
+#include "utils/rng.h"
 #include "test/utils.h"
 
 namespace {
@@ -328,6 +336,295 @@ TEST(Detector, OpAnalysisKeepsDetectorDisabled)
         sc_start(1, SC_NS);
         EXPECT_DOUBLE_EQ(tb.readout.read(), 1e-3);
         EXPECT_EQ(tb.rec.m_changes.size(), 1u);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+namespace {
+// SystemC elaborates once per process: run the scenario in a forked child and return the values it
+// produced, bit-exact (through a pipe), so that one test can compare several simulations
+std::vector<double> run_in_child(const std::function<std::vector<double>()> &scenario)
+{
+    int fds[2];
+    if (pipe(fds) != 0)
+    {
+        ADD_FAILURE() << "pipe() failed";
+        return {};
+    }
+    const pid_t pid = fork();
+    if (pid == -1)
+    {
+        ADD_FAILURE() << "fork() failed";
+        return {};
+    }
+    if (pid == 0)
+    {
+        close(fds[0]);
+        const std::vector<double> values = scenario();
+        const char *p = reinterpret_cast<const char *>(values.data());
+        size_t left = values.size() * sizeof(double);
+        while (left > 0)
+        {
+            const ssize_t n = write(fds[1], p, left);
+            if (n <= 0)
+                _exit(3);
+            p += n;
+            left -= n;
+        }
+        close(fds[1]);
+        std::cout << std::flush;
+        _exit(testing::Test::HasFailure() ? 1 : 0);
+    }
+    close(fds[1]);
+    std::string bytes;
+    char buf[4096];
+    ssize_t n_read;
+    while ((n_read = read(fds[0], buf, sizeof(buf))) > 0)
+        bytes.append(buf, n_read);
+    close(fds[0]);
+    int status = 0;
+    EXPECT_EQ(waitpid(pid, &status, 0), pid);
+    EXPECT_TRUE(WIFEXITED(status) && WEXITSTATUS(status) == 0) << "scenario failed, status " << status;
+    std::vector<double> values(bytes.size() / sizeof(double));
+    std::memcpy(values.data(), bytes.data(), values.size() * sizeof(double));
+    return values;
+}
+
+// Standard deviation of Detector::noise_gen() for the noiseless photocurrent I_A, with the Detector
+// defaults (fop = 1 GHz, 300 K, 400 Ohm, iTIA = 10 pA/sqrt(Hz)) and no dark current
+double noise_sd_A(double I_A)
+{
+    const double q = 1.60217e-19;
+    const double K = 1.38064e-23;
+    const double f_Hz = 1e9;
+    return std::sqrt(f_Hz * 10e-12 * 10e-12 + f_Hz * 2 * q * I_A + f_Hz * 4 * K * 300 / 400);
+}
+
+const double noisy_R_A_W = 0.8;
+const unsigned int noisy_n_events = 3;
+
+// Field of the k-th input event of noisy_pair_readouts(), k = 1 .. noisy_n_events
+OpticalSignal::field_type noisy_field(unsigned int k)
+{
+    return std::sqrt(k * 1e-3);
+}
+
+// Two detectors with noise (noiseBypass = false), "pdetA" on in_a and "pdetB" on in_b, created in
+// the given order, both lit by noisy_n_events input events. Returns pdetA's then pdetB's
+// (readout, readout_no_interf) after each event.
+std::vector<double> noisy_pair_readouts(uint64_t seed, bool a_first)
+{
+    init_config();
+    specsGlobalConfig.seed = seed;
+    std::unique_ptr<Detector> first = std::make_unique<Detector>(a_first ? "pdetA" : "pdetB", noisy_R_A_W, 0, false);
+    std::unique_ptr<Detector> second = std::make_unique<Detector>(a_first ? "pdetB" : "pdetA", noisy_R_A_W, 0, false);
+    Detector &a = a_first ? *first : *second;
+    Detector &b = a_first ? *second : *first;
+    spx::oa_signal_type in_a{"in_a"};
+    spx::oa_signal_type in_b{"in_b"};
+    spx::ea_signal_type out_a{"out_a"};
+    spx::ea_signal_type out_b{"out_b"};
+    a.p_in(in_a);
+    a.p_readout(out_a);
+    b.p_in(in_b);
+    b.p_readout(out_b);
+    sc_start(SC_ZERO_TIME);
+
+    std::vector<double> readouts_a, readouts_b;
+    for (unsigned int k = 1; k <= noisy_n_events; ++k)
+    {
+        in_a.write(OpticalSignal(noisy_field(k), 1550e-9));
+        in_b.write(OpticalSignal(noisy_field(k), 1550e-9));
+        sc_start(1, SC_NS);
+        EXPECT_EQ(out_a.read(), a.m_cur_readout);
+        readouts_a.push_back(a.m_cur_readout);
+        readouts_a.push_back(a.m_cur_readout_no_interf);
+        readouts_b.push_back(b.m_cur_readout);
+        readouts_b.push_back(b.m_cur_readout_no_interf);
+    }
+    readouts_a.insert(readouts_a.end(), readouts_b.begin(), readouts_b.end());
+    return readouts_a;
+}
+
+// Runs all the delta cycles of the current time
+void settle()
+{
+    do
+        sc_start(SC_ZERO_TIME);
+    while (sc_pending_activity_at_current_time());
+}
+
+// One detector ("uut", R = 1 A/W) that computes its readout with a total field of exactly 0, twice:
+// - enabled with an all-zero input memory (at most one wavelength: sum of |E_k|^2 = 0);
+// - two wavelengths with opposite fields at t = 0 (both non-zero, they beat, and
+//   E1 e^0 + E2 e^0 = 0 exactly).
+// Returns (readout, readout_no_interf) after each.
+std::vector<double> dark_readouts(uint64_t seed, bool dark_field_injection, bool noise_bypass = true,
+                                  double dark_current_A = 0)
+{
+    init_config();
+    specsGlobalConfig.seed = seed;
+    Detector uut("uut", 1.0, dark_current_A, noise_bypass);
+    uut.m_dark_field_injection = dark_field_injection;
+    spx::oa_signal_type in{"in"};
+    spx::ea_signal_type readout{"readout"};
+    uut.p_in(in);
+    uut.p_readout(readout);
+    std::vector<double> values;
+
+    // (1) enabled in the dark
+    uut.enable = sc_logic(0);
+    settle();
+    uut.enable = sc_logic(1);
+    settle();
+    EXPECT_EQ(sc_time_stamp(), SC_ZERO_TIME);
+    values.push_back(uut.m_cur_readout);
+    values.push_back(uut.m_cur_readout_no_interf);
+
+    // (2) beating fields that cancel at t = 0
+    const OpticalSignal::field_type E = std::sqrt(1e-3);
+    in.write(OpticalSignal(E, 1550e-9));
+    settle();
+    in.write(OpticalSignal(-E, 1551e-9));
+    settle();
+    EXPECT_EQ(sc_time_stamp(), SC_ZERO_TIME);
+    EXPECT_TRUE(uut.is_beating());
+    values.push_back(uut.m_cur_readout);
+    values.push_back(uut.m_cur_readout_no_interf);
+    EXPECT_EQ(readout.read(), uut.m_cur_readout);
+    return values;
+}
+}
+
+TEST(DetectorNoise, NoiseIsDrawnFromTheStreamOfTheDetectorName)
+{
+    SPECS_TEST_HEADER()
+    {
+        const uint64_t seed = 12345;
+        const std::vector<double> readouts = noisy_pair_readouts(seed, false);
+        ASSERT_EQ(readouts.size(), 4 * noisy_n_events);
+
+        // Per computed readout: one normal value for readout, one for readout_no_interf (the input
+        // is never dark: no dark-field draw)
+        const char *names[] = {"pdetA", "pdetB"};
+        for (unsigned int d = 0; d < 2; ++d)
+        {
+            spx::Rng rng = spx::rng_for(seed, names[d]);
+            for (unsigned int k = 1; k <= noisy_n_events; ++k)
+            {
+                const double I_A = std::norm(noisy_field(k)) * noisy_R_A_W;
+                const double expected = I_A + noise_sd_A(I_A) * rng.normal();
+                const double expected_no_interf = I_A + noise_sd_A(I_A) * rng.normal();
+                const size_t i = d * 2 * noisy_n_events + 2 * (k - 1);
+                // noise sd about 0.7 uA: 1e-15 A is far below one draw's contribution
+                EXPECT_NEAR(readouts[i], expected, 1e-15) << names[d] << " event " << k;
+                EXPECT_NEAR(readouts[i + 1], expected_no_interf, 1e-15) << names[d] << " event " << k;
+                EXPECT_NE(readouts[i], I_A);
+            }
+        }
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(DetectorNoise, StreamsDependOnTheNameNotOnTheCreationOrder)
+{
+    SPECS_TEST_HEADER()
+    {
+        const std::vector<double> ab = run_in_child([] { return noisy_pair_readouts(0, true); });
+        const std::vector<double> ba = run_in_child([] { return noisy_pair_readouts(0, false); });
+        ASSERT_EQ(ab.size(), 4 * noisy_n_events);
+        EXPECT_EQ(ab, ba);
+
+        // pdetA and pdetB see the same inputs but have independent streams
+        const size_t half = 2 * noisy_n_events;
+        for (size_t i = 0; i < half; ++i)
+            EXPECT_NE(ab[i], ab[half + i]) << i;
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(DetectorNoise, SameSeedGivesTheSameReadoutsAnotherSeedOtherOnes)
+{
+    SPECS_TEST_HEADER()
+    {
+        const std::vector<double> seed7 = run_in_child([] { return noisy_pair_readouts(7, true); });
+        const std::vector<double> seed7_again = run_in_child([] { return noisy_pair_readouts(7, true); });
+        const std::vector<double> seed8 = run_in_child([] { return noisy_pair_readouts(8, true); });
+        const std::vector<double> seed_default = run_in_child([] {
+            return noisy_pair_readouts(SPECSConfig::DEFAULT_SEED, true);
+        });
+        ASSERT_EQ(seed7.size(), 4 * noisy_n_events);
+        ASSERT_EQ(seed8.size(), seed7.size());
+        ASSERT_EQ(seed_default.size(), seed7.size());
+        EXPECT_EQ(seed7, seed7_again);
+        for (size_t i = 0; i < seed7.size(); ++i)
+        {
+            EXPECT_NE(seed7[i], seed8[i]) << i;
+            EXPECT_NE(seed7[i], seed_default[i]) << i;
+        }
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(DetectorNoise, DarkFieldInjectionOffReadsExactlyTheDarkCurrent)
+{
+    SPECS_TEST_HEADER()
+    {
+        // noise bypassed: exactly 0, in both branches of compute_readout()
+        const std::vector<double> off = run_in_child([] { return dark_readouts(0, false); });
+        ASSERT_EQ(off.size(), 4u);
+        EXPECT_EQ(off[0], 0.0);
+        EXPECT_EQ(off[1], 0.0);
+        EXPECT_EQ(off[2], 0.0);
+        EXPECT_DOUBLE_EQ(off[3], 2e-3); // readout_no_interf: sum of |E_k|^2, the fields are not 0
+
+        // with a dark current: exactly the dark current
+        const std::vector<double> dark = run_in_child([] { return dark_readouts(0, false, true, 100e-12); });
+        ASSERT_EQ(dark.size(), 4u);
+        EXPECT_EQ(dark[0], 100e-12);
+        EXPECT_EQ(dark[1], 100e-12);
+        EXPECT_EQ(dark[2], 100e-12);
+
+        // with noise: only the noise (the first draw of the stream: no dark-field draw before it)
+        const std::vector<double> noisy = run_in_child([] { return dark_readouts(0, false, false); });
+        ASSERT_EQ(noisy.size(), 4u);
+        spx::Rng rng = spx::rng_for(0, "uut");
+        EXPECT_NEAR(noisy[0], noise_sd_A(0) * rng.normal(), 1e-18);
+        EXPECT_NEAR(noisy[1], noise_sd_A(0) * rng.normal(), 1e-18);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(DetectorNoise, DarkFieldInjectionOnIsReproducible)
+{
+    SPECS_TEST_HEADER()
+    {
+        const std::vector<double> on = run_in_child([] { return dark_readouts(0, true); });
+        const std::vector<double> on_again = run_in_child([] { return dark_readouts(0, true); });
+        const std::vector<double> on_seed1 = run_in_child([] { return dark_readouts(1, true); });
+        ASSERT_EQ(on.size(), 4u);
+        EXPECT_EQ(on, on_again);
+        EXPECT_NE(on[0], on_seed1[0]);
+        EXPECT_NE(on[2], on_seed1[2]);
+
+        // (1) enabled in the dark: R |1e-20 n|^2, n = first normal value of the stream of "uut"
+        spx::Rng rng = spx::rng_for(0, "uut");
+        const double n0 = rng.normal();
+        EXPECT_DOUBLE_EQ(on[0], std::norm(OpticalSignal::field_type(1e-20 * n0)));
+        EXPECT_GT(on[0], 0.0);
+        EXPECT_LT(on[0], 1e-38);
+        EXPECT_EQ(on[1], 0.0); // readout_no_interf: sum of |E_k|^2 = 0, no injection
+        // (2) the beat cancels at t = 0: the 3rd computed readout, after 1 + 2 + 2 draws (dark field
+        // and two noise values at the enable, two noise values at the first input event)
+        rng.normal();
+        rng.normal();
+        rng.normal();
+        rng.normal();
+        const double n5 = rng.normal();
+        EXPECT_DOUBLE_EQ(on[2], std::norm(OpticalSignal::field_type(1e-20 * n5)));
+        EXPECT_GT(on[2], 0.0);
+        EXPECT_LT(on[2], 1e-38);
+        EXPECT_DOUBLE_EQ(on[3], 2e-3);
     }
     SPECS_TEST_FOOTER();
 }

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <systemc.h>
-#include <random>
 
 #include "optical_output_port.h"
 #include "optical_signal.h"
 #include "specs.h"
 #include "devices/spx_module.h"
+#include "utils/rng.h"
 
 // TODO: rename to photodetector
 //
@@ -21,6 +21,12 @@
 // With fewer than 2 non-zero wavelengths the readout is R * sum_k |E_k|^2 and nothing is scheduled,
 // so a quiet circuit ends an open-ended .tran (a permanent beat keeps it running, as it should).
 // A disabled detector keeps updating its input memory but never writes.
+//
+// Random draws (noise, dark field) come from m_rng, the stream
+// spx::rng_for(specsGlobalConfig.seed, name()) taken in start_of_simulation() (F-01, B-055), so they
+// are reproducible and do not depend on the other devices. Each computed readout draws, in order:
+// the dark-field value (only if the total field is 0 and m_dark_field_injection is set), then one
+// normal value for readout and one for readout_no_interf (also with m_noiseBypass, multiplied by 0).
 class Detector : public spx_module {
 public:
     // Ports
@@ -46,16 +52,20 @@ public:
     double m_iTIA; // A/sqrt(Hz)
     bool m_noiseBypass;
     double m_sampling_time;
+    // Dark field (B-056): when the total field is exactly 0, use a field of 1e-20 * N(0,1) sqrt(W)
+    // instead (readout about 1e-40 A). On by default (the historical behaviour); off, a dark
+    // detector reads exactly the dark current (plus noise). Netlist keyword `darkfield`
+    bool m_dark_field_injection = true;
 
-    // if each photodiode has an independent RNG device
-    std::default_random_engine m_rngGen;
-    std::normal_distribution<double> m_rngDist;
+    // Random stream of this detector (seeded in start_of_simulation())
+    spx::Rng m_rng;
 
     sc_event m_event_manual_trigger;
     bool m_input_changed = false; // input memory updated since the last computed readout
 
-    // Init all parameters
-    void init();
+    // Seed m_rng from (specsGlobalConfig.seed, name()), once per simulation: SystemC calls it for
+    // every module before the first sc_start(), after the CLI and .options were applied
+    virtual void start_of_simulation();
 
     // Function that generates the noise applied to the output of this module
     double noise_gen(const double &noiseless_readout);
@@ -98,7 +108,6 @@ public:
         , m_iTIA(iTIA)
         , m_noiseBypass(noiseBypass)
         , m_sampling_time(sampling_time)
-        , m_rngDist(0,1)
     {
         SC_HAS_PROCESS(Detector);
         enable = sc_logic(1);

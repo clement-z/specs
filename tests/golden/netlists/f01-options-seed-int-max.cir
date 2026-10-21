@@ -1,0 +1,6 @@
+* F-01: .options seed=3000000000 (an integer literal beyond the int range) is rejected with the same
+* message as seed=99999999999999999999 (both are read as 2147483647 by the lexer).
+* Expected: "Error: .options: SEED=2147483647: integer literals ...", exit 1
+pdet1 a v1 nb=0
+.options seed=3000000000
+.tran 10e-12

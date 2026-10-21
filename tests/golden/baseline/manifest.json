@@ -64,6 +64,15 @@
   "err/b165-dc-stray-kwarg",
   "err/b165-op-stray-args",
   "err/b165-op-stray-kwarg",
+  "err/f01-options-seed-huge-integer",
+  "err/f01-options-seed-int-max",
+  "err/f01-options-seed-invalid",
+  "err/f01-options-seed-negative",
+  "err/f01-options-seed-too-large",
+  "err/f01-seed-invalid",
+  "err/f01-seed-negative",
+  "err/f01-seed-not-integer",
+  "err/f01-seed-overflow",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -118,6 +127,14 @@
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
   "regress/b159-crossing-backward",
+  "regress/f01-options-seed",
+  "regress/f01-options-seed-cli-priority",
+  "regress/f01-options-seed-large",
+  "regress/f01-pdet-darkfield",
+  "regress/f01-pdet-noise-default-seed",
+  "regress/f01-pdet-noise-seed",
+  "regress/f01-seed-large",
+  "regress/f01-seed-max",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -441,6 +458,12 @@
    "only": "^gtest",
    "gtest": true,
    "note": "B-016: gtest SysCUtils.CollectionsAreNameOrdered"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:39:40Z",
+   "only": "^(cli/help|cli/no-args|tb/det|tb/detector|regress/f01-.*|err/f01-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-01 seeds (B-055, B-056): --seed in the help text (cli/help, cli/no-args); tb/det, tb/detector readouts drawn from seeded streams, now compared (vcd_ignore_values removed); new f01 seed/darkfield cases; gtest (rng, detector streams)"
   }
  ]
 }

@@ -26,6 +26,7 @@ SPECSConfig::SPECSConfig(sc_module_name name)
     engine_timescale = HUNDRED_FS;
     simulation_mode = OpticalOutputPortMode::DEFAULT;
     analysis_type = AnalysisType::TIME_DOMAIN;
+    seed = DEFAULT_SEED;
 
     // Port options
     default_abstol = 1e-8;

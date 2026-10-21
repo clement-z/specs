@@ -5,6 +5,7 @@
 #include "optical_output_port.h"
 
 #include <systemc.h>
+#include <cstdint>
 #include <vector>
 #include <map>
 #include <utility>
@@ -103,6 +104,12 @@ public:
     AnalysisType analysis_type;
     map<string, pair<function<void(double)>, vector<double>>> cw_sweep_orders;
     double tran_duration = std::numeric_limits<double>::infinity();
+    // Master seed of the random streams (F-01): each noisy device draws from
+    // spx::rng_for(seed, <its hierarchical name>) (utils/rng.h). Default 0: runs are reproducible
+    static constexpr uint64_t DEFAULT_SEED = 0;
+    uint64_t seed = DEFAULT_SEED;
+    // Set when the seed was chosen explicitly (specs --seed): .options seed is then ignored
+    bool seed_explicit = false;
 
     // Port options
     double default_abstol = 1e-8;

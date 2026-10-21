@@ -852,10 +852,7 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
-   "vcd_ignore_values": [
-    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
-   ]
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON, drawn from the seeded per-detector streams (F-01, default seed 0), so the readout VCD values are reproducible and compared; the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)"
   },
   {
    "id": "tb/detector",
@@ -863,10 +860,7 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
-   "vcd_ignore_values": [
-    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
-   ]
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON, drawn from the seeded per-detector streams (F-01, default seed 0), so the readout VCD values are reproducible and compared; the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)"
   },
   {
    "id": "tb/pcm",
@@ -2003,6 +1997,299 @@
     "tests/golden/netlists/b124-allpass-ring-tight-reltol.cir"
    ],
    "note": "B-124: same ring with .options reltol=1e-9: out = 1.000000 W."
+  },
+  {
+   "id": "regress/f01-pdet-noise-default-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01 (B-055): two PDETs with noise (nb=0) on the same input, no --seed: default seed 0. The noise is drawn from rng_for(seed, instance name), so the readouts are reproducible (were seeded from std::random_device) and pdet1 and pdet2 get different noise. One record per input event (0, 10, 20, 30 ps): P * 1 A/W plus a noise of about 0.7 uA"
+  },
+  {
+   "id": "regress/f01-pdet-noise-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "12345",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: same netlist as regress/f01-pdet-noise-default-seed with --seed 12345: same record times, different noise values"
+  },
+  {
+   "id": "regress/f01-options-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+   ],
+   "note": "F-01: .options seed=12345 (f01-pdet-noise.cir included): the VCD must be identical to the one of regress/f01-pdet-noise-seed (--seed 12345); stdout differs only by the .include and the extra directive"
+  },
+  {
+   "id": "regress/f01-options-seed-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "0",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+   ],
+   "note": "F-01: --seed takes priority over .options seed: --seed 0 with .options seed=12345 gives the VCD of regress/f01-pdet-noise-default-seed (seed 0)"
+  },
+  {
+   "id": "regress/f01-seed-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "18446744073709551615",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: --seed accepts the full unsigned 64-bit range (2^64 - 1 here): other noise values than seed 0 and 12345"
+  },
+  {
+   "id": "regress/f01-pdet-darkfield",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-darkfield.cir"
+   ],
+   "note": "F-01 (B-056): dark PDETs (0 W input). darkfield=0: readout exactly 0 (no dark-field injection). darkfield=1 (default): one readout of about 1e-40 A (1e-20 * N(0,1) sqrt(W) field), now seeded and reproducible (was random at every run)"
+  },
+  {
+   "id": "err/f01-seed-invalid",
+   "args": [
+    "--seed",
+    "abc",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed must be a decimal unsigned 64-bit integer: 'abc' is rejected (Invalid seed value), exit 1"
+  },
+  {
+   "id": "err/f01-seed-negative",
+   "args": [
+    "--seed",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed -1 is rejected (Invalid seed value), exit 1"
+  },
+  {
+   "id": "err/f01-seed-not-integer",
+   "args": [
+    "--seed",
+    "1.5",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed 1.5 is rejected (trailing characters after the integer), exit 1"
+  },
+  {
+   "id": "err/f01-seed-overflow",
+   "args": [
+    "--seed",
+    "18446744073709551616",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed 2^64 is rejected (out of the unsigned 64-bit range), exit 1"
+  },
+  {
+   "id": "err/f01-options-seed-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-invalid.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=1.5 is rejected (must be an integer between 0 and 2^53)"
+  },
+  {
+   "id": "err/f01-options-seed-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=-1 is rejected (must be an integer between 0 and 2^53)"
+  },
+  {
+   "id": "err/f01-options-seed-too-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-too-large.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=1e16 is rejected (above 2^53, the netlist number would not be exact)"
+  },
+  {
+   "id": "regress/f01-seed-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "3000000000",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: --seed 3000000000 (beyond the int range), reference for regress/f01-options-seed-large"
+  },
+  {
+   "id": "regress/f01-options-seed-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-large.cir"
+   ],
+   "note": "F-01: .options seed=3e9 (a large netlist seed in exponent form): the VCD must be identical to the one of regress/f01-seed-large (--seed 3000000000)"
+  },
+  {
+   "id": "err/f01-options-seed-huge-integer",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-huge-integer.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=99999999999999999999 is rejected: the lexer reads digit strings beyond the int range as 2147483647 (pre-existing, P4 'Found, not done'), so .options seed rejects that integer literal with a hint (exponent form or --seed)"
+  },
+  {
+   "id": "err/f01-options-seed-int-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int-max.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=3000000000 (integer literal beyond the int range, read as 2147483647) is rejected with the same hint as err/f01-options-seed-huge-integer"
   }
  ]
 }

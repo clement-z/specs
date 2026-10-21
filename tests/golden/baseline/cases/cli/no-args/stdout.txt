@@ -26,6 +26,9 @@
                                         parameter for field
       --abstol=[set_abstol]             Set the value of the absolute tolerance
                                         parameter for field
+      --seed=[set_seed]                 Set the master seed of the random
+                                        streams (decimal integer, 0 to 2^64-1,
+                                        default 0); overrides .options seed
       --nrings_crow=[set_nrings_crow]   temporary
       --vci, --verbose_ci               Print components detail before starting
                                         simulation

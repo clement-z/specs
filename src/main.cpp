@@ -1,5 +1,6 @@
 #include <sstream>
 #include <chrono>
+#include <charconv>
 
 #include <systemc.h>
 #include <args.hxx>
@@ -158,6 +159,11 @@ int sc_main(int argc, char *argv[])
                           "set_abstol",
                           "Set the value of the absolute tolerance parameter for field",
                           { "abstol" });
+    args::ValueFlag<string> set_seed(parser,
+                          "set_seed",
+                          "Set the master seed of the random streams (decimal integer, 0 to 2^64-1, "
+                          "default 0); overrides .options seed",
+                          { "seed" });
 
     args::ValueFlag<size_t> set_nrings_crow(parser,
                           "set_nrings_crow",
@@ -254,6 +260,20 @@ int sc_main(int argc, char *argv[])
             return 1;
         }
         option_overrides["abstol"] = set_abstol.Get();
+    }
+    if (set_seed) {
+        // F-01: set directly (not as a footer .options line), so that it also applies to the
+        // testbenches (-t) and keeps the full 64-bit range (netlist numbers are doubles)
+        const string &s = set_seed.Get();
+        uint64_t seed_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), seed_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid seed value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.seed = seed_val;
+        // takes priority over the netlist's .options seed
+        specsGlobalConfig.seed_explicit = true;
     }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();
