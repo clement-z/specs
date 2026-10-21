@@ -5,7 +5,11 @@ Heartbeat: `2852972a` (PA-heartbeat, every 5 min, expires in 48h). Delete after 
 | Order | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | B-146 | done | 5912b6a | union of cases.json/manifest.json; 5 new cases re-recorded with current build, `unordered_streams` dropped; 195/195 `--atol 0`; gcc + ASan meson test 12/12 |
-| 2 | B-014 error (b) | todo | | |
-| 3 | 64-bit integer literals (B-180) | todo | | |
-| 4 | Zero tolerances | todo | | |
+| 2 | B-014 error (b) | in progress (orchestrator) | | |
+| 3 | 64-bit integer literals (B-180) | implementer running in `/tmp/PA-wt/int64` (`PA-wip/int64`), proposed cases in `/tmp/PA-wt/int64-cases.json` | | relaunch from the worktree state if cut off |
+| 4 | Zero tolerances | implementer running in `/tmp/PA-wt/zerotol` (`PA-wip/zerotol`), proposed cases in `/tmp/PA-wt/zerotol-cases.json` | | relaunch from the worktree state if cut off |
 | — | Docs / report | todo | | |
+
+## Notes
+- ff4d2e2: merged `sprint/2026-10c` (8af20cc, B-181 `Variable` initialisers) at the coordinator's request, before item 3.
+- Builds: `/tmp/PA-gcc` (gcc release), `/tmp/PA-asan` (clang ASan+UBSan debug).
