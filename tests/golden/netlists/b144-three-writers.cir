@@ -1,0 +1,10 @@
+* B-144 known limitation, NOT fixed (repro: backlog/repro/a4-three-writers.cir): three
+* writers on one optical net. ParseNet::bidirectional() only tests m_writers_count == 2, so
+* the net stays unidirectional (a single signal ROOT/a) and SystemC stops with E115 (more
+* than one driver on ROOT/a), exit 1. This case documents the current behaviour; a netlist
+* error naming the net and its drivers is expected once drivers are validated (B-164).
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 a wl=1.55e-6 power=2e-3
+cwsrc3 a wl=1.55e-6 power=3e-3
+probe1 a
+.tran 1e-11

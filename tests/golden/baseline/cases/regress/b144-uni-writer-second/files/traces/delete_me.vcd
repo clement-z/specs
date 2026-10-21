@@ -1,0 +1,81 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaaau  abstol       $end
+$var real    1  aaaav  reltol       $end
+$var wire   32  aaaaw  resolution_multiplier [31:0]  $end
+$var wire   32  aaaax  engine_timescale [31:0]  $end
+$var wire   32  aaaay  simulation_mode [31:0]  $end
+$var wire   32  aaaaz  analysis_type [31:0]  $end
+$var wire    1  aaaba  trace_all_optical_nets       $end
+$var wire    1  aaabb  verbose_component_initialization       $end
+$scope module PROBE{ROOT/a:0} $end
+$var real    1  aaaam  power       $end
+$var real    1  aaaan  abs       $end
+$var real    1  aaaao  phase       $end
+$var real    1  aaaap  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/a:1} $end
+$var real    1  aaaaq  power       $end
+$var real    1  aaaar  abs       $end
+$var real    1  aaaas  phase       $end
+$var real    1  aaaat  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/b:0} $end
+$var real    1  aaaai  power       $end
+$var real    1  aaaaj  abs       $end
+$var real    1  aaaak  phase       $end
+$var real    1  aaaal  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/b:1} $end
+$var real    1  aaaae  power       $end
+$var real    1  aaaaf  abs       $end
+$var real    1  aaaag  phase       $end
+$var real    1  aaaah  wavelength       $end
+$upscope $end
+$scope module ROOT/PROBE1 $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0 aaaaa
+r0 aaaab
+r0 aaaac
+r0 aaaad
+r0 aaaae
+r0 aaaaf
+r0 aaaag
+r0 aaaah
+r0 aaaai
+r0 aaaaj
+r0 aaaak
+r0 aaaal
+r0 aaaam
+r0 aaaan
+r0 aaaao
+r0 aaaap
+r0 aaaaq
+r0 aaaar
+r0 aaaas
+r0 aaaat
+r1e-08 aaaau
+r0.0001 aaaav
+b1 aaaaw
+b11111111111111111111111111110011 aaaax
+b1 aaaay
+b10 aaaaz
+1aaaba
+0aaabb
+$end
+

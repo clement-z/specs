@@ -174,7 +174,7 @@ void ParseTreeCreationHelper::create_signals(const ParseElement *elem)
     }
 }
 
-void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
+void ParseTreeCreationHelper::upgrade_signal(const string &net_name, bool device_writes_net)
 {
     // Upgrade even if: net.bidirectional() is false
 
@@ -206,11 +206,14 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
             // instead, we add a second signal to the vector to make it bidirectional
             circuit_signals[net_name].push_back(pt->nets[net_name].create_uni(net_name + ":1"));
 
-            // For bidirectional signals, first port to connect binds to signal:0
-            // for writing and signal:1 for reading
-            // Therefore we have to "re-create" this scenario, as if the first device
-            // connected to a bidirectional net. But for this we need to know which
-            // if the first device was a writer or a reader.
+            // On a bidirectional net, every writer takes the next free slot
+            // (the first one writes signal:0) and a bidir device reads the
+            // other slot (see the slot convention in parse_tree.h).
+            // The ports already bound are all on signal:0, so we have to
+            // "re-create" this scenario. For this we need to know whether they
+            // write or read the signal, and whether the upgrading device writes
+            // or reads the net (device_writes_net). The next port to connect
+            // is the upgrading device, through connect_bi().
 
             // first determine if the connected port was writing or reading the signal
             bool has_writer = pt->nets[net_name].m_connect_writer_count;
@@ -219,19 +222,25 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
             // only one should be true since the net was unidirectional
             assert(has_writer ^ has_reader);
 
-            // if a writer, then it's as expected
             if (has_writer)
             {
-                // if a writer, then it's as expected:
-                // the next port will connect to signal:1 for writing
+                // if a writer, then it's as expected, whatever the role of the
+                // device: the writer holds signal:0 (first writer), the device
+                // will write signal:1 and read signal:0
                 // we just need to update the number of "readers" connected to the net
                 pt->nets[net_name].m_readers_count++;
             }
             else
             {
-                // if a writer, then the next port needs to reverse its order.
-                // for this we swap signal:0 and signal:1
-                swap(circuit_signals[net_name][0], circuit_signals[net_name][1]);
+                // if a reader, it reads signal:0, which the device will write.
+                // If the device writes the net (an output of its unidirectional
+                // variant), that is its forward output: keep the order.
+                // If the device reads the net (an input), the reader must read
+                // what the device reads (the net's other writer, connected later
+                // on signal:1), not the device's backward output: for this we
+                // swap signal:0 and signal:1
+                if (!device_writes_net)
+                    swap(circuit_signals[net_name][0], circuit_signals[net_name][1]);
                 // then we need to update the number of "writers" connected to the net
                 pt->nets[net_name].m_writers_count++;
             }

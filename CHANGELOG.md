@@ -59,6 +59,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * gtest fork harness: pipe deadlock above 64 KiB, escaping assertions/exceptions (B-125); angle check (B-123)
 * Multi-wavelength `.op`/`.dc` (and the OP phase of `.tran`): a stale partial value of one wavelength could be
   emitted as the converged result when another wavelength shared the output port (B-001)
+* Bidirectional (`&`) nets: one slot convention (every writer takes the next free slot), so light no longer
+  depends on the netlist line order: a source or other unidirectional writer listed before the bidirectional
+  device no longer loses its light, two sources on one net run (was E115), a net upgraded to bidirectional keeps
+  its reader on the device's output, and crossing outputs on bidirectional nets propagate (B-144, B-145, B-147)
 * Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
   at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
   positional arguments is a clean error (B-052)

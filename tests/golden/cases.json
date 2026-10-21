@@ -1453,6 +1453,248 @@
     "circuits/add_drop.cir"
    ],
    "note": "B-004: an explicit -m td is kept with .dc (was overridden to frequency domain); the sweep is unchanged (DC runs every port in NO_DELAY mode), only the printed and traced simulation_mode differ from cir/add_drop"
+  },
+  {
+   "id": "regress/b144-bidir-source-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-bidir-source-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: uni source created before a bidirectional WG on an explicit '&' net; the light now reaches the WG (out:0 = 1 W at -2.1890 rad, was 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-uni-writer-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-uni-writer-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: uni writer created first on a bidirectional net takes slot :0 (b:0 = 1 mW at -2.1890 rad, was 0); same values as b144-uni-writer-second. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-uni-writer-second",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-uni-writer-second.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: same circuit as b144-uni-writer-first, WG created first (b:0 = 1 mW at -2.1890 rad, unchanged by the fix). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-two-sources-one-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-two-sources-one-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: two sources on one net take slots :0 and :1 (a:0 = 1 mW, a:1 = 2 mW, exit 0; was E115, exit 1). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-three-writers",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-three-writers.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-144 known limitation (out of scope): three writers on one optical net still stop with SystemC E115, exit 1 (bidirectional() only tests m_writers_count == 2; validation is B-164)"
+  },
+  {
+   "id": "regress/b145-upgrade-reader",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: a bidirectional WG that writes a net with a uni reader already bound no longer swaps the signals (out = 1.3409 mW at 2.4261 rad, was 0.5 mW); same as b145-upgrade-reader-ref. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-reader-ref",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-ref.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: reference for b145-upgrade-reader without '&' (out = 1.3409 mW at 2.4261 rad). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-reader-case2",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-case2.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: counter-case, a bidirectional WG that reads the upgraded net still swaps (out = 1.3409 mW at -0.5209 rad, unchanged by the fix); same as b145-upgrade-reader-case2-ref. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-reader-case2-ref",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-case2-ref.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: reference for b145-upgrade-reader-case2 without '&' (out = 1.3409 mW at -0.5209 rad). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-roles",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-roles.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: role-aware upgrade for PSHIFT, COUPLER and MZI, writing (no swap) and reading (swap) the upgraded net; out_wps = out_r* = 4.5 mW, out_wdc = 3.38 mW, out_wmzi = 2.5 mW at 1.1071 rad (were 0 / 2 mW). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-bidir",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-bidir.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Values follow the current crossing model (P3, B-032/B-033, may change them). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-wg",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-wg.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-splitter",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-splitter.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-splitter-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-splitter-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   }
  ]
 }

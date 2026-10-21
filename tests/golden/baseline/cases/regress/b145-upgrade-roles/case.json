@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b145-upgrade-roles.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b145-upgrade-roles"
+}

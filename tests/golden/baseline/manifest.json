@@ -83,6 +83,20 @@
   "regress/b052-vlsrc-positional",
   "regress/b060-pcmcell-k-eq-n",
   "regress/b131-nrings-crow",
+  "regress/b144-bidir-source-first",
+  "regress/b144-three-writers",
+  "regress/b144-two-sources-one-net",
+  "regress/b144-uni-writer-first",
+  "regress/b144-uni-writer-second",
+  "regress/b145-upgrade-reader",
+  "regress/b145-upgrade-reader-case2",
+  "regress/b145-upgrade-reader-case2-ref",
+  "regress/b145-upgrade-reader-ref",
+  "regress/b145-upgrade-roles",
+  "regress/b147-crossing-out-bidir",
+  "regress/b147-crossing-out-explicit-splitter",
+  "regress/b147-crossing-out-explicit-splitter-first",
+  "regress/b147-crossing-out-explicit-wg",
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
   "tb/ac_add_drop",
@@ -354,6 +368,12 @@
    "only": "^cli/(help|no-args)$",
    "gtest": false,
    "note": "B-058: --mon removed from the help text (TimeMonitor removed)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:35:03Z",
+   "only": "^regress/b14[457]-",
+   "gtest": false,
+   "note": "B-144/B-145/B-147: new cases, next-free-slot convention on bidirectional nets (hand-checked values in the netlist headers)"
   }
  ]
 }

@@ -1,0 +1,13 @@
+* B-147 regression (repro: backlog/repro/v7-xing-v5.cir): same circuit as
+* b147-crossing-out-explicit-splitter with the splitter listed, and created, first: the
+* splitter binds c (as a reader, 0 writers: c:0) before the crossing writes it (first
+* writer: c:0). Correct before the fix; B-147 alone broke it (z1 = 0).
+* Expected, with the CURRENT crossing model (defaults: out1 = in1, out2 = in2; P3
+* (B-032/B-033) may change crossing values):
+*   a = b = d = 1 mW at 0; c:0 = 1 mW at 0; c:1 = 0
+*   z1 = z2 = 0.5 mW at 0 (splitter: ratio 0.5, field factor sqrt(0.5))
+splitter1 c z1 z2
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=1e-3
+crossing1 a b c& d
+.op

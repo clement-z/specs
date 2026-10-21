@@ -52,8 +52,9 @@ INSTANTIATE_AND_CONNECT_BI(WGElement, pt_helper)
         (*pt_helper.nets)[nets[1]].m_readers_count++;
 
     // Bidirectional waveguide needs all nets as bidir
-    for (const auto &net : nets)
-        pt_helper.upgrade_signal(net);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -267,8 +268,11 @@ INSTANTIATE_AND_CONNECT_BI(DCElement, pt_helper)
         (*pt_helper.nets)[nets[3]].m_readers_count++;
 
     // Bidirectional DC needs all nets as bidir
-    for (const auto &net : nets)
-        pt_helper.upgrade_signal(net);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_READER);
+    pt_helper.upgrade_signal(nets[2], AS_WRITER);
+    pt_helper.upgrade_signal(nets[3], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -370,8 +374,9 @@ INSTANTIATE_AND_CONNECT_BI(PhaseShifterElement, pt_helper)
         (*pt_helper.nets)[nets[1]].m_readers_count++;
 
     // Bidirectional phase-shifter needs only optical nets as bidir
-    pt_helper.upgrade_signal(nets[0]);
-    pt_helper.upgrade_signal(nets[1]);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -466,10 +471,11 @@ INSTANTIATE_AND_CONNECT_BI(MZIElement, pt_helper)
         (*pt_helper.nets)[nets[3]].m_readers_count++;
 
     // Bidirectional phase-shifter needs only optical nets as bidir
-    pt_helper.upgrade_signal(nets[0]);
-    pt_helper.upgrade_signal(nets[1]);
-    pt_helper.upgrade_signal(nets[2]);
-    pt_helper.upgrade_signal(nets[3]);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_READER);
+    pt_helper.upgrade_signal(nets[2], AS_WRITER);
+    pt_helper.upgrade_signal(nets[3], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -549,8 +555,8 @@ INSTANTIATE_AND_CONNECT_UNI(CrossingElement, pt_helper)
     // connect ports
     pt_helper.connect_uni<spx::oa_signal_type>(obj->p_in1,  nets[0], AS_READER);
     pt_helper.connect_uni<spx::oa_signal_type>(obj->p_in2,  nets[1], AS_READER);
-    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out1, nets[2], AS_READER);
-    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out2, nets[3], AS_READER);
+    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out1, nets[2], AS_WRITER);
+    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out2, nets[3], AS_WRITER);
 
     // return the module
     return obj;
@@ -571,10 +577,11 @@ INSTANTIATE_AND_CONNECT_BI(CrossingElement, pt_helper)
         (*pt_helper.nets)[nets[3]].m_readers_count++;
 
     // Bidirectional crossing needs all optical nets as bidir
-    pt_helper.upgrade_signal(nets[0]);
-    pt_helper.upgrade_signal(nets[1]);
-    pt_helper.upgrade_signal(nets[2]);
-    pt_helper.upgrade_signal(nets[3]);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_READER);
+    pt_helper.upgrade_signal(nets[2], AS_WRITER);
+    pt_helper.upgrade_signal(nets[3], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
