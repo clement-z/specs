@@ -8,8 +8,8 @@
 | # | Phase | Items | Workspace / branch | Model | Done marker (committed on its branch) | State |
 |---|---|---|---|---|---|---|
 | P1 | Golden harness hardening | B-126, B-127, B-128, B-129 | `ws-harness` / `ws/harness` (agent 6e49bae6) | Opus 5.5 high | `backlog/sprint-2026-10b/P1-REPORT.md` | done, merged (d214196) |
-| P2 | Netlist/engine correctness | B-144/145/147, B-146, B-052, B-001, B-002/004, B-058, B-051, B-060 (validation), B-037 (docs) | `ws-engine` / `ws/engine` (agent 062bddfe) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P2-REPORT.md` | running |
-| P3 | Devices/physics | B-032/033/159 (crossing), B-049/050 (PDET), B-048 (probes, IC-proof), B-021/B-014/B-124 (tolerance docs + delay warnings) | `ws-devices` / `ws/devices` | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P3-REPORT.md` | pending |
+| P2 | Netlist/engine correctness | B-144/145/147, B-146, B-052, B-001, B-002/004, B-058, B-051, B-060 (validation), B-037 (docs) | `ws-engine` / `ws/engine` (agent 062bddfe) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P2-REPORT.md` | done, merged (cdacdca); B-146 awaits sign-off |
+| P3 | Devices/physics | B-032/033/159 (crossing), B-049/050 (PDET), B-048 (probes, IC-proof), B-021/B-014/B-124 (tolerance docs + delay warnings) | `ws-devices` / `ws/devices` (agent a8c73097) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P3-REPORT.md` | running |
 | P4 | F-01 reproducible runs (fixes B-016) | seeds, name-ordered iteration, manifest | `ws-repro` / `ws/repro` | Opus 5.5 xhigh | `backlog/sprint-2026-10b/P4-REPORT.md` | pending |
 | P5 | F-28 + F-12 | `.op`/`.dc` convergence; netlist pack (SPICE semantics) | `ws-netlist` / `ws/netlist` | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P5-REPORT.md` | pending |
 | P6 | F-05 outputs/tracing | `.save`, `--no-trace`, CSV/`.npz`, trace-all fallback | `ws-outputs` / `ws/outputs` | Opus 5.5 high | `backlog/sprint-2026-10b/P6-REPORT.md` | pending |
@@ -52,8 +52,12 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 - Sanitizer job blocking (P7): **option a** — LSan suppression file limited to leaks at `exit()` on error paths and
   allocations owned by SystemC thread stacks; leak detection stays on otherwise.
 
+## Pending maintainer sign-offs
+- **B-146** (P2): fix ready on `P2-ready/b146` @ 8129020; the only unpredicted golden change is `cir-json/subckt_tests` `flat.json`: `writers` of `ROOT/out` and `ROOT/X2/N00001` 0 → 1 (flat-equivalent count; JSON export only, no simulation change). If approved: cherry-pick onto `sprint/2026-10b` and set B-146's status.
+
 ## Log
 - 2026-10-21 — decisions recorded (c4597b9); plan written; sanitizer option a chosen; awaiting "go".
 - 2026-10-21 — go; P1 launched (agent 6e49bae6, ws/harness).
 - 2026-10-21 — coordinator heartbeat 924bc5b5 (5 min) + heartbeat.py; phase agents set their own heartbeats.
 - 2026-10-21 — P1 merged (d214196): gate = no C++ change, 30 baseline files ID-only, gcc+clang meson test 12/12, golden 81/81 `--atol 0`, swapped line fails. P2 launched (agent 062bddfe). Note: phase agents' own heartbeats are denied by their permission classifier; the coordinator heartbeat resumes them.
+- 2026-10-21 — P2 merged (cdacdca): gate = scope OK, gcc+clang meson test 12/12, golden 115/115 `--atol 0`, old baseline + predicted edits == new baseline. B-146 parked for sign-off. P3 launched (agent a8c73097).
