@@ -77,7 +77,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %token <i_val> T_DIRECTIVE_OPTIONS T_DIRECTIVE_NODESET
 %token <i_val> T_DIRECTIVE_SUBCKT
 %token <s_ptr> T_DIRECTIVE_ENDS
-%token <s_ptr> T_DIRECTIVE_SAVE
+%token <i_val> T_DIRECTIVE_SAVE
 %token <i_val> T_LOCAL_ASSIGNMENT
 %type <c_val> '='
 
@@ -109,6 +109,8 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 // Available directives
 %type <i_val> directive.options
 %type <i_val> directive.nodeset
+%type <i_val> directive.save
+%type <elemattr_ptr> save_target
 
 // Rules for circuit nets (value is index in PT elements)
 %type <s_ptr> net_name.base.str
@@ -190,6 +192,42 @@ local_assignment: T_LOCAL_ASSIGNMENT assignment
 ;
 
 /* --------- Directives definitions parsing ----------- */
+
+/* .save net QTY(net) ... (F-05): probes on the listed optical nets */
+directive.save: T_DIRECTIVE_SAVE save_target
+                {
+                    $$ = cur_pt->register_directive(new SAVEDirective);
+                    static_cast<SAVEDirective *>(cur_pt->directives[$$])->add_target(*$2, cur_pt->name_prefix());
+                    delete $2;
+                }
+              | directive.save save_target
+                {
+                    static_cast<SAVEDirective *>(cur_pt->directives[$1])->add_target(*$2, cur_pt->name_prefix());
+                    $$ = $1;
+                    delete $2;
+                }
+;
+
+/* net (every quantity) or QTY(net), QTY as the keywords of PROBE (P, E, PHI, WL, ...) */
+save_target: net_name_base
+                {
+                    $$ = new pair<string, string>("", *$1);
+                    delete $1;
+                }
+           | T_STR '(' net_name_base ')'
+                {
+                    if (SAVEDirective::quantity(*$1) == SAVEDirective::UNKNOWN)
+                    {
+                        stringstream ss;
+                        ss << ".save: unknown quantity " << *$1 << "(" << *$3 << ")"
+                           << " (expected P, E, PHI or WL, or a net name alone for all of them)";
+                        yyerror(scanner, pt, ss.str().c_str());
+                    }
+                    $$ = new pair<string, string>(*$1, *$3);
+                    delete $1;
+                    delete $3;
+                }
+;
 
 directive.options: T_DIRECTIVE_OPTIONS { $$ = cur_pt->register_directive(new OPTIONSDirective); }
 ;
@@ -453,6 +491,7 @@ directive.with_kwargs:
 ;
 
 directive: directive.with_kwargs
+         | directive.save
 ;
 
 /* --------- Elements arguments parsing ----------- */

@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 using std::ostringstream;
 
@@ -818,8 +819,63 @@ void ParseTree::build_circuit()
         // move on to the next one
         next_net = pt_helper.next_fresh_net();
     }
+    // .save (F-05): one probe per signal of each listed net (two on a bidirectional net), named and
+    // traced like the automatic probes (PROBE{<signal>}); the targets on one net share its probe
+    bool has_save = false;
+    for (const auto &x : directives)
+    {
+        const auto *save = dynamic_cast<const SAVEDirective *>(x);
+        if (!save)
+            continue;
+        has_save = true;
+        for (const auto &target : save->targets)
+        {
+            const auto net = nets.find(target.net);
+            if (net == nets.end())
+            {
+                cerr << "Error: .save " << target.written << ": no net named '" << target.net_written
+                     << "' in the netlist" << endl;
+                exit(1);
+            }
+            if (net->second.type() != ParseNet::OANALOG)
+            {
+                cerr << "Error: .save " << target.written << ": '" << target.net_written
+                     << "' is not an optical net (" << net->second.type_str() << ")" << endl;
+                exit(1);
+            }
+            for (const auto &sig : circuit_signals.at(target.net))
+            {
+                const string probe_name = string("PROBE{") + sig->name() + "}";
+                auto &mod = circuit_modules[probe_name];
+                if (!mod)
+                {
+                    auto probe = make_shared<Probe>(probe_name.c_str(), false, false, false, false);
+                    probe->p_in(*dynamic_cast<spx::oa_signal_type *>(sig.get()));
+                    mod = probe;
+                }
+                Probe *probe = static_cast<Probe *>(mod.get());
+                const auto q = target.quantity;
+                probe->m_trace_power |= (q == SAVEDirective::ALL || q == SAVEDirective::POWER);
+                probe->m_trace_modulus |= (q == SAVEDirective::ALL || q == SAVEDirective::MODULUS);
+                probe->m_trace_phase |= (q == SAVEDirective::ALL || q == SAVEDirective::PHASE);
+                probe->m_trace_wavelength |= (q == SAVEDirective::ALL || q == SAVEDirective::WAVELENGTH);
+            }
+        }
+    }
+
     for (const auto &x : directives)
         x->create();
+
+    // F-05: a netlist with probes or .save targets only traces them; every optical net is traced only
+    // as a fallback, when it has neither (or when .options traceall says so)
+    if (!specsGlobalConfig.trace_all_optical_nets_explicit)
+    {
+        const bool has_probes = std::any_of(elements.begin(), elements.end(), [](const ParseElement *elem) {
+            return dynamic_cast<const ProbeElement *>(elem) || dynamic_cast<const MLProbeElement *>(elem);
+        });
+        if (has_probes || has_save)
+            specsGlobalConfig.trace_all_optical_nets = false;
+    }
 
     if (! analyses.empty())
         analyses.at(0)->create();

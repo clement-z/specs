@@ -30,7 +30,10 @@ void OPTIONSDirective::create() const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "TRACEALL")
+        {
             specsGlobalConfig.trace_all_optical_nets = p.second.as_boolean();
+            specsGlobalConfig.trace_all_optical_nets_explicit = true;
+        }
         else if (kw == "ABSTOL")
         {
             const double v = p.second.as_double();
@@ -152,4 +155,30 @@ void NODESETDirective::create() const
 {
     cerr << "NODESET is disabled pending bugfixes" << endl;
     exit(1);
+}
+
+SAVEDirective::Quantity SAVEDirective::quantity(string name)
+{
+    strutils::toupper(name);
+    if (name == "POWER" || name == "POW" || name == "P")
+        return POWER;
+    if (name == "MAGNITUDE" || name == "MAG" || name == "MODULUS" || name == "MOD" || name == "E")
+        return MODULUS;
+    if (name == "PHASE" || name == "PHI")
+        return PHASE;
+    if (name == "WAVELENGTH" || name == "WL")
+        return WAVELENGTH;
+    return UNKNOWN;
+}
+
+void SAVEDirective::add_target(const pair<string, string> &target, const string &prefix)
+{
+    Target t;
+    t.net = prefix + target.second;
+    t.net_written = target.second;
+    t.written = target.first.empty() ? target.second : target.first + "(" + target.second + ")";
+    t.quantity = target.first.empty() ? ALL : quantity(target.first);
+    targets.push_back(t);
+    // also as positional arguments, for print() and the JSON export
+    args.emplace_back(Variable(t.written));
 }

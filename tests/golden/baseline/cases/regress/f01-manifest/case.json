@@ -14,9 +14,9 @@
    "stored": "files/traces/m.manifest.json"
   },
   "traces/m.vcd": {
-   "bytes": 1894,
+   "bytes": 1013,
    "kind": "vcd",
-   "sha256": "9274899b5749d52d2babed41ddecb3431fbaed53def215cc7210a9820aafec10",
+   "sha256": "ddaee99ed71bb945384d4991d524fed4cc395ed55bed9b17150f3257fec114e1",
    "stored": "files/traces/m.vcd"
   }
  },

@@ -22,3 +22,7 @@ B-048, B-062.
 - Review ids: F-A3-11.
 ## Verification
 I ran the repro with the release binary.
+## Status
+Open for the VCD. Related (sprint 2026-10b P6, F-05, 824702e): the CSV/`.npz` tables (`--format csv|npz`) have one
+row per time step, probe and wavelength, so a PROBE on a WDM net keeps every carrier there; the VCD variables of
+a PROBE still show the last event.

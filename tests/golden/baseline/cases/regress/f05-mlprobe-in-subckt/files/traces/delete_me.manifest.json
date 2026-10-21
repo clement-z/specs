@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f05-mlprobe-in-subckt.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f05-mlprobe-in-subckt.cir", "sha256": "7f308f3dcb438ee4f1c8c3592bd21327d6223e529f777bc915975d8ebd5473a5"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

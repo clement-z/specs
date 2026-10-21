@@ -73,6 +73,22 @@
     differ (B-143)
   * The pre-release netlists `double_ring.cir`, `triple_ring.cir`, `paul_simple_ring.cir` moved to
     `circuits/legacy/` (they do not parse; kept for reference) (B-133)
+* Outputs and tracing (F-05, `doc/netlist.md`):
+  * **Changed outputs:** a netlist with probes (PROBE, MLPROBE, also inside a subcircuit) traces only them: the
+    automatic `PROBE{<net>}` probes of every optical net are added only when the netlist has no probe, or with
+    an explicit `.options traceall=1` (`.options traceall=0` still disables them). Simulation results and the
+    probed signals are unchanged; the VCD loses the automatic probes and `- trace all optical nets:` prints 0
+  * `.save net QTY(net) ...` traces the listed optical nets (the paper's `.save P(out) P(drop)` now parses): a net
+    alone traces power, modulus, phase and wavelength, `P(...)`, `E(...)`, `PHI(...)`, `WL(...)` one quantity
+    each; the probes are named `PROBE{<net>}` like the automatic ones. A netlist with `.save` traces only its
+    targets and probes
+  * `--no-trace`: no trace file and no run manifest file (as `-o ""`), for runs that only need stdout or for timing
+  * `--format vcd|csv|npz` (repeatable; default `vcd`): tables of the probe samples, `<output>.csv` and NumPy
+    `<output>.npz` (dependency-free writer), one row per time step, probe and wavelength, with time, probe,
+    wavelength, power and complex field, exact to the last bit (the VCD prints 16 digits). Column layout in
+    `doc/netlist.md` ("Tracing and output files"). The golden harness decodes `.npz` outputs to text
+  * An MLPROBE without a VCD (`-o ""`, `--no-trace`, `--format csv`) no longer reports every sample of its listed
+    wavelengths as an unsupported signal
 
 ### Fixed
 

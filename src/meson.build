@@ -4,6 +4,7 @@ core_sources = files(
   'optical_signal.cpp',
   'run_manifest.cpp',
   'specs.cpp',
+  'trace_table.cpp',
   'utils/rng.cpp',
   'utils/sha256.cpp',
   'utils/sysc_utils.cpp',

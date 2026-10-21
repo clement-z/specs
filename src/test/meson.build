@@ -24,6 +24,7 @@ if gtest_dep.found()
       'run_manifest.cpp',
       'specs_config.cpp',
       'sysc_utils.cpp',
+      'trace_table.cpp',
       'tran_start.cpp',
       'utils/sha256.cpp',
     ),

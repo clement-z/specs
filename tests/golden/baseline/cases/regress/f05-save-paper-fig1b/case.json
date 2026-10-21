@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f05-save-paper-fig1b.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "bd5dbf3f31bd07ba2ee1b044564c07caf547772657e7e523d2409d07bc02155e",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 12847,
+   "kind": "vcd",
+   "sha256": "59e7e91d9733913a5c00a3c24f1b20592a7316240fe71420e27041517833a113",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f05-save-paper-fig1b"
+}

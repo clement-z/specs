@@ -105,6 +105,12 @@ For every case the harness records:
     stdout (`argv[0]` is absolute in `rlimit_nofile` cases); the rest is verbatim, so
     the SHA-256 of the netlist files is compared: editing a netlist, even a comment,
     changes the manifest of every case that reads it;
+  * NumPy `.npz` (`specs` writes them): the ZIP is read entry by entry, in archive
+    order, and each `.npy` array is decoded (`<f8`, `<i4`, `<i8`, `<U<n>`) into text, one
+    value per line under a `npz <entry>: descr=... shape=...` line (floats with `repr`).
+    An undecodable file or entry becomes a `npz...: cannot decode: <reason>` line. The
+    baseline stores this text, not the binary; the SHA-256 and size of the raw bytes are
+    kept in `case.json` but never compared (the last bits of floats differ between compilers);
   * anything else: compared as text, or as bytes if binary.
 
 The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=DISABLE`.
@@ -130,6 +136,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   add or drop redundant records without changing the waveform. Timescale and
   the set of declared variables (with type and width) must match.
 * **JSON** is compared structurally, with numbers using the tolerance.
+* **NPZ** is compared as its decoded text, line by line, as **text** is (float
+  tolerance and print slack apply; a 1-ulp difference passes).
 * **gtest** results are compared per test name (`Suite.Test`: PASS / FAIL /
   SKIP / NOT_RUN); timings are ignored:
   * PASS -> FAIL and missing tests fail;
@@ -146,7 +154,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (175 `specs` cases + 1 gtest case)
+## Case list (189 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
@@ -155,8 +163,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*`, `err/fNN-*` (60) | bad inputs from the 2026-10 and 2026-10b fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
-| `regress/bNNN-*`, `regress/fNN-*` (70) | regression cases of the 2026-10 and 2026-10b fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, ...); hand-computed expected values are in the netlist headers |
+| `err/bNNN-*`, `err/fNN-*` (66) | bad inputs from the 2026-10 and 2026-10b fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
+| `regress/bNNN-*`, `regress/fNN-*` (78) | regression cases of the 2026-10 and 2026-10b fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, tracing only the probes of a netlist that has some, `.save`, `--no-trace`, CSV and `.npz` tables, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
@@ -184,7 +192,7 @@ baseline/manifest.json              format, date, note (build used, gtest proven
 baseline/cases/<group>/<name>/case.json    args, exit status, list of output files (+sha256, size)
 baseline/cases/<group>/<name>/stdout.txt   normalised
 baseline/cases/<group>/<name>/stderr.txt   normalised
-baseline/cases/<group>/<name>/files/...    normalised output files (VCD, JSON)
+baseline/cases/<group>/<name>/files/...    normalised output files (VCD, JSON; an .npz as decoded text in <name>.npz.txt)
 baseline/gtest/unit_tests.json      per-test PASS/FAIL
 ```
 

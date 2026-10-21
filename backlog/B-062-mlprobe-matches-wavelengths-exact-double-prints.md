@@ -19,3 +19,7 @@ B-057, B-066.
 - Review ids: F-A3-16.
 ## Verification
 I ran the repro with the release binary.
+## Status
+Open. Sprint 2026-10b P6 (F-05, 824702e) changed the lookup from the VCD signals to the MLPROBE's wavelength list
+(still exact `==`): without a trace file (`-o ""`, `--no-trace`, `--format csv`) a listed wavelength used to be
+reported as unsupported on every event.

@@ -1,0 +1,2 @@
+Warning: photodetector and power meter readouts are only traced in the VCD (add --format vcd)
+

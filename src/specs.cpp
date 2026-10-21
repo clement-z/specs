@@ -14,6 +14,7 @@
 #include "devices/power_meter.h"
 #include "devices/generic_transmission_device.h"
 #include "run_manifest.h"
+#include "trace_table.h"
 
 #include <algorithm>
 #include <cmath>
@@ -44,6 +45,8 @@ SPECSConfig::SPECSConfig(sc_module_name name)
     trace_all_optical_nets = 1;
 }
 
+SPECSConfig::~SPECSConfig() {}
+
 void SPECSConfig::runAnalysis()
 {
     verifyConfig();
@@ -64,6 +67,10 @@ void SPECSConfig::runAnalysis()
             cerr << "Undefined Analysis type";
             sc_stop();
     }
+
+    // F-05: write the .npz table, close the CSV
+    if (default_trace_table && !default_trace_table->close())
+        exit(1);
 }
 
 void SPECSConfig::runOPAnalysis()
@@ -363,24 +370,34 @@ void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
 }
 
 void SPECSConfig::applyDefaultTraceFileToAllSignals() {
-    if (!default_trace_file)
+    TraceTable *table = default_trace_table.get();
+    if (!default_trace_file && !table)
         return;
 
     auto all_probes = sc_get_all_object_by_type<Probe>();
     for (auto p: all_probes) {
         p->setTraceFile(default_trace_file);
+        p->setTraceTable(table);
     }
 
     auto all_mlambda_probes = sc_get_all_object_by_type<MLambdaProbe>();
     for (auto p: all_mlambda_probes) {
         p->setTraceFile(default_trace_file);
+        p->setTraceTable(table);
     }
 
     if (trace_all_optical_nets)
     {
+        // nets that already have their automatic probe (.save, F-05) keep it
+        set<string> probe_names;
+        for (auto p: all_probes)
+            probe_names.insert(p->name());
+
         auto all_optical_sigs = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
         for (auto &sig: all_optical_sigs) {
             string signame = sig->name();
+            if (probe_names.count("PROBE{" + signame + "}"))
+                continue;
 
             // Check if the signal is explicitly marked as uninteresting
             stringstream ss (signame);
@@ -392,17 +409,26 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
 
             auto p = make_shared<Probe>(("PROBE{" + signame + "}").c_str(), true, true, true, true);
             p->setTraceFile(default_trace_file);
+            p->setTraceTable(table);
             p->p_in(*sig);
             additional_objects.push_back(p);
         }
     }
     // TODO: refactor ↓
     auto all_pdets = sc_get_all_object_by_type<Detector>();
+    auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
+    if (!default_trace_file)
+    {
+        // the tables only hold the probes (F-05)
+        if (!all_pdets.empty() || !all_pwr_meters.empty())
+            cerr << "Warning: photodetector and power meter readouts are only traced in the VCD "
+                 << "(add --format vcd)" << endl;
+        return;
+    }
     for (auto &pdet: all_pdets) {
         pdet->trace(default_trace_file);
     }
 
-    auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
     for (auto &pwr_meter: all_pwr_meters) {
         pwr_meter->trace(default_trace_file);
     }
@@ -459,7 +485,7 @@ void SPECSConfig::prepareSimulation() {
 
     { // open default trace_file
         bool opened_default_trace_file = false;
-        if (!default_trace_file && trace_filename.size())
+        if (!default_trace_file && trace_filename.size() && trace_vcd)
         {
             default_trace_file = sc_create_vcd_trace_file(trace_filename.c_str());
             opened_default_trace_file = true;
@@ -468,14 +494,28 @@ void SPECSConfig::prepareSimulation() {
         if (default_trace_file)
             default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
 
+        // tables of the probes (F-05, --format csv|npz)
+        bool opened_default_trace_table = false;
+        if (!default_trace_table && trace_filename.size() && (trace_csv || trace_npz))
+        {
+            default_trace_table = std::make_unique<TraceTable>(trace_csv ? trace_filename + ".csv" : "",
+                                                               trace_npz ? trace_filename + ".npz" : "");
+            opened_default_trace_table = true;
+        }
+
         // Run manifest (F-01): written next to the default trace file opened above, and printed
-        // once with --print-manifest (with "trace_file": null if SPECS writes no default trace)
-        if (opened_default_trace_file || print_run_manifest)
+        // once with --print-manifest (with "trace_file": null if SPECS writes no default trace).
+        // Its trace file is the VCD, or the first table (CSV, then .npz) when there is no VCD
+        if (opened_default_trace_file || opened_default_trace_table || print_run_manifest)
         {
             // sc_create_vcd_trace_file() appends ".vcd"
-            const string manifest_trace_file = opened_default_trace_file ? trace_filename + ".vcd" : "";
-            const string manifest_json = RunManifest(*this, manifest_trace_file).to_json();
+            string manifest_trace_file;
             if (opened_default_trace_file)
+                manifest_trace_file = trace_filename + ".vcd";
+            else if (opened_default_trace_table)
+                manifest_trace_file = trace_filename + (trace_csv ? ".csv" : ".npz");
+            const string manifest_json = RunManifest(*this, manifest_trace_file).to_json();
+            if (opened_default_trace_file || opened_default_trace_table)
                 RunManifest::write_file(trace_filename + ".manifest.json", manifest_json);
             if (print_run_manifest)
             {

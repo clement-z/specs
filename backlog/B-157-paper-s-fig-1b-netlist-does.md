@@ -33,3 +33,8 @@ B-162 (.nodeset), B-161 (.ic), docs area (cheatsheet mismatches).
 - Review ids: F-A4-16.
 ## Verification
 Ran the repro on Release.
+## Status
+Partly fixed (sprint 2026-10b): `.dc WL(cwsrc1)` in b00b8ae (P5, F-12); `.save P(out) P(drop)` in 9feac83
+(P6, F-05; golden case `regress/f05-save-paper-fig1b` runs the paper's DC part). Open: the `dc1`/`dc2` coupler
+prefix (the golden netlist renames them `coupler1`/`coupler2`), `{expr}` and negative sweep bounds, and
+elements inside a subcircuit instance in `.dc`.

@@ -1,0 +1,36 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "--format",
+  "npz",
+  "-o",
+  "traces/t",
+  "-f",
+  "tests/golden/netlists/f05-save-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/t.csv": {
+   "bytes": 39775,
+   "kind": "text",
+   "sha256": "02e8ef2ecb0e363c72505697d8703260372505b733e5f71ad7ebf6e1ef195a69",
+   "stored": "files/traces/t.csv"
+  },
+  "traces/t.manifest.json": {
+   "bytes": 471,
+   "kind": "json",
+   "sha256": "660d9d8e48ddd2c21b60220fef8c0e162eedb35c0519ef65828681ac8ccb2d0a",
+   "stored": "files/traces/t.manifest.json"
+  },
+  "traces/t.npz": {
+   "bytes": 33919,
+   "kind": "npz",
+   "raw_bytes": 18584,
+   "raw_sha256": "6971b89ca2a89c9f8905b826c890b09c2a30ebc5def8c67c6bbe117dc2386813",
+   "sha256": "555b4505afb4aad9564eb662f38599eec43de97b0d1bfbc81dfb2e838bb46bff",
+   "stored": "files/traces/t.npz.txt"
+  }
+ },
+ "id": "regress/f05-format-csv-npz"
+}

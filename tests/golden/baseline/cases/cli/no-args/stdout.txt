@@ -19,6 +19,16 @@
       -T, --run-manual-test             Run manual test function
       -o[set_tracefile],
       --output=[set_tracefile]          Set the default trace file
+      --format=[format...]              Output format of the traces: vcd
+                                        (default), csv or npz (tables of the
+                                        probed signals: time, signal,
+                                        wavelength, power, complex field),
+                                        written as <output>.vcd/.csv/.npz;
+                                        repeat it to write several; netlists
+                                        only
+      --no-trace                        Write no trace file and no run manifest
+                                        (the probes and .save targets are not
+                                        traced); netlists only
       --json=[export_json]              Export json of completed circuit to file
       --version                         Output version information and exit
       --print-manifest                  Print the run manifest (version, seed,

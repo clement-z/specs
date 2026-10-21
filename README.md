@@ -27,6 +27,7 @@ meson setup build -Dcmake_prefix_path=/path/to/systemc/prefix   # release build 
 meson compile -C build
 meson test -C build                # unit tests, testbench smoke tests, golden-output regression
 build/specs -f circuits/add_drop.cir -o traces/out               # needs a traces/ directory
+build/specs -f circuits/add_drop.cir -o traces/out --format csv  # traces/out.csv instead of traces/out.vcd
 ```
 
 Without `-Dcmake_prefix_path` (and no `systemc` pkg-config package), Meson builds SystemC from the

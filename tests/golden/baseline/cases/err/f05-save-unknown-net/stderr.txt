@@ -1,0 +1,2 @@
+Error: .save nope: no net named 'nope' in the netlist
+
