@@ -26,6 +26,7 @@
 #include "parser/parse_element.h"
 #include "parser/parse_analysis.h"
 #include "parser/parse_directive.h"
+#include "parser/parser_state.h"
 
 #include "parser.h"
 #include "scanner.h"
@@ -204,6 +205,8 @@ subcircuit.with_ports: T_DIRECTIVE_SUBCKT T_STR
                     {
                         // Register a new subcircuit in current parse tree
                         $$ = cur_pt->register_subcircuit(*$2);
+                        // directory of the file being scanned, for .include in the body (B-143)
+                        cur_pt->subcircuits[$$]->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                         delete $2;
                     }
                 | subcircuit.with_ports port_name

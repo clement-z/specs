@@ -1,0 +1,3 @@
+* F-12: included by ../mid.cir after sub/leaf.cir
+probe1 a
+probe2 b

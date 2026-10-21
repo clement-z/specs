@@ -1,0 +1,2 @@
+* F-12: body of subcircuit SRC (sub/leaf.cir), included relative to sub/leaf.cir
+cwsrc1 p wl=1.55e-6 power=2e-3

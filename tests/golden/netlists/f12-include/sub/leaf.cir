@@ -1,0 +1,5 @@
+* F-12: included by ../mid.cir; defines subcircuit SRC, whose body includes src_body.cir from
+* this directory (f12-include/sub/src_body.cir) each time SRC is instantiated
+.subckt src p
+.include src_body.cir
+.ends

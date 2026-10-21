@@ -19,6 +19,7 @@ if gtest_dep.found()
       'general_utils.cpp',
       'main.cpp',
       'optical_output_port.cpp',
+      'parser_state.cpp',
       'rng.cpp',
       'run_manifest.cpp',
       'specs_config.cpp',

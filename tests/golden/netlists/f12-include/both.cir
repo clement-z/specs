@@ -1,0 +1,8 @@
+* F-12 (B-143): both candidates of ".include circuits/add_drop_sub.cir" exist and differ:
+* f12-include/circuits/add_drop_sub.cir (relative to this file, sets .param included_from) is
+* used, with a warning on stderr; circuits/add_drop_sub.cir of the working directory (the shipped
+* example, defines subcircuit ADD_DROP_FILTER) is not read: no subcircuit in the listing.
+.include circuits/add_drop_sub.cir
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.op

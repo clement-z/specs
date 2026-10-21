@@ -2733,6 +2733,40 @@
    ],
    "expect": "fail",
    "note": "F-12: --param needs name=value with an identifier name ('-' is not allowed): Invalid --param value, exit 1"
+  },
+  {
+   "id": "regress/f12-include-relative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-include/main.cir"
+   ],
+   "note": "F-12 (B-143): .include relative to the including file first: main.cir -> mid.cir (same dir) -> sub/leaf.cir then sub/probes.cir (relative to mid.cir, after sub/leaf.cir has ended); the body of subcircuit SRC, defined in sub/leaf.cir, includes src_body.cir next to sub/leaf.cir when X1 is flattened. 'Including file:' and the run manifest give the paths opened"
+  },
+  {
+   "id": "regress/f12-include-both-differ",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-include/both.cir"
+   ],
+   "note": "F-12 (B-143): .include circuits/add_drop_sub.cir exists next to both.cir and in the working directory, with different contents: the file-relative one is used (sets .param included_from, no subcircuit), with a warning on stderr"
   }
  ]
 }

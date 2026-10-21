@@ -152,6 +152,8 @@
   "regress/f12-dc-wl-alias",
   "regress/f12-dc-wl-slash",
   "regress/f12-ends-name",
+  "regress/f12-include-both-differ",
+  "regress/f12-include-relative",
   "regress/f12-param-override",
   "regress/f12-param-undefined",
   "regress/f12-si-op",
@@ -529,6 +531,12 @@
    "only": "^(cli/help|cli/no-args|regress/f12-param-.*|err/f12-param-.*)$",
    "gtest": false,
    "note": "F-12: --param name=value (help lines, new cases)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:05:49Z",
+   "only": "^(regress/f12-include-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-12 (B-143): .include relative to the including file (new cases, gtest ParserState.*)"
   }
  ]
 }

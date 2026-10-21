@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-include/main.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 998,
+   "kind": "json",
+   "sha256": "f5bf2bf251a29f3890ad6d8402ac65302b10c8c4ebf167e72b4906ea976f552c",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f12-include-relative"
+}

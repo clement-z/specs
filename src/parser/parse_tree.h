@@ -355,6 +355,9 @@ struct ParseSubcircuit {
     vector<string> ports; // name of ports
     map<string, Variable> kwargs; // list of kw arguments found on netlist
     const ParseTree *parent;
+    // directory of the file that defines the subcircuit: .include in the body is relative to it
+    // first (B-143); "" if none
+    string include_dir;
 
     ParseSubcircuit(const string &name, ParseTree *parent = nullptr)
     : name(name)

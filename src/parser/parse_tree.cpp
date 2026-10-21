@@ -331,6 +331,8 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     ParserState *parser_state = new ParserState;
     // .include lines of the body are opened by this scanner (B-150): record them in the root's list
     parser_state->input_files = root_input_files();
+    // and resolved relative to the file that defines the subcircuit first (B-143)
+    parser_state->include_dirs.assign(1, subcircuit.include_dir);
     YY_BUFFER_STATE buf;
 
     yylex_init_extra(parser_state, &scanner);
