@@ -1,3 +1,9 @@
+# Unit tests of the harness itself (normalisation and comparison rules; needs no build).
+test('golden-harness', find_program('python3'),
+  args: ['-I', files('test_run_golden.py')],
+  suite: 'golden',
+)
+
 # Golden-output regression check against the committed baseline (see README.md).
 # The tb/* cases need the legacy testbenches; without unit_tests the gtest case is SKIPPED.
 if not get_option('old_tb')

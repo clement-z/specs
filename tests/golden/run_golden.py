@@ -54,6 +54,10 @@ IN_FILE_RE = re.compile(r"In file: (?:\S*/)?([^/\s:]+)(?::\d+)?")
 # Wall-clock timings printed by `specs -t` (main.cpp do_test).
 RUNTIME_RE = re.compile(r"Total runtime: \S+ ms")
 NEG_NAN_RE = re.compile(r"-nan\b")
+# OpticalSignal IDs printed by operator<< (src/optical_signal.h): "[0042]  @ 1550 nm (...)".
+# They come from a global counter that every copy also bumps, so only their identity
+# structure is meaningful.  Also matches the canonical "[#3]" form (see canonical_ids).
+SIGNAL_ID_RE = re.compile(r"\[(\d{4,}|#\d+)\](?= +@ )")
 
 # Numbers embedded in text: not glued to identifiers (PS1, COL_0, uut2 ...).
 NUM_RE = re.compile(
@@ -105,7 +109,26 @@ def normalise_text(text, pathmap):
         out.pop(0)
     while len(out) > 1 and out[-1] == "" and out[-2] == "":
         out.pop()
-    return "\n".join(out)
+    return canonical_ids("\n".join(out))
+
+
+def canonical_ids(text, sort_lines=False):
+    """Replace every printed OpticalSignal ID by "[#k]", k = rank of its first appearance.
+
+    Prints of the same signal keep the same rank, absolute counter values vanish.
+    With sort_lines, the ranks follow the lines sorted with their IDs masked, so that
+    they don't depend on line order (streams compared as a multiset of lines).
+    """
+    lines = text.split("\n")
+    if sort_lines:
+        lines = sorted(lines, key=lambda l: SIGNAL_ID_RE.sub("[#]", l))
+    ranks = {}
+    for line in lines:
+        for m in SIGNAL_ID_RE.finditer(line):
+            ranks.setdefault(m.group(1), "[#%d]" % (len(ranks) + 1))
+    if not ranks:
+        return text
+    return SIGNAL_ID_RE.sub(lambda m: ranks[m.group(1)], text)
 
 
 VCD_DROP_BLOCKS = ("$date", "$version")
@@ -763,8 +786,9 @@ def compare_case(base, cand, case, tol, strict_order=False):
         d = compare_text(ta, tb_, tol, stream)
         if not d:
             continue
-        sa = "\n".join(sorted(ta.split("\n")))
-        sb = "\n".join(sorted(tb_.split("\n")))
+        # Signal ID ranks follow the line order: renumber them independently of it.
+        sa = "\n".join(sorted(canonical_ids(ta, sort_lines=True).split("\n")))
+        sb = "\n".join(sorted(canonical_ids(tb_, sort_lines=True).split("\n")))
         if not compare_text(sa, sb, tol, stream):
             # Same multiset of lines (within tolerance): only the order differs.
             # SPECS iterates SystemC objects in pointer order (std::set<T*>),

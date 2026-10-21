@@ -9,12 +9,12 @@ Current SPECS config:
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/detector_tb.vcd)
 0 s:
-	IN: [0006]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+	IN: [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 	READOUT:  0
 	READOUT2:  0
 	COUNT: 1
 100 ms:
-	IN: [0011]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	IN: [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 	READOUT:  0
 	READOUT2:  0
 	COUNT: 2
@@ -23,7 +23,7 @@ Failure!
 Expected 1A as both output currents!
 -----------------/! \---------------
 200 ms:
-	IN: [0016]  @ 1551 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+	IN: [#3]  @ 1551 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 	READOUT:  0
 	READOUT2:  0
 	COUNT: 3
