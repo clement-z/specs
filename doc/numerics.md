@@ -37,6 +37,9 @@ Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_d
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
   reproducible: the default seed is 0, and the same netlist and seed give the same values. Netlist numbers
   are doubles, hence the 2^53 limit of `.options seed`; `--seed` takes any decimal unsigned 64-bit integer.
+  Write netlist seeds of 2147483647 or more in exponent form (`seed=3e9`): the netlist lexer reads longer
+  digit strings as 2147483647 without an error, so `.options seed` rejects that value. See
+  [reproducibility.md](reproducibility.md).
 - `-R` sets the **timescale**, not `.options resolution`: `-R -14` is `.options timescale=-14`.
 - All optical output ports share these values. C++ testbenches can configure single ports differently.
 
