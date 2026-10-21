@@ -13,3 +13,4 @@ Heartbeat: `2852972a` (PA-heartbeat, every 5 min, expires in 48h). Delete after 
 ## Notes
 - ff4d2e2: merged `sprint/2026-10c` (8af20cc, B-181 `Variable` initialisers) at the coordinator's request, before item 3.
 - Builds: `/tmp/PA-gcc` (gcc release), `/tmp/PA-asan` (clang ASan+UBSan debug).
+- 2026-10-21, maintainer instruction: new subagents get a model chosen per task (haiku/sonnet/opus) and an explicit effort of medium or high (supersedes "Opus implementer subagents" in the phase prompt). The two implementers already running (items 3, 4: Opus, default effort) were not restarted.
