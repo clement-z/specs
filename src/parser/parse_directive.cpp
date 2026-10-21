@@ -30,7 +30,10 @@ void OPTIONSDirective::create() const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "TRACEALL")
+        {
             specsGlobalConfig.trace_all_optical_nets = p.second.as_boolean();
+            specsGlobalConfig.trace_all_optical_nets_explicit = true;
+        }
         else if (kw == "ABSTOL")
         {
             const double v = p.second.as_double();

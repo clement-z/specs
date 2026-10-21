@@ -195,8 +195,10 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 ## Directives
 
 - `.options key=value ...` (keys case-insensitive): `abstol`, `reltol`, `snapfactor`, `timescale` (alias `ts`),
-  `resolution`, `seed`, `maxiter`: see [numerics.md](numerics.md). `traceall` (0 or 1, default 1): trace every
-  optical net. An unknown key stops with `Unknown keyword: foo (value: 1 (INTEGER))`.
+  `resolution`, `seed`, `maxiter`: see [numerics.md](numerics.md). `traceall` (0 or 1): trace every optical net
+  (automatic probes `PROBE{<net>}`). Without it, a netlist with probes (PROBE, MLPROBE, also inside a subcircuit)
+  traces only them, and a netlist with none traces every optical net (F-05, see "PROBE, MLPROBE and traced nets"
+  below). An unknown key stops with `Unknown keyword: foo (value: 1 (INTEGER))`.
 - `.nodeset`: disabled, stops with `NODESET is disabled pending bugfixes` (exit status 1).
 - `.ic`: rejected, `the .ic directive is not supported`.
 - `.save`: not supported yet, a syntax error (offending token `.save`).
@@ -417,8 +419,10 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
 
 `PROBE<name> <net> [power [abs [phase [wl]]]]` traces the last event of its net (power, field modulus, phase,
 wavelength); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and phase per listed wavelength
-(the wavelength must match exactly). With `.options traceall=1` (the default) every optical net also gets an
-automatic probe, traced as `PROBE{<net>}`.
+(the wavelength must match exactly). A netlist without any probe traces every optical net through automatic
+probes, traced as `PROBE{<net>}`; a netlist with probes traces only those, unless `.options traceall=1` asks for
+the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
+name starts with `_` get no automatic probe.
 
 In `.tran`, the probes are disabled during the operating point. When the transient starts, after the operating
 point (`.nodeset` included) and after any initial conditions, every probe samples the current value of its net

@@ -3,38 +3,14 @@ $timescale
 $end
 
 $scope module SystemC $end
-$var real    1  aaabk  abstol       $end
-$var real    1  aaabl  reltol       $end
-$var wire   32  aaabm  resolution_multiplier [31:0]  $end
-$var wire   32  aaabn  engine_timescale [31:0]  $end
-$var wire   32  aaabo  simulation_mode [31:0]  $end
-$var wire   32  aaabp  analysis_type [31:0]  $end
-$var wire    1  aaabq  trace_all_optical_nets       $end
-$var wire    1  aaabr  verbose_component_initialization       $end
-$scope module PROBE{ROOT/in1} $end
-$var real    1  aaaau  power       $end
-$var real    1  aaaav  abs       $end
-$var real    1  aaaaw  phase       $end
-$var real    1  aaaax  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/in2} $end
-$var real    1  aaaay  power       $end
-$var real    1  aaaaz  abs       $end
-$var real    1  aaaba  phase       $end
-$var real    1  aaabb  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/out1} $end
-$var real    1  aaabc  power       $end
-$var real    1  aaabd  abs       $end
-$var real    1  aaabe  phase       $end
-$var real    1  aaabf  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/out2} $end
-$var real    1  aaabg  power       $end
-$var real    1  aaabh  abs       $end
-$var real    1  aaabi  phase       $end
-$var real    1  aaabj  wavelength       $end
-$upscope $end
+$var real    1  aaaau  abstol       $end
+$var real    1  aaaav  reltol       $end
+$var wire   32  aaaaw  resolution_multiplier [31:0]  $end
+$var wire   32  aaaax  engine_timescale [31:0]  $end
+$var wire   32  aaaay  simulation_mode [31:0]  $end
+$var wire   32  aaaaz  analysis_type [31:0]  $end
+$var wire    1  aaaba  trace_all_optical_nets       $end
+$var wire    1  aaabb  verbose_component_initialization       $end
 $scope module ROOT/MLPROBE1 $end
 $var real    1  aaaai  power@1550_000000       $end
 $var real    1  aaaaj  abs@1550_000000       $end
@@ -91,30 +67,14 @@ r0 aaaaq
 r0 aaaar
 r0 aaaas
 r0 aaaat
-r0 aaaau
-r0 aaaav
-r0 aaaaw
-r0 aaaax
-r0 aaaay
-r0 aaaaz
-r0 aaaba
-r0 aaabb
-r0 aaabc
-r0 aaabd
-r0 aaabe
-r0 aaabf
-r0 aaabg
-r0 aaabh
-r0 aaabi
-r0 aaabj
-r1e-08 aaabk
-r0.0001 aaabl
-b1 aaabm
-b11111111111111111111111111110011 aaabn
-b1 aaabo
-b10 aaabp
-1aaabq
-0aaabr
+r1e-08 aaaau
+r0.0001 aaaav
+b1 aaaaw
+b11111111111111111111111111110011 aaaax
+b1 aaaay
+b10 aaaaz
+0aaaba
+0aaabb
 $end
 
 #10
@@ -130,16 +90,6 @@ r0.9486832980505138 aaaaj
 r0.1 aaaao
 r0.3162277660168379 aaaap
 r1.570796326794897 aaaaq
-r1 aaaau
-r1 aaaav
-r1.55e-06 aaaax
-r0.8999999999999999 aaabc
-r0.9486832980505138 aaabd
-r1.55e-06 aaabf
-r0.1 aaabg
-r0.3162277660168379 aaabh
-r1.570796326794897 aaabi
-r1.55e-06 aaabj
 
 #20
 r0.1 aaaaa
@@ -155,17 +105,6 @@ r0.3162277660168379 aaaam
 r1.570796326794897 aaaan
 r0.8999999999999999 aaaar
 r0.9486832980505138 aaaas
-r1 aaaay
-r1 aaaaz
-r1.56e-06 aaabb
-r0.1 aaabc
-r0.3162277660168379 aaabd
-r1.570796326794897 aaabe
-r1.56e-06 aaabf
-r0.8999999999999999 aaabg
-r0.9486832980505138 aaabh
-r0 aaabi
-r1.56e-06 aaabj
 
 #50
 r0 aaaaa
@@ -180,15 +119,6 @@ r0 aaaaj
 r0 aaaao
 r0 aaaap
 r0 aaaaq
-r0 aaaau
-r0 aaaav
-r0 aaabc
-r0 aaabd
-r0 aaabe
-r1.55e-06 aaabf
-r0 aaabg
-r0 aaabh
-r1.55e-06 aaabj
 
 #60
 r1.56e-06 aaaad
@@ -198,8 +128,4 @@ r0 aaaam
 r0 aaaan
 r0 aaaar
 r0 aaaas
-r0 aaaay
-r0 aaaaz
-r1.56e-06 aaabf
-r1.56e-06 aaabj
 

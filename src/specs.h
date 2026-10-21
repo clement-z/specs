@@ -132,6 +132,9 @@ public:
     string trace_filename = "";
     sc_trace_file *default_trace_file = nullptr;
     bool trace_all_optical_nets = 1;
+    // Set when the netlist sets .options traceall: otherwise a netlist with probes (PROBE, MLPROBE)
+    // or .save targets only traces those (F-05, ParseTree::build_circuit())
+    bool trace_all_optical_nets_explicit = false;
 
     // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
     vector<string> command_line; // argv as received by sc_main

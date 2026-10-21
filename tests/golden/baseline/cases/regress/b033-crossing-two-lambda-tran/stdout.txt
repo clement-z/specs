@@ -62,7 +62,7 @@ Current SPECS config:
 - abstol: 1e-08
 - default reltol: 0.0001
 - resolution multiplier: 1
-- trace all optical nets: 1
+- trace all optical nets: 0
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
 ╔═══════════════════╗

@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 using std::ostringstream;
 
@@ -820,6 +821,17 @@ void ParseTree::build_circuit()
     }
     for (const auto &x : directives)
         x->create();
+
+    // F-05: a netlist with probes only traces them; every optical net is traced only as a fallback,
+    // when it has none (or when .options traceall says so)
+    if (!specsGlobalConfig.trace_all_optical_nets_explicit)
+    {
+        const bool has_probes = std::any_of(elements.begin(), elements.end(), [](const ParseElement *elem) {
+            return dynamic_cast<const ProbeElement *>(elem) || dynamic_cast<const MLProbeElement *>(elem);
+        });
+        if (has_probes)
+            specsGlobalConfig.trace_all_optical_nets = false;
+    }
 
     if (! analyses.empty())
         analyses.at(0)->create();

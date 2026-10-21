@@ -73,6 +73,11 @@
     differ (B-143)
   * The pre-release netlists `double_ring.cir`, `triple_ring.cir`, `paul_simple_ring.cir` moved to
     `circuits/legacy/` (they do not parse; kept for reference) (B-133)
+* Outputs and tracing (F-05, `doc/netlist.md`):
+  * **Changed outputs:** a netlist with probes (PROBE, MLPROBE, also inside a subcircuit) traces only them: the
+    automatic `PROBE{<net>}` probes of every optical net are added only when the netlist has no probe, or with
+    an explicit `.options traceall=1` (`.options traceall=0` still disables them). Simulation results and the
+    probed signals are unchanged; the VCD loses the automatic probes and `- trace all optical nets:` prints 0
 
 ### Fixed
 
