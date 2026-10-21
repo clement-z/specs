@@ -5,7 +5,7 @@ option('old_tb', type: 'boolean', value: true,
 option('spx', type: 'boolean', value: false,
        description: 'Build and install libspx.so by default (otherwise: meson compile -C <builddir> spx)')
 option('tests', type: 'feature', value: 'auto',
-       description: 'GoogleTest unit tests (system gtest, else the thirdparty/gtest.wrap fallback)')
+       description: 'GoogleTest unit tests (system gtest, else the subprojects/gtest.wrap fallback)')
 option('golden', type: 'boolean', value: true,
        description: 'Register the golden-output regression test (meson test --suite golden)')
 option('docs', type: 'feature', value: 'auto',

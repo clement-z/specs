@@ -11,11 +11,15 @@ project('specs', 'cpp',
     'warning_level=2',
     # Keep assert() on: the code validates user input with asserts (see discover/meson/DECISIONS.md).
     'b_ndebug=false',
+    # SystemC and taywee/args are built from their wraps (subprojects/) unless an installed copy is
+    # requested with -Dforce_fallback_for= or --wrap-mode=nofallback (see Dependencies below).
+    'force_fallback_for=systemc,args',
   ],
 )
 
 cxx = meson.get_compiler('cpp')
 fs = import('fs')
+cmake = import('cmake')
 src_root = meson.project_source_root() / 'src'
 
 # Project includes are quoted and relative to src/ ("devices/waveguide.h").
@@ -26,9 +30,20 @@ endif
 
 # ---- Dependencies -------------------------------------------------------------------------------
 
-# SystemC: pkg-config (distro/autotools installs), then its CMake package (honours
-# -Dcmake_prefix_path=...), then build it from subprojects/systemc.wrap.
-# An installed SystemC is only accepted if it was built with our C++ standard, otherwise
+# SystemC and taywee/args come from subprojects/*.wrap by default (force_fallback_for in the
+# default_options). An installed copy is only looked up on explicit request, with Meson's own
+# options: -Dforce_fallback_for= (installed if found, else the wrap) or --wrap-mode=nofallback
+# (installed or an error; it wins over the project's default force_fallback_for, which Meson
+# cannot tell apart from a user value). --wrap-mode=forcefallback always uses the wraps.
+use_installed = {}
+foreach name : ['systemc', 'args']
+  use_installed += {name: get_option('wrap_mode') == 'nofallback' or
+                          (get_option('wrap_mode') != 'forcefallback' and
+                           name not in get_option('force_fallback_for'))}
+endforeach
+
+# An installed SystemC: pkg-config (distro/autotools installs), then its CMake package (honours
+# -Dcmake_prefix_path=...). It is only accepted if it was built with our C++ standard, otherwise
 # linking fails late with "undefined reference to sc_api_version_..._cxx<std>".
 systemc_abi_check = '''
 #include <systemc.h>
@@ -38,39 +53,47 @@ int sc_main(int, char *[]) { return 0; }
 # (~/.cmake/packages), which may point to stale scratch builds: never search it.
 cmake_no_registry = ['-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF',
                      '-DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON']
-systemc_dep = dependency('systemc', method: 'pkg-config', required: false, include_type: 'system')
-if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: systemc_dep,
-                                         name: 'pkg-config SystemC matches cpp_std')
-  warning('Ignoring pkg-config SystemC: it was built with another C++ standard than', get_option('cpp_std'))
-  systemc_dep = dependency('', required: false)
-endif
-if not systemc_dep.found()
-  systemc_dep = dependency('SystemCLanguage', method: 'cmake', modules: ['SystemC::systemc'],
-                           cmake_args: cmake_no_registry, required: false, include_type: 'system')
-  if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: systemc_dep,
-                                           name: 'CMake SystemC matches cpp_std')
-    warning('Ignoring CMake SystemC package: it was built with another C++ standard than',
-            get_option('cpp_std'))
-    systemc_dep = dependency('', required: false)
-  endif
-endif
+systemc_dep = dependency('', required: false)
 # Where an installed specs/libspx.so finds a shared SystemC outside the default linker paths
 # (Meson drops build-tree rpaths on install).
 systemc_libdir = ''
-if systemc_dep.found() and systemc_dep.type_name() == 'pkgconfig'
-  systemc_libdir = systemc_dep.get_variable(pkgconfig: 'libdir', default_value: '')
-elif systemc_dep.found()
-  foreach prefix : get_option('cmake_prefix_path')
-    foreach libdir : ['lib64', 'lib']
-      if systemc_libdir == '' and fs.exists(prefix / libdir / 'libsystemc.so')
-        systemc_libdir = prefix / libdir
-      endif
+if use_installed['systemc']
+  systemc_dep = dependency('systemc', method: 'pkg-config', required: false, allow_fallback: false,
+                           include_type: 'system')
+  if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: systemc_dep,
+                                           name: 'pkg-config SystemC matches cpp_std')
+    warning('Ignoring pkg-config SystemC: it was built with another C++ standard than', get_option('cpp_std'))
+    systemc_dep = dependency('', required: false)
+  endif
+  if not systemc_dep.found()
+    systemc_dep = dependency('SystemCLanguage', method: 'cmake', modules: ['SystemC::systemc'],
+                             cmake_args: cmake_no_registry, required: false, include_type: 'system')
+    if systemc_dep.found() and not cxx.links(systemc_abi_check, dependencies: systemc_dep,
+                                             name: 'CMake SystemC matches cpp_std')
+      warning('Ignoring CMake SystemC package: it was built with another C++ standard than',
+              get_option('cpp_std'))
+      systemc_dep = dependency('', required: false)
+    endif
+  endif
+  if systemc_dep.found() and systemc_dep.type_name() == 'pkgconfig'
+    systemc_libdir = systemc_dep.get_variable(pkgconfig: 'libdir', default_value: '')
+  elif systemc_dep.found()
+    foreach prefix : get_option('cmake_prefix_path')
+      foreach libdir : ['lib64', 'lib']
+        if systemc_libdir == '' and fs.exists(prefix / libdir / 'libsystemc.so')
+          systemc_libdir = prefix / libdir
+        endif
+      endforeach
     endforeach
-  endforeach
+  endif
+  if not systemc_dep.found() and get_option('wrap_mode') == 'nofallback'
+    error('No usable installed SystemC (built as C++20), and --wrap-mode=nofallback forbids '
+          + 'building it from subprojects/systemc.wrap. Pass -Dcmake_prefix_path=<SystemC prefix> '
+          + 'or drop --wrap-mode=nofallback.')
+  endif
 endif
 if not systemc_dep.found()
   message('Building SystemC from subprojects/systemc.wrap (CMake subproject)')
-  cmake = import('cmake')
   systemc_opts = cmake.subproject_options()
   systemc_opts.add_cmake_defines({
     'CMAKE_CXX_STANDARD': '20',
@@ -102,21 +125,24 @@ if systemc_libdir in ['/usr/lib', '/usr/lib64'] or systemc_libdir.startswith('/u
   systemc_libdir = ''
 endif
 
-# taywee/args is header-only: its CMake package, else subprojects/args.wrap (its CMake build,
-# which only defines the include directory; nothing is built or installed).
-args_dep = dependency('args', method: 'cmake', modules: ['taywee::args'],
-                      cmake_args: cmake_no_registry, required: false,
-                      include_type: 'system')
+# taywee/args is header-only: an installed CMake package on request (same rule as SystemC), else
+# subprojects/args.wrap through its CMake build (it only defines the include directory; nothing
+# is built or installed).
+args_dep = dependency('', required: false)
+if use_installed['args']
+  args_dep = dependency('args', method: 'cmake', modules: ['taywee::args'],
+                        cmake_args: cmake_no_registry, required: get_option('wrap_mode') == 'nofallback',
+                        allow_fallback: false, include_type: 'system')
+endif
 if not args_dep.found()
-  args_opts = import('cmake').subproject_options()
+  args_opts = cmake.subproject_options()
   args_opts.add_cmake_defines({
     'ARGS_BUILD_EXAMPLE': false,
     'ARGS_BUILD_UNITTESTS': false,
     'CMAKE_EXPORT_NO_PACKAGE_REGISTRY': true,
   })
   args_opts.set_install(false)
-  args_dep = import('cmake').subproject('args', options: args_opts).dependency('args',
-                                                                               include_type: 'system')
+  args_dep = cmake.subproject('args', options: args_opts).dependency('args', include_type: 'system')
 endif
 
 m_dep = cxx.find_library('m', required: false)
