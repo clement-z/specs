@@ -4,7 +4,7 @@ Heartbeat: `2852972a` (PA-heartbeat, every 5 min, expires in 48h). Delete after 
 
 | Order | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| 1 | B-146 | todo | | |
+| 1 | B-146 | done | 5912b6a | union of cases.json/manifest.json; 5 new cases re-recorded with current build, `unordered_streams` dropped; 195/195 `--atol 0`; gcc + ASan meson test 12/12 |
 | 2 | B-014 error (b) | todo | | |
 | 3 | 64-bit integer literals (B-180) | todo | | |
 | 4 | Zero tolerances | todo | | |
