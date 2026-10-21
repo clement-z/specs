@@ -65,6 +65,7 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * PCMCELL requires `tc` and `ta` (a cell without them was silently opaque: Tc = Ta = 0); the C++ PCM
   constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
   parameters (B-051)
+* PCMCELL rejects `n` <= 0 and an initial state `k` outside [0, n] (B-060; the PCM model itself is unchanged)
 
 ### Removed
 

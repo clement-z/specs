@@ -1309,6 +1309,107 @@
    ],
    "expect": "fail",
    "note": "B-051: PCMCELL without ta (tc given positionally) gives a clean error (was T(0) = tc, ta silently 0)"
+  },
+  {
+   "id": "regress/b060-pcmcell-k-eq-n",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-eq-n.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-060: k = n is a valid initial state (n=4 k=4 tc=0.2 ta=0.8: out = 0.2+0.6*tanh(3) mW = 0.000797 W)"
+  },
+  {
+   "id": "err/b060-pcmcell-n-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-n-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with n = -1 gives a clean error (was accepted, frozen state)"
+  },
+  {
+   "id": "err/b060-pcmcell-n-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-n-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with n = 0 keeps its existing error (PCM Cell needs values for both Emelt and Nstates)"
+  },
+  {
+   "id": "err/b060-pcmcell-k-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with initial state k = -1 gives a clean error (was accepted)"
+  },
+  {
+   "id": "err/b060-pcmcell-k-gt-n",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-gt-n.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with initial state k = n + 1 gives a clean error (was accepted)"
   }
  ]
 }

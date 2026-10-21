@@ -36,6 +36,10 @@
   "err/b052-evlsrc-args",
   "err/b052-pcmcell-args",
   "err/b052-vlsrc-args",
+  "err/b060-pcmcell-k-gt-n",
+  "err/b060-pcmcell-k-negative",
+  "err/b060-pcmcell-n-negative",
+  "err/b060-pcmcell-n-zero",
   "err/b064-evlsrc-missing-file",
   "err/b131-nrings-crow-zero",
   "err/b148-crossing-args",
@@ -74,6 +78,7 @@
   "regress/b052-evlsrc-positional",
   "regress/b052-pcmcell-positional",
   "regress/b052-vlsrc-positional",
+  "regress/b060-pcmcell-k-eq-n",
   "regress/b131-nrings-crow",
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
@@ -316,6 +321,18 @@
    "only": "^(regress|err)/b051-",
    "gtest": false,
    "note": "B-051: new cases, PCMCELL requires tc/ta (tc=0 valid)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:27:57Z",
+   "only": "^(regress|err)/b060-",
+   "gtest": false,
+   "note": "B-060: new cases, PCMCELL n > 0 and 0 <= k <= n"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:27:57Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "B-060: new gtests PCMElementDeathTest.*"
   }
  ]
 }

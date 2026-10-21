@@ -59,11 +59,12 @@ Phase-change memory cell: `PCMCELL<name> <in> <out> [emelt [n [tc [ta]]]] [keywo
   - `EMELT` (aliases `MELT_ENERGY`, `E_MELT`);
   - `N` (aliases `NSTATES`, `NLEVELS`, `N_STATES`, `N_LEVELS`);
   - `TC` (aliases `T_C`, `SP`), `TA` (aliases `T_A`, `EP`);
-  - `K` (alias `INITIAL_STATE`): initial state, integer, default 0;
+  - `K` (alias `INITIAL_STATE`): initial state, integer in [0, n], default 0;
   - `TANH_COEF`: shape of the transmission curve, default 3.
 
   A keyword overrides the positional value.
 - Required: `emelt` and `n` (both non-zero), `tc` and `ta` (positionally or by any alias; `tc=0` is
   valid). There is no default transmission.
+- Checks: `n > 0` and `0 <= k <= n`, otherwise an error.
 - Power transmission in state k: `tc + (ta - tc) * tanh(TANH_COEF * k / n)`.
 - Example: `pcmcell1 in out 1e-12 10 0.85 0.95` is `pcmcell1 in out emelt=1e-12 n=10 tc=0.85 ta=0.95`.

@@ -1,0 +1,2 @@
+Error (ROOT/PCMCELL1): the number of states n must be > 0 (got -1)
+

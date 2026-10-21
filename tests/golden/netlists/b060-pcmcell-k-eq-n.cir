@@ -1,0 +1,7 @@
+* B-060: k = n is the last valid initial state.
+* Model (PCMElement::update_transmission_local, nothing programs in an .op):
+*   T(k) = tc + (ta - tc) * tanh(3 * k / n) = 0.2 + 0.6 * tanh(3) = 0.797033
+* Expected, P_in = 1 mW: ROOT/out = 0.000797 W (0.028232 sqrt(W)).
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=4 tc=0.2 ta=0.8 k=4
+.op

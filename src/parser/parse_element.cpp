@@ -1300,6 +1300,8 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         cerr << "Error (" << name << "): PCM Cell needs values for both Tc and Ta (missing: " << missing << ")" << endl;
         exit(1);
     }
+    // Reject n <= 0 and an initial state k outside [0, n] (B-060)
+    obj->check_parameters();
     return obj;
 }
 

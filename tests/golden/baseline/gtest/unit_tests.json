@@ -10,6 +10,8 @@
   "OpticalOutputPort.EmptyQueueStopsWithoutEmitting": "PASS",
   "OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop": "PASS",
   "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
+  "PCMElementDeathTest.CheckParametersRejectsInvalidStates": "PASS",
+  "PCMElementDeathTest.StartOfSimulationChecksParameters": "PASS",
   "SPECSConfig.VerifyConfigAcceptsValidValues": "PASS",
   "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",
   "SplitterModel.EqualSplitWithLoss": "PASS",
