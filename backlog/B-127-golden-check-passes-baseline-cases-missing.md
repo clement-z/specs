@@ -1,5 +1,5 @@
 # B-127: golden `check` passes when baseline cases are missing, when gtest is skipped, or when `--only` matches nothing
-severity: med | category: test-gap | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: test-gap | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in bfd6a15 (sprint 2026-10b P1)
 location: tests/golden/run_golden.py:964-975 (NEW/MISSING), :1002-1009 (gtest SKIPPED), :1013-1022 (`summarise`), :484-488 (`select`), CLAUDE.md "Testing"
 ## Problem
 Without `--strict` (not in the CLAUDE.md command) these conditions exit 0: a case present in cases.json but absent from the baseline directory ("NEW"), the gtest case when `--unit-tests` is not given ("SKIPPED"), and `--only <regex>` matching no case ("0 passed"). Deleting `tests/golden/baseline/cases/<group>/<name>` therefore removes that case's protection without any failure. Because `unit_tests` cannot be built in-tree (B-123), the gtest baseline is never exercised by agents following CLAUDE.md. Neither the golden harness nor any `specs -t` runs in `.gitlab-ci.yml`.
