@@ -77,6 +77,13 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * `-m sampled-time` is rejected with an error (it was not implemented and silently dropped every optical write);
   an explicit `-m` now takes priority over the default mode of the netlist's `.op`/`.dc`/`.tran` (it was
   silently overridden), e.g. `-m fd` runs a `.tran` in frequency domain (B-002, B-004)
+* CROSSING is passive: the crosstalk is in quadrature (j·x, as in the coupler), `att` is the excess loss on top
+  of the crosstalk (t = 10^(-att/20)·sqrt(1 − x²)), and the sign of `xtalk` is ignored (`xtalk=20` is a 20 dB
+  isolation, it was a 100× gain). Two coherent inputs gave more power out than in (2 W → 2.42 W) (B-032)
+* CROSSING keeps one memory per wavelength and input, so two wavelengths on its two inputs both come out (one was
+  dropped, with "Attempted to sum signals of different wavelengths" in `.tran`) (B-033), and it is
+  bidirectional when one of its nets is: light entering an output comes back out of the inputs (B-159).
+  Documented in `doc/netlist.md`
 
 ### Removed
 

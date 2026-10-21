@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b032-crossing-passive.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b032-crossing-passive"
+}

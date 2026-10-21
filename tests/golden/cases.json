@@ -1643,7 +1643,7 @@
      "traces"
     ]
    },
-   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Values follow the current crossing model (P3, B-032/B-033, may change them). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Since B-159 the crossing is a CrossingBi there (a, b, d become bidirectional: a:1 = b:1 = 1 mW from the sources, crossing backward outputs a:0 = b:0 = 0, d:0 = 1 mW); values follow the passive crossing model (B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "regress/b147-crossing-out-explicit-wg",
@@ -1660,7 +1660,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "regress/b147-crossing-out-explicit-splitter",
@@ -1677,7 +1677,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "regress/b147-crossing-out-explicit-splitter-first",
@@ -1694,7 +1694,92 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b032-crossing-passive",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b032-crossing-passive.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-032: passive crossing S-matrix (t = 10^(-att/20) sqrt(1-x^2), cross j*x, x = 10^(-|xtalk|/20)); two coherent 1 W inputs, att=0 xtalk=-20: out1 = out2 = 1 W at 0.1002 rad, total 2 W (was 1.21 W + 1.21 W at 0)"
+  },
+  {
+   "id": "regress/b032-crossing-isolation-sign",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b032-crossing-isolation-sign.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-032: att is the excess loss on top of crosstalk, positive xtalk read as isolation; 1 W into in1, att=1, xtalk=10 (positional) and xtalk=-10 (keywords) give the same: through 0.714895 W at 0, cross 0.1 W at 1.5708 rad (xtalk=10 gave 10 W)"
+  },
+  {
+   "id": "regress/b033-crossing-two-lambda",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm"
+  },
+  {
+   "id": "regress/b033-crossing-two-lambda-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-033: per-wavelength crossing memories in .tran, overlapping VLSRC pulses at 1550/1560 nm, xtalk=-10: no 'Attempted to sum signals of different wavelengths' on stderr (was 6 lines); MLPROBE per-wavelength powers 0.9/0.1 W on out1 and 0.1/0.9 W on out2 (hand values in the netlist header)"
+  },
+  {
+   "id": "regress/b159-crossing-backward",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b159-crossing-backward.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-159: a crossing on a bidirectional net is a CrossingBi; 1 mW backward into out1, 4 mW forward into in2, xtalk=-10: a:0 = 0.9 mW at 0, b:0 = 0.1 mW at 1.5708 rad (backward, was lost), c:1 = 0.4 mW at 1.5708 rad, d:0 = 3.6 mW (slots explained in the netlist header)"
   }
  ]
 }

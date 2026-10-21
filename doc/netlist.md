@@ -37,6 +37,43 @@ a netlist) is a **power** ratio, i.e. `kp=0.15`, or `k=sqrt(0.15)` (about 0.387)
 `k=0.15`, which is **field** coupling (P_cross = 0.15^2 = 0.0225). The two are different parameters, not an
 erratum.
 
+## CROSSING
+
+Waveguide crossing (2x2, passive) with excess loss and crosstalk.
+
+    CROSSINGname in1 in2 out1 out2 [att [xtalk]] [keyword=value ...]
+
+Nets, in this order: two inputs (`in1`, `in2`), then two outputs (`out1`, `out2`). `in1`->`out1` and
+`in2`->`out2` are the through paths (phase 0); `in1`->`out2` and `in2`->`out1` are the crosstalk paths (phase
++pi/2, in quadrature, as in the coupler). Positional arguments, in order: `att`, `xtalk`. At most 2; more is
+an error.
+
+| Keyword (case-insensitive) | Sets | Default |
+| --- | --- | --- |
+| `att`, `attenuation` (also the 1st positional argument) | **excess loss** in dB, on top of the power that goes to the cross port | 0 |
+| `xtalk`, `crosstalk` (also the 2nd positional argument) | crosstalk in dB: the power ratio out2/in1 with nothing on `in2` | none (no crosstalk) |
+
+Keywords override positional arguments. With x = 10^(-|xtalk|/20) (x = 0 when `xtalk` is not given), the
+through field coefficient is t = 10^(-att/20)·sqrt(1 - x^2) and the cross field coefficient is j·x. With one
+input, P_cross = x^2 and P_through = 10^(-att/10)·(1 - x^2). The crossing is passive: with `att` = 0 it is
+lossless (P_through + P_cross = P_in), and two coherent inputs never give more output power than input power,
+whatever their phases. Each wavelength propagates independently.
+
+The sign of `xtalk` is ignored: a positive value is read as an isolation, so `xtalk=-20` and `xtalk=20` both
+send 1 % of the power to the cross port. A negative positional number is a parse error, so write a negative
+crosstalk as a keyword (`xtalk=-20`) or use the positive form positionally. `att` is not range-checked: a
+negative value is a gain, do not use it.
+
+If any net of the crossing is bidirectional (`&`, or two writers), the crossing is bidirectional: light
+entering an output comes out of the inputs with the same coefficients (reciprocal), e.g. `out1`->`in1` through
+and `out1`->`in2` cross. Otherwise it is unidirectional (inputs are read, outputs are written).
+
+Example, with 1 W into `a`: x^2 = 0.1, so 0.1 W leaves on `d` at +pi/2 rad and 10^(-0.1)·0.9 = 0.7149 W
+leaves on `c` at 0 rad (the two lines are equivalent):
+
+    crossing1 a b c d att=1 xtalk=-10
+    crossing1 a b c d 1 10
+
 ## CWSRC
 
 Continuous-wave optical source: `CWSRC<name> <out> [wl [power [phi]]] [keyword=value ...]`

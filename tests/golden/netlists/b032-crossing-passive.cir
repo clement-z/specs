@@ -1,0 +1,16 @@
+* B-032 regression (repro: backlog/repro/a2-crossing-gain.cir): the crossing S-matrix is passive.
+* Two coherent 1 W CW inputs (1550 nm, phase 0) into in1 and in2, att=0, xtalk=-20.
+* Model: x = 10^(-|xtalk|/20) = 10^(-1) = 0.1; t = 10^(-att/20)*sqrt(1-x^2) = sqrt(0.99) = 0.994987;
+* through = t (phase 0), cross = j*x (quadrature).
+* Expected:
+*   out1 = t*in1 + j*x*in2 = 0.994987 + 0.1j (sqrt(W)): |out1|^2 = 0.99 + 0.01 = 1 W,
+*          phase atan(0.1/0.994987) = 0.1002 rad
+*   out2 = j*x*in1 + t*in2 = the same: 1 W at 0.1002 rad
+*   out1 + out2 = 2 W = input power (energy conservation). Before the fix: out1 = out2 =
+*   (1 + 0.1)^2 = 1.21 W at 0 (2.42 W out of 2 W: real cross term, |t|^2 + |x|^2 = 1.01).
+cwsrc1 in1 wl=1.55e-6 power=1
+cwsrc2 in2 wl=1.55e-6 power=1
+crossing1 in1 in2 out1 out2 att=0 xtalk=-20
+pwr1 out1
+pwr2 out2
+.op

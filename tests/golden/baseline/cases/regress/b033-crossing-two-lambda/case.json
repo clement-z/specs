@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b033-crossing-two-lambda.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b033-crossing-two-lambda"
+}

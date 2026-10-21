@@ -4,12 +4,18 @@
 * wg1's backward output and wg1 read the other one: e:0 = e:1 = 0. They are now bound as
 * writers: wg1 (created first, while elaborating e) writes c:0 and reads c:1; crossing1 (the
 * second writer of c) writes c:1.
-* Expected, with the CURRENT crossing model (defaults att = 0 dB, no crosstalk: out1 = in1,
-* out2 = in2; P3 (B-032/B-033) changes the crossing model and may change these values);
+* Since B-159 the crossing is a CrossingBi (c is bidirectional), so a, b and d become
+* bidirectional too. crossing1 creates them, and the sources and probe1 join the backlog
+* then, so crossing1 is the first writer of each: a:0, b:0, d:0 (it reads a:1, b:1, d:1);
+* cwsrc1 writes a:1, cwsrc2 b:1; probe1 (uni reader, 1 writer) reads d:0.
+* Expected, crossing model of B-032 with the defaults att = 0 dB, no crosstalk: t = 1, x = 0
+* (out1 = in1, out2 = in2, and backwards in1 = out1, in2 = out2);
 * waveguides: L = 1e-4 m, neff 2.2111, att 0: lossless,
 * phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped, 2*phi = 1.9052 rad:
-*   a = b = 1 mW at 0 (sources); d = 1 mW at 0 (crossing out2 = in2)
-*   c:1 = 1 mW at 0 (crossing out1 = in1); c:0 = 0 (nothing comes back from e)
+*   a:1 = b:1 = 1 mW at 0 (sources)
+*   d:0 = 1 mW at 0 (crossing out2 = in2 = b:1); d:1 = 0 (no writer)
+*   c:1 = 1 mW at 0 (crossing out1 = in1 = a:1); c:0 = 0 (nothing comes back from e)
+*   a:0 = b:0 = 0 (crossing backward outputs, from c:0 = d:1 = 0)
 *   e:0 = 1 mW at phi (wg1 output); e:1 = 0
 *   f:0 = 1 mW at 2*phi (wg1's output, back through wg2); f:1 = 0
 * Same e:0 as with "coupler1 a b c d k=0" in place of the crossing.

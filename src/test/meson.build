@@ -9,6 +9,7 @@ unit_tests_exe = disabler()
 if gtest_dep.found()
   unit_tests_exe = executable('unit_tests',
     files(
+      'devices/crossing.cpp',
       'devices/models.cpp',
       'devices/pcm.cpp',
       'devices/waveguide.cpp',

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b159-crossing-backward.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b159-crossing-backward"
+}

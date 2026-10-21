@@ -3,6 +3,13 @@
  "id": "gtest/unit_tests",
  "tests": {
   "A.B": "PASS",
+  "CrossingModel.BidirectionalReciprocal": "PASS",
+  "CrossingModel.Coefficients": "PASS",
+  "CrossingModel.DefaultNoCrosstalk": "PASS",
+  "CrossingModel.PassiveForAnyRelativePhase": "PASS",
+  "CrossingModel.SingleInput": "PASS",
+  "CrossingModel.TwoWavelengthsIndependent": "PASS",
+  "CrossingModel.XtalkSignIgnored": "PASS",
   "DirectionalCouplerModel.LosslessUnitarity": "PASS",
   "DirectionalCouplerModel.Smatrix": "PASS",
   "MergerModel.CoherentSum": "PASS",
