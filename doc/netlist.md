@@ -223,6 +223,7 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `-n`, `--dryrun` | parse and elaborate, do not simulate |
 | `--json file` | write the flattened circuit as JSON |
 | `-o name`, `--output=name` | trace file base name (`<name>.vcd`, `<name>.manifest.json`); its directory must exist; default `traces/delete_me` |
+| `--no-trace` | write no trace file and no run manifest file, as `-o ""` (F-05); wins over `-o`. Netlists only: the `-t` testbenches choose their own trace files |
 | `--param name=value` | set a top-level parameter (see Parameters) |
 | `--maxiter N` | `.options maxiter`, overrides the netlist |
 | `--abstol x`, `--reltol x`, `-R n` | tolerances and timescale, see [numerics.md](numerics.md) |

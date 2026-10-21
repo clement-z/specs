@@ -82,6 +82,7 @@
     alone traces power, modulus, phase and wavelength, `P(...)`, `E(...)`, `PHI(...)`, `WL(...)` one quantity
     each; the probes are named `PROBE{<net>}` like the automatic ones. A netlist with `.save` traces only its
     targets and probes
+  * `--no-trace`: no trace file and no run manifest file (as `-o ""`), for runs that only need stdout or for timing
 
 ### Fixed
 

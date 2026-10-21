@@ -152,6 +152,7 @@
   "regress/f01-seed-large",
   "regress/f01-seed-max",
   "regress/f05-mlprobe-in-subckt",
+  "regress/f05-no-trace",
   "regress/f05-save-paper-fig1b",
   "regress/f05-save-traceall-bidir",
   "regress/f05-save-tran",
@@ -562,6 +563,12 @@
    "only": "^(regress|err)/f05-save-",
    "gtest": false,
    "note": "F-05: .save directive, 6 new cases (probed values bit-identical to the old automatic probes, /tmp/P6-tools/vcd_subset.py)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:44:33Z",
+   "only": "^(cli/help|cli/no-args|regress/f05-no-trace)$",
+   "gtest": false,
+   "note": "F-05: --no-trace (new case; help text of cli/help and cli/no-args gains the flag)"
   }
  ]
 }

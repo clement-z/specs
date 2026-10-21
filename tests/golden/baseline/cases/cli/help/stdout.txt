@@ -19,6 +19,9 @@
       -T, --run-manual-test             Run manual test function
       -o[set_tracefile],
       --output=[set_tracefile]          Set the default trace file
+      --no-trace                        Write no trace file and no run manifest
+                                        (the probes and .save targets are not
+                                        traced); netlists only
       --json=[export_json]              Export json of completed circuit to file
       --version                         Output version information and exit
       --print-manifest                  Print the run manifest (version, seed,

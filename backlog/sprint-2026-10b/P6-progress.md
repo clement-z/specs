@@ -10,8 +10,8 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 | # | item | owner | status | commit | notes |
 |---|---|---|---|---|---|
 | 1 | trace-all fallback: PROBE/MLPROBE present → trace only those, unless `.options traceall` is explicit | orchestrator | done | fd381fc | 26 cases re-recorded, all checked by `backlog/repro/p6-verify-traceall.py` (auto-probes gone, traceall 1→0, everything else bit-identical); new `regress/f05-mlprobe-in-subckt` |
-| 2 | `.save` directive (`.save out P(drop) ...` → `PROBE{<net>}` probes) | orchestrator | done | (item-2 commit) | 6 new cases; saved signals bit-identical to the old automatic probes (`backlog/repro/p6-vcd-subset.py`); paper Fig. 1b runs once dc1/dc2 are renamed coupler1/2 |
-| 3 | `--no-trace` | orchestrator | pending | | |
+| 2 | `.save` directive (`.save out P(drop) ...` → `PROBE{<net>}` probes) | orchestrator | done | 9feac83 | 6 new cases; saved signals bit-identical to the old automatic probes (`backlog/repro/p6-vcd-subset.py`); paper Fig. 1b runs once dc1/dc2 are renamed coupler1/2 |
+| 3 | `--no-trace` | orchestrator | done | (item-3 commit) | new `regress/f05-no-trace`; `cli/help`, `cli/no-args` re-recorded (flag in the help) |
 | 4 | CSV / `.npz` table export (`--format`), harness `.npz` decoder | orchestrator | pending | | |
 | 5 | CROW bench (full tracing vs probes only), docs, backlog, report | orchestrator | pending | | |
 
@@ -26,4 +26,5 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 - `.save` targets: top-level nets only; a `.save` in a subcircuit body is ignored with the existing warning
   (every directive is). No `.save all` (would clash with a net named `all`). Quantity keywords = PROBE's.
 - Unknown quantity: parse error (file:line); unknown net / electrical net: error after elaboration, exit 1.
-
+- `--no-trace` = `-o ""` (no VCD, no table, no manifest file; `--print-manifest` still prints, with a null
+  trace file); it wins over `-o` and prints `Tracing disabled (--no-trace)`; no effect on `-t` testbenches.

@@ -181,6 +181,11 @@ int sc_main(int argc, char *argv[])
                           "set_tracefile",
                           "Set the default trace file",
                           { 'o', "output" });
+    args::Flag set_no_trace(parser,
+                          "no_trace",
+                          "Write no trace file and no run manifest (the probes and .save targets are not "
+                          "traced); netlists only",
+                          { "no-trace" });
     args::ValueFlag<string> export_json(parser,
                           "export_json",
                           "Export json of completed circuit to file",
@@ -403,7 +408,12 @@ int sc_main(int argc, char *argv[])
     if (list_tests) {
         return do_list_tests();
     }
-    if (set_tracefile) {
+    if (set_no_trace) {
+        // F-05: as -o "" (no trace file, no run manifest file); wins over -o
+        cout << "Tracing disabled (--no-trace)" << endl;
+        specsGlobalConfig.trace_filename = "";
+    }
+    else if (set_tracefile) {
         cout << "Using trace file: " << set_tracefile.Get() << endl;
         // TODO: validate filename
         specsGlobalConfig.trace_filename = set_tracefile.Get();

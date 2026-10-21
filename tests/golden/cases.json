@@ -2898,6 +2898,27 @@
    ],
    "expect": "fail",
    "note": "F-05: .save I(out): unknown quantity, parse error with file:line, exit 1"
+  },
+  {
+   "id": "regress/f05-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "-o",
+    "traces/ignored",
+    "--print-manifest",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "note": "F-05: --no-trace wins over -o: no trace file and no run manifest file are written (--print-manifest shows \"trace_file\": null); the simulation runs as usual (Simulated 1 ns)"
   }
  ]
 }
