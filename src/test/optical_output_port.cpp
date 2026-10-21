@@ -255,7 +255,9 @@ TEST(DelayRounding, MatchesSystemCRounding)
 }
 
 // checkDelayRounding(): a message only where delays are honoured (event-driven
-// ports in a time-domain analysis), and only above the threshold
+// ports in a time-domain analysis), and only above the threshold. A delay that
+// rounds to 0 is an error for netlist waveguides (zero_is_error), a warning
+// for device-internal ones
 TEST(DelayRoundingDeathTest, CheckDelayRounding)
 {
     SPECS_TEST_HEADER()
@@ -267,8 +269,8 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
         auto config = make_shared<OpticalOutputPortConfig>();
         oop.setConfig(config);
         const auto ok = testing::ExitedWithCode(0);
-        auto check = [&](double delay_s) {
-            oop.checkDelayRounding("dev", delay_s);
+        auto check = [&](double delay_s, bool zero_is_error = false) {
+            oop.checkDelayRounding("dev", delay_s, zero_is_error);
             std::cerr << "end";
             exit(0);
         };
@@ -280,8 +282,16 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
                     "use a finer time resolution, e.g. .options timescale=-14\nend$");
         EXPECT_EXIT(check(13.34e-15), ok,
                     "^Warning \\(dev\\): delay 1.334e-14 s rounds to 0 at the time resolution 1e-13 s [^\n]*timescale=-15\nend$");
+        EXPECT_EXIT(check(13.34e-15, true), testing::ExitedWithCode(1),
+                    "^Error \\(dev\\): delay 1.334e-14 s rounds to 0 at the time resolution 1e-13 s "
+                    "\\(the delayed events would happen in the same time step\\); "
+                    "use a finer time resolution, e.g. .options timescale=-15\n$");
+        // only a rounding to 0 is an error: the other verdicts are the same for both origins
+        EXPECT_EXIT(check(53.37e-15, true), ok, "^Warning \\(dev\\): delay 5.337e-14 s rounded to 1e-13 s [^\n]*\nend$");
         EXPECT_EXIT(check(755.09e-15), ok, "^end$");
+        EXPECT_EXIT(check(755.09e-15, true), ok, "^end$");
         EXPECT_EXIT(check(0), ok, "^end$");
+        EXPECT_EXIT(check(0, true), ok, "^end$");
 
         // with a resolution multiplier, events are on multiples of 10 ticks = 1 ps
         config->m_timestep_value = 10;
@@ -292,12 +302,12 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
 
         // delays ignored: frequency-domain ports, .op, .dc
         config->m_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
-        EXPECT_EXIT(check(13.34e-15), ok, "^end$");
+        EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
         config->m_mode = OpticalOutputPortMode::EVENT_DRIVEN;
         specsGlobalConfig.analysis_type = SPECSConfig::OP;
-        EXPECT_EXIT(check(13.34e-15), ok, "^end$");
+        EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
         specsGlobalConfig.analysis_type = SPECSConfig::DC;
-        EXPECT_EXIT(check(13.34e-15), ok, "^end$");
+        EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
     }
     SPECS_TEST_FOOTER();
 }

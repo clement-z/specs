@@ -1,13 +1,15 @@
 * B-014: a non-zero delay that rounds to 0 time steps. Ring round trip L*ng/c = 1e-6 m * 4 / 299792458 m/s
-* = 13.34 fs < half the default time step (100 fs): sc_time() rounds it to 0, so the whole ring response
-* collapses into delta cycles at t = 1 ps (the VCD has a single timestamp, #10). It used to be silent.
+* = 13.34 fs < half the default time step (100 fs): sc_time() would round it to 0, so the whole ring response
+* would collapse into delta cycles at t = 1 ps (the VCD had a single timestamp, #10). It used to be silent,
+* then a warning (sprint 2026-10b). wgr is written in the netlist, so it is an error (decision option (b);
+* device-internal waveguides only warn, see b014-device-internal-rounds-to-zero.cir).
 * Same netlist as backlog/repro/a1-zero-tick-delay-ring.cir.
-* Expected: stderr "Warning (ROOT/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s
-* (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-15"
-* (at 1 fs: 13 fs, -2.6 %; at 10 fs: 10 fs, -25 %), exit 0, simulation unchanged: everything at t = 1 ps,
-* i.e. the CW steady state of the lossless all-pass ring (k = 0.5, t = sqrt(0.75), phi = 2 pi 2.3 L / 1550 nm
-* = 3.0403 rad mod 2 pi): out = 1 W (1.000078 W, within the reltol truncation), r1 = r2 = k^2 / |1 - t e^(i phi)|^2
-* = 0.25 / 3.47316 = 0.071980 W (0.071986 W).
+* Expected: stderr "Error (ROOT/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s
+* (the delayed events would happen in the same time step); use a finer time resolution, e.g. .options
+* timescale=-15" (at 1 fs: 13 fs, -2.6 %; at 10 fs: 10 fs, -25 %), exit 1, before the simulation.
+* (Before: everything at t = 1 ps, i.e. the CW steady state of the lossless all-pass ring: out = 1 W,
+* r1 = r2 = k^2 / |1 - t e^(i phi)|^2 = 0.25 / 3.47316 = 0.071980 W with k = 0.5, t = sqrt(0.75),
+* phi = 2 pi 2.3 L / 1550 nm = 3.0403 rad mod 2 pi.)
 vlsrc1 in values=[[1e-12,1,1.55e-6]]
 coupler1 in r1 out r2 k=0.5
 wgr r2 r1 length=1e-6 neff=2.3 ng=4 att=0

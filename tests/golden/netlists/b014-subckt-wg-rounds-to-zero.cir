@@ -1,0 +1,13 @@
+* B-014 (option b): a waveguide inside a .subckt is written in the netlist too, so a non-zero
+* delay that rounds to 0 time steps is an error, as for b014-delay-rounds-to-zero.cir.
+* wgr: L*ng/c = 1e-6 m * 4 / 299792458 m/s = 13.34 fs, rounds to 0 at the default 100 fs.
+* Expected: stderr "Error (ROOT/X1/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution
+* 1e-13 s (the delayed events would happen in the same time step); use a finer time resolution,
+* e.g. .options timescale=-15", exit 1, before the simulation.
+.subckt short a b
+wgr a b length=1e-6 neff=2.3 ng=4 att=0
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in out short
+probe1 out
+.tran 5e-12

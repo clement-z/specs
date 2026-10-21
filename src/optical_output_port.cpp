@@ -40,7 +40,7 @@ DelayRoundingVerdict classifyDelayRounding(double exact_s, double resolution_s, 
     return DELAY_ROUNDING_OK;
 }
 
-void OpticalOutputPort::checkDelayRounding(const char *device_name, double delay_s) const
+void OpticalOutputPort::checkDelayRounding(const char *device_name, double delay_s, bool zero_is_error) const
 {
     // Called once per device before the simulation (start_of_simulation()), so it reads the
     // port configuration, not m_mode (set by applyConfig()). Delays are only honoured by
@@ -78,10 +78,14 @@ void OpticalOutputPort::checkDelayRounding(const char *device_name, double delay
     if (multiplier > 1)
         fix << ", or a smaller .options resolution (" << multiplier << ")";
 
+    if (verdict == DELAY_ROUNDING_ERROR && zero_is_error)
+    {
+        std::cerr << "Error (" << device_name << "): delay " << delay_s << " s rounds to 0 at the time resolution "
+                  << resolution_s << " s (the delayed events would happen in the same time step); " << fix.str() << std::endl;
+        exit(1);
+    }
     if (verdict == DELAY_ROUNDING_ERROR)
     {
-        // TODO(B-014): decided as an error (exit 1); a warning until regress/b031-mzi-bidir,
-        // whose MZI arms (43 fs) round to 0 at 100 fs, is settled
         std::cerr << "Warning (" << device_name << "): delay " << delay_s << " s rounds to 0 at the time resolution "
                   << resolution_s << " s (the delayed events happen in the same time step); " << fix.str() << std::endl;
         return;

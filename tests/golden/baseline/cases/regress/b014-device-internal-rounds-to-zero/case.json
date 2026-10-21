@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b014-device-internal-rounds-to-zero.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 467,
+   "kind": "json",
+   "sha256": "d83da8208302c726374eccfbe9e4ea5678d5a8f560a5bde8b692c51ef3fb64de",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1333,
+   "kind": "vcd",
+   "sha256": "be1d4dcb5da970d9da70b0c230465e46b9112a5542c33c2ce9c376382ca3d082",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b014-device-internal-rounds-to-zero"
+}

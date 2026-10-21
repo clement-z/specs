@@ -1948,7 +1948,7 @@
    "note": "B-048: probes on an undriven net in .tran: the sample taken at TRAN start is skipped silently (PROBE2, PROBE{ROOT/nc}, MLPROBE2 stay 0; no 'received unsupported signal (lambda = 1.55e-06m)' although wavelength id 0 aliases 1550 nm, B-012); the CW net next to it reads 1 mW from t = 0"
   },
   {
-   "id": "regress/b014-delay-rounds-to-zero",
+   "id": "err/b014-delay-rounds-to-zero",
    "setup": {
     "copy": [
      "circuits",
@@ -1962,7 +1962,49 @@
     "-f",
     "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
    ],
-   "note": "B-014: a 13 fs ring round trip rounds to 0 at 100 fs (the response collapses into delta cycles at 1 ps): reported on stderr (was silent); decided as an error, a warning until regress/b031-mzi-bidir is settled"
+   "note": "B-014: a 13 fs ring round trip of a waveguide written in the netlist rounds to 0 at 100 fs (the response collapsed into delta cycles at 1 ps, silently; a warning in sprint 2026-10b): clean error before the simulation, exit 1 (decision option (b))",
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "err/b014-subckt-wg-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-subckt-wg-rounds-to-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-014: a waveguide inside a .subckt is written in the netlist too: its 13 fs delay rounding to 0 at 100 fs is an error (ROOT/X1/WGR), exit 1 (decision option (b))"
+  },
+  {
+   "id": "regress/b014-device-internal-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-device-internal-rounds-to-zero.cir"
+   ],
+   "note": "B-014: the arms of an MZI (created by the device, 43 fs) round to 0 at 100 fs: a warning only, the run goes on (decision option (b)); the netlist waveguide (755 fs) gives no message"
   },
   {
    "id": "regress/b014-delay-rounding-warning",

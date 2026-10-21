@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b014-device-internal-rounds-to-zero.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b014-device-internal-rounds-to-zero.cir", "sha256": "1eed55c6f057808417031208046568a2ce055c50cd61ce5b49449155d81a21ab"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

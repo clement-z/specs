@@ -105,7 +105,9 @@ public:
     // (88 fs at 100 fs), the B-014 failure mode by 87 % (53 fs -> 100 fs). 10 % warns
     // only for delays shorter than 5 time steps
     static constexpr double DELAY_ROUNDING_WARN_THRESHOLD = 0.1;
-    void checkDelayRounding(const char *device_name, double delay_s) const;
+    // A non-zero delay that rounds to 0 is an error (exit 1) when zero_is_error is set (delays
+    // written in the netlist), a warning otherwise (delays a device creates internally)
+    void checkDelayRounding(const char *device_name, double delay_s, bool zero_is_error) const;
     sc_time snap_to_next_valid_time(const sc_time &t, const unsigned int resolution_multiplier=1);
     void delayedWriteEventDriven(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
     void delayedWriteSampledTime(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);

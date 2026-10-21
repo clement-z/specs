@@ -157,7 +157,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * Delays that the time resolution rounds by more than 10 % (e.g. a 53 fs ring round trip run at 100 fs: +87 %), or
   to 0 (the loop then collapses into one time step), are reported on stderr once per waveguide in `.tran` and
   testbenches, with the `.options timescale` to use; they were rounded silently and the check meant to catch it
-  could never fire (B-014; an error for delays that round to 0 is pending, see `backlog/B-014-*.md`)
+  could never fire (B-014)
+* A waveguide written in the netlist (also inside a `.subckt`) whose non-zero delay rounds to 0 at the time
+  resolution is an error (exit 1, before the simulation, with the `.options timescale` to use); waveguides that
+  devices create internally (MZI arms, ...) keep the warning (B-014)
 
 * Output order no longer depends on heap addresses: the operating-point listing, the `--vci` dump, the
   automatic probes and VCD declarations, `init()` calls and the enable order of the analyses follow

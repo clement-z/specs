@@ -86,6 +86,7 @@
   "Waveguide.Instantiation": "PASS",
   "Waveguide.OperatingPoint": "PASS",
   "WaveguideDeathTest.DelayRoundingReportedOncePerDevice": "PASS",
+  "WaveguideDeathTest.DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides": "PASS",
   "WaveguideModel.GroupDelay": "PASS",
   "WaveguideModel.LossAndPhaseZeroSlope": "PASS"
  }

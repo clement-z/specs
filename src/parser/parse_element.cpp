@@ -91,6 +91,9 @@ sc_module *WGElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, bidirectional);
 
+    // B-014: written in the netlist, so a delay that rounds to 0 time steps is an error
+    obj->m_from_netlist = true;
+
     // Parse positional arguments
     if(args.size() > 0)
         obj->m_length_cm = args[0].as_double() * 100;

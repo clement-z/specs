@@ -25,6 +25,8 @@
   "cli/no-args",
   "cli/unknown-testbench",
   "err/b008-dc-bare",
+  "err/b014-delay-rounds-to-zero",
+  "err/b014-subckt-wg-rounds-to-zero",
   "err/b017-json-unwritable",
   "err/b018-resolution-below-fs",
   "err/b021-snapfactor-negative",
@@ -103,7 +105,7 @@
   "regress/b004-mode-td-op",
   "regress/b006-empty-output",
   "regress/b014-delay-rounding-warning",
-  "regress/b014-delay-rounds-to-zero",
+  "regress/b014-device-internal-rounds-to-zero",
   "regress/b021-snapfactor",
   "regress/b021-snapfactor-default",
   "regress/b021-snapfactor-zero",
@@ -604,6 +606,12 @@
    "only": "^(cir-json/subckt_tests|(regress|err)/b146-.*)$",
    "gtest": false,
    "note": "B-146 (landed in sprint 2026-10c phase A, maintainer decision 'land P2-ready/b146 as is'): cir-json/subckt_tests JSON writers of ROOT/out and ROOT/X2/N00001 0 -> 1 (flat-equivalent count); the 5 b146 cases recorded with the current build (strict line order)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T15:21:16Z",
+   "only": "^(err/b014-delay-rounds-to-zero|err/b014-subckt-wg-rounds-to-zero|regress/b014-device-internal-rounds-to-zero|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-014 option (b): a netlist waveguide whose non-zero delay rounds to 0 is an error (regress/b014-delay-rounds-to-zero becomes err/b014-delay-rounds-to-zero; new err/b014-subckt-wg-rounds-to-zero); device-internal waveguides keep the warning (new regress/b014-device-internal-rounds-to-zero); gtest gains WaveguideDeathTest.DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides"
   }
  ]
 }

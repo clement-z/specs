@@ -165,11 +165,21 @@ port time step. If rounding changes it by more than 10 %, stderr shows (`ROOT/WG
 
     Warning (ROOT/WGR): delay 5.33703e-14 s rounded to 1e-13 s (+87.4 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
 
-A non-zero delay that rounds to 0 gives a second form (this case may become an error):
+A non-zero delay that rounds to 0 is an **error** for a waveguide written in the netlist (also inside a
+`.subckt`): the run stops before the simulation, with exit status 1:
 
-    Warning (ROOT/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-15
+    Error (ROOT/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events would happen in the same time step); use a finer time resolution, e.g. .options timescale=-15
 
-"Time resolution" in the message is the port time step. The simulation runs anyway.
+For a waveguide that a device creates internally (the arms of an MZI, the waveguides of OCTANE cells, CROWs
+and meshes) and for waveguides built by testbenches, it is a warning, and the simulation runs:
+
+    Warning (ROOT/MZI1/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+
+The device decides its own internal lengths, and these are feed-forward (an MZI arm only shifts arrival times by
+less than a time step), so they are not rejected. The distinction is where the waveguide comes from, not its
+name: the parser marks the waveguides it creates from netlist lines.
+
+"Time resolution" in the messages is the port time step. Apart from the error above, the simulation runs anyway.
 
 - Checked once per waveguide, only where delays matter: `.tran` and event-driven testbenches. `.op`, `.dc`
   and `-m fd` ignore delays, so nothing is reported there. Only waveguides are checked; couplers have no delay.

@@ -6,7 +6,7 @@
   "seed": 0,
   "command_line": ["specs", "-f", "tests/golden/netlists/b014-delay-rounds-to-zero.cir"],
   "netlist_files": [
-    {"path": "tests/golden/netlists/b014-delay-rounds-to-zero.cir", "sha256": "5cda4dc530a7cd1b44b5100ef3a48ca6d34588f62d7f1c5185e086e3d0d6d93a"}
+    {"path": "tests/golden/netlists/b014-delay-rounds-to-zero.cir", "sha256": "31d1b5aa2c51207a3c1dadf888cc467fe2441a5fc6e9bec8023b29de9959435d"}
   ],
   "trace_file": "traces/delete_me.vcd"
 }
