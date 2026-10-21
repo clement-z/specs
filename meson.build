@@ -115,6 +115,9 @@ if not systemc_dep.found()
   systemc_opts.append_compile_args('c', '-xnone')
   # libsystemc.so calls the user's sc_main: it must link with undefined symbols.
   systemc_opts.set_override_option('b_lundef', 'false')
+  # Not sanitized, like the installed SystemC sanitizer builds used before: SystemC's process
+  # dispatch (sc_process.h, member-function pointer on sc_process_host) trips UBSan's vptr check.
+  systemc_opts.set_override_option('b_sanitize', 'none')
   # Installed next to specs (library only, no headers).
   systemc_opts.set_install(true)
   systemc_dep = cmake.subproject('systemc', options: systemc_opts).dependency('systemc',

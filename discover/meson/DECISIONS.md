@@ -211,3 +211,10 @@ Maintainer decision in `backlog/DECISIONS-2026-10-21.md` ("third round"); implem
     `.wrap` files; GitLab: a fixed key, Meson checks the hashes) and `.ccache`, and clones the full
     history for `git describe`. The binaries artefact ships `build/subprojects/systemc-*/libsystemc.so*`.
     `install.sh` is plain setup/compile/test.
+38. **The SystemC subproject is never sanitized** (`set_override_option('b_sanitize', 'none')`). Sanitizer builds
+    used to link an unsanitized, installed SystemC. Built from the wrap, SystemC inherited
+    `-fsanitize=address,undefined`, and UBSan's vptr check fires in SystemC's own process dispatch
+    (`sc_process.h:633`, a member-function pointer called on `sc_process_host`) for every process: with
+    `meson test`'s `halt_on_error`, 11/12 tests and 123/212 golden cases failed (gcc). With the override, the
+    SPECS objects are sanitized as before and SystemC's are not (checked in `compile_commands.json`, Meson
+    1.3.0 and 1.11.2).
