@@ -1,5 +1,5 @@
 # B-050: The PDET sampling loop: two detectors make an open-ended `.tran` never end, and every PDET wakes and dumps every Ts
-severity: high | category: perf | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: high | category: perf | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: fixed in be96f26 (sprint 2026-10b P3)
 location: src/devices/detector.cpp:48-57,64-79
 ## Problem
 `on_time_tick()` loops on `if (sc_pending_activity()) wait(Ts, m_event_manual_trigger); else wait();` with Ts = 1 ps by default.

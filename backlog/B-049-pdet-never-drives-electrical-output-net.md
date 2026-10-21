@@ -1,5 +1,5 @@
 # B-049: PDET never drives its electrical output net (`p_readout->write` commented out)
-severity: high | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: high | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in be96f26 (sprint 2026-10b P3)
 location: src/devices/detector.cpp:82-84, src/parser/parse_element.cpp:1261, src/tb/detector_tb.cpp:89-95
 ## Problem
 `Detector::on_time_tick()` computes `m_cur_readout` but the write to `p_readout` is commented out (detector.cpp:84). The PDET's second net, which the parser binds as a writer (parse_element.cpp:1261), therefore stays 0 forever. The readout reaches only the VCD, through `Detector::trace()`. Any electrical consumer of a photodetector sees 0: a PSHIFT, an MZI `vin`, the OCTANE `p_readout` chain, or a subcircuit port.
