@@ -6,9 +6,10 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
 
 ## Build & run
 - Deps: SystemC 3.0.2 **built as C++20** and taywee/args. On this machine they are prebuilt in
-  `~/.local/opt/specs-deps`; otherwise use the submodules (`git submodule update --init --recursive`).
+  `~/.local/opt/specs-deps-next` (`~/.local/opt/specs-deps` is the older SystemC 3.0.1, don't use it);
+  otherwise use the submodules (`git submodule update --init --recursive`).
 - Build (Meson, release by default):
-  `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps && meson compile -C build`
+  `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps-next && meson compile -C build`
   - Options (`meson.options`): `native` (`-march=native`, default on), `old_tb`, `spx`, `tests`, `golden`, `docs`.
     `libspx.so`: `meson compile -C build spx`. Docs: `ninja -C build doc`. Decisions: `discover/meson/DECISIONS.md`.
   - Asserts are on by default (`b_ndebug=false`). The golden baseline was recorded with `-DNDEBUG`; both pass.
@@ -24,9 +25,11 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   Line order, NEW/MISSING cases and the gtest case are all checked by default: `--allow-new` while a new
   case is not recorded yet, `--no-unit-tests` to skip gtest explicitly; an `--only` that matches nothing exits 2.
   Output order is name-based (F-01), so sanitizer and other-compiler builds pass with strict order too.
-- Sanitizers: `meson setup <b> -Db_sanitize=address,undefined -Db_lundef=false --buildtype=debug` (clang works
-  locally; gcc needs libasan). `meson test` then applies `tests/sanitizers/lsan.supp`, which suppresses only
+- Sanitizers: `meson setup <b> -Db_sanitize=address,undefined -Db_lundef=false --buildtype=debug` (gcc and clang
+  both work locally). `meson test` then applies `tests/sanitizers/lsan.supp`, which suppresses only
   parse-error-exit flex buffers and SystemC-thread-stack allocations; any other leak fails (CI job is blocking).
+  Running `run_golden.py` directly on a sanitizer build needs the same suppressions
+  (`LSAN_OPTIONS=suppressions=$PWD/tests/sanitizers/lsan.supp:print_suppressions=0`), else error cases fail on leak reports.
 - If a change **intentionally** alters outputs (a bug fix), re-record with
   `run_golden.py record ... --out tests/golden/baseline --only '<ids>' --note "<why, backlog ID>"`, inspect the diff
   (`compare`), and commit the new baseline **in the same commit** as the fix.
