@@ -231,6 +231,20 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
                 cur_pt->subcircuits[$1]->netlist = *$2;
                 delete $2;
             }
+          | subcircuit.with_assignments T_DIRECTIVE_ENDS T_STR
+            {
+                // .ends NAME: the name must be the one of the .subckt (case-insensitive)
+                const string &subckt_name = cur_pt->subcircuits[$1]->name;
+                if (!strutils::iequals(*$3, subckt_name))
+                {
+                    stringstream ss;
+                    ss << ".ends " << *$3 << " does not match the name of the subcircuit (.subckt " << subckt_name << ")";
+                    yyerror(scanner, pt, ss.str().c_str());
+                }
+                cur_pt->subcircuits[$1]->netlist = *$2;
+                delete $2;
+                delete $3;
+            }
 ;
 
 /* --------- Elements definitions parsing ----------- */

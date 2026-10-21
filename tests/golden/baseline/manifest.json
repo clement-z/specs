@@ -73,6 +73,7 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f12-ends-name-mismatch",
   "err/f12-si-unit-letters",
   "err/f28-lossless-ring-dc",
   "err/f28-lossless-ring-op",
@@ -145,6 +146,7 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f12-ends-name",
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
   "regress/f28-maxiter-cli-priority",
@@ -496,6 +498,12 @@
    "only": "^(regress/f12-si-.*|err/f12-si-.*)$",
    "gtest": false,
    "note": "F-12 (B-160): SI suffix cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:01:45Z",
+   "only": "^(regress/f12-ends-name|err/f12-ends-name-mismatch)$",
+   "gtest": false,
+   "note": "F-12 (B-169): .ends NAME cases"
   }
  ]
 }

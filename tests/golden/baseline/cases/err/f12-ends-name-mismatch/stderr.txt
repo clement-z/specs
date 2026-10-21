@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/f12-ends-name-mismatch.cir:5): .ends rong does not match the name of the subcircuit (.subckt RING)
+-- offending token: "rong"
+-- while parsing line: ".ends rong"
+

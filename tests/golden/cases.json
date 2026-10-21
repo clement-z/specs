@@ -2572,6 +2572,44 @@
    ],
    "expect": "fail",
    "note": "F-12 (B-160): unit letters after the scale suffix are not accepted: wl=1.55um lexes as 1.55u followed by the identifier m, a syntax error (offending token \"m\"), exit 1"
+  },
+  {
+   "id": "regress/f12-ends-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-ends-name.cir"
+   ],
+   "note": "F-12 (B-169): .ends NAME accepted, name compared case-insensitively with the .subckt name (.ends DELAY, nested .ends Delay_Line inside ring_path checked when the body is parsed per instance, plus a bare .ends); .op output identical to the same netlist with bare .ends lines"
+  },
+  {
+   "id": "err/f12-ends-name-mismatch",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-ends-name-mismatch.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12 (B-169): .ends rong closing .subckt ring is rejected with a parsing error naming both names, exit 1"
   }
  ]
 }
