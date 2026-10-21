@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Sprint heartbeat (run every 5 min by the coordinator's paseo heartbeat).
 
-Reads discover/orchestration/2026-10b/agents.json ({"agents": [{"id", "phase", "branch", "done"}]}) and, for
+Usage: heartbeat.py [REGISTRY]  (default: discover/orchestration/2026-10b/agents.json)
+Reads the registry ({"agents": [{"id", "phase", "branch", "done"}]}) and, for
 each listed phase agent, prints one line when something needs doing; prints only "OK" otherwise:
   DONE <phase> ...       done marker committed on its branch and agent idle -> coordinator gate + merge
   RESUMED <phase> ...    agent stopped by a usage/rate limit -> a resume message was sent (max 1 per 15 min)
@@ -11,11 +12,11 @@ Resume attempts are throttled through ~/.local/state/specs-sprint-heartbeat.json
 import datetime as dt, json, os, re, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-AGENTS = os.path.join(REPO, 'discover/orchestration/2026-10b/agents.json')
+AGENTS = os.path.join(REPO, sys.argv[1] if len(sys.argv) > 1 else 'discover/orchestration/2026-10b/agents.json')
 STATE = os.path.expanduser('~/.local/state/specs-sprint-heartbeat.json')
 LIMIT = re.compile(r"hit your (session|usage|weekly) limit|rate.?limit|usage limit|overloaded|API Error", re.I)
 RESUME = ("The heartbeat found you stopped (usage/rate limit or error). The limit has reset: please continue where "
-          "you left off. Read backlog/sprint-2026-10b/{phase}-progress.md first; resume or relaunch any subagents "
+          "you left off. Read {progress} first; resume or relaunch any subagents "
           "that were cut off; commit progress after every item. Never git push.")
 
 def sh(*a):
@@ -48,7 +49,8 @@ def main():
             last = state.get(aid)
             if last and (now() - dt.datetime.fromisoformat(last)).total_seconds() < 15 * 60:
                 continue
-            s = sh('paseo', 'send', '--no-wait', aid, RESUME.format(phase=phase))
+            progress = os.path.join(os.path.dirname(done), f'{phase}-progress.md')
+            s = sh('paseo', 'send', '--no-wait', aid, RESUME.format(progress=progress))
             state[aid] = now().isoformat()
             out.append(f'RESUMED {phase} {aid[:8]}: ' + ('message sent' if s.returncode == 0 else 'send failed: ' + s.stderr.strip()[:120]))
             continue
