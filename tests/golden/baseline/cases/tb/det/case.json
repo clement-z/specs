@@ -5,6 +5,12 @@
  ],
  "exit": 0,
  "files": {
+  "traces/detector_tb.manifest.json": {
+   "bytes": 252,
+   "kind": "json",
+   "sha256": "65c0fa109279e458e1382608d7850b71316f77399e76b0b402b800e0099f00d5",
+   "stored": "files/traces/detector_tb.manifest.json"
+  },
   "traces/detector_tb.vcd": {
    "bytes": 1615,
    "kind": "vcd",

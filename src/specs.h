@@ -126,6 +126,11 @@ public:
     sc_trace_file *default_trace_file = nullptr;
     bool trace_all_optical_nets = 1;
 
+    // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
+    vector<string> command_line; // argv as received by sc_main
+    vector<string> netlist_files; // files opened by the parser (-f, .include), in first-open order
+    bool print_run_manifest = false; // also print the run manifest to stdout, once (--print-manifest)
+
     // other
     // Unused since ws-cleanup C-01; kept because removing it shifts the printed
     // OpticalSignal IDs (heap layout, B-016): delete it together with B-016.

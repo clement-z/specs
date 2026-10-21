@@ -4,6 +4,13 @@
   "tests/golden/netlists/b144-bidir-source-first.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 443,
+   "kind": "json",
+   "sha256": "c22b3512ed8a014ac08db97892068050ff5cb949bcafe001605b38d71badc204",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b144-bidir-source-first"
 }

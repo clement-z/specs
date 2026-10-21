@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b048-undriven-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b048-undriven-tran.cir", "sha256": "5437b219131c1502adc13ea1e7d62f008863e6b15c23a8e234af99c8434a8e1f"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

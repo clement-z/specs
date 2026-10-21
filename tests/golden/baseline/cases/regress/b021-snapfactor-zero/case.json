@@ -4,6 +4,13 @@
   "tests/golden/netlists/b021-snapfactor-zero.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "709d93e39407d923e62f0e8495a382aa1479981754bd20ff491a2f1ac3a2fb7a",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b021-snapfactor-zero"
 }

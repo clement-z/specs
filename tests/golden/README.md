@@ -68,8 +68,11 @@ reported as NEW, everything else must pass), then `record --only '^<id>$'`.
 `specs`) in a **fresh temporary working directory**. Before the run, `circuits/`
 is copied in (netlists use `.include circuits/...`, which resolves relative to
 the cwd) and an empty `traces/` is created. Testbenches and the default trace
-file write to `traces/<name>.vcd` relative to the cwd. If `traces/` is missing,
-SystemC fails with `E701 cannot open trace file`.
+file write to `traces/<name>.vcd` relative to the cwd, with the run manifest
+(F-01: version, seed, command line, netlist file hashes) next to it as
+`traces/<name>.manifest.json`. If `traces/` is missing, specs fails (exit 1) with
+`Error: cannot open run manifest file` (before F-01: SystemC `E701 cannot open
+trace file`).
 
 Netlists that only exist to test a fix (error paths, regressions) live in
 `tests/golden/netlists/`, not in `circuits/` (the examples). Their cases override
@@ -85,6 +88,8 @@ For every case the harness records:
   * absolute paths become `<CWD>`, `<BUILD>`, `<REPO>`, `<HOME>`;
   * SystemC `In file: /…/x.cpp:123` becomes `In file: x.cpp`;
   * `-nan` becomes `nan`, and trailing blanks are stripped;
+  * the `"specs_version": "..."` line printed by `specs --print-manifest` becomes
+    `"specs_version": "<VERSION>"` (the version changes with every commit);
   * printed OpticalSignal IDs (`[0042]  @ 1550 nm ...`, a global counter that every
     copy also bumps) become `[#k]`, k = rank of the ID's first appearance in that
     stream or file (B-129). Prints of the same signal keep the same rank; adding or
@@ -95,6 +100,11 @@ For every case the harness records:
 * every file created or modified in the working dir (`circuits/` copies excluded):
   * VCD: `$date` and `$version` blocks are stripped;
   * JSON (the `--json` export): stored verbatim and compared structurally;
+  * run manifests (`*.manifest.json`, F-01): JSON as well, but the value of
+    `"specs_version"` becomes `"<VERSION>"` and absolute paths are mapped as in
+    stdout (`argv[0]` is absolute in `rlimit_nofile` cases); the rest is verbatim, so
+    the SHA-256 of the netlist files is compared: editing a netlist, even a comment,
+    changes the manifest of every case that reads it;
   * anything else: compared as text, or as bytes if binary.
 
 The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=DISABLE`.

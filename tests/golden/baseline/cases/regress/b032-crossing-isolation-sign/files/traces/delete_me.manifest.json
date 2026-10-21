@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b032-crossing-isolation-sign.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b032-crossing-isolation-sign.cir", "sha256": "c83e8753ac9c422741f316add7b16ad3dc5d65ebcc2a0da175687a2d86ec1ec8"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

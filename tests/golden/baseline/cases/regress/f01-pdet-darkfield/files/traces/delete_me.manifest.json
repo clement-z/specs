@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f01-pdet-darkfield.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f01-pdet-darkfield.cir", "sha256": "016897a05da06ab2e659b7453d8b5b5c6f785b37c5f87222885eb887797a354d"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

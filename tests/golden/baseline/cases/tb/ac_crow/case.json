@@ -5,6 +5,12 @@
  ],
  "exit": 0,
  "files": {
+  "traces/crow_tb.manifest.json": {
+   "bytes": 252,
+   "kind": "json",
+   "sha256": "4a45533edc2bbc2cf81dbfd731b09abea3f86bd5f2957161e8c75d270968ee68",
+   "stored": "files/traces/crow_tb.manifest.json"
+  },
   "traces/crow_tb.vcd": {
    "bytes": 145450,
    "kind": "vcd",

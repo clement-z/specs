@@ -5,6 +5,12 @@
  ],
  "exit": 0,
  "files": {
+  "traces/ps_tb.manifest.json": {
+   "bytes": 245,
+   "kind": "json",
+   "sha256": "383874f1e3b661d01a72b649fa2cdee6449bf93feebcd61f509cf794074f20d3",
+   "stored": "files/traces/ps_tb.manifest.json"
+  },
   "traces/ps_tb.vcd": {
    "bytes": 1377,
    "kind": "vcd",

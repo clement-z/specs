@@ -1,0 +1,16 @@
+* F-01: run manifest. Run with -o traces/m: traces/m.manifest.json is written next to traces/m.vcd:
+*   "seed": 0, "command_line": ["specs", "-o", "traces/m", "-f", "tests/golden/netlists/f01-manifest.cir"],
+*   "trace_file": "traces/m.vcd", and "netlist_files" lists, once each and in first-open order, the
+*   files opened by the parser with the SHA-256 of their bytes:
+*   1. tests/golden/netlists/f01-manifest.cir (this file, -f)
+*   2. tests/golden/netlists/f01-manifest-sub.cir (.include below)
+*   3. tests/golden/netlists/f01-manifest-leaf.cir (.include inside the body of subcircuit f01wg:
+*      opened while flattening, once per instance (B-150), i.e. twice, listed once)
+* "specs_version" is masked as "<VERSION>" by the harness. With --print-manifest -n
+* (regress/f01-print-manifest), the same JSON is printed on stdout with "trace_file": null.
+.include tests/golden/netlists/f01-manifest-sub.cir
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in mid f01wg
+x2 mid out f01wg
+probe1 out
+.tran 1e-11

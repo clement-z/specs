@@ -4,6 +4,13 @@
   "tests/golden/netlists/b145-upgrade-roles.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 433,
+   "kind": "json",
+   "sha256": "b42aadaebc00f3fa87f146aa2699444f8da8bcc65d909503ff42dd869a392140",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b145-upgrade-roles"
 }

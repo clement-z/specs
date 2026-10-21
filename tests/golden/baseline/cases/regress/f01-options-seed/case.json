@@ -5,6 +5,12 @@
  ],
  "exit": 0,
  "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 591,
+   "kind": "json",
+   "sha256": "0077e8d1912adf775a4b6885386d8b15856deaa41ffc6425565e81259cc2b064",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
   "traces/delete_me.vcd": {
    "bytes": 1483,
    "kind": "vcd",

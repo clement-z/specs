@@ -13,6 +13,7 @@
 #include "devices/detector.h"
 #include "devices/power_meter.h"
 #include "devices/generic_transmission_device.h"
+#include "run_manifest.h"
 
 using std::string;
 
@@ -370,11 +371,31 @@ void SPECSConfig::prepareSimulation() {
     verifyConfig();
 
     { // open default trace_file
+        bool opened_default_trace_file = false;
         if (!default_trace_file && trace_filename.size())
+        {
             default_trace_file = sc_create_vcd_trace_file(trace_filename.c_str());
+            opened_default_trace_file = true;
+        }
 
         if (default_trace_file)
             default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
+
+        // Run manifest (F-01): written next to the default trace file opened above, and printed
+        // once with --print-manifest (with "trace_file": null if SPECS writes no default trace)
+        if (opened_default_trace_file || print_run_manifest)
+        {
+            // sc_create_vcd_trace_file() appends ".vcd"
+            const string manifest_trace_file = opened_default_trace_file ? trace_filename + ".vcd" : "";
+            const string manifest_json = RunManifest(*this, manifest_trace_file).to_json();
+            if (opened_default_trace_file)
+                RunManifest::write_file(trace_filename + ".manifest.json", manifest_json);
+            if (print_run_manifest)
+            {
+                cout << manifest_json << flush;
+                print_run_manifest = false;
+            }
+        }
     }
 
     applyDefaultOpticalOutputPortConfig();

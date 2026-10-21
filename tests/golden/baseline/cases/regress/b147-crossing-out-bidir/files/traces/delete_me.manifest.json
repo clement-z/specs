@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b147-crossing-out-bidir.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b147-crossing-out-bidir.cir", "sha256": "0771e657ff3b53508cc715d8800f66d04f69a915353a0cdcd93819ecbbdc073a"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

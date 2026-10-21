@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b033-crossing-two-lambda.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b033-crossing-two-lambda.cir", "sha256": "9b9cc0e63bb27a68025f113afaf7be7509d0efa15bc53e467abf5d38a3fb757a"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

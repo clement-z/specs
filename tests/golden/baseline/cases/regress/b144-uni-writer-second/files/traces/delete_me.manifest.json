@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b144-uni-writer-second.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b144-uni-writer-second.cir", "sha256": "6af9b4484a7998457d4adbd2954533c525939a2758b015784e2fb0e2b74dedb7"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

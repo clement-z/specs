@@ -1,6 +1,8 @@
-# Version header for `specs --version` (src/main.cpp includes <utils/version.h>), computed from the
-# git tags like the former cmake/version.cmake. `full` is refreshed at every build (vcs_tag) and falls
-# back to the project version outside a git checkout; major/minor/patch are set at configure time.
+# Version header for `specs --version` and the run manifest (src/main.cpp and src/run_manifest.cpp
+# include <utils/version.h>; run_manifest.cpp is a core source, so libspx.so needs version_dep too),
+# computed from the git tags like the former cmake/version.cmake. `full` is refreshed at every build
+# (vcs_tag) and falls back to the project version outside a git checkout; major/minor/patch are set at
+# configure time.
 git_version_sh = find_program(meson.project_source_root() / 'utils/git-version.sh')
 version_conf = configuration_data()
 foreach part : ['major', 'minor', 'patch']

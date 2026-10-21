@@ -7,6 +7,12 @@
  ],
  "exit": 0,
  "files": {
+  "traces/freqsweep_tb.manifest.json": {
+   "bytes": 273,
+   "kind": "json",
+   "sha256": "1e626fe0d98530332da00d730f4f37773455004adcae20636a233f3724240290",
+   "stored": "files/traces/freqsweep_tb.manifest.json"
+  },
   "traces/freqsweep_tb.vcd": {
    "bytes": 111960,
    "kind": "vcd",

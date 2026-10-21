@@ -150,6 +150,8 @@ void yy_add_content_from_file(const string &filename, yyscan_t &scanner)
         cerr << "Error: File not found \"" << filename << "\"" << endl;
         exit(1);
     }
+    // run manifest (F-01)
+    ((ParserState *)yyget_extra(scanner))->record_input_file(filename);
 
     netlist_content_t netlist_content;
 
@@ -246,6 +248,8 @@ string convert_special_char(char c)
             cerr << "Error: included file not found \"" << yytext << "\"" << endl;
             exit(1);
         }
+        // run manifest (F-01)
+        ((ParserState *)yyextra)->record_input_file(yytext);
         cout << "Including file: " << yytext << endl;
         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE, yyscanner), yyscanner);
 

@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b052-cwsrc-positional.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b052-cwsrc-positional.cir", "sha256": "b83ad3a58633665fae64b3e0a218e75e3ba0d6ec8f8ebf1fa997db054e5c35a9"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

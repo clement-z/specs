@@ -4,6 +4,13 @@
   "tests/golden/netlists/b147-crossing-out-explicit-splitter-first.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 479,
+   "kind": "json",
+   "sha256": "30dac752a272249cb7f5effad5cf58f99af90d4bfc225121e8c2b737c1360ab1",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b147-crossing-out-explicit-splitter-first"
 }

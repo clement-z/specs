@@ -128,7 +128,7 @@ m_dep = cxx.find_library('m', required: false)
 
 # Defines core_sources, main_source, parser_dep, tb_sources and tb_args.
 subdir('src')
-# Defines version_dep (the generated <utils/version.h> for `specs --version`).
+# Defines version_dep (the generated <utils/version.h> for `specs --version` and the run manifest).
 subdir('src/utils')
 
 # ---- Targets ------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ specs_exe = executable('specs',
 # it, which builds it anyway when the tests are enabled.)
 spx_lib = shared_library('spx',
   core_sources,
-  dependencies: [systemc_dep],
+  dependencies: [systemc_dep, version_dep],
   implicit_include_directories: false,
   build_by_default: get_option('spx'),
   install: get_option('spx'),

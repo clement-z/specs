@@ -2290,6 +2290,44 @@
    ],
    "expect": "fail",
    "note": "F-01: .options seed=3000000000 (integer literal beyond the int range, read as 2147483647) is rejected with the same hint as err/f01-options-seed-huge-integer"
+  },
+  {
+   "id": "regress/f01-manifest",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-o",
+    "traces/m",
+    "-f",
+    "tests/golden/netlists/f01-manifest.cir"
+   ],
+   "note": "F-01: run manifest traces/m.manifest.json next to traces/m.vcd: seed, argv, trace file, and the SHA-256 of the 3 netlist files opened by the parser (-f file, .include, .include in a subcircuit body opened twice while flattening, listed once); specs_version masked by the harness"
+  },
+  {
+   "id": "regress/f01-print-manifest",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--print-manifest",
+    "-n",
+    "-f",
+    "tests/golden/netlists/f01-manifest.cir"
+   ],
+   "note": "F-01: --print-manifest in a dry run prints the run manifest on stdout after building the circuit, with \"trace_file\": null; no file is written"
   }
  ]
 }

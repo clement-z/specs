@@ -4,6 +4,13 @@
   "tests/golden/netlists/b060-pcmcell-k-eq-n.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 435,
+   "kind": "json",
+   "sha256": "8e5d9c004339c15c079a62c1e2a96d6a8746e33afe128714c77508ea71c24360",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b060-pcmcell-k-eq-n"
 }

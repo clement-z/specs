@@ -563,10 +563,22 @@ struct ParseTree {
     vector<ParseSubcircuit *> subcircuits;
     map<string, Variable> local_assignments;
     static map<string, Variable> global_assignments;
+    // Netlist files opened by the parser (-f files, .include), in first-open order, for the run
+    // manifest (F-01). Only the root tree's list is filled: the subcircuit trees, parsed during
+    // flatten(), record their .include files into it (root_input_files()).
+    mutable vector<string> input_files;
 
     ParseTree(const string &name = "ROOT")
     : name(name)
     {}
+
+    vector<string> *root_input_files() const
+    {
+        const ParseTree *root = this;
+        while (root->parent)
+            root = root->parent;
+        return &root->input_files;
+    }
 
     ParseTree(const string &name, const ParseSubcircuit &subcircuit, const map<string, Variable> &kwargs);
 

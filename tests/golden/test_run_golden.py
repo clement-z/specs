@@ -270,5 +270,98 @@ class PrintSlack(unittest.TestCase):
         self.assertTrue(rg.compare_text("k = 0.5", "k = 0.6", loose, "stdout"))
 
 
+MANIFEST = """{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "%s",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-o", "traces/m", "-f", "a.cir"],
+  "netlist_files": [
+    {"path": "a.cir", "sha256": "%s"}
+  ],
+  "trace_file": "traces/m.vcd"
+}
+"""
+HASH_A = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+HASH_B = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+
+class RunManifest(unittest.TestCase):
+    """F-01: the "specs_version" of the run manifest (file and --print-manifest) is masked."""
+
+    def norm(self, text, pathmap=None):
+        return rg.normalise_run_manifest(text, pathmap or rg.PathMap([]))
+
+    def test_file_version_masked(self):
+        out = self.norm(MANIFEST % ("v0.1-209.gd16e573", HASH_A))
+        self.assertEqual(out, MANIFEST % ("<VERSION>", HASH_A))
+        self.assertEqual(json.loads(out)["specs_version"], "<VERSION>")
+        self.assertEqual(self.norm(out), out)
+
+    def test_versions_compare_equal_other_changes_fail(self):
+        a = self.norm(MANIFEST % ("v0.1-209.gd16e573", HASH_A))
+        b = self.norm(MANIFEST % ("v0.2-1.g0123456-dirty", HASH_A))
+        self.assertEqual(a, b)
+        c = self.norm(MANIFEST % ("v0.2-1.g0123456-dirty", HASH_B))
+        diffs = []
+        rg.compare_json_values(json.loads(a), json.loads(c), DEFAULT_TOL, "m.manifest.json", diffs)
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("sha256", diffs[0])
+
+    def test_escaped_quotes_and_crlf(self):
+        text = (MANIFEST % ('v1 \\"quoted\\" \\\\ x', HASH_A)).replace("\n", "\r\n")
+        self.assertEqual(self.norm(text), MANIFEST % ("<VERSION>", HASH_A))
+
+    def test_only_the_key_is_masked(self):
+        # argv may contain the key as text: it is an escaped string value, not a key
+        text = MANIFEST.replace('"-f", "a.cir"', '"-f", "\\"specs_version\\": \\"keep\\""') % ("v1", HASH_A)
+        out = self.norm(text)
+        self.assertEqual(json.loads(out)["command_line"][-1], '"specs_version": "keep"')
+        self.assertEqual(json.loads(out)["specs_version"], "<VERSION>")
+
+    def test_absolute_paths_mapped(self):
+        text = MANIFEST.replace('["specs",', '["/opt/build/specs",') % ("v1", HASH_A)
+        out = self.norm(text, rg.PathMap([("/opt/build", "<BUILD>")]))
+        self.assertEqual(json.loads(out)["command_line"][0], "<BUILD>/specs")
+
+    def test_print_manifest_stdout_line_masked(self):
+        stdout = "Current SPECS config: \n" + MANIFEST % ("v0.1-209.gd16e573", HASH_A) + "DONE"
+        out = rg.normalise_text(stdout, rg.PathMap([]))
+        self.assertIn('\n  "specs_version": "<VERSION>",\n', out)
+        self.assertNotIn("d16e573", out)
+        self.assertIn(HASH_A, out)
+        # elsewhere in a line, the text is not touched
+        line = 'note: "specs_version": "v1"'
+        self.assertEqual(rg.normalise_text(line, rg.PathMap([])), line)
+
+    def test_run_case_masks_file_and_stdout(self):
+        """End to end through run_case(), with a fake specs that writes and prints a manifest."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            fake = root / "bin" / "specs"
+            fake.parent.mkdir()
+            fake.write_text(
+                "#!/bin/sh\n"
+                "printf '{\\n  \"specs_version\": \"%s\",\\n  \"command_line\": [\"%s/specs\"]\\n}\\n' "
+                "\"$1\" \"$PWD\" > traces/m.manifest.json\n"
+                "printf '{\\n  \"specs_version\": \"%s\"\\n}\\n' \"$1\"\n"
+            )
+            fake.chmod(0o755)
+            (root / "repo").mkdir()
+            (root / "tmp").mkdir()
+            case = {"id": "x", "setup": {"mkdir": ["traces"]}}
+            res = [rg.run_case(dict(case, args=[v]), fake, root / "repo", str(root / "tmp"))
+                   for v in ("v0.1-209.gd16e573", "v0.2")]
+            for r in res:
+                self.assertEqual(r["exit"], 0, r["stderr"])
+                content = r["files"]["traces/m.manifest.json"]["content"]
+                self.assertEqual(r["files"]["traces/m.manifest.json"]["kind"], "json")
+                self.assertEqual(json.loads(content),
+                                 {"specs_version": "<VERSION>", "command_line": ["<CWD>/specs"]})
+                self.assertEqual(r["stdout"], '{\n  "specs_version": "<VERSION>"\n}\n')
+            self.assertEqual(res[0]["files"], res[1]["files"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
