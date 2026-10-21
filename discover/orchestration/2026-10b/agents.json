@@ -1,5 +1,5 @@
 {
  "agents": [
-  {"id": "6e49bae6-ae1b-4540-a618-9b958f3a7ca9", "phase": "P1", "branch": "ws/harness", "done": "backlog/sprint-2026-10b/P1-REPORT.md"}
+  {"id": "062bddfe-13d2-4639-987b-21098083ae1f", "phase": "P2", "branch": "ws/engine", "done": "backlog/sprint-2026-10b/P2-REPORT.md"}
  ]
 }
