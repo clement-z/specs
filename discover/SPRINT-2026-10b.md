@@ -7,7 +7,7 @@
 ## Phases (sequential; each = one paseo workspace branched from the current `sprint/2026-10b`)
 | # | Phase | Items | Workspace / branch | Model | Done marker (committed on its branch) | State |
 |---|---|---|---|---|---|---|
-| P1 | Golden harness hardening | B-126, B-127, B-128, B-129 | `ws-harness` / `ws/harness` | Opus 5.5 high | `backlog/sprint-2026-10b/P1-REPORT.md` | pending |
+| P1 | Golden harness hardening | B-126, B-127, B-128, B-129 | `ws-harness` / `ws/harness` (agent 6e49bae6) | Opus 5.5 high | `backlog/sprint-2026-10b/P1-REPORT.md` | running |
 | P2 | Netlist/engine correctness | B-144/145/147, B-146, B-052, B-001, B-002/004, B-058, B-051, B-060 (validation), B-037 (docs) | `ws-engine` / `ws/engine` | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P2-REPORT.md` | pending |
 | P3 | Devices/physics | B-032/033/159 (crossing), B-049/050 (PDET), B-048 (probes, IC-proof), B-021/B-014/B-124 (tolerance docs + delay warnings) | `ws-devices` / `ws/devices` | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P3-REPORT.md` | pending |
 | P4 | F-01 reproducible runs (fixes B-016) | seeds, name-ordered iteration, manifest | `ws-repro` / `ws/repro` | Opus 5.5 xhigh | `backlog/sprint-2026-10b/P4-REPORT.md` | pending |
@@ -47,3 +47,4 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 
 ## Log
 - 2026-10-21 — decisions recorded (c4597b9); plan written; sanitizer option a chosen; awaiting "go".
+- 2026-10-21 — go; P1 launched (agent 6e49bae6, ws/harness).
