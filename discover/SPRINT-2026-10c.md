@@ -47,3 +47,4 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 - 2026-10-21 — Q2, Q5 confirmed; Q8 under review. Push of `sprint/2026-10b` and `sprint/2026-10c` and housekeeping of the 2026-10b workspaces authorised.
 - 2026-10-21 — pushed `sprint/2026-10b` (d5890f1) and `sprint/2026-10c`; 2026-10b workspaces archived, `ws/*` and `P*-wip/*` branches and `/tmp` scratch removed (`P*-ready/*` kept for phase A).
 - 2026-10-21 — Q8 decided: order by time only (same-time order unspecified, deterministic). All F-15 answers confirmed. Waiting for "go" on A/B.
+- 2026-10-21 — backlog B-179 recorded (PUF circuit ring coupling to align before benchmark use; needs-human, decision pending); integer-clamp entry of phase A renumbered B-180.
