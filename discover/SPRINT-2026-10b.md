@@ -11,8 +11,8 @@
 | P2 | Netlist/engine correctness | B-144/145/147, B-146, B-052, B-001, B-002/004, B-058, B-051, B-060 (validation), B-037 (docs) | `ws-engine` / `ws/engine` (agent 062bddfe) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P2-REPORT.md` | done, merged (cdacdca); B-146 awaits sign-off |
 | P3 | Devices/physics | B-032/033/159 (crossing), B-049/050 (PDET), B-048 (probes, IC-proof), B-021/B-014/B-124 (tolerance docs + delay warnings) | `ws-devices` / `ws/devices` (agent a8c73097) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P3-REPORT.md` | done, merged (3fc4f94); B-014 error awaits sign-off |
 | P4 | F-01 reproducible runs (fixes B-016) | seeds, name-ordered iteration, manifest | `ws-repro` / `ws/repro` (agent 87116f2a) | Opus 5.5 xhigh | `backlog/sprint-2026-10b/P4-REPORT.md` | done, merged (0dee6b2); lexer fix awaits sign-off |
-| P5 | F-28 + F-12 | `.op`/`.dc` convergence; netlist pack (SPICE semantics) | `ws-netlist` / `ws/netlist` (agent e01d0c83) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P5-REPORT.md` | running |
-| P6 | F-05 outputs/tracing | `.save`, `--no-trace`, CSV/`.npz`, trace-all fallback | `ws-outputs` / `ws/outputs` | Opus 5.5 high | `backlog/sprint-2026-10b/P6-REPORT.md` | pending |
+| P5 | F-28 + F-12 | `.op`/`.dc` convergence; netlist pack (SPICE semantics) | `ws-netlist` / `ws/netlist` (agent e01d0c83) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P5-REPORT.md` | done, merged (43a50d7) |
+| P6 | F-05 outputs/tracing | `.save`, `--no-trace`, CSV/`.npz`, trace-all fallback | `ws-outputs` / `ws/outputs` (agent 5532f8fc) | Opus 5.5 high | `backlog/sprint-2026-10b/P6-REPORT.md` | running |
 | P7 | CI: sanitizer job blocking | after P4 removes the ordering noise | coordinator | Opus 5.5 | CI green with blocking sanitizer job | pending |
 | P8 | Final docs + verification + push | cheatsheet/README/CHANGELOG, full re-verification, push branch | coordinator | Opus 5.5 | pushed `origin/sprint/2026-10b` | pending |
 
@@ -65,3 +65,4 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 - 2026-10-21 — P2 merged (cdacdca): gate = scope OK, gcc+clang meson test 12/12, golden 115/115 `--atol 0`, old baseline + predicted edits == new baseline. B-146 parked for sign-off. P3 launched (agent a8c73097).
 - 2026-10-21 — P3 merged (3fc4f94): gate = gcc+clang meson test 12/12, golden 134/134 `--atol 0`; vs pre-P3 baseline exactly the 18 predicted cases (stderr-only warnings; 472 VCD signals follow the B-048 pattern; b147 slot split; tb/det 3/3). P4 launched (agent 87116f2a).
 - 2026-10-21 — P4 merged (0dee6b2): gate = gcc, clang, clang ASan meson test 12/12, golden 153/153 `--atol 0`, no unordered exemptions; old→new audit: ordering-only + manifests + seeded readouts + predicted cases. P5 launched (agent e01d0c83).
+- 2026-10-21 — P5 merged (43a50d7): gate = gcc+clang meson test 12/12, golden 176/176 `--atol 0`; vs pre-P5 baseline exactly 12 predicted cases (7 `.dc` old-prefix + stop point, 3 legacy path-only, help lines added). P6 launched (agent 5532f8fc).
