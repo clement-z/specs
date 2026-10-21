@@ -80,6 +80,9 @@
   "regress/b033-crossing-two-lambda",
   "regress/b033-crossing-two-lambda-tran",
   "regress/b036-vci-crow",
+  "regress/b049-pdet-drives-net",
+  "regress/b050-pdet-beat",
+  "regress/b050-pdet-two-open-tran",
   "regress/b051-pcmcell-tc-zero",
   "regress/b052-cwsrc-positional",
   "regress/b052-evlsrc-positional",
@@ -391,6 +394,12 @@
    "only": "^(regress/b147-crossing-out-.*|regress/b032-.*|regress/b033-.*|regress/b159-.*|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-032/B-033/B-159: passive per-wavelength crossing, CrossingBi on bidirectional nets (b147 crossing cases: a, b, d split into :0/:1 slots, other values unchanged); new crossing cases; gtest CrossingModel.*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T03:26:43Z",
+   "only": "^(tb/det|tb/detector|regress/b049-.*|regress/b050-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-049/B-050: event-driven PDET (readout written on input events/enable, Ts sampling only while beating, enabled by default); tb/det, tb/detector: detectors enabled, self-checks pass 3/3, readouts printed with 3 decimals, noisy readout VCD signals ignored (vcd_ignore_values); new PDET cases; gtest Detector*"
   }
  ]
 }

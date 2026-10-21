@@ -1,0 +1,20 @@
+* B-050 regression (repro: backlog/repro/a3-pdet-two-hang.cir). An open-ended .tran (no duration)
+* with two photodetectors never ended: each detector's 1 ps sampling timeout was "pending
+* activity" (sc_pending_activity()) for the other one. Detectors now only wake on input events
+* (and every Ts while two non-zero wavelengths beat, not the case here: one wavelength).
+* merger1 (lossless) outputs (Ea + Eb)/sqrt(2), a and b in phase at 1550 nm:
+*   before 1 ns: in = 1 mW / 2 = 0.5 mW; from 1 ns (vlsrc1): in = (2 sqrt(1 mW))^2 / 2 = 2 mW.
+* Expected (R = 1 A/W): PDET1.readout = PDET2.readout = 0.5 mA from t = 0, 2 mA from 1 ns
+*   (readout_no_interference identical); one VCD record per change; "Simulated 2 ns".
+* vlsrc2 (net c, read by nobody) only makes a later event at 2 ns: SystemC does not dump the last
+* time step of an open-ended run to the VCD, so without it the 1 ns values would not be traced.
+cwsrc1 a wl=1.55e-6 power=1e-3
+vlsrc1 b values=[[1e-9,1e-3,1.55e-6]]
+merger1 a b in
+pdet1 in v1
+pdet2 in v2
+vlsrc2 c values=[[2e-9,1e-3,1.55e-6]]
+* traceall=0: only the PDETs (and explicit probes) are traced, the case does not depend on the
+* automatic probes of the CW nets
+.options traceall=0
+.tran

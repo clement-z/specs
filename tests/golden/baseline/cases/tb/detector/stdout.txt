@@ -10,23 +10,38 @@ Current SPECS config:
 Info: (I703) tracing timescale unit set: 100 fs (traces/detector_tb.vcd)
 0 s:
 	IN: [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-	READOUT:  0
-	READOUT2:  0
+	READOUT:  0.000
+	READOUT2:  0.000
 	COUNT: 1
+0 s:
+	IN: [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+	READOUT:  1.000
+	READOUT2:  1.000
+	COUNT: 2
 100 ms:
 	IN: [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-	READOUT:  0
-	READOUT2:  0
-	COUNT: 2
------------------/! \---------------
-Failure!
-Expected 1A as both output currents!
------------------/! \---------------
+	READOUT:  1.000
+	READOUT2:  1.000
+	COUNT: 3
+100 ms:
+	IN: [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	READOUT:  0.000
+	READOUT2:  0.000
+	COUNT: 4
 200 ms:
 	IN: [#3]  @ 1551 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-	READOUT:  0
-	READOUT2:  0
-	COUNT: 3
+	READOUT:  0.000
+	READOUT2:  0.000
+	COUNT: 5
+200 ms:
+	IN: [#3]  @ 1551 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+	READOUT:  1.000
+	READOUT2:  1.000
+	COUNT: 6
+-----------------/! \---------------
+Test finished!
+Success rate: 3/3
+-----------------/! \---------------
 
 
 .vcd trace file: traces/detector_tb

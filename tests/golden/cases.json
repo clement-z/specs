@@ -872,7 +872,10 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised."
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
+   "vcd_ignore_values": [
+    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
+   ]
   },
   {
    "id": "tb/detector",
@@ -880,7 +883,10 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised."
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
+   "vcd_ignore_values": [
+    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
+   ]
   },
   {
    "id": "tb/pcm",
@@ -1780,6 +1786,58 @@
     ]
    },
    "note": "B-159: a crossing on a bidirectional net is a CrossingBi; 1 mW backward into out1, 4 mW forward into in2, xtalk=-10: a:0 = 0.9 mW at 0, b:0 = 0.1 mW at 1.5708 rad (backward, was lost), c:1 = 0.4 mW at 1.5708 rad, d:0 = 3.6 mW (slots explained in the netlist header)"
+  },
+  {
+   "id": "regress/b049-pdet-drives-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b049-pdet-drives-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-049: the PDET readout (1 mA, written from the start of the transient) drives its electrical net: the phase shifter it controls gives out2 a 1 rad phase at 10 ps (was 0: p_readout was never written)"
+  },
+  {
+   "id": "regress/b050-pdet-two-open-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b050-pdet-two-open-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "timeout": 30,
+   "note": "B-050: an open-ended .tran with two PDETs ends (was: never, the detectors kept each other's 1 ps sampling loop alive); readouts 0.5 mA, then 2 mA at 1 ns, one VCD record per change, 'Simulated 2 ns'. Short timeout so that a regression fails fast"
+  },
+  {
+   "id": "regress/b050-pdet-beat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b050-pdet-beat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-050: two CW wavelengths (1550/1551 nm) on one PDET are sampled every Ts = 1 ps while they beat: readout 0.625 + 0.5 cos(2 pi 124.703 GHz t) mA (period 8.019 ps, between 0.125 and 1.125 mA)"
   }
  ]
 }

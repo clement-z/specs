@@ -139,3 +139,43 @@ Phase-change memory cell: `PCMCELL<name> <in> <out> [emelt [n [tc [ta]]]] [keywo
 - Checks: `n > 0` and `0 <= k <= n`, otherwise an error.
 - Power transmission in state k: `tc + (ta - tc) * tanh(TANH_COEF * k / n)`.
 - Example: `pcmcell1 in out 1e-12 10 0.85 0.95` is `pcmcell1 in out emelt=1e-12 n=10 tc=0.85 ta=0.95`.
+
+## PDET
+
+Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
+
+- Nets: `in`, optical input; `out`, electrical output (the photocurrent, in A).
+- Positional arguments, in order: `ts` (sampling time, s), `r` (responsivity, A/W). At most 2; more is
+  an error.
+- Keywords (case-insensitive); a keyword overrides the positional value:
+
+  | Keyword | Sets | Default |
+  | --- | --- | --- |
+  | `ts`, `sampling_time` | sampling time, s | 1e-12 |
+  | `r`, `responsivity`, `gain` | responsivity, A/W | 1 |
+  | `nb`, `noise_bypass` | boolean: `true` means no noise | true |
+  | `fop`, `frequency` | operating frequency used by the noise model, Hz | 1e9 |
+
+  The dark current is 0 and cannot be set from a netlist.
+- Readout: R·|E_total|², plus noise when `nb=false`. With one wavelength (or several where at most one has
+  a non-zero field) this is R·Σ|E_k|², exact. With two or more wavelengths with non-zero fields, they beat:
+  the readout is R·|Σ E_k·e^(j2πf_k·t)|² and depends on time.
+- The readout is written to `out` (and traced as `<name>.readout` in the VCD; `<name>.readout_no_interference`
+  is R·Σ|E_k|²):
+  - on every input event;
+  - when the detector is enabled: in `.tran`, detectors are disabled during the operating point and enabled at
+    the start of the transient, so a detector lit by a CW source shows its readout from t = 0;
+  - while two or more wavelengths beat, also every `ts`. These periodic samples are written only when the
+    readout changed by more than max(abstol, reltol·|last written value|), with the `.options abstol` and
+    `reltol` values.
+- A constant input gives one record, not one per `ts`. The detector does not keep the simulation alive: an
+  open-ended `.tran` (no duration) ends when the circuit is quiet. A permanent beat (e.g. two CW wavelengths
+  on one PDET) never goes quiet, so give a duration.
+- `.op` and `.dc`: detectors are disabled and do not write `out`. Testbenches and C++ users get an enabled
+  `Detector`.
+- Caveats: a detector whose total field is exactly 0 writes a tiny random value (about 1e-40 A, a "dark
+  field" injection; reproducible random numbers are planned). With `nb=false` the noise is drawn each time
+  the readout is computed, so its values differ between runs. Before B-049/B-050, `out` was never written
+  (a PSHIFT or MZI driven by a PDET saw 0) and two detectors made an open-ended `.tran` run forever.
+- Example: `pdet1 in vout` then `pshift1 a b vout sensitivity=1000`. With 1 mW on `in` (R = 1 A/W), `vout`
+  is 1 mA and the phase shifter adds 1000 rad/A · 1 mA = 1 rad.

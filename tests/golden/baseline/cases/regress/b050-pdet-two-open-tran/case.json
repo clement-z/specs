@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b050-pdet-two-open-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1187,
+   "kind": "vcd",
+   "sha256": "ec4947246a476c8771b181ea09cb66f4b0b462bc3988fd1902a4f1cb8aeec12e",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b050-pdet-two-open-tran"
+}

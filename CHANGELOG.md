@@ -84,6 +84,13 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   dropped, with "Attempted to sum signals of different wavelengths" in `.tran`) (B-033), and it is
   bidirectional when one of its nets is: light entering an output comes back out of the inputs (B-159).
   Documented in `doc/netlist.md`
+* PDET drives its electrical output net (the write was commented out, so a PSHIFT or MZI driven by a photodetector
+  saw 0) (B-049), and its readout is event-driven: it is written on input events and when the detector is
+  enabled (in `.tran`, right after the operating point); it is sampled every `ts` only while two or more
+  wavelengths beat, and those samples are written only when they change by more than max(abstol, reltol·|last|).
+  An open-ended `.tran` with two or more detectors now ends (it never did), and a constant input gives one VCD
+  record instead of one per sample (B-050). Detectors are enabled by default for C++ and testbench users;
+  `detector_tb` enables them and its self-checks pass. Documented in `doc/netlist.md` (PDET)
 
 ### Removed
 

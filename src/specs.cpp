@@ -68,6 +68,12 @@ void SPECSConfig::runOPAnalysis()
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Disable photodetectors before the first sc_start(): they are enabled by default
+    // (testbenches, C++ users) but must not write their readout during the OP
+    for (auto pdet: all_photodetectors) {
+        pdet->enable = sc_logic(0);
+    }
+
     // Run to initialize all threads and register first values
     sc_start();
 
@@ -85,11 +91,6 @@ void SPECSConfig::runOPAnalysis()
     // Disable ML probes for OP point
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(0);
-    }
-
-    // Disable photodetectors
-    for (auto pdet: all_photodetectors) {
-        pdet->enable = sc_logic(0);
     }
 
     // Set all ports mode to NO_DELAY
@@ -117,6 +118,13 @@ void SPECSConfig::runDCAnalysis()
     auto all_sig = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Disable photodetectors before the first sc_start() (they are enabled by default)
+    for (auto pdet: all_photodetectors) {
+        // Remark: Photodetectors could in fact be left enabled ?
+        // Would that serve any purpose though...?
+        pdet->enable = sc_logic(0);
+    }
+
     // Run to initialize all threads and register first values
     sc_start();
 
@@ -128,13 +136,6 @@ void SPECSConfig::runDCAnalysis()
     // Disable ML probes
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(0);
-    }
-
-    // Disable photodetectors
-    for (auto pdet: all_photodetectors) {
-        // Remark: Photodetectors could in fact be left enabled ?
-        // Would that serve any purpose though...?
-        pdet->enable = sc_logic(0);
     }
 
     // Set all ports mode to NO_DELAY

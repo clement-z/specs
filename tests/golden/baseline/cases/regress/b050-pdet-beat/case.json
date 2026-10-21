@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b050-pdet-beat.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1564,
+   "kind": "vcd",
+   "sha256": "67a01c34d0791136d37d77f18e1684393f50e6b4e2bef423e172fa6cf50874f4",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b050-pdet-beat"
+}
