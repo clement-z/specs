@@ -19,3 +19,9 @@ lines / the set of (signal, waveform) pairs is unchanged except for seeded noise
 `unordered_streams` exception P1 listed, and show `check --strict` passes twice in a row and under a clang
 ASan/UBSan build (`CC=clang CXX=clang++ meson setup ... -Db_sanitize=address,undefined -Db_lundef=false`, with
 `ASAN_OPTIONS=detect_leaks=0` since leak suppressions come in P7): ordering must no longer depend on the allocator.
+
+Note from P2 (see `backlog/sprint-2026-10b/P2-REPORT.md`, "Found, not done"): `upgrade_signal` asserts
+`has_writer ^ has_reader`, but a unidirectional net can already have a writer and readers when a bidirectional
+device upgrades it; today's pointer-ordered creation avoids it, name-ordered iteration may not. If it fires, relax it
+to `assert(has_writer || has_reader)` (the slot convention approved for B-144/B-145 already handles that case) in its
+own commit `fix(B-145): …`, with `regress/b145-upgrade-reader-case2` / `b145-upgrade-roles` as the tests.
