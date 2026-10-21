@@ -3,6 +3,13 @@
 
 using namespace std;
 
+void WaveguideUni::start_of_simulation()
+{
+    // B-014: check once how the group delay is rounded to the time step. With dispersion
+    // (m_D != 0) the delay depends on the wavelength: the nominal one (1.55 um) is checked
+    m_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9);
+}
+
 void WaveguideUni::on_port_in_changed()
 {
     const double c = 299792458.0;
@@ -15,7 +22,7 @@ void WaveguideUni::on_port_in_changed()
 
     // vg = c/ng
     // => delay = L / vg = (L * ng) / c
-    const double group_delay_ns = 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    const double group_delay_ns = groupDelay_ns();
 
     // precalculate 2 * pi * L
     double phase_delay_factor = 2.0 * M_PI * m_length_cm * 1e-2;
@@ -100,6 +107,12 @@ void WaveguideUni::on_port_in_changed()
 }
 
 
+void WaveguideBi::start_of_simulation()
+{
+    // B-014: as WaveguideUni. Same delay in both directions: checked (and reported) once
+    m_p1_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9);
+}
+
 void WaveguideBi::on_p0_in_changed()
 {
     const double c = 299792458.0;
@@ -112,7 +125,7 @@ void WaveguideBi::on_p0_in_changed()
 
     // vg = c/ng
     // => delay = L / vg = (L * ng) / c
-    const double group_delay_ns = 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    const double group_delay_ns = groupDelay_ns();
 
     // precalculate 2 * pi * L
     double phase_delay_factor = 2.0 * M_PI * m_length_cm * 1e-2;
@@ -212,7 +225,7 @@ void WaveguideBi::on_p1_in_changed()
 
     // vg = c/ng
     // => delay = L / vg = (L * ng) / c
-    const double group_delay_ns = 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    const double group_delay_ns = groupDelay_ns();
 
     // precalculate 2 * pi * L
     double phase_delay_factor = 2.0 * M_PI * m_length_cm * 1e-2;

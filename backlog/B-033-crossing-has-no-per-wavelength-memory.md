@@ -1,5 +1,5 @@
 # B-033: Crossing has no per-wavelength memory (light lost or errors with 2 λ)
-severity: med | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 04c7819 (sprint 2026-10b P3)
 location: src/devices/crossing.cpp:37-56, src/devices/crossing.cpp:101-128
 ## Problem
 On every event the thread reads the last event of each port (`p_in1->read()`, `p_in2->read()`) and adds

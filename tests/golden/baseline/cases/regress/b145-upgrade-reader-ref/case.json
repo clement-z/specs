@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/delete_me.vcd": {
-   "bytes": 3445,
+   "bytes": 4066,
    "kind": "vcd",
-   "sha256": "0b2b7632100ad8d0b5236ca397821d694cbcfb47b0c28ce899534b0ce73c679a",
+   "sha256": "c2040aa50f097a86d9cdd9b37dc1f7977a117c9c2c694760cb33b4efb44f6b29",
    "stored": "files/traces/delete_me.vcd"
   }
  },

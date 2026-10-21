@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 2034,
+   "kind": "vcd",
+   "sha256": "16a3dc1954972da828e2d45e6ab84bd98cd9b93ba3669982502122cfdcf9accc",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b014-delay-rounds-to-zero"
+}

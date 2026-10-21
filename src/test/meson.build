@@ -9,12 +9,16 @@ unit_tests_exe = disabler()
 if gtest_dep.found()
   unit_tests_exe = executable('unit_tests',
     files(
+      'devices/crossing.cpp',
+      'devices/detector.cpp',
       'devices/models.cpp',
       'devices/pcm.cpp',
+      'devices/probe.cpp',
       'devices/waveguide.cpp',
       'main.cpp',
       'optical_output_port.cpp',
       'specs_config.cpp',
+      'tran_start.cpp',
     ),
     cpp_args: ['-pedantic'],
     dependencies: [gtest_dep, systemc_dep],

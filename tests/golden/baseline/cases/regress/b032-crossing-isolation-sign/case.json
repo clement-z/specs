@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b032-crossing-isolation-sign.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b032-crossing-isolation-sign"
+}

@@ -101,3 +101,30 @@ TEST(Waveguide, OperatingPoint)
     }
     SPECS_TEST_FOOTER();
 }
+
+// B-014: a bidirectional waveguide checks the rounding of its group delay once,
+// before the simulation, and reports it once (not once per direction)
+TEST(WaveguideDeathTest, DelayRoundingReportedOncePerDevice)
+{
+    SPECS_TEST_HEADER()
+    {
+        specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
+        specsGlobalConfig.engine_timescale = SPECSConfig::HUNDRED_FS;
+        specsGlobalConfig.applyEngineResolution();
+
+        WaveguideTest tb;
+        tb.uut.m_ng = 4;
+        tb.uut.m_length_cm = 4e-4; // 4 um: L*ng/c = 53.4 fs -> 100 fs
+        auto config = make_shared<OpticalOutputPortConfig>();
+        tb.uut.m_p0_out_writer.setConfig(config);
+        tb.uut.m_p1_out_writer.setConfig(config);
+
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(0),
+                    "^Warning \\(uut\\): delay 5.33703e-14 s rounded to 1e-13 s \\(\\+87.4 %\\)[^\n]*\nend$");
+
+        // .op: delays are ignored, nothing to report
+        specsGlobalConfig.analysis_type = SPECSConfig::OP;
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(0), "^end$");
+    }
+    SPECS_TEST_FOOTER();
+}

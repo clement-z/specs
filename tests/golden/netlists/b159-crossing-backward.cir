@@ -1,0 +1,23 @@
+* B-159 regression: a crossing on a bidirectional net is a CrossingBi (it was always uni, so
+* backward light never came out of its inputs). Net c (crossing out1) has two writers, cwsrc1
+* and the crossing, so it is bidirectional; the crossing upgrades a, b and d to bidirectional.
+* cwsrc1: 1 mW backward into out1 (c); cwsrc2: 4 mW forward into in2 (b). att=0, xtalk=-10:
+* x = 10^(-0.5) = 0.316228 (x^2 = 0.1), t = sqrt(1 - x^2) = 0.948683 (t^2 = 0.9), reciprocal.
+* Slots (next-free-slot convention, parse_tree.h): elaborating c, cwsrc1 (listed first) is the
+* first writer of c: c:0. crossing1 (bidir backlog of c) writes the next free slot of each of
+* its nets and reads the other one: a:0 (reads a:1), b:0 (reads b:1), c:1 (reads c:0), d:0
+* (reads d:1). cwsrc2 joins the backlog when crossing1 creates b, so it is created after it:
+* second writer of b, b:1. Nothing writes a:1 and d:1.
+* Expected:
+*   c:0 = 1 mW at 0 (cwsrc1); b:1 = 4 mW at 0 (cwsrc2)
+*   a:0 = t*c:0 = 0.9 mW (0.03 sqrt(W)) at 0                 (backward, out1 -> in1 through)
+*   b:0 = j*x*c:0 = 0.1 mW (0.01 sqrt(W)) at pi/2 = 1.5708   (backward, out1 -> in2 cross)
+*   c:1 = j*x*b:1 = 0.4 mW (0.02 sqrt(W)) at pi/2            (forward, in2 -> out1 cross)
+*   d:0 = t*b:1 = 3.6 mW (0.06 sqrt(W)) at 0                 (forward, in2 -> out2 through)
+*   a:1 = d:1 = 0 (no writer)
+* Before the fix (uni crossing, a b d unidirectional): a = 0 (backward light lost), d = 4 mW and
+* c:1 = 0.4 mW at 0 (4.4 mW out of 4 mW, B-032).
+cwsrc1 c wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=4e-3
+crossing1 a b c d xtalk=-10
+.op

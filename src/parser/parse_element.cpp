@@ -563,7 +563,7 @@ INSTANTIATE_AND_CONNECT_BI(CrossingElement, pt_helper)
 {
     element_type_bi *obj = new element_type_bi(name.c_str());
 
-    // Update unidirectional nets connected to the waveguide
+    // Update unidirectional nets connected to the crossing
     if (!pt_helper.nets->at(nets[0]).bidirectional())
         (*pt_helper.nets)[nets[0]].m_writers_count++;
     if (!pt_helper.nets->at(nets[1]).bidirectional())
@@ -607,10 +607,21 @@ sc_module *CrossingElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create signals if they don't exist
     pt_helper.create_signals(this);
 
+    // Check if device has to be bidirectional (B-159)
+    bool bidirectional = false;
+    for (const auto &net : nets)
+    {
+        // for crossing, if any net is bidir, module has to be bidir
+        bidirectional |= pt_helper.nets->at(net).bidirectional();
+    }
+
     // Create the object and connect ports to signals
-    INSTANTIATE(pt_helper, false);
+    INSTANTIATE(pt_helper, bidirectional);
 
     // Parse positional arguments
+    // att: excess loss in dB, on top of the power lost to crosstalk
+    // xtalk: cross power ratio in dB; its sign is ignored, a positive value is read as
+    // an isolation (xtalk=20 and xtalk=-20 both give 1 % on the cross port, B-032)
     if(args.size() > 0)
         obj->m_attenuation_power_dB = args[0].as_double();
     if(args.size() > 1)
@@ -624,6 +635,7 @@ sc_module *CrossingElement::create(ParseTreeCreationHelper &pt_helper) const
         if (kw == "ATTENUATION" || kw == "ATT")
             obj->m_attenuation_power_dB = p.second.as_double();
         else if (kw == "CROSSTALK" || kw == "XTALK")
+            // sign ignored: xtalk=20 (isolation) is the same as xtalk=-20 (B-032)
             obj->m_crosstalk_power_dB = p.second.as_double();
         else {
             cerr << "Unknown keyword: " << p.first << endl;

@@ -826,6 +826,7 @@ WARN_LOGFILE           =
 INPUT                  = src/ \
                          doc/mainpage.md \
                          doc/netlist.md \
+                         doc/numerics.md \
                          README.md
 
 # This tag can be used to specify the character encoding of the source files

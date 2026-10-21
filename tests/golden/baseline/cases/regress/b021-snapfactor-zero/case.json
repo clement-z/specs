@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b021-snapfactor-zero.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b021-snapfactor-zero"
+}

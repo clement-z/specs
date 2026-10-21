@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b048-probe-cw-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1601,
+   "kind": "vcd",
+   "sha256": "d540d843714733f29bf726bc012ea09f4c601d0cd2cc74df061c475a019faf54",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b048-probe-cw-tran"
+}

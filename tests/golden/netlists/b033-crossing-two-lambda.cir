@@ -1,0 +1,14 @@
+* B-033 regression (repro: backlog/repro/a2-crossing-multi-lambda.cir): per-wavelength memories.
+* in1 = 1 W at 1550 nm, in2 = 1 W at 1560 nm, ideal crossing (att=0, no xtalk: t = 1, x = 0).
+* Each wavelength propagates on its own:
+*   out1 = 1 W @1550 nm at 0 (in1 through); its 1560 nm value (j*x*in2 = 0) is below abstol
+*          and never emitted, so the OP listing shows the 1550 nm one
+*   out2 = 1 W @1560 nm at 0 (in2 through); same for its 1550 nm value
+* Before the fix: out1 = 0 W @1560 nm (in1 + in2 summed across wavelengths in FD mode kept the
+* longer wavelength: the 1550 nm light was lost).
+cwsrc1 in1 wl=1.55e-6 power=1
+cwsrc2 in2 wl=1.56e-6 power=1
+crossing1 in1 in2 out1 out2
+pwr1 out1
+pwr2 out2
+.op

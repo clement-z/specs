@@ -53,7 +53,8 @@ public:
         SC_HAS_PROCESS(Probe);
 
         SC_THREAD(on_port_in_changed);
-        sensitive << p_in;
+        // Also woken when the probe is enabled, to sample the current value of its net (B-048)
+        sensitive << p_in << enable.posedge_event();
     }
 
     // Constructor overloading
@@ -109,7 +110,8 @@ public:
         SC_HAS_PROCESS(MLambdaProbe);
 
         SC_THREAD(on_port_in_changed);
-        sensitive << p_in;
+        // Also woken when the probe is enabled, to sample the current value of its net (B-048)
+        sensitive << p_in << enable.posedge_event();
     }
 
     // TODO: overload the constructor for the case of not informing lambdas, need to check all components

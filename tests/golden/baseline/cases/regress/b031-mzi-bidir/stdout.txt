@@ -247,22 +247,22 @@ ROOT/CWSRC_U2 emitted: [#6]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/EVLSRC_R1 was enabled
-ROOT/EVLSRC_R2 was enabled
 ROOT/EVLSRC_B1 was enabled
 ROOT/EVLSRC_B2 was enabled
+ROOT/EVLSRC_R2 was enabled
 ROOT/EVLSRC_U1 was enabled
 ROOT/EVLSRC_U2 was enabled
 @0 s, ROOT/EVLSRC_U2 emitted: 0
 @0 s, ROOT/EVLSRC_U1 emitted: 0
+@0 s, ROOT/EVLSRC_R2 emitted: 0
 @0 s, ROOT/EVLSRC_B2 emitted: 0
 @0 s, ROOT/EVLSRC_B1 emitted: 0
-@0 s, ROOT/EVLSRC_R2 emitted: 0
 @0 s, ROOT/EVLSRC_R1 emitted: 0
 @10 ps, ROOT/EVLSRC_U2 emitted: 1.3
 @10 ps, ROOT/EVLSRC_R1 emitted: 1.3
-@10 ps, ROOT/EVLSRC_R2 emitted: 1.3
 @10 ps, ROOT/EVLSRC_B1 emitted: 1.3
 @10 ps, ROOT/EVLSRC_B2 emitted: 1.3
+@10 ps, ROOT/EVLSRC_R2 emitted: 1.3
 @10 ps, ROOT/EVLSRC_U1 emitted: 1.3
 Simulated 20 ps
 ╔═══════════════════╗

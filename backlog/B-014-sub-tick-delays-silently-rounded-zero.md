@@ -1,5 +1,5 @@
 # B-014: Sub-tick delays are silently rounded (to zero); the OOP check meant to catch it is dead
-severity: med | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: warnings fixed in c527d7d (sprint 2026-10b P3); error for delays rounding to 0 held back, needs-human (P3-ready/b014-error)
 location: src/optical_output_port.cpp:329-331, src/devices/waveguide.cpp:72,98
 ## Problem
 Delays become `sc_time(double, SC_NS)`, which rounds to the nearest tick (100 fs by default) without any warning.
@@ -25,3 +25,20 @@ A2 (waveguide). Paper benchmarks compare 100 fs and 1 fs resolution.
 - Review ids: F-A1-14.
 ## Verification
 Ran the repro with both lengths. Code reading of sc_time addition.
+
+## Sprint 2026-10b P3 (needs-human: the error part)
+Done in c527d7d: the dead check is removed; each waveguide checks its group delay once before the simulation,
+only where delays are honoured (event-driven ports in a time-domain analysis: `.tran`, testbenches; not `.op`,
+`.dc`, `-m fd`), against the port time step (engine step × `.options resolution`), and warns on stderr when the
+delay is rounded by more than 10 % (`OpticalOutputPort::DELAY_ROUNDING_WARN_THRESHOLD`, chosen from the delays of
+every golden case, testbench and repro: realistic parameters round by at most 5.95 %, 2.27 ps at 1 ps by 11.7 %,
+the B-014 case by 87 %). A non-zero delay that rounds to 0 gets its own warning.
+
+Held back: the decided **error** for a non-zero delay that rounds to 0. It makes the existing
+`regress/b031-mzi-bidir` exit 1: its MZI-internal arm waveguides (43.4 fs, created by `MZI::init()`) round to 0
+at the default 100 fs (harmless there: feed-forward). The phase's predicted golden impact was "stderr warnings
+only, no value changes", so the error was not merged. Ready on branch `P3-ready/b014-error` (cfe0eb0 + cc1614c, on
+top of c527d7d; 134/134 golden `--atol 0` with its own baseline): the error, `err/b014-delay-rounds-to-zero`, and
+b031 run at `.options timescale=-14` (arms 40 fs / 90 fs, no message, same OP values; stdout gains the directive
+and the timescale lines, VCD timescale 10 fs). Options for the maintainer: (a) take the branch as is; (b) keep
+the warning for device-internal delays (MZI arms) and error only for netlist waveguides; (c) keep the warning.

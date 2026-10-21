@@ -38,10 +38,10 @@ r1 aaaaa
 r1 aaaab
 r0 aaaac
 r1.55e-06 aaaad
-r0 aaaae
-r0 aaaaf
-r0 aaaag
-r0 aaaah
+r0.9999846599837222 aaaae
+r0.9999867553742341 aaaaf
+r0.999985984079261 aaaag
+r1.000013316646928 aaaah
 r1e-08 aaaai
 r0.0001 aaaaj
 b1 aaaak
@@ -50,11 +50,16 @@ b1 aaaam
 b10 aaaan
 0aaaao
 0aaaap
-r0 aaaaq
+r0.9999846599837222 aaaaq
 $end
 
 #1000000000000
 r0 aaaaa
 r0 aaaab
+r5.032547059978949e-07 aaaae
+r6.182228396707885e-07 aaaaf
+r1.461298441755657e-07 aaaag
+r9.772486412031558e-08 aaaah
+r5.032547059978949e-07 aaaaq
 
 #2000000000000

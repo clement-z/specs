@@ -1,0 +1,17 @@
+* B-032 regression: excess loss and the sign convention of xtalk. 1 W CW (1550 nm) into in1 of
+* two crossings, nothing into in2. crossing1 has positional args att=1 xtalk=10 (a positive
+* xtalk is read as an isolation), crossing2 keywords att=1 xtalk=-10: same S-matrix.
+* Model: x = 10^(-|xtalk|/20) = 10^(-0.5) = 0.316228 (x^2 = 0.1);
+*        t = 10^(-att/20)*sqrt(1-x^2) = 0.891251*0.948683 = 0.845515
+*        (att is the excess loss, on top of the power lost to crosstalk).
+* Expected, for both crossings:
+*   o11 = o21 = t^2 = 10^(-0.1)*(1-0.1) = 0.794328*0.9 = 0.714895 W at 0
+*   o12 = o22 = x^2 = 0.1 W at pi/2 = 1.5708 rad (cross coefficient j*x)
+*   b1 = b2 = 0 (dangling inputs)
+* Before the fix: o11 = o21 = 0.794328 W, o12 = 10 W (xtalk=10 was a +10 dB gain), o22 = 0.1 W,
+* all at phase 0.
+cwsrc1 a1 wl=1.55e-6 power=1
+cwsrc2 a2 wl=1.55e-6 power=1
+crossing1 a1 b1 o11 o12 1 10
+crossing2 a2 b2 o21 o22 att=1 xtalk=-10
+.op

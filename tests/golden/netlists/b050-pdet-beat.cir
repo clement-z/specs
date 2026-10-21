@@ -1,0 +1,18 @@
+* B-050 regression: a PDET lit by two CW wavelengths is sampled every Ts (1 ps, default) while
+* they beat; single-wavelength inputs are not sampled (only written on input events).
+* merger1 (lossless) outputs E/sqrt(2) per wavelength: in = 0.5 mW at 1550 nm + 0.125 mW at 1551 nm.
+* Beat: df = c/1550nm - c/1551nm = 124.703 GHz, period 8.019 ps. With R = 1 A/W:
+*   readout(t) = 0.625 + 0.5 cos(2 pi df t) mA, between (|E1| - |E2|)^2 = 0.125 mA and
+*   (|E1| + |E2|)^2 = 1.125 mA; readout_no_interference = 0.625 mA (constant).
+* Expected PDET1.readout records every 1 ps from t = 0 (enable after the OP), in mA:
+*   0: 1.125, 1: 0.979212, 2: 0.626866, 3: 0.273431, 4: 0.125014, 5: 0.268164, 6: 0.619403,
+*   7: 0.973906, 8: 1.124944, ..., 16: 1.124777, ..., 19 ps: 0.284198
+*   (the 20 ps sample is the last time step: SystemC does not dump it).
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.551e-6 power=0.25e-3
+merger1 a b in
+pdet1 in v
+* traceall=0: only the PDETs (and explicit probes) are traced, the case does not depend on the
+* automatic probes of the CW nets
+.options traceall=0
+.tran 20e-12

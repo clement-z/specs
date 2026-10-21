@@ -1,6 +1,18 @@
 #include <ios>
 #include "devices/probe.h"
 
+namespace {
+
+// Value of a net that was never written: the default OpticalSignal (no field, wavelength id 0). Id 0
+// aliases the first registered wavelength (B-012), so isnan(getWavelength()) does not detect it, and
+// getWavelength() exits when no wavelength is registered yet.
+inline bool isDefaultSignal(const OpticalSignal &s)
+{
+    return s.m_field == OpticalSignal::field_type(0.0) && s.m_wavelength_id == 0;
+}
+
+}
+
 void Probe::on_port_in_changed()
 {
     if (specsGlobalConfig.verbose_component_initialization)
@@ -15,17 +27,23 @@ void Probe::on_port_in_changed()
     }
 
     while (true) {
-        // Wait for a new input signal
+        // Wait for a new input signal, or for the probe to be enabled
         wait();
 
-        // Check if enabled first
+        // While disabled (e.g. during the OP of a .tran), ignore the input events. Once enabled,
+        // sample the current value of the net, whether or not it changed in the meantime (B-048)
         if (!enable.read().to_bool())
         {
             wait(enable.posedge_event());
-            continue;
         }
 
         auto &s = p_in->read();
+
+        // Sampled because the probe was enabled (the net did not change in this delta) and the
+        // net was never written: nothing to trace (B-048)
+        if (!p_in->event() && isDefaultSignal(s))
+            continue;
+
         // cout << name() << ": " << s << endl;
         if (!isnan(s.getWavelength()))
         {
@@ -97,17 +115,23 @@ void MLambdaProbe::on_port_in_changed()
     //m_trace_sig.write(0);
 
     while (true) {
-        // Wait for a new input signal
+        // Wait for a new input signal, or for the probe to be enabled
         wait();
 
-        // Check if enabled first
+        // While disabled (e.g. during the OP of a .tran), ignore the input events. Once enabled,
+        // sample the current value of the net, whether or not it changed in the meantime (B-048)
         if (!enable.read().to_bool())
         {
             wait(enable.posedge_event());
-            continue;
         }
 
         auto &s = p_in->read();
+
+        // Sampled because the probe was enabled (the net did not change in this delta) and the
+        // net was never written: nothing to trace or to report (B-048)
+        if (!p_in->event() && isDefaultSignal(s))
+            continue;
+
         auto search = m_lambda_signals.find(s.getWavelength());
 
         if (search != m_lambda_signals.end())

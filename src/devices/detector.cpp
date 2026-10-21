@@ -20,8 +20,9 @@ void Detector::on_port_in_changed()
         const auto &p_in_read = p_in->read();
 
         auto cur_wavelength_id = p_in_read.m_wavelength_id;
-        // Updating the field memory
+        // Updating the field memory (also while disabled: an enable writes the stored readout)
         m_memory_in[cur_wavelength_id] = p_in_read.m_field;
+        m_input_changed = true;
         m_event_manual_trigger.notify();
     }
 }
@@ -32,54 +33,122 @@ void Detector::on_time_tick()
     if (sampling_time.value() == 0)
         sampling_time = sc_time::from_value(1);
 
-    OpticalSignal::field_type total_field;
-    OpticalSignal::field_type::value_type total_power;
-    double photocurrent;
+    double readout;
+    double readout_no_interf;
 
-    // Wait for enable signal
-    if (! enable.read().to_bool())
+    while (true)
     {
-        // cout << name() << " waiting for enable" << endl;
-        wait(enable.posedge_event());
-        cout << name() << " was enabled" << endl;
-    }
+        // Wait for enable signal (outer loop: also after a disable during the simulation)
+        if (! enable.read().to_bool())
+        {
+            // cout << name() << " waiting for enable" << endl;
+            wait(enable.posedge_event());
+            cout << name() << " was enabled" << endl;
 
-    while(true)
-    {
-        if (sc_pending_activity()) {
-            wait(sampling_time, m_event_manual_trigger);
-            //wait(m_event_manual_trigger); // if only time-averaged signal is of interest
-        } else {
-            /* wait for reset */
-            //TODO (see CWSource code)
-            wait(); // effectively wait until the end of the simulation
+            // Write the readout of the fields stored so far (e.g. CW inputs set during the OP)
+            m_input_changed = false;
+            compute_readout(readout, readout_no_interf);
+            write_readout(readout, readout_no_interf);
         }
 
+        while (enable.read().to_bool())
+        {
+            // Only a beat makes the readout time-dependent: sample it every Ts while it lasts.
+            // Otherwise wait for the next input event only, so that a quiet circuit ends the
+            // simulation (no sc_pending_activity(): detectors kept each other alive, B-050).
+            if (is_beating())
+                wait(sampling_time, m_event_manual_trigger | enable.value_changed_event());
+            else
+                wait(m_event_manual_trigger | enable.value_changed_event());
+
+            if (! enable.read().to_bool())
+                break; // disabled: never write, wait for the next posedge
+
+            compute_readout(readout, readout_no_interf);
+            if (m_input_changed)
+            {
+                // Input event: always write (sc_signal only notifies readers on a change)
+                m_input_changed = false;
+                write_readout(readout, readout_no_interf);
+            }
+            else
+            {
+                // Periodic sample of a beat: write only a change beyond the tolerance
+                // max(abstol, reltol * |last written|), with the simulator-wide port tolerances
+                // (specsGlobalConfig.default_abstol, applied here to the current in A, and
+                // default_reltol)
+                const double tol = max(specsGlobalConfig.default_abstol,
+                                       specsGlobalConfig.default_reltol * abs(m_cur_readout));
+                if (abs(readout - m_cur_readout) > tol)
+                    write_readout(readout, readout_no_interf);
+            }
+        }
+    }
+}
+
+bool Detector::is_beating() const
+{
+    unsigned int n_nonzero = 0;
+    for (const auto &field : m_memory_in)
+    {
+        if (field.second != 0.0)
+            n_nonzero++;
+    }
+    return n_nonzero >= 2;
+}
+
+void Detector::compute_readout(double &readout, double &readout_no_interf)
+{
+    OpticalSignal::field_type total_field = 0;
+    OpticalSignal::field_type::value_type total_power = 0;
+    double photocurrent;
+
+    for (const auto &field : m_memory_in)
+        total_power += norm(field.second);
+
+    if (is_beating())
+    {
         /* Get current time tk*/
         double tk = sc_time_stamp().to_seconds();
 
-        /* Calculate current output value based on present fields */
-        /* Calculate sum of fields at current time*/
-        total_field = 0;
-        total_power = 0;
-        for (auto field : m_memory_in)
+        /* Calculate sum of fields at current time (interference between wavelengths) */
+        for (const auto &field : m_memory_in)
         {
             double wl = specsGlobalConfig.wavelengths_vector[field.first];
             double freq = 299792458 / wl;
             total_field += field.second * exp(complex<double>(0, 2 * M_PI * freq * tk));
-            total_power += norm(field.second);
         }
 
         if (norm(total_field) == 0)
             total_field = 1e-20*m_rngDist(m_rngGen);
 
         photocurrent = norm(total_field) * m_responsivity_A_W;
-        m_cur_readout = photocurrent + (!m_noiseBypass)*noise_gen(photocurrent) + m_darkCurrent_A;
-        m_cur_readout_no_interf = total_power * m_responsivity_A_W + (!m_noiseBypass)*noise_gen(photocurrent) + m_darkCurrent_A;
-
-        // Write to output port
-        //p_readout->write(m_cur_readout);
     }
+    else
+    {
+        // At most one non-zero wavelength: no beat, use sum_k |E_k|^2 (exact, no ulp jitter
+        // from e^{j2pi f t})
+        if (total_power == 0)
+        {
+            total_field = 1e-20*m_rngDist(m_rngGen);
+            photocurrent = norm(total_field) * m_responsivity_A_W;
+        }
+        else
+            photocurrent = total_power * m_responsivity_A_W;
+    }
+
+    readout = photocurrent + (!m_noiseBypass)*noise_gen(photocurrent) + m_darkCurrent_A;
+    readout_no_interf = total_power * m_responsivity_A_W + (!m_noiseBypass)*noise_gen(photocurrent) + m_darkCurrent_A;
+}
+
+void Detector::write_readout(const double &readout, const double &readout_no_interf)
+{
+    // The traced members hold the last written values: one VCD record per write
+    m_cur_readout = readout;
+    m_cur_readout_no_interf = readout_no_interf;
+
+    // Write to output port
+    p_readout->write(m_cur_readout);
 }
 
 /*

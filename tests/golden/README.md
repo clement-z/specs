@@ -136,7 +136,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (114 `specs` cases + 1 gtest case)
+## Case list (133 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
@@ -145,8 +145,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*` (39) | bad inputs from the 2026-10 and 2026-10b fix phases (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
-| `regress/bNNN-*` (30) | regression cases of the 2026-10 and 2026-10b fix phases | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, ...); hand-computed expected values are in the netlist headers |
+| `err/bNNN-*` (40) | bad inputs from the 2026-10 and 2026-10b fix phases (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
+| `regress/bNNN-*` (48) | regression cases of the 2026-10 and 2026-10b fix phases | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
@@ -201,14 +201,16 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
 
 * `record --repeat 3`, and two independent `record` runs compared with
   `--rtol 0 --atol 0 --print-slack 0`, are **bit-identical** for every case
-  (`tb/det` and `tb/detector` since B-054, see below).
+  (except the `tb/det` and `tb/detector` readouts, see below).
 * `tb/det`, `tb/detector`: until B-054, `Detector::m_cur_readout` and
-  `m_cur_readout_no_interf` (`src/devices/detector.h:18-19`) were never
+  `m_cur_readout_no_interf` (`src/devices/detector.h`) were never
   initialised and were dumped at t=0, for example `r6.92e-310` (stale pointer
-  bits), so `uut*.readout*` had to be excluded through `vcd_ignore_values`.
-  They are now initialised to 0 and compared like every other signal. The
-  `random_device`-seeded detector noise is *not* exercised: the testbench
-  never enables the detectors.
+  bits). Since B-049/B-050 the testbench's detectors are enabled and write
+  their readout, with the `random_device`-seeded noise ON: the readout values
+  (`READOUT`, `uut*.readout*`) differ from run to run and are excluded through
+  `vcd_ignore_values`, and the testbench prints them with 3 decimals (far
+  above the noise), so its stdout, self-checks included, is reproducible.
+  Reproducible seeds are planned (P4, F-01).
 * **Pointer-ordered iteration.** `sc_get_all_object_by_type<T>()` and
   `sc_get_all_module_by_type<T>()` (`src/utils/sysc_utils.h`) return
   `std::set<T*>`, so the following are listed in memory-address order:

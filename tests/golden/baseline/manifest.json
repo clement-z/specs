@@ -27,6 +27,7 @@
   "err/b008-dc-bare",
   "err/b017-json-unwritable",
   "err/b018-resolution-below-fs",
+  "err/b021-snapfactor-negative",
   "err/b034-coupler-k-gt-1",
   "err/b034-coupler-kp-negative",
   "err/b034-splitter-ratio-gt-1",
@@ -74,14 +75,31 @@
   "regress/b004-mode-td-dc",
   "regress/b004-mode-td-op",
   "regress/b006-empty-output",
+  "regress/b014-delay-rounding-warning",
+  "regress/b014-delay-rounds-to-zero",
+  "regress/b021-snapfactor",
+  "regress/b021-snapfactor-default",
+  "regress/b021-snapfactor-zero",
   "regress/b031-mzi-bidir",
+  "regress/b032-crossing-isolation-sign",
+  "regress/b032-crossing-passive",
+  "regress/b033-crossing-two-lambda",
+  "regress/b033-crossing-two-lambda-tran",
   "regress/b036-vci-crow",
+  "regress/b048-mlprobe-cw-tran",
+  "regress/b048-probe-cw-tran",
+  "regress/b048-undriven-tran",
+  "regress/b049-pdet-drives-net",
+  "regress/b050-pdet-beat",
+  "regress/b050-pdet-two-open-tran",
   "regress/b051-pcmcell-tc-zero",
   "regress/b052-cwsrc-positional",
   "regress/b052-evlsrc-positional",
   "regress/b052-pcmcell-positional",
   "regress/b052-vlsrc-positional",
   "regress/b060-pcmcell-k-eq-n",
+  "regress/b124-allpass-ring-default-reltol",
+  "regress/b124-allpass-ring-tight-reltol",
   "regress/b131-nrings-crow",
   "regress/b144-bidir-source-first",
   "regress/b144-three-writers",
@@ -99,6 +117,7 @@
   "regress/b147-crossing-out-explicit-wg",
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
+  "regress/b159-crossing-backward",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -380,6 +399,30 @@
    "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/paul_3ring_puf|cir/subckt_tests|regress/b150-include-in-subckt|cir-json/add_drop|cir-json/add_drop_pyspecs|cir-json/subckt_tests|opt/tracefile-o|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|opt/vci|regress/b006-empty-output|err/b017-json-unwritable|regress/b004-mode-fd-tran|regress/b004-mode-td-op|regress/b004-mode-td-dc|regress/b145-upgrade-roles|err/b034-coupler-k-gt-1|err/b034-coupler-kp-negative)$",
    "gtest": false,
    "note": "B-037: the per-instance 'Warning: coupling power for DC currently set to field.' line is removed from stdout (verified: the only difference)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T03:19:45Z",
+   "only": "^(regress/b147-crossing-out-.*|regress/b032-.*|regress/b033-.*|regress/b159-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-032/B-033/B-159: passive per-wavelength crossing, CrossingBi on bidirectional nets (b147 crossing cases: a, b, d split into :0/:1 slots, other values unchanged); new crossing cases; gtest CrossingModel.*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T03:26:43Z",
+   "only": "^(tb/det|tb/detector|regress/b049-.*|regress/b050-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-049/B-050: event-driven PDET (readout written on input events/enable, Ts sampling only while beating, enabled by default); tb/det, tb/detector: detectors enabled, self-checks pass 3/3, readouts printed with 3 decimals, noisy readout VCD signals ignored (vcd_ignore_values); new PDET cases; gtest Detector*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T03:30:25Z",
+   "only": "^(regress/b031-mzi-bidir|regress/b144-uni-writer-first|regress/b144-uni-writer-second|regress/b144-two-sources-one-net|regress/b145-upgrade-reader(-ref|-case2|-case2-ref)?|regress/b147-crossing-out-bidir|regress/b150-include-in-subckt|regress/b048-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-048: probes (PROBE, MLPROBE, auto-probes) sample their net when enabled at TRAN start: .tran VCDs of constant nets show their OP value from t = 0 (was 0), waveforms unchanged afterwards; new B-048 cases; gtest Probe*, MLambdaProbe*, TranStart*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T03:35:57Z",
+   "only": "^(cir/add_drop_pyspecs|opt/tracefile-o|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b033-crossing-two-lambda|regress/b014-.*|regress/b021-.*|err/b021-.*|regress/b124-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-021/B-014/B-124: stderr gains delay-rounding warnings (10 % threshold; non-zero delays rounding to 0 reported as warnings, the decided error is held back: b031) in cir/add_drop_pyspecs, opt/tracefile-o, regress/b006-empty-output, regress/b031-mzi-bidir (stderr unordered); regress/b033-crossing-two-lambda: stdout unordered (pointer-ordered OP listing, B-016); new snapfactor, delay-rounding and tight-reltol cases; gtest"
   }
  ]
 }

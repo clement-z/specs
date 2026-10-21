@@ -1,0 +1,9 @@
+* B-048: MLPROBE on a constant CW net in .tran, listing exactly the source's wavelength. The probe is
+* disabled during the OP; at TRAN start it samples the current (OP) value of its net. It used to
+* read 0 for the whole transient.
+* Expected at t = 0, constant until 1 ns (ROOT/MLPROBE1.*@1550_000000):
+*   power 1e-3 W, abs sqrt(1e-3) = 0.031623 sqrt(W), phase 0.5 rad
+cwsrc1 a wl=1.55e-6 power=1e-3 phi=0.5
+mlprobe1 a wl=[1.55e-6]
+.options traceall=0
+.tran 1e-9

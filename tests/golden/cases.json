@@ -785,9 +785,10 @@
      "traces"
     ]
    },
-   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered. B-014: stderr has one delay-rounding warning per MZI-internal waveguide (arms of 43 fs round to 0, 88 fs to 100 fs at the default 100 fs); they are created by MZI init() in pointer order (B-016), hence stderr is unordered too",
    "unordered_streams": [
-    "stdout"
+    "stdout",
+    "stderr"
    ]
   },
   {
@@ -872,7 +873,10 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised."
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
+   "vcd_ignore_values": [
+    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
+   ]
   },
   {
    "id": "tb/detector",
@@ -880,7 +884,10 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. The detectors are never enabled in this tb, so the random_device-seeded noise generator is not exercised."
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
+   "vcd_ignore_values": [
+    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
+   ]
   },
   {
    "id": "tb/pcm",
@@ -1643,7 +1650,7 @@
      "traces"
     ]
    },
-   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Values follow the current crossing model (P3, B-032/B-033, may change them). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Since B-159 the crossing is a CrossingBi there (a, b, d become bidirectional: a:1 = b:1 = 1 mW from the sources, crossing backward outputs a:0 = b:0 = 0, d:0 = 1 mW); values follow the passive crossing model (B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "regress/b147-crossing-out-explicit-wg",
@@ -1660,7 +1667,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "regress/b147-crossing-out-explicit-splitter",
@@ -1677,7 +1684,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "regress/b147-crossing-out-explicit-splitter-first",
@@ -1694,7 +1701,353 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b032-crossing-passive",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b032-crossing-passive.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-032: passive crossing S-matrix (t = 10^(-att/20) sqrt(1-x^2), cross j*x, x = 10^(-|xtalk|/20)); two coherent 1 W inputs, att=0 xtalk=-20: out1 = out2 = 1 W at 0.1002 rad, total 2 W (was 1.21 W + 1.21 W at 0)"
+  },
+  {
+   "id": "regress/b032-crossing-isolation-sign",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b032-crossing-isolation-sign.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-032: att is the excess loss on top of crosstalk, positive xtalk read as isolation; 1 W into in1, att=1, xtalk=10 (positional) and xtalk=-10 (keywords) give the same: through 0.714895 W at 0, cross 0.1 W at 1.5708 rad (xtalk=10 gave 10 W)"
+  },
+  {
+   "id": "regress/b033-crossing-two-lambda",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016; it changed when OpticalOutputPort gained a member, B-021); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
+  },
+  {
+   "id": "regress/b033-crossing-two-lambda-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-033: per-wavelength crossing memories in .tran, overlapping VLSRC pulses at 1550/1560 nm, xtalk=-10: no 'Attempted to sum signals of different wavelengths' on stderr (was 6 lines); MLPROBE per-wavelength powers 0.9/0.1 W on out1 and 0.1/0.9 W on out2 (hand values in the netlist header)"
+  },
+  {
+   "id": "regress/b159-crossing-backward",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b159-crossing-backward.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-159: a crossing on a bidirectional net is a CrossingBi; 1 mW backward into out1, 4 mW forward into in2, xtalk=-10: a:0 = 0.9 mW at 0, b:0 = 0.1 mW at 1.5708 rad (backward, was lost), c:1 = 0.4 mW at 1.5708 rad, d:0 = 3.6 mW (slots explained in the netlist header)"
+  },
+  {
+   "id": "regress/b049-pdet-drives-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b049-pdet-drives-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-049: the PDET readout (1 mA, written from the start of the transient) drives its electrical net: the phase shifter it controls gives out2 a 1 rad phase at 10 ps (was 0: p_readout was never written)"
+  },
+  {
+   "id": "regress/b050-pdet-two-open-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b050-pdet-two-open-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "timeout": 30,
+   "note": "B-050: an open-ended .tran with two PDETs ends (was: never, the detectors kept each other's 1 ps sampling loop alive); readouts 0.5 mA, then 2 mA at 1 ns, one VCD record per change, 'Simulated 2 ns'. Short timeout so that a regression fails fast"
+  },
+  {
+   "id": "regress/b050-pdet-beat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b050-pdet-beat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-050: two CW wavelengths (1550/1551 nm) on one PDET are sampled every Ts = 1 ps while they beat: readout 0.625 + 0.5 cos(2 pi 124.703 GHz t) mA (period 8.019 ps, between 0.125 and 1.125 mA)"
+  },
+  {
+   "id": "regress/b048-probe-cw-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-probe-cw-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: PROBE and traceall auto-probes on a CW path in .tran sample the OP value of their net at TRAN start: ROOT/in = 1 mW, 0.031623 sqrt(W), 0 rad; ROOT/out = 1 mW, 0.031623 sqrt(W), -0.40537 rad (2*pi*2.2*100e-6/1.55e-6 wrapped), 1.55e-6, from t = 0 (was 0 for the whole transient)"
+  },
+  {
+   "id": "regress/b048-mlprobe-cw-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-mlprobe-cw-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: MLPROBE wl=[1.55e-6] on a CW net in .tran samples the OP value at TRAN start: power@1550 = 1 mW, abs 0.031623 sqrt(W), phase 0.5 rad from t = 0 (was 0 for the whole transient)"
+  },
+  {
+   "id": "regress/b048-undriven-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-undriven-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: probes on an undriven net in .tran: the sample taken at TRAN start is skipped silently (PROBE2, PROBE{ROOT/nc}, MLPROBE2 stay 0; no 'received unsupported signal (lambda = 1.55e-06m)' although wavelength id 0 aliases 1550 nm, B-012); the CW net next to it reads 1 mW from t = 0"
+  },
+  {
+   "id": "regress/b014-delay-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
+   ],
+   "note": "B-014: a 13 fs ring round trip rounds to 0 at 100 fs (the response collapses into delta cycles at 1 ps): reported on stderr (was silent); decided as an error, a warning until regress/b031-mzi-bidir is settled"
+  },
+  {
+   "id": "regress/b014-delay-rounding-warning",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-delay-rounding-warning.cir"
+   ],
+   "note": "B-014: a 53 fs ring round trip rounded to 100 fs (+87 %): one warning on stderr before the simulation (was silent), simulation unchanged"
+  },
+  {
+   "id": "regress/b021-snapfactor-default",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-default.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-021: with abstol=1e-2, fields below 10 * abstol are emitted as 0 (default snapfactor 10): out_a = out_b = 0, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b021-snapfactor",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-021: .options snapfactor=4 (abstol=1e-2): only fields below 0.04 sqrt(W) are emitted as 0: out_a = 0, out_b = 0.06, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b021-snapfactor-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-zero.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-021: .options snapfactor=0 disables the snap to 0: out_a = 0.03, out_b = 0.06, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "err/b021-snapfactor-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-021: .options snapfactor=-1 is rejected (must be >= 0)"
+  },
+  {
+   "id": "regress/b124-allpass-ring-default-reltol",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-124: lossless all-pass ring .op with the default reltol 1e-4: out = 0.995098 W instead of 1 W (truncation error about 49 x reltol). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b124-allpass-ring-tight-reltol",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-tight-reltol.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-124: same ring with .options reltol=1e-9: out = 1.000000 W. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   }
  ]
 }

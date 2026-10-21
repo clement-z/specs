@@ -30,6 +30,7 @@ SPECSConfig::SPECSConfig(sc_module_name name)
     // Port options
     default_abstol = 1e-8;
     default_reltol = 1e-4;
+    default_snap_factor = 10;
     default_resolution_multiplier = 1;
 
     // Trace options
@@ -68,6 +69,12 @@ void SPECSConfig::runOPAnalysis()
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Disable photodetectors before the first sc_start(): they are enabled by default
+    // (testbenches, C++ users) but must not write their readout during the OP
+    for (auto pdet: all_photodetectors) {
+        pdet->enable = sc_logic(0);
+    }
+
     // Run to initialize all threads and register first values
     sc_start();
 
@@ -85,11 +92,6 @@ void SPECSConfig::runOPAnalysis()
     // Disable ML probes for OP point
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(0);
-    }
-
-    // Disable photodetectors
-    for (auto pdet: all_photodetectors) {
-        pdet->enable = sc_logic(0);
     }
 
     // Set all ports mode to NO_DELAY
@@ -117,6 +119,13 @@ void SPECSConfig::runDCAnalysis()
     auto all_sig = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Disable photodetectors before the first sc_start() (they are enabled by default)
+    for (auto pdet: all_photodetectors) {
+        // Remark: Photodetectors could in fact be left enabled ?
+        // Would that serve any purpose though...?
+        pdet->enable = sc_logic(0);
+    }
+
     // Run to initialize all threads and register first values
     sc_start();
 
@@ -128,13 +137,6 @@ void SPECSConfig::runDCAnalysis()
     // Disable ML probes
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(0);
-    }
-
-    // Disable photodetectors
-    for (auto pdet: all_photodetectors) {
-        // Remark: Photodetectors could in fact be left enabled ?
-        // Would that serve any purpose though...?
-        pdet->enable = sc_logic(0);
     }
 
     // Set all ports mode to NO_DELAY
@@ -191,20 +193,31 @@ void SPECSConfig::runTRANAnalysis()
     auto all_vl_src = sc_get_all_module_by_type<VLSource>();
     auto all_evl_src = sc_get_all_module_by_type<EVLSource>();
 
-    // Run OP analysis
+    // TRAN start sequence (B-048):
+    // (a) operating point, .nodeset values included
+    // (b) initial conditions
+    // (c) enable the probes: each one samples the current value of its net at that point
+    //     (and the photodetectors, which write their readout)
+    // (b) must stay before (c), so that the probes trace the post-OP, post-IC state at t = 0
+    // (B-048 maintainer condition, see TranStart.ProbesSampleAfterOperatingPointAndInitialConditions)
+
+    // (a) Run OP analysis
     runOPAnalysis();
 
-    // Enable probes
+    // (b) Apply initial conditions
+    applyInitialConditions();
+
+    // (c) Enable probes
     for (auto probe: all_probes) {
         probe->enable = sc_logic(1);
     }
 
-    // Enable ML probes
+    // (c) Enable ML probes
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(1);
     }
 
-    // Enable photodetectors
+    // (c) Enable photodetectors: each one writes the readout of the fields it stored (B-049)
     for (auto pdet: all_photodetectors) {
         pdet->enable = sc_logic(1);
     }
@@ -229,12 +242,26 @@ void SPECSConfig::runTRANAnalysis()
     cout << "Simulated " << sc_time_stamp() << endl;
 }
 
+void SPECSConfig::applyInitialConditions()
+{
+    // Set values of signals according to the initial conditions (same mechanism as
+    // nodeset_orders, but applied after the OP). The writes take effect at the next
+    // sc_start(), in the same update phase as the probe enables of runTRANAnalysis().
+    // ic_orders is only filled from C++ for now: the parser rejects .ic (B-161). A future
+    // .ic directive must fill ic_orders, or keep this order (B-048).
+    for (auto &ic_order : ic_orders)
+    {
+        ic_order.second.first->write(ic_order.second.second);
+    }
+}
+
 void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
     //assert(!oop_configs.empty());
     auto oop_default_config = make_shared<OpticalOutputPortConfig>();
     oop_default_config->m_mode = simulation_mode;
     oop_default_config->m_abstol = default_abstol;
     oop_default_config->m_reltol = default_reltol;
+    oop_default_config->m_snap_factor = default_snap_factor;
     oop_default_config->m_timestep_value = default_resolution_multiplier; // relative to systemc timestep
 
     // apply default config to all optical output ports which don't have one

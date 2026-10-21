@@ -1,5 +1,5 @@
 # B-124: lossless ring settles at 0.995 W instead of 1 W with the default reltol (error is about 50 x reltol)
-severity: med | category: physics | effort: M | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: physics | effort: M | fix-class: needs-human | verdict: CONFIRMED | status: fixed in c527d7d (sprint 2026-10b P3)
 location: src/optical_output_port.cpp (convergence check, owner: core reviewer), tests/golden/baseline/cases/tb/ring, CLAUDE.md "Physics & numerics"
 ## Problem
 For a lossless all-pass ring the output power must be exactly 1 W at steady state for any phase. With the default `reltol=1e-4` the simulator settles at 0.995098 W (-0.49 %), with `reltol=1e-6` at 0.999952 W, with `reltol=1e-9` at 0.9999999 W. So energy conservation is violated by roughly 50 to 100 times the requested relative tolerance, because event propagation is cut off when the change per round trip is below the tolerance. Users who read `reltol=1e-4` as "1e-4 accuracy" are off by two orders of magnitude (the ECOC paper states "0.01 %" for the benchmark tolerance). Not a crash, but analytic tests must use a tolerance of about 100 x reltol, and the golden baselines (tb/ring, opt/*) encode the truncated values.

@@ -49,22 +49,22 @@ All initial values are dumped below at time 0 sec = 0 timescale units.
 $end
 
 $dumpvars
-r0 aaaaa
-r0 aaaab
-r0 aaaac
-r0 aaaad
-r0 aaaae
-r0 aaaaf
-r0 aaaag
-r0 aaaah
+r0.0009999999999999998 aaaaa
+r0.03162277660168379 aaaab
+r-2.188980687662379 aaaac
+r1.55e-06 aaaad
+r0.0009999999999999998 aaaae
+r0.03162277660168379 aaaaf
+r-2.188980687662379 aaaag
+r1.55e-06 aaaah
 r0 aaaai
 r0 aaaaj
 r0 aaaak
 r0 aaaal
-r0 aaaam
-r0 aaaan
+r0.0009999999999999998 aaaam
+r0.03162277660168379 aaaan
 r0 aaaao
-r0 aaaap
+r1.55e-06 aaaap
 r0 aaaaq
 r0 aaaar
 r0 aaaas
