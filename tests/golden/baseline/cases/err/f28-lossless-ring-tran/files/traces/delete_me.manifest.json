@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--maxiter", "20000", "-f", "tests/golden/netlists/f28-lossless-ring-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f28-lossless-ring-tran.cir", "sha256": "fd41c113546906468dbbd1f8b80d8b241a5b75533b8c4e6293c6601f2b639278"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

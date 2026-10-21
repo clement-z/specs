@@ -1,0 +1,9 @@
+* F-28: the ring of f28-lossless-ring-op.cir in a .tran: the operating point computed before the
+* transient does not converge (run with specs --maxiter 20000).
+* Expected: exit 1, ".tran: the operating point before the transient did not converge within
+* 20000 iterations", residual on ROOT/ring_bl and ROOT/ring_br.
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=1e-4
+wg_ring ring_br ring_bl length=775.3e-6 neff=1 ng=1 att=0
+probe1 out
+.tran 1e-12

@@ -51,6 +51,11 @@
   * Run manifest: every run that writes the default trace also writes `<trace>.manifest.json` (SPECS and
     SystemC versions, seed, command line, SHA-256 of every netlist and `.include` file, trace file);
     `--print-manifest` prints it on stdout
+* `.op`/`.dc` convergence (F-28, `doc/numerics.md`): the delta-cycle fixed point of an operating point or a
+  sweep point stops after `maxiter` iterations (delta cycles; default 1000000, `.options maxiter=N`,
+  `--maxiter N`, 0: no limit) with an error naming the analysis (and the sweep point), a residual report (the
+  output ports still changing, their last change and threshold) and exit status 1, instead of running for
+  hours (weakly coupled or lossless loops). Converging circuits are not affected
 
 ### Fixed
 

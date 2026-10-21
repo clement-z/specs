@@ -26,13 +26,15 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 | `timescale` (alias `ts`) | -13 | log10 of the engine time step in s: -13 is 100 fs | integer, -15 (1 fs) to 0 (1 s) | `-R`, `--resolution` |
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
 | `seed` | 0 | master seed of the random numbers (see below) | integer, 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
+| `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer, 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
 - An invalid value is an error and the simulation does not start.
 - With `-f`, the CLI values are appended to the netlist as `.options` lines, so they override the netlist.
   They are ignored by the legacy testbenches (`-t`), except `--seed`, which is applied directly: it also
-  sets the seed of the testbenches and takes priority over a netlist's `.options seed`.
+  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter` is
+  applied directly too and takes priority over `.options maxiter`.
 - `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
   reproducible: the default seed is 0, and the same netlist and seed give the same values. Netlist numbers
@@ -108,6 +110,38 @@ Choosing reltol:
 - Check that abstol/|E| is below reltol for the fields you care about, else lower abstol too.
 - If in doubt, divide reltol by 10 and check that the result moves by less than your target.
 - Reference: `regress/b124-allpass-ring-tight-reltol` (reltol 1e-9 gives 1.000000 W).
+
+## Convergence of `.op` and `.dc`
+
+`.op`, each point of a `.dc` sweep and the operating point computed before a `.tran` are a fixed point:
+every output port works without delay and the circuit iterates in SystemC delta cycles, all at the same time
+stamp, until no port emits any more (every change is below the tolerances above). One iteration is one delta
+cycle; a signal crossing one device takes about two.
+
+A feedback loop whose round-trip field transmission r is close to 1 needs about ln(δ)/ln(r) round trips, δ
+being the relative threshold of the previous section, so a weakly coupled lossless ring (k = 1e-4, r = 1 -
+5e-9) needs about 2e9 round trips, and a loop with r = 1 never stops. To keep such a circuit from running
+for hours, the fixed point stops after `maxiter` iterations (default 1000000, `.options maxiter`,
+`--maxiter`; 0 is no limit) with an error and exit status 1. The message gives the residual: the output
+ports that still emitted in the last tenth of the iterations, sorted by their last change relative to its
+threshold (`tests/golden/netlists/f28-lossless-ring-op.cir`):
+
+    Error: .op: the operating point did not converge within 1000000 iterations (delta cycles, .options maxiter)
+    Residual: 2 optical output port(s) changed in the last 100000 delta cycles. Last change |dE| and emission threshold max(abstol, reltol*|E_last|), in sqrt(W):
+      ROOT/ring_br (ROOT/COUPLER1) @ 1550 nm: |dE| = 0.0001 > 1.38425e-08 (7224.15 x)
+      ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 0.0001 > 1.38425e-08 (7224.15 x)
+    A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss
+
+Each net is shown with the device that writes it. In a `.dc` the first line names the sweep point
+(`.dc: sweep point 1 of 3 (WL(ROOT/CWSRC1) = 1.55e-06) did not converge ...`), before a `.tran` it says
+`.tran: the operating point before the transient`. A circuit that converges is not affected: same results,
+same output.
+
+The default leaves a wide margin: the golden cases need at most 869 iterations (the all-pass ring of B-124),
+a chain of 1000 such rings about 1e5, a CROW of 10 rings 3.5e4. A circuit of a few devices runs 1e6
+iterations in about 0.25 s; a large one is slower per iteration (a 100-ring CROW took 30 s). If a large
+circuit stops while the residual keeps decreasing, raise `maxiter`; if the residual stays at the size of the
+signal, the loop does not converge (r = 1 or a gain).
 
 ## Time resolution
 

@@ -1,0 +1,11 @@
+* F-28: the ring of f28-lossless-ring-op.cir in a .dc sweep, with .options maxiter: the first sweep
+* point does not converge. The sweep has 3 points (1550, 1551, 1552 nm; the ratio 2.5 is not an
+* integer, so the count does not depend on the stop value).
+* Expected: exit 1, "sweep point 1 of 3 (WL(ROOT/CWSRC1) = 1.55e-06) did not converge within
+* 100000 iterations", residual on ROOT/ring_bl and ROOT/ring_br.
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=1e-4
+wg_ring ring_br ring_bl length=775.3e-6 neff=1 ng=1 att=0
+probe1 out
+.options maxiter=100000
+.dc /cwsrc1/WL 1.55e-6 1.5525e-6 1e-9

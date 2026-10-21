@@ -174,6 +174,13 @@ int sc_main(int argc, char *argv[])
                           "default 0); overrides .options seed",
                           { "seed" });
 
+    args::ValueFlag<string> set_maxiter(parser,
+                          "set_maxiter",
+                          "Set the maximum number of iterations (delta cycles) of the .op/.dc fixed point, "
+                          "per operating point or sweep point (decimal integer, default 1000000, 0: no "
+                          "limit); overrides .options maxiter",
+                          { "maxiter" });
+
     args::ValueFlag<size_t> set_nrings_crow(parser,
                           "set_nrings_crow",
                           "temporary",
@@ -287,6 +294,18 @@ int sc_main(int argc, char *argv[])
         specsGlobalConfig.seed = seed_val;
         // takes priority over the netlist's .options seed
         specsGlobalConfig.seed_explicit = true;
+    }
+    if (set_maxiter) {
+        // F-28: set directly, like --seed (full 64-bit range); takes priority over .options maxiter
+        const string &s = set_maxiter.Get();
+        uint64_t maxiter_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), maxiter_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid maxiter value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.max_iterations = maxiter_val;
+        specsGlobalConfig.max_iterations_explicit = true;
     }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();

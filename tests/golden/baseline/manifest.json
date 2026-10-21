@@ -73,6 +73,13 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f28-lossless-ring-dc",
+  "err/f28-lossless-ring-op",
+  "err/f28-lossless-ring-tran",
+  "err/f28-maxiter-cli-invalid",
+  "err/f28-maxiter-small",
+  "err/f28-options-maxiter-fraction",
+  "err/f28-options-maxiter-negative",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -137,6 +144,8 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f28-maxiter-cli-priority",
+  "regress/f28-maxiter-zero",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -472,6 +481,12 @@
    "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/add_drop_sub|cir/subckt_test|cir/subckt_tests|cli/help|cli/no-args|opt/mode-fd|opt/multi-file|opt/tol-resolution-overrides|opt/tracefile-o|opt/vci|regress/b001-fd-multilambda-stale|regress/b004-mode-fd-tran|regress/b004-mode-td-dc|regress/b004-mode-td-op|regress/b014-delay-rounding-warning|regress/b014-delay-rounds-to-zero|regress/b021-snapfactor|regress/b021-snapfactor-default|regress/b021-snapfactor-zero|regress/b031-mzi-bidir|regress/b032-crossing-isolation-sign|regress/b032-crossing-passive|regress/b033-crossing-two-lambda|regress/b033-crossing-two-lambda-tran|regress/b036-vci-crow|regress/b048-mlprobe-cw-tran|regress/b048-probe-cw-tran|regress/b048-undriven-tran|regress/b049-pdet-drives-net|regress/b050-pdet-beat|regress/b050-pdet-two-open-tran|regress/b051-pcmcell-tc-zero|regress/b052-cwsrc-positional|regress/b052-evlsrc-positional|regress/b052-pcmcell-positional|regress/b052-vlsrc-positional|regress/b060-pcmcell-k-eq-n|regress/b124-allpass-ring-default-reltol|regress/b124-allpass-ring-tight-reltol|regress/b131-nrings-crow|regress/b144-bidir-source-first|regress/b144-three-writers|regress/b144-two-sources-one-net|regress/b144-uni-writer-first|regress/b144-uni-writer-second|regress/b145-upgrade-reader|regress/b145-upgrade-reader-case2|regress/b145-upgrade-reader-case2-ref|regress/b145-upgrade-reader-ref|regress/b145-upgrade-roles|regress/b147-crossing-out-bidir|regress/b147-crossing-out-explicit-splitter|regress/b147-crossing-out-explicit-splitter-first|regress/b147-crossing-out-explicit-wg|regress/b150-include-in-subckt|regress/b159-crossing-backward|regress/f01-manifest|regress/f01-options-seed|regress/f01-options-seed-cli-priority|regress/f01-options-seed-large|regress/f01-pdet-darkfield|regress/f01-pdet-noise-default-seed|regress/f01-pdet-noise-seed|regress/f01-print-manifest|regress/f01-seed-large|regress/f01-seed-max|tb/ac_add_drop|tb/ac_add_drop-fd|tb/ac_crow|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-01 run manifest: every run that writes the default trace also writes <trace>.manifest.json (84 cases gain only that file, specs_version masked by the harness); --print-manifest in the help text (cli/help, cli/no-args); new regress/f01-manifest, regress/f01-print-manifest; gtest (Sha256, RunManifest)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T05:58:56Z",
+   "only": "^(cli/help|cli/no-args|err/f28-.*|regress/f28-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-28: .op/.dc iteration cap (--maxiter in the help; new f28 cases; gtest FixedPoint.*)"
   }
  ]
 }

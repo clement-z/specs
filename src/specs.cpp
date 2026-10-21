@@ -105,8 +105,16 @@ void SPECSConfig::runOPAnalysis()
     for (auto cws: all_cws)
         cws->enable = sc_logic(1);
 
-    // Run operating point simulation
-    sc_start();
+    // Run operating point simulation: the delta-cycle fixed point, at most max_iterations
+    // delta cycles (F-28), then what is left at later times, as sc_start() did (nothing in FD)
+    const sc_dt::uint64 start_delta = sc_delta_count();
+    const bool idle = !sc_pending_activity_at_current_time();
+    if (!runFixedPoint())
+        reportNonConvergence(analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
+                                                          : ".op: the operating point", start_delta);
+    // (an idle circuit keeps the SystemC warning W571, no activity, that this sc_start() gave)
+    if (idle || sc_pending_activity())
+        sc_start();
 
     // Print results on the command line
     printOPAnalysisResult();
@@ -160,8 +168,10 @@ void SPECSConfig::runDCAnalysis()
     wavelengths_vector.reserve(order.second.second.size());
     cout << "Starting sweep on " << order.first;
     cout << " (" << order.second.second.size() << " points)" << endl;
+    size_t point = 0;
     for (const auto &val : order.second.second)
     {
+        ++point;
         // Apply sweep param
         order.second.first(val);
 
@@ -173,7 +183,15 @@ void SPECSConfig::runDCAnalysis()
             // TODO: also reset photodetectors?
         }
 
-        // run simulation and advance one tick
+        // run the fixed point (at most max_iterations delta cycles, F-28) and advance one tick
+        const sc_dt::uint64 start_delta = sc_delta_count();
+        if (!runFixedPoint())
+        {
+            stringstream what;
+            what << ".dc: sweep point " << point << " of " << order.second.second.size()
+                 << " (" << order.first << " = " << val << ")";
+            reportNonConvergence(what.str(), start_delta);
+        }
         sc_start(sc_time::from_value(1));
 
         // Reset CW sources
@@ -242,6 +260,70 @@ void SPECSConfig::runTRANAnalysis()
         sc_start();
 
     cout << "Simulated " << sc_time_stamp() << endl;
+}
+
+// The .op/.dc fixed point (F-28): runs the delta cycles of the current time step one at a time,
+// as sc_start() would, but at most max_iterations of them (0: no limit). Returns false if
+// activity is still pending at the current time after that
+bool SPECSConfig::runFixedPoint()
+{
+    uint64_t iterations = 0;
+    while (sc_pending_activity_at_current_time() && sc_get_status() != SC_STOPPED)
+    {
+        if (max_iterations && iterations >= max_iterations)
+            return false;
+        sc_start(SC_ZERO_TIME);
+        ++iterations;
+    }
+    return true;
+}
+
+// Non-convergence of runFixedPoint() (F-28): error message and residual, then exit(1).
+// The residual lists the output ports that still emitted in the last tenth of the iterations
+// (at least the last 100 delta cycles), with their last change and its emission threshold
+void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_delta) const
+{
+    const sc_dt::uint64 end_delta = sc_delta_count();
+    const sc_dt::uint64 window = std::max<sc_dt::uint64>(100, max_iterations / 10);
+    const sc_dt::uint64 window_start = std::max(start_delta, end_delta > window ? end_delta - window : 0);
+
+    vector<OpticalOutputPort *> changing;
+    for (auto oop : sc_get_all_module_by_type<OpticalOutputPort>())
+    {
+        if (oop->m_has_emitted && oop->m_last_emission_delta >= window_start)
+            changing.push_back(oop);
+    }
+    auto ratio = [](const OpticalOutputPort *oop)
+    {
+        return oop->m_last_emission_change / oop->m_last_emission_threshold;
+    };
+    // largest change relative to its threshold first (name order between equal ones)
+    std::stable_sort(changing.begin(), changing.end(),
+                     [&ratio](const OpticalOutputPort *a, const OpticalOutputPort *b) { return ratio(a) > ratio(b); });
+
+    cerr << "Error: " << what << " did not converge within " << max_iterations
+         << " iterations (delta cycles, .options maxiter)" << endl;
+    cerr << "Residual: " << changing.size() << " optical output port(s) changed in the last "
+         << end_delta - window_start << " delta cycles. Last change |dE| and emission threshold "
+         << "max(abstol, reltol*|E_last|), in sqrt(W):" << endl;
+    const size_t max_listed = 10;
+    for (size_t i = 0; i < changing.size() && i < max_listed; ++i)
+    {
+        OpticalOutputPort *oop = changing[i];
+        const sc_object *net = dynamic_cast<const sc_object *>(oop->m_port.get_interface());
+        const sc_object *device = oop->get_parent_object();
+        cerr << "  " << (net ? net->name() : oop->name());
+        if (device)
+            cerr << " (" << device->name() << ")";
+        cerr << " @ " << OpticalSignal::getWavelength(oop->m_last_emission_wlid) * 1e9 << " nm: |dE| = "
+             << oop->m_last_emission_change << " > " << oop->m_last_emission_threshold
+             << " (" << ratio(oop) << " x)" << endl;
+    }
+    if (changing.size() > max_listed)
+        cerr << "  ... and " << changing.size() - max_listed << " more" << endl;
+    cerr << "A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges "
+         << "slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss" << endl;
+    exit(1);
 }
 
 void SPECSConfig::applyInitialConditions()

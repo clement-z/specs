@@ -1,0 +1,18 @@
+{
+ "args": [
+  "--maxiter",
+  "1000000",
+  "-f",
+  "tests/golden/netlists/f28-maxiter-small.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 455,
+   "kind": "json",
+   "sha256": "1677ec855717fa1f5d117d51d2191c7224f1266794150ba456cc72a3d669b423",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f28-maxiter-cli-priority"
+}

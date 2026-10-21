@@ -2328,6 +2328,192 @@
     "tests/golden/netlists/f01-manifest.cir"
    ],
    "note": "F-01: --print-manifest in a dry run prints the run manifest on stdout after building the circuit, with \"trace_file\": null; no file is written"
+  },
+  {
+   "id": "err/f28-lossless-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-op.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: weakly coupled lossless ring (k = 1e-4, off resonance): the .op fixed point stops after the default 1000000 iterations (delta cycles) with the residual of the two ring nets and exit 1 (it ran for hours before)"
+  },
+  {
+   "id": "err/f28-lossless-ring-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-dc.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: the same ring in a .dc sweep with .options maxiter=100000: sweep point 1 of 3 does not converge, residual, exit 1"
+  },
+  {
+   "id": "err/f28-lossless-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "20000",
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-tran.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: the same ring in a .tran with specs --maxiter 20000: the operating point before the transient does not converge, residual, exit 1"
+  },
+  {
+   "id": "err/f28-maxiter-small",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-maxiter-small.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=100 stops the converging all-pass ring of b124 (869 delta cycles): exit 1, residual lists the 4 ports that changed"
+  },
+  {
+   "id": "regress/f28-maxiter-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "1000000",
+    "-f",
+    "tests/golden/netlists/f28-maxiter-small.cir"
+   ],
+   "note": "F-28: specs --maxiter overrides .options maxiter=100 of the netlist: converges to the operating point of regress/b124-allpass-ring-default-reltol (out = 0.995098 W)"
+  },
+  {
+   "id": "regress/f28-maxiter-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "0",
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "note": "F-28: --maxiter 0 is no limit: same operating point and outputs as regress/b124-allpass-ring-default-reltol"
+  },
+  {
+   "id": "err/f28-options-maxiter-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-options-maxiter-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=-1 is rejected (integer between 0 and 2^53), exit 1"
+  },
+  {
+   "id": "err/f28-options-maxiter-fraction",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-options-maxiter-fraction.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=1.5 is rejected (integer between 0 and 2^53), exit 1"
+  },
+  {
+   "id": "err/f28-maxiter-cli-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "abc",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-28: specs --maxiter abc is rejected before parsing (decimal integer), exit 1"
   }
  ]
 }

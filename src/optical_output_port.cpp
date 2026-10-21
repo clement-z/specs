@@ -2,6 +2,7 @@
 #include "optical_signal.h"
 #include "specs.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
@@ -211,6 +212,13 @@ void OpticalOutputPort::on_data_ready()
             // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
             // cout << " emitting " << m_desired_fields[wlid] << endl;
             m_skip_next_convergence_check = false;
+
+            // Remember the change, for the .op/.dc non-convergence report (F-28)
+            m_has_emitted = true;
+            m_last_emission_delta = sc_delta_count();
+            m_last_emission_wlid = wlid;
+            m_last_emission_change = abs(desired - emitted);
+            m_last_emission_threshold = std::max(m_abstol, m_reltol * abs(emitted));
 
             // Replace the stored emitted output value at that wavelength
             emitted = desired;

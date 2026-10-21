@@ -15,6 +15,7 @@ if gtest_dep.found()
       'devices/pcm.cpp',
       'devices/probe.cpp',
       'devices/waveguide.cpp',
+      'fixed_point.cpp',
       'main.cpp',
       'optical_output_port.cpp',
       'rng.cpp',
