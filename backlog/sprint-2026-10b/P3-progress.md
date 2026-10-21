@@ -15,6 +15,8 @@ Base: `ws/devices` @ 51f0ca2 (= `sprint/2026-10b` after the P2 merge). Baseline 
 | 4 | B-021 + B-014 + B-124 numerics | in progress | | `/tmp/P3-wt/numerics` (`P3-wip/numerics`); docs after the code |
 
 ## Resume notes
+- Implementer agent ids (Agent tool, SendMessage to resume): crossing a7a716e5b802628f9, pdet afe95174b3cb6aab9,
+  probes a5d3360dd44737675, numerics a784da990e3dcb2ac (all Opus, launched 2026-10-21).
 - Implementers commit code/tests/netlists on their `P3-wip/*` branch only; the orchestrator reviews, cherry-picks
   onto `ws/devices` in order 1→4, records the golden cases and does the bookkeeping.
 - If an implementer was cut off: check its worktree (`git -C /tmp/P3-wt/<name> status/log`), relaunch with the same
