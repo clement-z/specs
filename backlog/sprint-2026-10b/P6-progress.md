@@ -11,8 +11,8 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 |---|---|---|---|---|---|
 | 1 | trace-all fallback: PROBE/MLPROBE present → trace only those, unless `.options traceall` is explicit | orchestrator | done | fd381fc | 26 cases re-recorded, all checked by `backlog/repro/p6-verify-traceall.py` (auto-probes gone, traceall 1→0, everything else bit-identical); new `regress/f05-mlprobe-in-subckt` |
 | 2 | `.save` directive (`.save out P(drop) ...` → `PROBE{<net>}` probes) | orchestrator | done | 9feac83 | 6 new cases; saved signals bit-identical to the old automatic probes (`backlog/repro/p6-vcd-subset.py`); paper Fig. 1b runs once dc1/dc2 are renamed coupler1/2 |
-| 3 | `--no-trace` | orchestrator | done | (item-3 commit) | new `regress/f05-no-trace`; `cli/help`, `cli/no-args` re-recorded (flag in the help) |
-| 4 | CSV / `.npz` table export (`--format`), harness `.npz` decoder | orchestrator | pending | | |
+| 3 | `--no-trace` | orchestrator | done | 02a05de | new `regress/f05-no-trace`; `cli/help`, `cli/no-args` re-recorded (flag in the help) |
+| 4 | CSV / `.npz` table export (`--format`), harness `.npz` decoder | orchestrator; harness decoder by a Sonnet subagent (`/tmp/P6-wt/harness`, `P6-wip/harness` 45b069b, reviewed, squashed in) | done | (item-4 commit) | 6 new cases, gtest `TraceTable.*` (5); oracle `backlog/repro/p6-table-vs-vcd.py` OK on 9 netlists; VCD unchanged by `--format` |
 | 5 | CROW bench (full tracing vs probes only), docs, backlog, report | orchestrator | pending | | |
 
 ## Decisions (running list, copied into the report)
@@ -28,3 +28,13 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 - Unknown quantity: parse error (file:line); unknown net / electrical net: error after elaboration, exit 1.
 - `--no-trace` = `-o ""` (no VCD, no table, no manifest file; `--print-manifest` still prints, with a null
   trace file); it wins over `-o` and prints `Tracing disabled (--no-trace)`; no effect on `-t` testbenches.
+- Table rows: one per (time step, probe, wavelength) = last sample of that wavelength in the step (first version
+  wrote every delta-cycle sample: 128082 rows for the 201-point Fig. 1b sweep, now 402).
+- Columns: time_s, signal, wavelength_m, power_W, field_re, field_im (no abs/phase: derivable). Numbers with
+  `std::to_chars` shortest round-trip (exact; the VCD has 16 digits). `.npz`: stored zip, fixed 1980 dates,
+  arrays per column + `signal_names` (`<U`, ASCII names widened), in memory until the end; > 4 GiB → error.
+- `--format` repeatable, exactly the listed formats (VCD only if listed); with `--no-trace` → error.
+  Tables hold PROBE/MLPROBE/automatic/.save probes only; a warning when PDET/power meters exist and no VCD.
+- Manifest `trace_file`: the VCD, else the first table (csv, then npz); no schema change.
+- MLPROBE: listed-wavelength check uses `m_lambdas` (the VCD signals only exist with a trace file).
+

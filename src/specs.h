@@ -10,6 +10,7 @@
 #include <map>
 #include <utility>
 #include <functional>
+#include <memory>
 
 using std::vector;
 using std::map;
@@ -51,6 +52,8 @@ namespace spx {
     typedef sc_port<ea_if_out_type> ea_port_out_type;
     typedef sc_port<ea_if_inout_type> ea_port_inout_type;
 };
+
+class TraceTable;
 
 class SPECSConfig : public sc_module {
 public:
@@ -135,6 +138,12 @@ public:
     // Set when the netlist sets .options traceall: otherwise a netlist with probes (PROBE, MLPROBE)
     // or .save targets only traces those (F-05, ParseTree::build_circuit())
     bool trace_all_optical_nets_explicit = false;
+    // Output formats (F-05, specs --format): the VCD (default) and/or the CSV and .npz tables of the
+    // probes, written as <trace_filename>.vcd, .csv, .npz (none if trace_filename is empty)
+    bool trace_vcd = true;
+    bool trace_csv = false;
+    bool trace_npz = false;
+    std::unique_ptr<TraceTable> default_trace_table;
 
     // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
     vector<string> command_line; // argv as received by sc_main
@@ -149,7 +158,7 @@ public:
 
     SPECSConfig(sc_module_name name);
 
-    ~SPECSConfig() {}
+    ~SPECSConfig();
 
     void runAnalysis();
     void runOPAnalysis();

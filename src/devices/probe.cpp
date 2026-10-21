@@ -1,5 +1,6 @@
 #include <ios>
 #include "devices/probe.h"
+#include "trace_table.h"
 
 namespace {
 
@@ -55,8 +56,24 @@ void Probe::on_port_in_changed()
                 m_trace_sig_phase.write(s.phase());
             if (m_trace_wavelength)
                 m_trace_sig_wavelength.write(s.getWavelength());
+            if (m_table)
+                m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
         }
     }
+}
+
+void Probe::setTraceTable(TraceTable *table)
+{
+    m_table = table;
+    if (m_table)
+        m_table_signal = m_table->signal_index(name());
+}
+
+void MLambdaProbe::setTraceTable(TraceTable *table)
+{
+    m_table = table;
+    if (m_table)
+        m_table_signal = m_table->signal_index(name());
 }
 
 void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
@@ -132,14 +149,20 @@ void MLambdaProbe::on_port_in_changed()
         if (!p_in->event() && isDefaultSignal(s))
             continue;
 
-        auto search = m_lambda_signals.find(s.getWavelength());
-
-        if (search != m_lambda_signals.end())
+        // A listed wavelength (the VCD signals only exist with a trace file: without one, e.g. with
+        // --no-trace or --format csv, a listed wavelength is not "unsupported", F-05)
+        if (m_lambdas.count(s.getWavelength()))
         {
             //cout << name() << " received supported signal (lambda = " << s.getWavelength() << "m)" << endl;
-            m_lambda_signals[s.getWavelength()][0]->write(s.power());
-            m_lambda_signals[s.getWavelength()][1]->write(s.modulus());
-            m_lambda_signals[s.getWavelength()][2]->write(s.phase());
+            auto search = m_lambda_signals.find(s.getWavelength());
+            if (search != m_lambda_signals.end())
+            {
+                search->second[0]->write(s.power());
+                search->second[1]->write(s.modulus());
+                search->second[2]->write(s.phase());
+            }
+            if (m_table)
+                m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
         }
         else {
             cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;

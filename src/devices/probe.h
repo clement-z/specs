@@ -10,6 +10,8 @@
 #include "specs.h"
 #include "devices/spx_module.h"
 
+class TraceTable;
+
 /*
 This class defines an ideal optical probe. It will sample the signal at its input and
 write it in a file. Any OpticalSignal can be its input, without caring for optical
@@ -32,6 +34,9 @@ public:
     sc_signal<double> m_trace_sig_modulus;
     sc_signal<double> m_trace_sig_phase;
     sc_signal<double> m_trace_sig_wavelength;
+    // Table export (F-05, specs --format csv|npz): every traced sample is also a row of m_table
+    TraceTable *m_table = nullptr;
+    uint32_t m_table_signal = 0;
 
     sc_signal<sc_logic> enable;
     bool m_trace_power;
@@ -78,6 +83,8 @@ public:
             if (m_trace_wavelength) sc_trace(m_Tf, m_trace_sig_wavelength, (string(this->name()) + ".wavelength").c_str());
         }
     }
+
+    void setTraceTable(TraceTable *table);
 };
 
 class MLambdaProbe : public spx_module {
@@ -94,11 +101,15 @@ public:
     // Will not save to txt and rather use VCD tracing
     sc_signal<sc_logic> enable;
     sc_trace_file *m_Tf;
+    // Table export (F-05): every traced sample (listed wavelengths only) is also a row of m_table
+    TraceTable *m_table = nullptr;
+    uint32_t m_table_signal = 0;
 
     std::set<double> m_lambdas;
     std::map< double, std::vector< unique_ptr<sc_signal<double> > > > m_lambda_signals;
 
     void setTraceFile(sc_trace_file *Tf);
+    void setTraceTable(TraceTable *table);
 
     // Constructor
     MLambdaProbe(sc_module_name name, set<double> lambdas = {})

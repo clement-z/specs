@@ -17,20 +17,24 @@ See tests/golden/README.md for details.
 """
 
 import argparse
+import ast
 import concurrent.futures
 import fnmatch
 import gzip
 import hashlib
+import io
 import json
 import math
 import os
 import re
 import shutil
 import signal
+import struct
 import subprocess
 import sys
 import tempfile
 import time
+import zipfile
 from pathlib import Path
 
 FORMAT_VERSION = 1
@@ -190,6 +194,8 @@ def file_kind(rel):
         return "vcd"
     if low.endswith(".json"):
         return "json"
+    if low.endswith(".npz"):
+        return "npz"
     if low.endswith((".txt", ".csv", ".log", ".out", ".dat", ".cir")):
         return "text"
     return "auto"
@@ -199,6 +205,86 @@ def sha256(data):
     if isinstance(data, str):
         data = data.encode("utf-8")
     return hashlib.sha256(data).hexdigest()
+
+
+# --------------------------------------------------------------------------
+# NumPy .npz outputs (decoded to text: floats may differ in the last bits between compilers)
+# --------------------------------------------------------------------------
+
+NPY_MAGIC = b"\x93NUMPY"
+NPY_STRUCT_CODES = {"<f8": ("d", 8), "<i4": ("i", 4), "<i8": ("q", 8)}
+NPY_UNICODE_RE = re.compile(r"<U([0-9]+)$")
+
+
+def decode_npy(data):
+    """One NPY v1.0/2.0 file (bytes) -> (descr, shape, list of values). Raises ValueError."""
+    if data[:6] != NPY_MAGIC:
+        raise ValueError("bad npy magic")
+    if len(data) < 10:
+        raise ValueError("truncated npy header")
+    major = data[6]
+    if major == 1:
+        hlen, start = struct.unpack("<H", data[8:10])[0], 10
+    elif major == 2 and len(data) >= 12:
+        hlen, start = struct.unpack("<I", data[8:12])[0], 12
+    else:
+        raise ValueError("unsupported npy version %d.%d" % (major, data[7]))
+    if len(data) < start + hlen:
+        raise ValueError("truncated npy header")
+    try:
+        header = ast.literal_eval(data[start:start + hlen].decode("ascii"))
+        descr, fortran, shape = header["descr"], header["fortran_order"], header["shape"]
+    except Exception:
+        raise ValueError("bad npy header")
+    if fortran is not False:
+        raise ValueError("unsupported fortran_order")
+    if not isinstance(shape, tuple) or not all(type(n) is int and n >= 0 for n in shape):
+        raise ValueError("bad shape %r" % (shape,))
+    count = 1
+    for n in shape:
+        count *= n
+    m = NPY_UNICODE_RE.match(descr) if isinstance(descr, str) else None
+    if descr in NPY_STRUCT_CODES:
+        code, size = NPY_STRUCT_CODES[descr]
+    elif m and int(m.group(1)) > 0:
+        code, size = "U", 4 * int(m.group(1))
+    else:
+        raise ValueError("unsupported descr %r" % (descr,))
+    body = data[start + hlen:]
+    if len(body) != count * size:
+        raise ValueError("data size %d != %d expected from shape %r" % (len(body), count * size, shape))
+    if code == "U":
+        values = [body[i:i + size].decode("utf-32-le").rstrip("\0") for i in range(0, len(body), size)]
+    else:
+        values = struct.unpack("<%d%s" % (count, code), body)
+        if code == "d":
+            values = [repr(v) for v in values]
+        else:
+            values = [str(v) for v in values]
+    return descr, shape, values
+
+
+def decode_npz(raw):
+    """A .npz file (bytes) -> deterministic text: a header line per entry (archive order), then one
+    value per line (floats with repr(), shortest round-trip). Never raises: an undecodable file is
+    the single line `npz: cannot decode: <reason>`, an undecodable entry replaces its block with
+    `npz <entry>: cannot decode: <reason>`."""
+    lines = []
+    try:
+        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+            infos = zf.infolist()
+            for info in infos:
+                try:
+                    descr, shape, values = decode_npy(zf.read(info))
+                except Exception as e:
+                    lines.append("npz %s: cannot decode: %s" % (info.filename, e))
+                    continue
+                lines.append("npz %s: descr=%s shape=%r" % (info.filename, descr, shape))
+                lines += values
+    except Exception as e:
+        return "npz: cannot decode: %s\n" % (
+            "not a zip archive" if isinstance(e, zipfile.BadZipFile) else e)
+    return "".join(line + "\n" for line in lines)
 
 
 # --------------------------------------------------------------------------
@@ -675,11 +761,17 @@ def run_case(case, specs, repo, tmp_root):
                 content = normalise_vcd(decode(raw))
             elif kind == "json" and rel.endswith(RUN_MANIFEST_SUFFIX):
                 content = normalise_run_manifest(decode(raw), pathmap)
+            elif kind == "npz":
+                content = decode_npz(raw)
             elif kind in ("text", "json"):
                 content = normalise_text(decode(raw), pathmap) if kind == "text" else decode(raw)
             else:
                 content = raw
             files[rel] = {"kind": kind, "content": content}
+            if kind == "npz":
+                # The raw bytes may differ between compilers (last bits): kept, never compared.
+                files[rel]["raw_sha256"] = sha256(raw)
+                files[rel]["raw_bytes"] = len(raw)
         return {
             "id": case["id"],
             "args": list(case.get("args", [])),
@@ -769,20 +861,24 @@ def store_result(outdir, res, max_file_bytes):
         content = f["content"]
         data = content.encode("utf-8") if isinstance(content, str) else content
         entry = {"kind": f["kind"], "bytes": len(data), "sha256": sha256(data)}
+        stored_rel = rel + ".txt" if f["kind"] == "npz" else rel   # the decoded text, not a fake .npz
+        if f["kind"] == "npz":
+            entry["raw_sha256"] = f["raw_sha256"]
+            entry["raw_bytes"] = f["raw_bytes"]
         gz = None
         if len(data) > max_file_bytes:
             # Deterministic gzip (mtime=0) so that re-recording is reproducible.
             gz = gzip.compress(data, compresslevel=9, mtime=0)
         if len(data) <= max_file_bytes or len(gz) <= max_file_bytes:
-            dest = cdir / "files" / (rel if gz is None else rel + ".gz")
+            dest = cdir / "files" / (stored_rel if gz is None else stored_rel + ".gz")
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(data if gz is None else gz)
-            entry["stored"] = "files/" + rel + ("" if gz is None else ".gz")
+            entry["stored"] = "files/" + stored_rel + ("" if gz is None else ".gz")
         else:
             entry["stored"] = None
             if f["kind"] == "vcd":
                 entry["summary"] = vcd_summary(content)
-            elif f["kind"] in ("text", "json"):
+            elif f["kind"] in ("text", "json", "npz"):
                 entry["summary"] = {"lines": content.count("\n") + 1}
         meta["files"][rel] = entry
     (cdir / "case.json").write_text(json.dumps(meta, indent=1, sort_keys=True) + "\n", encoding="utf-8")
@@ -894,7 +990,7 @@ def compare_case(base, cand, case, tol, lenient_order=False):
                     diffs += jd
                 except ValueError:
                     diffs += compare_text(eb["content"], ec["content"], tol, rel)
-            elif kind == "text":
+            elif kind in ("text", "npz"):
                 diffs += compare_text(eb["content"], ec["content"], tol, rel)
             else:
                 diffs.append("%s: binary content differs" % rel)

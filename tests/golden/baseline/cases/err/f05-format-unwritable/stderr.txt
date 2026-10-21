@@ -1,0 +1,2 @@
+Error: cannot open trace file "no_such_dir/t.csv"
+

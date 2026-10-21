@@ -181,6 +181,12 @@ int sc_main(int argc, char *argv[])
                           "set_tracefile",
                           "Set the default trace file",
                           { 'o', "output" });
+    args::ValueFlagList<string> set_formats(parser,
+                          "format",
+                          "Output format of the traces: vcd (default), csv or npz (tables of the probed "
+                          "signals: time, signal, wavelength, power, complex field), written as "
+                          "<output>.vcd/.csv/.npz; repeat it to write several; netlists only",
+                          { "format" });
     args::Flag set_no_trace(parser,
                           "no_trace",
                           "Write no trace file and no run manifest (the probes and .save targets are not "
@@ -407,6 +413,26 @@ int sc_main(int argc, char *argv[])
 #endif
     if (list_tests) {
         return do_list_tests();
+    }
+    if (set_formats) {
+        // F-05: exactly the listed formats (the VCD only if listed)
+        if (set_no_trace) {
+            cerr << "Error: --no-trace and --format cannot be combined" << endl;
+            return 1;
+        }
+        specsGlobalConfig.trace_vcd = false;
+        for (const auto &f : set_formats.Get()) {
+            if (strutils::iequals(f, "vcd"))
+                specsGlobalConfig.trace_vcd = true;
+            else if (strutils::iequals(f, "csv"))
+                specsGlobalConfig.trace_csv = true;
+            else if (strutils::iequals(f, "npz"))
+                specsGlobalConfig.trace_npz = true;
+            else {
+                cerr << "Invalid --format value: '" << f << "' (expected vcd, csv or npz)" << endl;
+                return 1;
+            }
+        }
     }
     if (set_no_trace) {
         // F-05: as -o "" (no trace file, no run manifest file); wins over -o

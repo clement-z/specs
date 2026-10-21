@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "vcd", "--format", "csv", "-f", "tests/golden/netlists/f05-save-paper-fig1b.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f05-save-paper-fig1b.cir", "sha256": "219fac9932a933232d150f16e110d3bd418cca951a15f3960f7d6f30957ecf2a"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

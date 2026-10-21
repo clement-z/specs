@@ -73,6 +73,9 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f05-format-invalid",
+  "err/f05-format-no-trace",
+  "err/f05-format-unwritable",
   "err/f05-save-electrical-net",
   "err/f05-save-unknown-net",
   "err/f05-save-unknown-quantity",
@@ -151,6 +154,9 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f05-format-csv-npz",
+  "regress/f05-format-npz-mlprobe-pdet",
+  "regress/f05-format-vcd-csv-dc",
   "regress/f05-mlprobe-in-subckt",
   "regress/f05-no-trace",
   "regress/f05-save-paper-fig1b",
@@ -569,6 +575,12 @@
    "only": "^(cli/help|cli/no-args|regress/f05-no-trace)$",
    "gtest": false,
    "note": "F-05: --no-trace (new case; help text of cli/help and cli/no-args gains the flag)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:54:54Z",
+   "only": "^((regress|err)/f05-format-|cli/help$|cli/no-args$|gtest/unit_tests$)",
+   "gtest": true,
+   "note": "F-05: --format vcd|csv|npz (6 new cases; cli/help and cli/no-args gain the flag; gtest gains TraceTable.*)"
   }
  ]
 }

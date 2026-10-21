@@ -83,6 +83,12 @@
     each; the probes are named `PROBE{<net>}` like the automatic ones. A netlist with `.save` traces only its
     targets and probes
   * `--no-trace`: no trace file and no run manifest file (as `-o ""`), for runs that only need stdout or for timing
+  * `--format vcd|csv|npz` (repeatable; default `vcd`): tables of the probe samples, `<output>.csv` and NumPy
+    `<output>.npz` (dependency-free writer), one row per time step, probe and wavelength, with time, probe,
+    wavelength, power and complex field, exact to the last bit (the VCD prints 16 digits). Column layout in
+    `doc/netlist.md` ("Tracing and output files"). The golden harness decodes `.npz` outputs to text
+  * An MLPROBE without a VCD (`-o ""`, `--no-trace`, `--format csv`) no longer reports every sample of its listed
+    wavelengths as an unsupported signal
 
 ### Fixed
 

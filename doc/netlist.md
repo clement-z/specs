@@ -222,7 +222,8 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `-f file`, `--file=file` | netlist; repeat the option for several files, read in order as one netlist |
 | `-n`, `--dryrun` | parse and elaborate, do not simulate |
 | `--json file` | write the flattened circuit as JSON |
-| `-o name`, `--output=name` | trace file base name (`<name>.vcd`, `<name>.manifest.json`); its directory must exist; default `traces/delete_me` |
+| `-o name`, `--output=name` | trace file base name (`<name>.vcd`, `.csv`, `.npz`, `<name>.manifest.json`); its directory must exist; default `traces/delete_me` |
+| `--format vcd\|csv\|npz` | output format(s) of the traces, repeatable (`--format vcd --format csv`); default `vcd` only; see "Tracing and output files" (F-05) |
 | `--no-trace` | write no trace file and no run manifest file, as `-o ""` (F-05); wins over `-o`. Netlists only: the `-t` testbenches choose their own trace files |
 | `--param name=value` | set a top-level parameter (see Parameters) |
 | `--maxiter N` | `.options maxiter`, overrides the netlist |
@@ -230,6 +231,50 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `--seed N` | master seed, see [reproducibility.md](reproducibility.md) |
 
 `specs -h` lists all options. `-t name` runs a legacy C++ testbench instead of a netlist (`-p` lists them).
+
+## Tracing and output files
+
+What is traced (F-05): the probes (PROBE, MLPROBE) and the `.save` targets of the netlist; when it has none,
+every optical net through an automatic probe `PROBE{<net>}` (`.options traceall=0|1` forces either). The
+photodetectors (`<name>.readout`) and power meters are always traced in the VCD.
+
+Where, with `-o name` (default `traces/delete_me`) and `--format` (default `vcd`; repeat it for several):
+
+- `vcd`: `<name>.vcd`, every traced variable (probe power, abs, phase, wavelength; PDET readouts), one record per
+  time step where a value changed, reals printed by SystemC with 16 significant digits.
+- `csv`: `<name>.csv`, a table of the probe samples (no PDET or power meter: a warning says so when there is no
+  VCD), one row per **time step, probe and wavelength**, holding the last sample of that wavelength in that time
+  step: the delta cycles of one time step (the iterations of a `.op`/`.dc` fixed point, zero-delay propagation)
+  are not physical time, and the VCD also only shows the end of a time step. A `.dc` sweep gives one row per
+  point and probe (the converged value). Rows in time order; within a time step, in the order of the first
+  sample of each (probe, wavelength). Columns:
+
+  | column | unit | content |
+  | --- | --- | --- |
+  | `time_s` | s | simulation time (the sweep point index times the time resolution in a `.dc`) |
+  | `signal` | | probe name (`ROOT/PROBE1`, `PROBE{ROOT/out}`, `ROOT/X1/MLPROBE1`) |
+  | `wavelength_m` | m | wavelength of the sample |
+  | `power_W` | W | \|E\|² |
+  | `field_re`, `field_im` | √W | complex field E (modulus and phase: `abs(E)`, `angle(E)`) |
+
+  Numbers are written in the shortest form that reads back to the same double (more precise than the VCD). A
+  probe has no row before its first sample (the VCD shows 0 there), and an MLPROBE only has rows at its listed
+  wavelengths. `.save` quantities only select VCD variables: the table always has every column.
+- `npz`: `<name>.npz`, the same rows as a NumPy archive (written without any dependency, not compressed): one
+  array per column, `time_s`, `wavelength_m`, `power_W`, `field_re`, `field_im` (float64) and `signal` (int32, an
+  index into `signal_names`, a unicode array of every probe). With NumPy and pandas:
+
+  ```python
+  z = np.load("traces/out.npz")
+  df = pd.DataFrame({k: z[k] for k in ("time_s", "wavelength_m", "power_W", "field_re", "field_im")})
+  df["signal"] = z["signal_names"][z["signal"]]
+  ```
+
+  The `.npz` is kept in memory until the end of the analysis (48 bytes per row); above 4 GiB, use `csv`.
+
+The run manifest `<name>.manifest.json` (F-01) is written when any of these files is; its `trace_file` is the
+VCD, or the first table (`.csv`, then `.npz`) without a VCD. `--no-trace` (or `-o ""`) writes nothing.
+`--format` and `--no-trace` apply to netlists; the `-t` testbenches write their own VCD.
 
 ## Legacy netlists
 

@@ -2919,6 +2919,135 @@
     "tests/golden/netlists/f05-save-tran.cir"
    ],
    "note": "F-05: --no-trace wins over -o: no trace file and no run manifest file are written (--print-manifest shows \"trace_file\": null); the simulation runs as usual (Simulated 1 ns)"
+  },
+  {
+   "id": "regress/f05-format-csv-npz",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "--format",
+    "npz",
+    "-o",
+    "traces/t",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "note": "F-05: --format csv --format npz on the .save transient: traces/t.csv and traces/t.npz (decoded to text by the harness), no VCD; the manifest's trace_file is the CSV. One row per (time step, probe, wavelength)"
+  },
+  {
+   "id": "regress/f05-format-vcd-csv-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/f05-save-paper-fig1b.cir"
+   ],
+   "note": "F-05: --format vcd --format csv on the paper's Fig. 1b sweep: the VCD is unchanged (same as regress/f05-save-paper-fig1b) and the CSV has one row per sweep point and probe (402 rows: the converged value, not the delta-cycle iterations)"
+  },
+  {
+   "id": "regress/f05-format-npz-mlprobe-pdet",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "npz",
+    "-f",
+    "tests/golden/netlists/f05-format-mlprobe-pdet.cir"
+   ],
+   "note": "F-05: --format npz with an MLPROBE and a PDET: MLPROBE rows only, warning that PDET readouts are only traced in the VCD"
+  },
+  {
+   "id": "err/f05-format-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "hdf5",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "expect": "fail",
+   "note": "F-05: --format hdf5: 'Invalid --format value: 'hdf5' (expected vcd, csv or npz)', exit 1"
+  },
+  {
+   "id": "err/f05-format-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "expect": "fail",
+   "note": "F-05: --no-trace with --format: 'Error: --no-trace and --format cannot be combined', exit 1"
+  },
+  {
+   "id": "err/f05-format-unwritable",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-o",
+    "no_such_dir/t",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: the CSV cannot be created (no such directory): 'Error: cannot open trace file \"no_such_dir/t.csv\"', exit 1"
   }
  ]
 }
