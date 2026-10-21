@@ -22,8 +22,11 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   `python3 -I tests/golden/run_golden.py check --specs build/specs --unit-tests build/src/test/unit_tests --baseline tests/golden/baseline -j 8`
   (also registered as `meson test -C build --suite golden`; `meson test -C build` runs everything).
   Line order, NEW/MISSING cases and the gtest case are all checked by default: `--allow-new` while a new
-  case is not recorded yet, `--no-unit-tests` to skip gtest explicitly, `--lenient-order` only for
-  sanitizer/other-compiler runs; an `--only` that matches nothing exits 2.
+  case is not recorded yet, `--no-unit-tests` to skip gtest explicitly; an `--only` that matches nothing exits 2.
+  Output order is name-based (F-01), so sanitizer and other-compiler builds pass with strict order too.
+- Sanitizers: `meson setup <b> -Db_sanitize=address,undefined -Db_lundef=false --buildtype=debug` (clang works
+  locally; gcc needs libasan). `meson test` then applies `tests/sanitizers/lsan.supp`, which suppresses only
+  parse-error-exit flex buffers and SystemC-thread-stack allocations; any other leak fails (CI job is blocking).
 - If a change **intentionally** alters outputs (a bug fix), re-record with
   `run_golden.py record ... --out tests/golden/baseline --only '<ids>' --note "<why, backlog ID>"`, inspect the diff
   (`compare`), and commit the new baseline **in the same commit** as the fix.

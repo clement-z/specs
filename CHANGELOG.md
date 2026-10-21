@@ -30,6 +30,8 @@
     fewer than 5 significant digits compare exactly, and printed OpticalSignal IDs are normalised to
     first-appearance ranks (`[#k]`). `--strict`/`--strict-order` are accepted as no-ops
 * Paper reference (ECOC 2023, hal-04302200) in the README and `doc/papers/`
+* CI: the ASan+UBSan job is blocking; LeakSanitizer suppressions (`tests/sanitizers/lsan.supp`) cover only
+  parse-error exits and SystemC thread stacks, and are applied by `meson test` in sanitizer builds
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)
 * SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
