@@ -1,5 +1,5 @@
 # B-144: Uni writer connected first to a bidirectional net steals the bidir device's slot
-severity: high | category: bug | effort: XS | fix-class: needs-design | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 6d6bf9c (sprint 2026-10b P2): next-free-slot convention
 location: src/parser/parse_tree.h:828-831, src/parser/parse_tree.h:881-882
 ## Problem
 On a bidirectional net, `connect_uni()` gives every unidirectional writer slot `max(m_connect_writer_count, 1)`,

@@ -1,5 +1,5 @@
 # B-147: Crossing outputs are connected AS_READER, so output light is dropped on bidir nets
-severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 6d6bf9c (sprint 2026-10b P2): next-free-slot convention
 location: src/parser/parse_element.cpp:539-540
 ## Problem
 `CrossingElement::instantiate_and_connect_uni` binds `p_out1`/`p_out2` with `AS_READER`. On a unidirectional net

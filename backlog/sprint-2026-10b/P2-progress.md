@@ -10,8 +10,8 @@ Start state (d214196): `meson test` 12/12, golden `--atol 0` 81/81.
 | # | item(s) | status | commit | notes |
 |---|---|---|---|---|
 | 1 | B-001 FD queue merge | done | b2bd836 | validated patch; gtest + golden `regress/b001-fd-multilambda-stale`; existing cases unchanged |
-| 2 | B-144 + B-145 + B-147 bidir slots | implementing (Opus, wt bidir) | | |
-| 3 | B-146 subckt port nets via `nets_flat` | implementing (Opus, wt bidir, after item 2) | | |
+| 2 | B-144 + B-145 + B-147 bidir slots | done | 6d6bf9c | prototype extended to WG/COUPLER/PSHIFT/MZI/CROSSING-bi (`device_writes_net` required); crossing uni outputs AS_WRITER; 14 golden cases (13 regress + three-writers expect=fail), strict line order (same in gcc, clang, gcc -O0); existing cases unchanged |
+| 3 | B-146 subckt port nets via `nets_flat` | **stopped** (unpredicted golden change) | parked c694140 on `P2-wip/bidir-b146` | fix works (hierarchical == flat) but `cir-json/subckt_tests` changes: `writers` of ROOT/out and ROOT/X2/N00001 0 -> 1 (correct flat count); table predicted none on existing cases -> report, needs-human |
 | 4 | B-052 positional args + 4 asserts | done | aaa02b3 | 4 positional + 4 too-many-args golden cases; `doc/netlist.md` created; existing cases unchanged |
 | 5 | B-051 PCMCELL requires tc/ta | done | 344d60b | presence check incl. aliases; PCMElement default Ta = 1; OctaneCell/Segment/Matrix take Tc/Ta as required params (meltEnergy/nStates defaults of OctaneCell/OctaneMatrix dropped: C++ forbids required after defaulted); 3 golden cases |
 | 6 | B-060 PCM validation | done | c22ff40 | `PCMElement::check_parameters()` (parser + `start_of_simulation`); n = 0 keeps its old message; 2 gtests + 5 golden cases; model untouched |
