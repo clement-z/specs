@@ -30,7 +30,6 @@
       --vci, --verbose_ci               Print components detail before starting
                                         simulation
       -p, --list-testbenches            List available testbenches
-      --mon                             Monitor simulation status
       -t[test_name],
       --testbench=[test_name]           Run the specified testbench (use -p to
                                         list available testbenches)

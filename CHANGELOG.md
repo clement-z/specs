@@ -72,6 +72,8 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 
 ### Removed
 
+* `--mon` and the `TimeMonitor` device: it shifted simulated time, stopped after initialisation in netlist runs
+  and called `exit(1)` on its first report (B-058; progress reporting is planned separately, scout F-15)
 * Dead code (see `backlog/cleanup/REPORT.md`): `do_circuit`/`raphael_main`, the unused `Ring`,
   `PowerProbe` and `PhaseProbe` devices, dead output-port and parser code, the duplicate
   `utils/draw_graph_from_json.py`, leftover debug prints on stdout

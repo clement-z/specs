@@ -348,6 +348,12 @@
    "only": "^gtest/unit_tests$",
    "gtest": true,
    "note": "B-002: new gtest OpticalOutputPortDeathTest.ApplyConfigRejectsSampledTime"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:31:34Z",
+   "only": "^cli/(help|no-args)$",
+   "gtest": false,
+   "note": "B-058: --mon removed from the help text (TimeMonitor removed)"
   }
  ]
 }

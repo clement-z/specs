@@ -5,7 +5,6 @@
 #include <args.hxx>
 
 #include "optical_signal.h"
-#include "devices/time_monitor.h"
 #include "tb/alltestbenches.h"
 #include "utils/strutils.h"
 
@@ -174,10 +173,6 @@ int sc_main(int argc, char *argv[])
                           "list_tests",
                           "List available testbenches",
                           { 'p', "list-testbenches" });
-    args::Flag add_time_monitor(parser,
-                          "add_time_monitor",
-                          "Monitor simulation status",
-                          { "mon" });
     args::ValueFlag<string> test(
         parser,
         "test_name",
@@ -299,14 +294,6 @@ int sc_main(int argc, char *argv[])
         cout << "Using trace file: " << set_tracefile.Get() << endl;
         // TODO: validate filename
         specsGlobalConfig.trace_filename = set_tracefile.Get();
-    }
-
-    shared_ptr<TimeMonitor> tm;
-    if (add_time_monitor) {
-        if (specsGlobalConfig.simulation_mode == OpticalOutputPortMode::FREQUENCY_DOMAIN)
-            tm = make_shared<TimeMonitor>("TM", 0, 0.5);
-        else
-            tm = make_shared<TimeMonitor>("TM", 1e-14, 0.5);
     }
 
     if (file) {

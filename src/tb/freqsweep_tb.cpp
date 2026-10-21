@@ -5,8 +5,6 @@
 #include <cstdlib>
 #include <unistd.h>
 
-#include "devices/time_monitor.h"
-
 #include "utils/general_utils.h"
 
 /* ----------------------------------------------------------------------------- *
