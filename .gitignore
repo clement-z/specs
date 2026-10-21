@@ -31,10 +31,11 @@ gmon.out
 !/circuits/*.cir
 !/circuits/legacy/*.cir
 tmp/
-# Meson: build dirs, and wrap downloads/lock in thirdparty/ (subproject_dir)
+# Meson: build dirs, and everything in subprojects/ but the wrap files (downloads, extracted
+# sources, packagecache/, .wraplock)
 builddir/
-thirdparty/packagecache/
-thirdparty/googletest-*/
-thirdparty/.wraplock
+/subprojects/*
+!/subprojects/*.wrap
+!/subprojects/packagefiles/
 # install.sh / CI: SystemC build and install prefix
 .deps/

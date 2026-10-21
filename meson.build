@@ -2,8 +2,6 @@ project('specs', 'cpp',
   version: '0.2.0',
   license: 'LGPL-3.0-or-later',
   meson_version: '>=1.3.0',
-  # The thirdparty/ git submodules (systemc, args) double as subprojects, next to the gtest wrap.
-  subproject_dir: 'thirdparty',
   default_options: [
     # gnu++20 (not c++20): same as the former CMake build (CMAKE_CXX_STANDARD 20, extensions ON).
     # GNU mode enables -ffp-contract=fast on GCC, so ISO mode could change results in the last bits.
@@ -29,7 +27,7 @@ endif
 # ---- Dependencies -------------------------------------------------------------------------------
 
 # SystemC: pkg-config (distro/autotools installs), then its CMake package (honours
-# -Dcmake_prefix_path=...), then build it from the thirdparty/systemc submodule.
+# -Dcmake_prefix_path=...), then build it from subprojects/systemc.wrap.
 # An installed SystemC is only accepted if it was built with our C++ standard, otherwise
 # linking fails late with "undefined reference to sc_api_version_..._cxx<std>".
 systemc_abi_check = '''
@@ -71,11 +69,7 @@ elif systemc_dep.found()
   endforeach
 endif
 if not systemc_dep.found()
-  if not fs.exists('thirdparty/systemc/CMakeLists.txt')
-    error('SystemC not found. Pass -Dcmake_prefix_path=<SystemC prefix> or run ',
-          '`git submodule update --init --recursive` to build it from thirdparty/systemc.')
-  endif
-  message('Building SystemC from the thirdparty/systemc submodule (CMake subproject)')
+  message('Building SystemC from subprojects/systemc.wrap (CMake subproject)')
   cmake = import('cmake')
   systemc_opts = cmake.subproject_options()
   systemc_opts.add_cmake_defines({
@@ -108,18 +102,21 @@ if systemc_libdir in ['/usr/lib', '/usr/lib64'] or systemc_libdir.startswith('/u
   systemc_libdir = ''
 endif
 
-# taywee/args is header-only.
+# taywee/args is header-only: its CMake package, else subprojects/args.wrap (its CMake build,
+# which only defines the include directory; nothing is built or installed).
 args_dep = dependency('args', method: 'cmake', modules: ['taywee::args'],
                       cmake_args: cmake_no_registry, required: false,
                       include_type: 'system')
 if not args_dep.found()
-  if not fs.exists('thirdparty/args/args.hxx')
-    error('taywee/args not found. Pass -Dcmake_prefix_path=<args prefix> or run ',
-          '`git submodule update --init --recursive`.')
-  endif
-  # Plain -isystem: include_directories() into the subproject_dir is a sandbox violation.
-  args_dep = declare_dependency(compile_args: ['-isystem',
-                                               meson.project_source_root() / 'thirdparty/args'])
+  args_opts = import('cmake').subproject_options()
+  args_opts.add_cmake_defines({
+    'ARGS_BUILD_EXAMPLE': false,
+    'ARGS_BUILD_UNITTESTS': false,
+    'CMAKE_EXPORT_NO_PACKAGE_REGISTRY': true,
+  })
+  args_opts.set_install(false)
+  args_dep = import('cmake').subproject('args', options: args_opts).dependency('args',
+                                                                               include_type: 'system')
 endif
 
 m_dep = cxx.find_library('m', required: false)
