@@ -1,5 +1,5 @@
 # B-153: `.options` values are not validated (UB cast, out-of-range timescale, non-positive tolerances)
-severity: med | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in d90348d
+severity: med | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in d90348d; zero tolerances allowed (abstol, reltol >= 0) in 26327cb (sprint 2026-10c phase A)
 location: src/parser/parse_directive.cpp:30-37
 ## Problem
 - `RESOLUTION` stores a double into the `uint64` `default_resolution_multiplier`. Negative or huge values are UB, and
@@ -47,3 +47,10 @@ Patched scratch build: the 7 invalid values give rc 1 with a message. Golden cir
 **Independent second check (V8, of F-A4-12): CONFIRMED.** Method: applied the suggested checks (ABSTOL/RELTOL > 0, TS in [ONE_FS, ONE_SEC] via as_integer, RESOLUTION in [1, 2^64) before the cast), rebuilt, golden --atol 0, ran a4-options.sh, valid forms, CLI overrides and a differential run of all netlists
 
 Release reproduces exactly as described (resolution=-1 -> multiplier 18446744073709551615, 0.5/1e30 -> 0, timescale -20/3 -> E705, -12.7 -> -12, abstol=-1 and reltol=0 accepted). Patched: the 7 invalid values give rc 1 with one line, e.g. `.options: TIMESCALE must be between -15 and 0 (got -20)`. timescale=-12.7 is still accepted, as the finding intends. Golden: 44 pass, no notes. Differential run: no change. On as_integer(): every netlist form works. A negative literal such as `timescale=-14` is parsed as a DOUBLE (unary minus), and as_integer() converts DOUBLE/INTEGER/BOOLEAN, which is what the current code already calls. The full paul_3ring_puf.cir line (`abstol=1e-5 reltol=1e-4 traceall=0 timescale=-14 resolution=1`) is not reached in golden (that case fails earlier on a missing values file), so I ran it standalone: accepted, same config printout. CLI `--abstol 1e-10 --reltol 1e-5 -R -14` is unchanged. `-R -20` now gives the new .options message instead of E705, as the finding notes. Minor optional point: `as_integer()` on an out-of-int-range double (e.g. 1e30) is formally UB before the range check. It is rejected in practice (tested 1e30, -1e30 and 4294967282). Doing the range check on `as_double()` and casting afterwards would be cleaner. Not a blocker.
+
+## Sprint 2026-10c phase A: zero tolerances allowed
+Maintainer decision (2026-10-21, follow-up round): `abstol >= 0` and `reltol >= 0` (`.options`, `--abstol`/`--reltol`,
+`verifyConfig()`); negative values and NaN stay errors. When both are 0, one warning per run says that the emission
+gate is off, feedback circuits may never quiesce in `.tran` and `.op`/`.dc` may stop at `maxiter`. Done in 26327cb
+(`doc/numerics.md`, "Zero tolerances"). Golden: `err/b153-reltol-zero` became `regress/b153-reltol-zero`;
+`err/b153-abstol-negative` now says "must be >= 0"; new `b153-zerotol-*` cases.

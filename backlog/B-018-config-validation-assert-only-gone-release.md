@@ -1,5 +1,5 @@
 # B-018: Config validation is assert-only (gone in Release), and `-R` has no lower bound
-severity: low | category: cli | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in b588268
+severity: low | category: cli | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in b588268; zero tolerances allowed (abstol, reltol >= 0) in 26327cb (sprint 2026-10c phase A)
 location: src/specs.h:138-146, src/specs.cpp:43-44,363, src/main.cpp:351
 ## Problem
 `verifyConfig()` is only `assert`s, so Release accepts `.options abstol=-1 reltol=0` silently. `-R` only rejects
@@ -36,3 +36,10 @@ invalid inputs change behaviour, and they already fail or misbehave today.
 The problem is reproduced. Base accepts `.options abstol=-1 reltol=0` (rc=0), and `-R -16` / `.options timescale=-16` fail with E705. Patched: clear errors, rc=1. Golden: 44/44, 0 notes. Change step (2): do NOT remove verifyConfig() from prepareSimulation (specs.cpp:363). All 13 testbench files (src/tb/*_tb.cpp) and src/test/devices/waveguide.cpp:152 call prepareSimulation() directly, never runAnalysis(), so removing it drops all validation for them. Instead, add a call at the top of runAnalysis() and keep the existing one. Validated: 44/44, 0 notes. Golden impact text should add that these inputs go from rc=0 today (Release) to an error: `.options abstol=0`, `reltol=0`, `resolution=0`, `resolution=0.5` (cast to 0), `timescale=1`. They violate the existing assert contract and the CLI --abstol/--reltol validators, so this is acceptable, but say so explicitly. Coordinate with A4 seed S1.27 (parse_directive casts / verifyConfig).
 
 **Orchestrator:** Kept the prepareSimulation() validation call; golden-impact text now lists the inputs that become errors.
+
+## Sprint 2026-10c phase A: zero tolerances allowed
+Maintainer decision (2026-10-21, follow-up round): `abstol >= 0` and `reltol >= 0` (`.options`, `--abstol`/`--reltol`,
+`verifyConfig()`); negative values and NaN stay errors. When both are 0, one warning per run says that the emission
+gate is off, feedback circuits may never quiesce in `.tran` and `.op`/`.dc` may stop at `maxiter`. Done in 26327cb
+(`doc/numerics.md`, "Zero tolerances"). Golden: `err/b153-reltol-zero` became `regress/b153-reltol-zero`;
+`err/b153-abstol-negative` now says "must be >= 0"; new `b153-zerotol-*` cases.
