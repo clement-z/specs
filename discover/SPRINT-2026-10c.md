@@ -13,10 +13,10 @@ journal publication. Merges into `dev`/`master`, tags and pushes only on an expl
 | # | Phase | Items | Workspace / branch | Model | Done marker | Blocked on | State |
 |---|---|---|---|---|---|---|---|
 | A | Decided follow-ups (v0.2.0) | B-146 land; B-014 error option (b); lexer integer overflow → parse error; zero tolerances allowed (≥ 0, warning when both 0) | `ws-followups` / `ws/followups` | Opus 5.5 xhigh | `backlog/sprint-2026-10c/PA-REPORT.md` | "go" | prepared |
-| B | Sanitizer CI (gcc ASan/UBSan) green | diagnose the failing Test step, fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | CI log, or `libasan`/`libubsan` installed | blocked |
-| C | v0.2.0 release prep | CHANGELOG `[0.2.0]`, version `0.2.0` in `meson.build`, `CITATION.cff` + `.zenodo.json` (scout F-20), README citation | coordinator (or Sonnet) | Opus 5.5 | release-prep commit; **stop before tag/merge** | A, B; citation metadata | prepared |
-| D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 xhigh | `PD1-REPORT.md` | F-15 answers, C | draft |
-| D2 | F-15 part 2: bit-identical refactors | squared-norm gate, per-λ S-parameter caches, per-port ordered pending map + single `sc_event`, `OpticalSignal` id/virtual dtor | `ws-engine2` / `ws/engine2` | Opus 5.5 xhigh | `PD2-REPORT.md` | D1, F-15 answers | draft |
+| B | Sanitizer CI (gcc ASan/UBSan) green | reproduce locally with gcc (runtimes now installed), fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | "go" | prepared |
+| C | v0.2.0 release prep | CHANGELOG `[0.2.0]`, version `0.2.0` in `meson.build`, `CITATION.cff` citing the ECOC paper (no DOI per version) | coordinator (or Sonnet) | Opus 5.5 | release-prep commit; **stop before tag/merge** | A, B | prepared |
+| D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 xhigh | `PD1-REPORT.md` | C | prepared (answers recorded, Q2/Q5/Q8 provisional) |
+| D2 | F-15 part 2: bit-identical refactors | squared-norm gate, per-λ S-parameter caches, single `sc_event` per port (heap order kept), `OpticalSignal` id behind a flag | `ws-engine2` / `ws/engine2` | Opus 5.5 xhigh | `PD2-REPORT.md` | D1, F-15 answers | draft |
 | D3 | F-15 part 3: `SC_METHOD` conversion | output port + stateless device reactions | `ws-methods` / `ws/methods` | Opus 5.5 xhigh | `PD3-REPORT.md` | D2, F-15 answers | draft |
 | D4 | F-15 measurement (v0.3.0 candidate) | before/after per-event cost on the CROW benchmark (`discover/scout/bench/`); ratios only (shared host) | coordinator | Opus 5.5 | numbers in the D reports | D3 | draft |
 | E | Private validation runs (optional) | instructions kept outside the repository at the maintainer's request | coordinator | Opus 5.5 | outside the repo | A | prepared (outside repo) |
@@ -36,15 +36,14 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 |---|---|---|
 | B-146 | `cir-json/subckt_tests` (`flat.json` `writers` of 2 nets 0 → 1) | the 5 cases of `P2-ready/b146` |
 | B-014 (b) | none (`regress/b031-mzi-bidir` keeps passing at the default timescale; its device-internal arms warn) | netlist waveguide rounding to 0 → error; device-internal rounding → warning only |
-| Lexer overflow | `err/f01-options-seed-huge-integer` (new parse-error message); `err/f01-options-seed-int-max` becomes a passing case (2147483647 is legal once the clamp is gone; the P4 guard is removed) | literal beyond the `int` range in a kwarg, a positional argument and a net name |
+| 64-bit integers | `err/f01-options-seed-huge-integer` (new parse-error message); `err/f01-options-seed-int-max` becomes a passing case (the P4 guard is removed) | `.options seed=3000000000`; literal beyond 64 bits in a kwarg, a positional argument and a net name; a narrow consumer out of range |
 | Zero tolerances | `err/b153-reltol-zero` becomes a passing case (warning only if abstol is also 0) | open loop at zero tolerance; lossy ring `.tran` at zero tolerance; both zero → one warning; negative values still errors |
 
 ## Pending maintainer input
-- **F-15 questions** (see the sprint plan message / `backlog/DECISIONS-2026-10-21.md` once answered).
-- **v0.2.0 citation metadata**: authors and ORCIDs for `CITATION.cff`, Zenodo integration on the GitHub repo.
-- **Sanitizer CI**: the failing job's log, or the gcc sanitizer runtimes on this host.
+- **F-15**: answers recorded (second round); confirm the provisional notes on Q2 (listing prefix), Q5 (tiers), Q8 (order).
 - Unpushed local commits on `sprint/2026-10b` (bca9c50, d5890f1) and everything on `sprint/2026-10c`: push only on request.
 - Housekeeping of the 2026-10b phase workspaces and `ws/*`, `P*-wip/*` branches.
 
 ## Log
 - 2026-10-21 — sprint prepared (board, prompts, heartbeat registry); not launched ("no go, just prepare").
+- 2026-10-21 — maintainer answers recorded (e6c443e): sanitizer runtimes installed, no DOI per version (ECOC paper stays the citation), 64-bit integer literals, F-15 Q1–Q8. Prompts updated; still no go.

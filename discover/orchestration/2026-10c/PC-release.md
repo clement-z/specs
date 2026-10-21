@@ -8,9 +8,9 @@ Prerequisites: phase A merged, phase B green (all CI jobs, sanitizer job blockin
 2. `CHANGELOG.md`: rename `[unreleased]` to `[0.2.0] - <release date>`, regroup under New / Changed (incl. output
    changes users will notice: field label √W, `.dc` stop point, tracing only probes when present, PCMCELL `tc`/`ta`
    required, `--mon` removed, positional argument order) / Fixed / Removed; start a new empty `[unreleased]`.
-3. `CITATION.cff` (CFF 1.2.0) for the software, `preferred-citation` = the ECOC 2023 paper (already in the README);
-   `.zenodo.json` with the same metadata (scout F-20 brief). **Needs from the maintainer**: author list, ORCIDs,
-   affiliations, keywords; whether the GitHub–Zenodo integration is enabled.
-4. README: "How to cite" section pointing to `CITATION.cff` (software DOI added after Zenodo mints it).
+3. `CITATION.cff` (CFF 1.2.0) for the software (version, release date, repository, LGPL-3.0, authors as in the ECOC
+   paper), with `preferred-citation` = the ECOC 2023 paper (HAL hal-04302200). **No DOI per minor version, no
+   Zenodo release, no `.zenodo.json`** (decision, second round).
+4. README: keep the "Reference" section (ECOC 2023); mention `CITATION.cff` (GitHub's "Cite this repository").
 5. Full gate on the release commit (gcc, clang, clang ASan; golden; CI green after an explicitly requested push).
 6. **Stop.** Report the commit to tag; the maintainer requests the tag, the merge into `dev`/`master` and the push.
