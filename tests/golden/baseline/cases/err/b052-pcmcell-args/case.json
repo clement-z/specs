@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b052-pcmcell-args.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b052-pcmcell-args"
+}

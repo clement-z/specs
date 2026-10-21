@@ -1098,6 +1098,158 @@
     ]
    },
    "note": "B-001: multi-wavelength .op; a stale partial value of one wavelength used to be emitted as the converged value (m = o = 0.25 W at 1550 nm instead of 0.5625 W)"
+  },
+  {
+   "id": "regress/b052-cwsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-cwsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: CWSRC positional `wl power phi` (cwsrc1 a 1.55e-6 1e-3 0.5 -> 1550 nm, 1 mW, 0.5 rad; was 0 W at 1 mm)"
+  },
+  {
+   "id": "regress/b052-vlsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-vlsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: VLSRC positional values file is loaded (emissions at 100/200/300 ps; was silently ignored)"
+  },
+  {
+   "id": "regress/b052-evlsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-evlsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: EVLSRC positional values file is loaded (emissions at 100/200/300 ps; was silently ignored)"
+  },
+  {
+   "id": "regress/b052-pcmcell-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-pcmcell-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: PCMCELL positional `emelt n tc ta` (out = 0.85 mW at k=0, 0.9495 mW at k=n; was an assert abort in Debug)"
+  },
+  {
+   "id": "err/b052-cwsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-cwsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: CWSRC with 4 positional args gives a clean error (was an assert abort / args shifted with NDEBUG)"
+  },
+  {
+   "id": "err/b052-vlsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-vlsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: VLSRC with 2 positional args gives a clean error (was an assert abort / loaded the first file with NDEBUG)"
+  },
+  {
+   "id": "err/b052-evlsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-evlsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: EVLSRC with 2 positional args gives a clean error (was an assert abort / loaded the first file with NDEBUG)"
+  },
+  {
+   "id": "err/b052-pcmcell-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-pcmcell-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: PCMCELL with 5 positional args gives a clean error (at most 4: emelt n tc ta)"
   }
  ]
 }

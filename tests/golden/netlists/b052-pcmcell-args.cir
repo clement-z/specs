@@ -1,0 +1,5 @@
+* B-052: PCMCELL with five positional arguments (at most 4: emelt n tc ta)
+* Expected: Error (ROOT/PCMCELL1): too many positional arguments (5, expected at most 4)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out 1e-12 10 0.85 0.95 1
+.op

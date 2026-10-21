@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b052-cwsrc-positional.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b052-cwsrc-positional"
+}

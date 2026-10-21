@@ -33,6 +33,7 @@
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)
 * SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
+* `doc/netlist.md`: nets, positional arguments and keywords of netlist elements (complements the cheatsheet)
 
 ### Fixed
 
@@ -58,6 +59,9 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * gtest fork harness: pipe deadlock above 64 KiB, escaping assertions/exceptions (B-125); angle check (B-123)
 * Multi-wavelength `.op`/`.dc` (and the OP phase of `.tran`): a stale partial value of one wavelength could be
   emitted as the converged result when another wavelength shared the output port (B-001)
+* Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
+  at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
+  positional arguments is a clean error (B-052)
 
 ### Removed
 

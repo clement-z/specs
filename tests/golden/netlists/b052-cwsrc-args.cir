@@ -1,0 +1,4 @@
+* B-052: CWSRC with four positional arguments (at most 3: wl power phi)
+* Expected: Error (ROOT/CWSRC1): too many positional arguments (4, expected at most 3)
+cwsrc1 a 1.55e-6 1e-3 0.5 1
+.op
