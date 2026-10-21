@@ -1,5 +1,5 @@
 # B-160: SI suffixes (`10u`, `1.55u`, `1m`, `10p`) are a syntax error
-severity: med | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 6c837e5 (sprint 2026-10b P5, F-12): SI suffixes, SPICE semantics (M = milli, MEG = mega), no trailing unit letters
 location: src/parser/parser.l:8, src/parser/parser.l:340-351
 ## Problem
 Numbers are C-style only. SPICE users write `10u`, and the legacy netlists use suffixes (`350.85u`).

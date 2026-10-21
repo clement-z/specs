@@ -1,5 +1,5 @@
 # B-169: `.ends NAME` (standard SPICE) is a syntax error
-severity: low | category: parser | effort: XS | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: parser | effort: XS | fix-class: needs-design | verdict: CONFIRMED | status: fixed in e80bba4 (sprint 2026-10b P5, F-12): `.ends NAME`, checked case-insensitively
 location: src/parser/parser.l:294-313, src/parser/parser.y:238
 ## Problem
 `.ends s` returns `T_DIRECTIVE_ENDS`, then `s` is parsed as a new top-level token.

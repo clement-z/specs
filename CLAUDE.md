@@ -15,7 +15,7 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   - Without the prebuilt deps: `./install.sh`, or plain `meson setup build` (builds SystemC from the submodule).
   - **Don't run `ninja clang-format`** (Meson's automatic target): it reformats every file.
 - Run: `build/specs -f circuits/add_drop.cir -o traces/out` (needs a `traces/` dir in the cwd;
-  `.include` paths resolve relative to the cwd). Legacy testbenches: `build/specs -t wg` (list them with `specs -p`).
+  `.include` paths resolve relative to the including file, then the cwd). Legacy testbenches: `build/specs -t wg` (list them with `specs -p`).
 
 ## Testing — golden outputs are the safety net
 - Any change that could affect behaviour must pass:

@@ -56,6 +56,23 @@
   `--maxiter N`, 0: no limit) with an error naming the analysis (and the sweep point), a residual report (the
   output ports still changing, their last change and threshold) and exit status 1, instead of running for
   hours (weakly coupled or lossless loops). Converging circuits are not affected
+* Netlist pack (F-12, SPICE semantics; syntax reference at the top of `doc/netlist.md`):
+  * SI scale suffixes on numbers: `f p n u m k meg g t` (`1.55u`, `10p`, `2meg`), also in expressions,
+    `.param`, `.options` and analyses; case-insensitive, so `M` is milli and `MEG` mega. `1.55u` is exactly
+    `1.55e-6`. Trailing unit letters (`1.55um`) are not accepted (B-160)
+  * `.ends NAME`, checked against the `.subckt` name (case-insensitive) (B-169)
+  * `.dc WL(cwsrc1) start stop step` (also `P(...)`, `F(...)` and the long forms), the same sweep as
+    `.dc /cwsrc1/WL ...`, as written in the paper and the cheatsheet
+  * **Changed results:** `.dc` includes the stop value when (stop - start)/step is an integer (SPICE):
+    `circuits/add_drop.cir` sweeps 31 points, 1535 to 1565 nm, instead of 30; the other points keep their
+    values (still accumulated, B-009), and the announced point count is the swept one
+  * `--param name=value` (repeatable) overrides the netlist's `.param`/`.assign` of that name; the value is
+    parsed like a `.param` value
+  * `.include` resolves a relative path against the directory of the including file first (for a `.subckt`
+    body: the file that defines it), then the working directory as before; a warning when both exist and
+    differ (B-143)
+  * The pre-release netlists `double_ring.cir`, `triple_ring.cir`, `paul_simple_ring.cir` moved to
+    `circuits/legacy/` (they do not parse; kept for reference) (B-133)
 
 ### Fixed
 

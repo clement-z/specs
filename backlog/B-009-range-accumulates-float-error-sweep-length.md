@@ -1,5 +1,5 @@
 # B-009: `range()` accumulates float error: sweep length and endpoint depend on rounding
-severity: med | category: bug | effort: S | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: bug | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: partly addressed in a67deb3 (sprint 2026-10b P5, F-12): the stop is included and the announced count is the swept count; the values are still accumulated (start + i·step: open, needs-human)
 location: src/utils/general_utils.h:20-35 (loop at 32), src/parser/parse_analysis.cpp:74
 ## Problem
 `for (val = min; val < max; val += step)` accumulates rounding error. Depending on that rounding, the stop value
