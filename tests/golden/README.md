@@ -50,7 +50,7 @@ Useful options (all sub-commands that compare):
 | `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt) with 5 or more significant digits: N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it. Shorter floats get no slack (B-128) |
 | `--lenient-order` | off | accept stdout/stderr lines that differ only in **order** in every case (reported as a note). By default only the streams a case lists in `unordered_streams` may be reordered (see "Determinism findings"). `--strict-order` is accepted as a no-op |
 | `--allow-new` | off | NEW cases (in `cases.json`, not in the baseline) are reported but don't fail, e.g. while adding a case before recording it. MISSING cases (in the baseline, no result) always fail. `--strict` is accepted as a no-op |
-| `--no-unit-tests` | off | skip the gtest case explicitly (reported as SKIPPED). Without it and without `--unit-tests`, a selected gtest case fails as MISSING |
+| `--no-unit-tests` | off | (`check`, `compare`) skip the gtest case explicitly (reported as SKIPPED). Without it, a selected gtest case with no result fails as MISSING, also when the baseline has none |
 | `--only REGEX` | all | restrict to matching case ids (`gtest/unit_tests` included); exit 2 when it matches nothing |
 | `--max-file-bytes` | `1e6` | larger outputs are stored gzipped (deterministic, lossless). If still too large, only a lossy summary is kept: per-signal min/max/last for VCDs, line count for text |
 

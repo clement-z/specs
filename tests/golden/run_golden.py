@@ -1001,8 +1001,9 @@ def cmd_record(args):
     print("Recording %d case(s) into %s" % (len(cases), outdir))
     for w in discover_uncovered(load_cases(args.cases)[1], Path(args.specs).resolve(), Path(args.repo).resolve()):
         print("  WARNING: " + w)
-    if with_gtest and not args.unit_tests:
-        print("  WARNING: %s not recorded (no --unit-tests): `check` will fail on it" % GTEST_ID)
+    if with_gtest and not args.unit_tests and not args.only:
+        print("  WARNING: the baseline has no %s result (no --unit-tests): `check` will need --no-unit-tests"
+              % GTEST_ID)
     _, gres = record_into(outdir, cases, gspec, args, with_gtest)
     if args.only and (outdir / "manifest.json").exists():
         old = json.loads((outdir / "manifest.json").read_text(encoding="utf-8"))
@@ -1034,7 +1035,8 @@ def determinism_check(cases, gspec, args, first_dir, with_gtest):
         with tempfile.TemporaryDirectory(prefix="specs-golden-rep-", dir=args.tmpdir) as td:
             print("Determinism: repeat %d/%d" % (k, args.repeat))
             record_into(Path(td), cases, gspec, args, with_gtest, verbose=False)
-            res = compare_dirs(first_dir, Path(td), cases, tol, "compare" if with_gtest else "off", verbose=False)
+            gtest = "compare" if with_gtest and args.unit_tests else "off"
+            res = compare_dirs(first_dir, Path(td), cases, tol, gtest, verbose=False)
             for cid, diffs in res["failed"].items():
                 bad += 1
                 print("  NONDETERMINISTIC %s" % cid)
@@ -1097,11 +1099,12 @@ def compare_dirs(base_dir, cand_dir, cases, tol, gtest, verbose=True, lenient_or
             print("%-8s %s  %s" % ("FAIL" if fatal else "PASS", GTEST_ID, dict(sorted(gk["tests"].items()))))
             for d in fatal + notes:
                 print("    " + d)
-    elif gb and not gk:
+    elif not gk:
+        # Also when the baseline has no gtest result either: the skip must be explicit.
         out["missing"].append(GTEST_ID)
         if verbose:
             print("MISSING  %s (no result: give --unit-tests, or --no-unit-tests to skip it explicitly)" % GTEST_ID)
-    elif gk and not gb:
+    else:
         out["new"].append(GTEST_ID)
         if verbose:
             print("NEW      %s (not in baseline)" % GTEST_ID)
@@ -1160,8 +1163,8 @@ def cmd_compare(args):
     spec, cases, gspec = load_cases(args.cases)
     cases, with_gtest = select(cases, args.only)
     tol = Tol(args.rtol, args.atol, args.print_slack)
-    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, "compare" if with_gtest else "off",
-                       lenient_order=args.lenient_order)
+    gtest = "off" if not with_gtest else ("skip" if args.no_unit_tests else "compare")
+    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, gtest, lenient_order=args.lenient_order)
     if args.report:
         Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     return summarise(out, args.allow_new)
@@ -1242,6 +1245,7 @@ def main(argv=None):
     common(p, need_specs=False)
     p.add_argument("--baseline", required=True)
     p.add_argument("--candidate", required=True)
+    p.add_argument("--no-unit-tests", action="store_true", help="skip the gtest case explicitly")
     p.set_defaults(func=cmd_compare)
 
     p = sub.add_parser("list", help="list cases")

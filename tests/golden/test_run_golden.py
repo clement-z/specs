@@ -7,6 +7,7 @@ Stdlib only; run as `python3 -I tests/golden/test_run_golden.py` (also `meson te
 import contextlib
 import importlib.util
 import io
+import json
 import re
 import shutil
 import tempfile
@@ -184,6 +185,28 @@ class Coverage(unittest.TestCase):
         shutil.rmtree(self.cand / "gtest")
         out, rc = self.run_compare("off")
         self.assertEqual((out["missing"], out["skipped"], rc), ([], [], 0))
+
+    def test_gtest_absent_on_both_sides_fails(self):
+        shutil.rmtree(self.base / "gtest")
+        shutil.rmtree(self.cand / "gtest")
+        out, rc = self.run_compare(allow_new=True)
+        self.assertEqual((out["missing"], rc), ([rg.GTEST_ID], 1))
+        self.assertEqual(self.run_compare("skip")[1], 0)
+
+    def test_compare_no_unit_tests(self):
+        shutil.rmtree(self.cand / "gtest")
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc = rg.main(["compare", "--baseline", str(self.base), "--candidate", str(self.cand),
+                          "--cases", str(self.cases_json()), "--no-unit-tests"])
+            self.assertEqual(rc, 0)
+            rc = rg.main(["compare", "--baseline", str(self.base), "--candidate", str(self.cand),
+                          "--cases", str(self.cases_json())])
+            self.assertEqual(rc, 1)
+
+    def cases_json(self):
+        p = Path(self.tmp.name) / "cases.json"
+        p.write_text(json.dumps({"cases": self.CASES}), encoding="utf-8")
+        return p
 
     def test_new_gtest_fails_unless_allowed(self):
         shutil.rmtree(self.base / "gtest")
