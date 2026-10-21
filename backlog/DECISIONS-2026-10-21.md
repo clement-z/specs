@@ -46,3 +46,13 @@ New branch `sprint/2026-10b` stacked on `sprint/2026-10` (PR #16); same unattend
 (paseo workspaces, Opus xhigh orchestrators, golden check per commit, coordinator re-verification before every
 merge). Order: harness hardening → approved correctness/physics fixes → F-01 → F-28 → F-12 → F-05, docs alongside.
 Push the branch after the final verification (no PR creation, no merge into `dev`).
+
+## Follow-up decisions (2026-10-21, after sprint 2026-10b)
+| Item | Decision |
+|---|---|
+| B-146 | **Land** `P2-ready/b146` as is (JSON `writers` 0 → 1 for nets shared between subcircuit instances; hierarchical = flat). |
+| B-014 error | **Option (b)**: error when a non-zero delay of a waveguide written in the netlist rounds to 0 ticks; warning only for delays created inside devices (e.g. the MZI's internal arms, feed-forward). Adapt `P3-ready/b014-error`; `regress/b031-mzi-bidir` keeps passing at the default timescale. |
+| Lexer integer overflow | **Clean parse error**, not lexing as doubles (drop the approach of `P4-ready/lexer-int-overflow`). A digit-only literal beyond the `int` range is rejected with its line and the limit (2147483647), instead of being clamped silently. No netlist use needs more: numeric net names, counts (`nstates`), `.options seed` (the full 64-bit range stays available through `--seed`), `maxiter` (`--maxiter` is 64-bit). |
+| Zero tolerances | **Allow abstol ≥ 0 and reltol ≥ 0** (netlist `.options`, CLI, config validation of B-018/B-153); negative values stay errors. When both are 0, print one warning: gating is off, feedback circuits never quiesce in `.tran`, `.op`/`.dc` end at `maxiter`. Needed to verify equivalence with the fixed-step discrete model at zero tolerance (it worked in NDEBUG builds before B-018). Add golden cases (open loop at zero tolerance; lossy ring `.tran` at zero tolerance). |
+| Next sprint | **F-15 approved** (`discover/scout/F-15-engine-performance-and-accounting.md`), including `--stats` (per run: values scheduled, coalesced, processed, emitted, suppressed; max/mean queue length; last emission time; wall time; JSON next to the trace) and documented expert switches for ablation (no coalescing with FIFO ties; event cap). No new globals. |
+| Versioning | **Minor version per upgrade**: v0.2.0 = sprints 2026-10 + 2026-10b + the items above; v0.3.0 = F-15; **v1.0.0 is reserved for the journal publication**. Merges into `dev`/`master`, tags and pushes only on an explicit maintainer request. |
