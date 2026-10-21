@@ -44,7 +44,7 @@ Useful options (all sub-commands that compare):
 |---|---|---|
 | `--rtol`, `--atol` | `1e-9`, `1e-12` | float tolerance: `|a-b| <= atol + rtol*max(|a|,|b|)` |
 | `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt): N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it |
-| `--strict-order` | off | fail if stdout/stderr lines differ only in **order** (see "Known nondeterminism") |
+| `--lenient-order` | off | accept stdout/stderr lines that differ only in **order** in every case (reported as a note). By default only the streams a case lists in `unordered_streams` may be reordered (see "Determinism findings"). `--strict-order` is accepted as a no-op |
 | `--strict` | off | NEW cases (not in the baseline), MISSING cases and a SKIPPED gtest also fail |
 | `--only REGEX` | all | restrict to matching case ids |
 | `--max-file-bytes` | `1e6` | larger outputs are stored gzipped (deterministic, lossless). If still too large, only a lossy summary is kept: per-signal min/max/last for VCDs, line count for text |
@@ -113,7 +113,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * without `--unit-tests` the gtest case is reported as SKIPPED.
 * Per-case keys in `cases.json`:
   * `vcd_ignore_values`: regexes on signal names excluded from the VCD comparison;
-  * `unordered_streams`: streams compared as a multiset of lines even with `--strict-order`;
+  * `unordered_streams`: streams compared as a multiset of lines (a reorder is
+    reported as a note); every other stream must keep its line order;
   * `ignore_streams`, `ignore_files` (globs), `timeout`;
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
@@ -196,11 +197,19 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   * the `--vci` dump;
   * the detector names printed while setting up tracing.
 
-  The order is stable for a given binary, but changes between builds:
-  `-O0` vs `-O3` swaps `uut`/`uut2` in `tb/det*`, and clang reorders the OP
-  listing of `cir/subckt_tests` and `opt/vci`. Reorder-only differences are
-  therefore accepted by default and reported as a note; use `--strict-order`
-  to make them fail. VCD comparison does not depend on declaration order.
+  The order is stable for a given binary (run-to-run identical), but changes
+  between builds (B-016). Line order is checked by default (B-126); the cases
+  whose order differs between the baseline and the gcc, clang and gcc `-O0`
+  Meson builds of 2026-10-21 (SystemC 3.0.2) declare `"unordered_streams":
+  ["stdout"]`: `cir/add_drop_pyspecs`, `cir/subckt_tests`, `opt/tracefile-o`,
+  `opt/mode-sampled-time`, `opt/multi-file`, `opt/vci`,
+  `regress/b031-mzi-bidir`, `regress/b006-empty-output`. These exceptions go
+  away once iteration is name-ordered (F-01). An ASan/UBSan (clang, `-O0`)
+  build also reorders `cir/add_drop`, `cir/subckt_test`, `cir-json/add_drop`,
+  `opt/mode-fd`, `opt/tol-resolution-overrides`, `regress/b150-include-in-subckt`
+  and `err/b017-json-unwritable` (element creation order, "unidir backlog");
+  use `--lenient-order` for such builds. VCD comparison does not depend on
+  declaration order.
 * **Cross-build check:** the same baseline passes for
   * CMake Release (GCC, `-O3`),
   * CMake Debug (`-O0`),

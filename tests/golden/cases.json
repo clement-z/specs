@@ -1,6 +1,6 @@
 {
  "format": 1,
- "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines), rlimit_nofile (soft open-files limit of the specs process).",
+ "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines; every other stream must keep its line order), rlimit_nofile (soft open-files limit of the specs process).",
  "defaults": {
   "timeout": 120,
   "setup": {
@@ -28,7 +28,11 @@
    "args": [
     "-f",
     "circuits/add_drop_pyspecs.cir"
-   ]
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "cir/add_drop_sub",
@@ -77,7 +81,11 @@
    "args": [
     "-f",
     "circuits/subckt_tests.cir"
-   ]
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "cir/triple_ring",
@@ -695,7 +703,10 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "note": "-o overrides the default trace file name"
+   "note": "-o overrides the default trace file name. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
   },
   {
    "id": "opt/tol-resolution-overrides",
@@ -718,7 +729,11 @@
     "sampled-time",
     "-f",
     "circuits/add_drop_pyspecs.cir"
-   ]
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   },
   {
    "id": "opt/mode-fd",
@@ -737,7 +752,10 @@
     "-f",
     "circuits/add_drop.cir"
    ],
-   "note": "several -f files are concatenated"
+   "note": "several -f files are concatenated. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
   },
   {
    "id": "opt/vci",
@@ -746,7 +764,10 @@
     "-f",
     "circuits/subckt_tests.cir"
    ],
-   "note": "verbose component initialisation"
+   "note": "verbose component initialisation. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
   },
   {
    "id": "regress/b031-mzi-bidir",
@@ -763,7 +784,10 @@
      "traces"
     ]
    },
-   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward"
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
   },
   {
    "id": "regress/b036-vci-crow",
@@ -1009,7 +1033,10 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file)"
+   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
   },
   {
    "id": "err/b017-json-unwritable",

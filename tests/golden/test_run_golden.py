@@ -72,5 +72,45 @@ class SignalIds(unittest.TestCase):
         self.assertEqual(a, b)
 
 
+class LineOrder(unittest.TestCase):
+    """B-126: line order matters, except in unordered_streams or with lenient_order."""
+
+    A = "t=0 s: a = 1\nt=0 s: b = 2\nt=1 s: a = 3\nt=1 s: b = 4"
+    B = "t=1 s: a = 3\nt=1 s: b = 4\nt=0 s: a = 1\nt=0 s: b = 2"
+
+    def test_reorder_fails_by_default(self):
+        diffs, _ = rg.compare_case(stored(self.A), stored(self.B), {}, DEFAULT_TOL)
+        self.assertTrue(diffs)
+        self.assertIn("ONLY THE LINE ORDER DIFFERS", diffs[0])
+
+    def test_unordered_stream_passes_with_note(self):
+        diffs, notes = rg.compare_case(stored(self.A), stored(self.B), {"unordered_streams": ["stdout"]}, DEFAULT_TOL)
+        self.assertEqual(diffs, [])
+        self.assertEqual(notes, ["stdout: line order differs (reordered)"])
+
+    def test_unordered_is_per_stream(self):
+        diffs, _ = rg.compare_case(stored("", self.A), stored("", self.B), {"unordered_streams": ["stdout"]}, DEFAULT_TOL)
+        self.assertTrue(diffs)
+
+    def test_lenient_order(self):
+        diffs, notes = rg.compare_case(stored(self.A), stored(self.B), {}, DEFAULT_TOL, lenient_order=True)
+        self.assertEqual(diffs, [])
+        self.assertTrue(notes)
+
+    def test_other_differences_still_fail(self):
+        diffs, _ = rg.compare_case(stored(self.A), stored(self.B.replace("= 4", "= 5")),
+                                   {"unordered_streams": ["stdout"]}, DEFAULT_TOL)
+        self.assertTrue(diffs)
+
+    def test_reordered_signal_prints(self):
+        # The first print of a signal moves: its rank changes, the multiset comparison must not care.
+        lines = SIGNALS.split("\n")
+        moved = "\n".join([lines[3], lines[0], lines[1], lines[2]])
+        base, cand = rg.canonical_ids(SIGNALS), rg.canonical_ids(moved)
+        self.assertNotEqual(sorted(base.split("\n")), sorted(cand.split("\n")))
+        diffs, _ = rg.compare_case(stored(base), stored(cand), {"unordered_streams": ["stdout"]}, DEFAULT_TOL)
+        self.assertEqual(diffs, [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

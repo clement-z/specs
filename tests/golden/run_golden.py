@@ -767,10 +767,12 @@ def dir_size(path):
 # --------------------------------------------------------------------------
 
 
-def compare_case(base, cand, case, tol, strict_order=False):
+def compare_case(base, cand, case, tol, lenient_order=False):
     """Both base/cand are 'stored' dicts (see load_stored).
 
     Returns (diffs, notes): diffs make the case fail, notes are informational.
+    Line order matters, except in the case's unordered_streams (or every stream
+    with lenient_order).
     """
     diffs, notes = [], []
     if base["args"] != cand["args"]:
@@ -793,13 +795,14 @@ def compare_case(base, cand, case, tol, strict_order=False):
             # Same multiset of lines (within tolerance): only the order differs.
             # SPECS iterates SystemC objects in pointer order (std::set<T*>),
             # so listing order depends on memory layout (compiler, flags,
-            # allocation pattern).  Accepted unless --strict-order.
-            if stream in unordered or not strict_order:
+            # allocation pattern, B-016).  Accepted only for the streams a case
+            # declares in unordered_streams, or with --lenient-order.
+            if stream in unordered or lenient_order:
                 notes.append("%s: line order differs (reordered)" % stream)
                 continue
             d = [
-                "%s: ONLY THE LINE ORDER DIFFERS (SPECS iterates objects in pointer order, "
-                "see README 'Known nondeterminism')" % stream
+                "%s: ONLY THE LINE ORDER DIFFERS (pointer-ordered listing? see README "
+                "'Known nondeterminism': unordered_streams, --lenient-order)" % stream
             ] + d[:4]
         diffs += d
     ign = [re.compile(r) for r in case.get("vcd_ignore_values", [])]
@@ -983,7 +986,7 @@ def determinism_check(cases, gspec, args, first_dir):
         with tempfile.TemporaryDirectory(prefix="specs-golden-rep-", dir=args.tmpdir) as td:
             print("Determinism: repeat %d/%d" % (k, args.repeat))
             record_into(Path(td), cases, gspec, args, verbose=False)
-            res = compare_dirs(first_dir, Path(td), cases, tol, verbose=False, strict_order=True)
+            res = compare_dirs(first_dir, Path(td), cases, tol, verbose=False)
             for cid, diffs in res["failed"].items():
                 bad += 1
                 print("  NONDETERMINISTIC %s" % cid)
@@ -994,7 +997,7 @@ def determinism_check(cases, gspec, args, first_dir):
     return 1 if bad else 0
 
 
-def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, strict_order=False):
+def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, lenient_order=False):
     out = {"passed": [], "failed": {}, "new": [], "missing": [], "notes": {}}
     for c in cases:
         cid = c["id"]
@@ -1012,7 +1015,7 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, strict_order=Fals
             if verbose:
                 print("MISSING  %s (not run)" % cid)
             continue
-        diffs, notes = compare_case(b, k, c, tol, strict_order)
+        diffs, notes = compare_case(b, k, c, tol, lenient_order)
         if notes:
             out["notes"][cid] = notes
         if diffs:
@@ -1084,7 +1087,7 @@ def cmd_check(args):
         print("Running %d case(s) against baseline %s" % (len(cases), base))
         record_into(cand, cases, gspec, args, verbose=False)
         write_manifest(cand, cases, args, load_gtest(cand), "candidate")
-        out = compare_dirs(base, cand, cases, tol, strict_order=args.strict_order)
+        out = compare_dirs(base, cand, cases, tol, lenient_order=args.lenient_order)
     finally:
         if td:
             td.cleanup()
@@ -1099,7 +1102,7 @@ def cmd_compare(args):
     spec, cases, gspec = load_cases(args.cases)
     cases = select(cases, args.only)
     tol = Tol(args.rtol, args.atol, args.print_slack)
-    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, strict_order=args.strict_order)
+    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, lenient_order=args.lenient_order)
     if args.report:
         Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     return summarise(out, args.strict)
@@ -1133,9 +1136,11 @@ def main(argv=None):
         )
         p.add_argument("--strict", action="store_true", help="NEW/MISSING/SKIPPED cases also fail")
         p.add_argument(
-            "--strict-order", action="store_true",
-            help="fail when stdout/stderr lines only differ in order (default: accepted, reported as 'reordered')",
+            "--lenient-order", action="store_true",
+            help="accept stdout/stderr lines that only differ in order in every case, reported as 'reordered' "
+            "(default: only in the streams a case lists in unordered_streams)",
         )
+        p.add_argument("--strict-order", action="store_true", help="no-op, kept for old command lines (now the default)")
         p.add_argument("--report", help="write a JSON report to this file")
         if need_specs:
             p.add_argument("--specs", required=True, help="path to the specs binary")
