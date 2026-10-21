@@ -38,11 +38,13 @@ struct Variable {
         NONE,
         TYPE_MAX,
     };
-    Type type;
-    double num;
-    complex<double> cnum;
-    int inum;
-    bool bnum;
+    // Every member is initialised: the defaulted copy assignment copies all of them, and copying an
+    // indeterminate bool is undefined behaviour (UBSan -fsanitize=bool, B-181).
+    Type type = NONE;
+    double num = 0;
+    complex<double> cnum = 0;
+    int inum = 0;
+    bool bnum = false;
     string str;
     vector<Variable> vec;
 
