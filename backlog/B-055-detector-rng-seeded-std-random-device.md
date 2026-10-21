@@ -1,5 +1,5 @@
 # B-055: Detector RNG is seeded from `std::random_device`, twice, with no seed option
-severity: med | category: determinism | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: determinism | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 083c8be (sprint 2026-10b P4, F-01): --seed, .options seed, per-name mt19937_64 streams seeded once in start_of_simulation()
 location: src/devices/detector.cpp:15,132-136, src/devices/detector.h:38-39, src/specs.cpp:359-361
 ## Problem
 `Detector::init()` seeds `m_rngGen` from `std::random_device`. It is called by `prepareSimulation()` (specs.cpp:361) and again at the start of the `on_port_in_changed` thread (detector.cpp:15).
