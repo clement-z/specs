@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-dc-wl-slash.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 427,
+   "kind": "json",
+   "sha256": "78e67098b8b85ad101977a1b4db87993aa3852c8ab5414d3593fd9ae9b3ad5a4",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 3975,
+   "kind": "vcd",
+   "sha256": "a99a4016e67052862899dbf1d1b874dc904c20e978ac7e522a2d7948c3175e43",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f12-dc-wl-slash"
+}

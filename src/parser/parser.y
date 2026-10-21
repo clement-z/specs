@@ -724,6 +724,13 @@ element_attribute: '/' T_STR '/' T_STR
                     delete $2;
                     delete $4;
                 }
+                 | T_STR '(' T_STR ')'
+                {
+                    // ATTR(elem), same as /elem/ATTR (e.g. .dc WL(cwsrc1) ...)
+                    $$ = new pair<string, string>(*$3,*$1);
+                    delete $1;
+                    delete $3;
+                }
 ;
 
 assignment: T_ASSIGN_ID '=' variable

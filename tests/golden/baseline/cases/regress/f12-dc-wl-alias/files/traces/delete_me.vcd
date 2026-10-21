@@ -1,0 +1,159 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaabc  abstol       $end
+$var real    1  aaabd  reltol       $end
+$var wire   32  aaabe  resolution_multiplier [31:0]  $end
+$var wire   32  aaabf  engine_timescale [31:0]  $end
+$var wire   32  aaabg  simulation_mode [31:0]  $end
+$var wire   32  aaabh  analysis_type [31:0]  $end
+$var wire    1  aaabi  trace_all_optical_nets       $end
+$var wire    1  aaabj  verbose_component_initialization       $end
+$scope module PROBE{ROOT/a} $end
+$var real    1  aaaae  power       $end
+$var real    1  aaaaf  abs       $end
+$var real    1  aaaag  phase       $end
+$var real    1  aaaah  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/b} $end
+$var real    1  aaaai  power       $end
+$var real    1  aaaaj  abs       $end
+$var real    1  aaaak  phase       $end
+$var real    1  aaaal  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/c} $end
+$var real    1  aaaam  power       $end
+$var real    1  aaaan  abs       $end
+$var real    1  aaaao  phase       $end
+$var real    1  aaaap  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/d} $end
+$var real    1  aaaaq  power       $end
+$var real    1  aaaar  abs       $end
+$var real    1  aaaas  phase       $end
+$var real    1  aaaat  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in} $end
+$var real    1  aaaau  power       $end
+$var real    1  aaaav  abs       $end
+$var real    1  aaaaw  phase       $end
+$var real    1  aaaax  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out} $end
+$var real    1  aaaay  power       $end
+$var real    1  aaaaz  abs       $end
+$var real    1  aaaba  phase       $end
+$var real    1  aaabb  wavelength       $end
+$upscope $end
+$scope module ROOT/PROBE1 $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.0007163417020255054 aaaaa
+r0.02676456056103865 aaaab
+r-0.7714137940913304 aaaac
+r1.549e-06 aaaad
+r0.0005 aaaae
+r0.0223606797749979 aaaaf
+r0 aaaag
+r1.549e-06 aaaah
+r0.0005 aaaai
+r0.0223606797749979 aaaaj
+r0 aaaak
+r1.549e-06 aaaal
+r0.0005000000000000001 aaaam
+r0.0223606797749979 aaaan
+r-1.333078404580172 aaaao
+r1.549e-06 aaaap
+r0.0005 aaaaq
+r0.0223606797749979 aaaar
+r-0.2097491836024883 aaaas
+r1.549e-06 aaaat
+r0.0009999999999999998 aaaau
+r0.03162277660168379 aaaav
+r0 aaaaw
+r1.549e-06 aaaax
+r0.0007163417020255054 aaaay
+r0.02676456056103865 aaaaz
+r-0.7714137940913304 aaaba
+r1.549e-06 aaabb
+r1e-08 aaabc
+r0.0001 aaabd
+b1 aaabe
+b11111111111111111111111111110011 aaabf
+b11 aaabg
+b1 aaabh
+1aaabi
+0aaabj
+$end
+
+#1
+r0.0007407831248787089 aaaaa
+r0.027217331332787 aaaab
+r-1.348639234577973 aaaac
+r1.5495e-06 aaaad
+r1.5495e-06 aaaah
+r1.5495e-06 aaaal
+r0.0005 aaaam
+r-1.882816919329438 aaaao
+r1.5495e-06 aaaap
+r0.0004999999999999999 aaaaq
+r0.02236067977499789 aaaar
+r-0.8144615498265093 aaaas
+r1.5495e-06 aaaat
+r1.5495e-06 aaaax
+r0.0007407831248787089 aaaay
+r0.027217331332787 aaaaz
+r-1.348639234577973 aaaba
+r1.5495e-06 aaabb
+
+#2
+r0.0007644820051635388 aaaaa
+r0.02764926771477933 aaaab
+r-1.925492271554873 aaaac
+r1.55e-06 aaaad
+r1.55e-06 aaaah
+r1.55e-06 aaaal
+r-2.432200764069288 aaaao
+r1.55e-06 aaaap
+r0.0005000000000000001 aaaaq
+r0.0223606797749979 aaaar
+r-1.418783779040458 aaaas
+r1.55e-06 aaaat
+r1.55e-06 aaaax
+r0.0007644820051635388 aaaay
+r0.02764926771477933 aaaaz
+r-1.925492271554873 aaaba
+r1.55e-06 aaabb
+
+#3
+r0.0007873683219340105 aaaaa
+r0.02806008413982414 aaaab
+r-2.50197326529613 aaaac
+r1.5505e-06 aaaad
+r1.5505e-06 aaaah
+r1.5505e-06 aaaal
+r-2.981230281918082 aaaao
+r1.5505e-06 aaaap
+r0.0005 aaaaq
+r0.02236067977499789 aaaar
+r-2.022716248674177 aaaas
+r1.5505e-06 aaaat
+r1.5505e-06 aaaax
+r0.0007873683219340105 aaaay
+r0.02806008413982414 aaaaz
+r-2.50197326529613 aaaba
+r1.5505e-06 aaabb
+

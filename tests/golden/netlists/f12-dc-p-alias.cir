@@ -1,0 +1,10 @@
+* F-12: .dc ATTR(elem) alias with the power: P(cwsrc1) is the same sweep order as
+* /cwsrc1/P. Circuit of f12-dc-wl-alias.cir at 1550 nm; the output power is
+* proportional to the source power (1 mW, 2 mW, 3 mW, ...).
+cwsrc1 in wl=1.55e-6 power=1e-3
+splitter1 in a b
+wg1 a c length=100e-6 neff=2.35 ng=4.2
+wg2 b d length=110e-6 neff=2.35 ng=4.2
+merger1 c d out
+probe1 out
+.dc P(cwsrc1) 1e-3 4e-3 1e-3

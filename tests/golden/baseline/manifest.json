@@ -73,6 +73,7 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f12-dc-alias-unknown-attr",
   "err/f12-ends-name-mismatch",
   "err/f12-si-unit-letters",
   "err/f28-lossless-ring-dc",
@@ -146,6 +147,9 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f12-dc-p-alias",
+  "regress/f12-dc-wl-alias",
+  "regress/f12-dc-wl-slash",
   "regress/f12-ends-name",
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
@@ -504,6 +508,12 @@
    "only": "^(regress/f12-ends-name|err/f12-ends-name-mismatch)$",
    "gtest": false,
    "note": "F-12 (B-169): .ends NAME cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:02:13Z",
+   "only": "^(regress/f12-dc-(wl-alias|wl-slash|p-alias)|err/f12-dc-alias-unknown-attr)$",
+   "gtest": false,
+   "note": "F-12: .dc ATTR(elem) alias cases"
   }
  ]
 }

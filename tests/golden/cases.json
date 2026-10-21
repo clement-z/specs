@@ -2610,6 +2610,78 @@
    ],
    "expect": "fail",
    "note": "F-12 (B-169): .ends rong closing .subckt ring is rejected with a parsing error naming both names, exit 1"
+  },
+  {
+   "id": "regress/f12-dc-wl-alias",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-wl-alias.cir"
+   ],
+   "note": "F-12: .dc WL(cwsrc1) start stop step (ATTR(elem), the paper/cheatsheet syntax) on an unbalanced MZI; stdout and VCD must be identical to regress/f12-dc-wl-slash (.dc /cwsrc1/WL), only the run manifest differs (netlist path and hash)"
+  },
+  {
+   "id": "regress/f12-dc-wl-slash",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-wl-slash.cir"
+   ],
+   "note": "F-12: reference for regress/f12-dc-wl-alias: the same circuit and sweep with .dc /cwsrc1/WL"
+  },
+  {
+   "id": "regress/f12-dc-p-alias",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-p-alias.cir"
+   ],
+   "note": "F-12: .dc P(cwsrc1) start stop step (power sweep through the ATTR(elem) alias) on the circuit of regress/f12-dc-wl-alias at 1550 nm: output power proportional to the source power"
+  },
+  {
+   "id": "err/f12-dc-alias-unknown-attr",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-alias-unknown-attr.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12: .dc Q(cwsrc1) is rejected with the existing message of the /elem/ATTR form (Unknown attribute for CWSRC1: Q), exit 1"
   }
  ]
 }
