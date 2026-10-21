@@ -342,8 +342,9 @@ Nothing is excluded. Expected-failure cases are kept and documented:
   names follow memory order.
 * That order is stable per binary but differs between builds: Debug swaps `uut`/`uut2`, and clang reorders
   `cir/subckt_tests` and `opt/vci`.
-* Reorder-only stdout differences therefore pass by default with a "reordered" note, and fail with
-  `--strict-order`.
+* Reorder-only stdout differences fail by default since sprint 2026-10b (B-126), except in the streams a
+  case declares in `unordered_streams` (8 cases until F-01 makes iteration name-ordered) or with
+  `--lenient-order`.
 
 **Validation:**
 * `check` passes (exit 0) for:

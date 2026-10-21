@@ -54,6 +54,10 @@ IN_FILE_RE = re.compile(r"In file: (?:\S*/)?([^/\s:]+)(?::\d+)?")
 # Wall-clock timings printed by `specs -t` (main.cpp do_test).
 RUNTIME_RE = re.compile(r"Total runtime: \S+ ms")
 NEG_NAN_RE = re.compile(r"-nan\b")
+# OpticalSignal IDs printed by operator<< (src/optical_signal.h): "[0042]  @ 1550 nm (...)".
+# They come from a global counter that every copy also bumps, so only their identity
+# structure is meaningful.  Also matches the canonical "[#3]" form (see canonical_ids).
+SIGNAL_ID_RE = re.compile(r"\[(\d{4,}|#\d+)\](?= +@ )")
 
 # Numbers embedded in text: not glued to identifiers (PS1, COL_0, uut2 ...).
 NUM_RE = re.compile(
@@ -105,7 +109,41 @@ def normalise_text(text, pathmap):
         out.pop(0)
     while len(out) > 1 and out[-1] == "" and out[-2] == "":
         out.pop()
-    return "\n".join(out)
+    return canonical_ids("\n".join(out))
+
+
+def canonical_ids(text):
+    """Replace every printed OpticalSignal ID by "[#k]", k = rank of its first appearance.
+
+    Prints of the same signal keep the same rank, absolute counter values vanish.
+    """
+    ranks = {}
+    for m in SIGNAL_ID_RE.finditer(text):
+        ranks.setdefault(m.group(1), "[#%d]" % (len(ranks) + 1))
+    if not ranks:
+        return text
+    return SIGNAL_ID_RE.sub(lambda m: ranks[m.group(1)], text)
+
+
+def mask_ids(text):
+    return SIGNAL_ID_RE.sub("[#]", text)
+
+
+def id_profiles(text):
+    """Order-independent identity structure of the signal IDs of a text.
+
+    For each ID, the sorted list of the lines it appears in (IDs and numbers
+    masked); returns the sorted list of these profiles.  Ranks follow line
+    order, so streams compared as a multiset of lines use this instead.
+    """
+    groups = {}
+    for line in text.split("\n"):
+        ids = SIGNAL_ID_RE.findall(line)
+        if ids:
+            shape = NUM_RE.sub("N", mask_ids(line))
+            for i in ids:
+                groups.setdefault(i, []).append(shape)
+    return sorted(sorted(v) for v in groups.values())
 
 
 VCD_DROP_BLOCKS = ("$date", "$version")
@@ -172,9 +210,26 @@ def is_int_token(tok):
     return not any(c in tok for c in ".eE")
 
 
+# Text floats with fewer significant digits than this (B-128) get neither the
+# print slack nor atol: tolerances and config echoes ("1e-08", "0.0001"),
+# parameters, short fixed-point values.  With the default rtol they compare
+# exactly.  Longer tokens keep the slack, at most 1e-4 relative.  gcc, clang,
+# -O0 and ASan builds need no slack at all (2026-10-21).
+PRINT_SLACK_MIN_DIGITS = 5
+FLOAT_TOKEN_RE = re.compile(r"[-+]?(\d*)(?:\.(\d*))?(?:[eE]([-+]?\d+))?$")
+
+
+def sig_digits(tok):
+    """Number of printed significant digits of a number token ("0.00120" -> 3)."""
+    m = FLOAT_TOKEN_RE.match(tok)
+    if not m:
+        return 0
+    return len(((m.group(1) or "") + (m.group(2) or "")).lstrip("0"))
+
+
 def printed_ulp(tok):
     """Value of one unit in the last printed digit of a float token."""
-    m = re.match(r"[-+]?(\d*)(?:\.(\d*))?(?:[eE]([-+]?\d+))?$", tok)
+    m = FLOAT_TOKEN_RE.match(tok)
     if not m:
         return 0.0
     decimals = len(m.group(2) or "")
@@ -205,8 +260,12 @@ def compare_text(a, b, tol, label, limit=10):
                         break
                     continue
                 fx, fy = float(tx), float(ty)
-                extra = tol.slack * max(printed_ulp(tx), printed_ulp(ty))
-                if not tol.floats_close(fx, fy, extra):
+                if max(sig_digits(tx), sig_digits(ty)) < PRINT_SLACK_MIN_DIGITS:
+                    close = Tol(tol.rtol, 0.0, 0.0).floats_close(fx, fy)
+                else:
+                    # The longer token sets the slack: "1" vs "1.99999" must not get a slack of 1.
+                    close = tol.floats_close(fx, fy, tol.slack * min(printed_ulp(tx), printed_ulp(ty)))
+                if not close:
                     ok = False
                     break
         if not ok:
@@ -482,10 +541,19 @@ def load_cases(path):
 
 
 def select(cases, only):
+    """Returns (selected cases, whether the gtest case is selected).
+
+    Exits with status 2 when --only selects nothing (a typo must not pass).
+    """
     if not only:
-        return cases
+        return cases, True
     rx = re.compile(only)
-    return [c for c in cases if rx.search(c["id"])]
+    sel = [c for c in cases if rx.search(c["id"])]
+    gtest = bool(rx.search(GTEST_ID))
+    if not sel and not gtest:
+        print("error: --only %r matches no case (see `run_golden.py list`)" % only, file=sys.stderr)
+        sys.exit(2)
+    return sel, gtest
 
 
 def safe_rel(case_id):
@@ -744,10 +812,12 @@ def dir_size(path):
 # --------------------------------------------------------------------------
 
 
-def compare_case(base, cand, case, tol, strict_order=False):
+def compare_case(base, cand, case, tol, lenient_order=False):
     """Both base/cand are 'stored' dicts (see load_stored).
 
     Returns (diffs, notes): diffs make the case fail, notes are informational.
+    Line order matters, except in the case's unordered_streams (or every stream
+    with lenient_order).
     """
     diffs, notes = [], []
     if base["args"] != cand["args"]:
@@ -763,19 +833,22 @@ def compare_case(base, cand, case, tol, strict_order=False):
         d = compare_text(ta, tb_, tol, stream)
         if not d:
             continue
-        sa = "\n".join(sorted(ta.split("\n")))
-        sb = "\n".join(sorted(tb_.split("\n")))
-        if not compare_text(sa, sb, tol, stream):
+        # Signal ID ranks follow the line order: compare the lines with their IDs
+        # masked, and the ID structure separately (id_profiles).
+        sa = "\n".join(sorted(mask_ids(ta).split("\n")))
+        sb = "\n".join(sorted(mask_ids(tb_).split("\n")))
+        if not compare_text(sa, sb, tol, stream) and id_profiles(ta) == id_profiles(tb_):
             # Same multiset of lines (within tolerance): only the order differs.
             # SPECS iterates SystemC objects in pointer order (std::set<T*>),
             # so listing order depends on memory layout (compiler, flags,
-            # allocation pattern).  Accepted unless --strict-order.
-            if stream in unordered or not strict_order:
+            # allocation pattern, B-016).  Accepted only for the streams a case
+            # declares in unordered_streams, or with --lenient-order.
+            if stream in unordered or lenient_order:
                 notes.append("%s: line order differs (reordered)" % stream)
                 continue
             d = [
-                "%s: ONLY THE LINE ORDER DIFFERS (SPECS iterates objects in pointer order, "
-                "see README 'Known nondeterminism')" % stream
+                "%s: ONLY THE LINE ORDER DIFFERS (pointer-ordered listing? see README "
+                "'Known nondeterminism': unordered_streams, --lenient-order)" % stream
             ] + d[:4]
         diffs += d
     ign = [re.compile(r) for r in case.get("vcd_ignore_values", [])]
@@ -877,7 +950,7 @@ def discover_uncovered(cases, specs, repo):
     return warnings
 
 
-def record_into(outdir, cases, gspec, args, verbose=True):
+def record_into(outdir, cases, gspec, args, with_gtest, verbose=True):
     outdir.mkdir(parents=True, exist_ok=True)
     specs = Path(args.specs).resolve()
     repo = Path(args.repo).resolve()
@@ -892,7 +965,7 @@ def record_into(outdir, cases, gspec, args, verbose=True):
             if verbose:
                 print("  ran %-40s exit=%-14s %6.2fs  files=%d" % (res["id"], res["exit"], res["elapsed"], len(res["files"])))
     gres = None
-    if args.unit_tests:
+    if with_gtest and args.unit_tests:
         gres = run_gtest(Path(args.unit_tests).resolve(), gspec, tmp_root)
         store_gtest(outdir, gres)
         if verbose:
@@ -919,7 +992,7 @@ def write_manifest(outdir, cases, args, gres, note):
 
 def cmd_record(args):
     spec, cases, gspec = load_cases(args.cases)
-    cases = select(cases, args.only)
+    cases, with_gtest = select(cases, args.only)
     outdir = Path(args.out).resolve()
     if outdir.exists() and not args.only:
         # Full re-record: start from a clean tree so stale cases disappear.
@@ -928,7 +1001,10 @@ def cmd_record(args):
     print("Recording %d case(s) into %s" % (len(cases), outdir))
     for w in discover_uncovered(load_cases(args.cases)[1], Path(args.specs).resolve(), Path(args.repo).resolve()):
         print("  WARNING: " + w)
-    _, gres = record_into(outdir, cases, gspec, args)
+    if with_gtest and not args.unit_tests and not args.only:
+        print("  WARNING: the baseline has no %s result (no --unit-tests): `check` will need --no-unit-tests"
+              % GTEST_ID)
+    _, gres = record_into(outdir, cases, gspec, args, with_gtest)
     if args.only and (outdir / "manifest.json").exists():
         old = json.loads((outdir / "manifest.json").read_text(encoding="utf-8"))
         ids = sorted(set(old.get("cases", [])) | {c["id"] for c in cases})
@@ -948,18 +1024,19 @@ def cmd_record(args):
     print("Baseline size: %.1f kB" % (size / 1024.0))
     rc = 0
     if args.repeat > 1:
-        rc = determinism_check(cases, gspec, args, outdir)
+        rc = determinism_check(cases, gspec, args, outdir, with_gtest)
     return rc
 
 
-def determinism_check(cases, gspec, args, first_dir):
+def determinism_check(cases, gspec, args, first_dir, with_gtest):
     tol = Tol(args.rtol, args.atol, args.print_slack)
     bad = 0
     for k in range(2, args.repeat + 1):
         with tempfile.TemporaryDirectory(prefix="specs-golden-rep-", dir=args.tmpdir) as td:
             print("Determinism: repeat %d/%d" % (k, args.repeat))
-            record_into(Path(td), cases, gspec, args, verbose=False)
-            res = compare_dirs(first_dir, Path(td), cases, tol, verbose=False, strict_order=True)
+            record_into(Path(td), cases, gspec, args, with_gtest, verbose=False)
+            gtest = "compare" if with_gtest and args.unit_tests else "off"
+            res = compare_dirs(first_dir, Path(td), cases, tol, gtest, verbose=False)
             for cid, diffs in res["failed"].items():
                 bad += 1
                 print("  NONDETERMINISTIC %s" % cid)
@@ -970,8 +1047,10 @@ def determinism_check(cases, gspec, args, first_dir):
     return 1 if bad else 0
 
 
-def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, strict_order=False):
-    out = {"passed": [], "failed": {}, "new": [], "missing": [], "notes": {}}
+def compare_dirs(base_dir, cand_dir, cases, tol, gtest, verbose=True, lenient_order=False):
+    """gtest: "compare" (missing on either side is MISSING/NEW), "skip" (explicitly
+    not run: reported, not compared) or "off" (not selected by --only: ignored)."""
+    out = {"passed": [], "failed": {}, "new": [], "missing": [], "skipped": [], "notes": {}}
     for c in cases:
         cid = c["id"]
         b = load_stored(base_dir, cid)
@@ -988,7 +1067,7 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, strict_order=Fals
             if verbose:
                 print("MISSING  %s (not run)" % cid)
             continue
-        diffs, notes = compare_case(b, k, c, tol, strict_order)
+        diffs, notes = compare_case(b, k, c, tol, lenient_order)
         if notes:
             out["notes"][cid] = notes
         if diffs:
@@ -1002,7 +1081,13 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, strict_order=Fals
             if verbose:
                 print("PASS     %s%s" % (cid, ("  (" + "; ".join(notes) + ")") if notes else ""))
     gb, gk = load_gtest(base_dir), load_gtest(cand_dir)
-    if gb and gk:
+    if gtest == "off":
+        pass
+    elif gtest == "skip":
+        out["skipped"].append(GTEST_ID)
+        if verbose:
+            print("SKIPPED  %s (--no-unit-tests)" % GTEST_ID)
+    elif gb and gk:
         fatal, notes = compare_gtest(gb, gk)
         if fatal:
             out["failed"][GTEST_ID] = fatal
@@ -1014,32 +1099,34 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, strict_order=Fals
             print("%-8s %s  %s" % ("FAIL" if fatal else "PASS", GTEST_ID, dict(sorted(gk["tests"].items()))))
             for d in fatal + notes:
                 print("    " + d)
-    elif gb and not gk:
+    elif not gk:
+        # Also when the baseline has no gtest result either: the skip must be explicit.
         out["missing"].append(GTEST_ID)
         if verbose:
-            print("SKIPPED  %s (no --unit-tests given / not run)" % GTEST_ID)
-    elif gk and not gb:
+            print("MISSING  %s (no result: give --unit-tests, or --no-unit-tests to skip it explicitly)" % GTEST_ID)
+    else:
         out["new"].append(GTEST_ID)
         if verbose:
             print("NEW      %s (not in baseline)" % GTEST_ID)
     return out
 
 
-def summarise(out, strict):
+def summarise(out, allow_new):
+    """Exit status: FAIL and MISSING always fail, NEW fails unless allow_new."""
     nfail = len(out["failed"])
     nnotes = len([c for c in out["notes"] if c not in out["failed"]])
     print(
-        "\nSummary: %d passed (%d with notes), %d failed, %d new, %d missing/skipped"
-        % (len(out["passed"]), nnotes, nfail, len(out["new"]), len(out["missing"]))
+        "\nSummary: %d passed (%d with notes), %d failed, %d new, %d missing, %d skipped"
+        % (len(out["passed"]), nnotes, nfail, len(out["new"]), len(out["missing"]), len(out["skipped"]))
     )
-    if strict and (out["new"] or out["missing"]):
-        return 1
-    return 1 if nfail else 0
+    if out["new"] and not allow_new:
+        print("NEW cases fail: record them (`record --only ...`), or pass --allow-new while adding cases")
+    return 1 if nfail or out["missing"] or (out["new"] and not allow_new) else 0
 
 
 def cmd_check(args):
     spec, cases, gspec = load_cases(args.cases)
-    cases = select(cases, args.only)
+    cases, with_gtest = select(cases, args.only)
     base = Path(args.baseline).resolve()
     if not (base / "manifest.json").exists():
         raise SystemExit("no manifest.json in baseline %s" % base)
@@ -1058,9 +1145,10 @@ def cmd_check(args):
         cand = Path(td.name)
     try:
         print("Running %d case(s) against baseline %s" % (len(cases), base))
-        record_into(cand, cases, gspec, args, verbose=False)
+        record_into(cand, cases, gspec, args, with_gtest, verbose=False)
         write_manifest(cand, cases, args, load_gtest(cand), "candidate")
-        out = compare_dirs(base, cand, cases, tol, strict_order=args.strict_order)
+        gtest = "off" if not with_gtest else ("skip" if args.no_unit_tests else "compare")
+        out = compare_dirs(base, cand, cases, tol, gtest, lenient_order=args.lenient_order)
     finally:
         if td:
             td.cleanup()
@@ -1068,29 +1156,32 @@ def cmd_check(args):
         print("STALE    %s (in baseline but not in cases.json)" % s)
     if args.report:
         Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
-    return summarise(out, args.strict)
+    return summarise(out, args.allow_new)
 
 
 def cmd_compare(args):
     spec, cases, gspec = load_cases(args.cases)
-    cases = select(cases, args.only)
+    cases, with_gtest = select(cases, args.only)
     tol = Tol(args.rtol, args.atol, args.print_slack)
-    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, strict_order=args.strict_order)
+    gtest = "off" if not with_gtest else ("skip" if args.no_unit_tests else "compare")
+    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, gtest, lenient_order=args.lenient_order)
     if args.report:
         Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
-    return summarise(out, args.strict)
+    return summarise(out, args.allow_new)
 
 
 def cmd_list(args):
     spec, cases, gspec = load_cases(args.cases)
-    for c in select(cases, args.only):
+    cases, with_gtest = select(cases, args.only)
+    for c in cases:
         extra = []
         if c.get("expect"):
             extra.append("expect=" + c["expect"])
         if c.get("vcd_ignore_values"):
             extra.append("vcd_ignore_values")
         print("%-40s specs %s %s" % (c["id"], " ".join(c.get("args", [])), " ".join(extra)))
-    print("%-40s (only with --unit-tests)" % GTEST_ID)
+    if with_gtest:
+        print("%-40s (only with --unit-tests)" % GTEST_ID)
     return 0
 
 
@@ -1105,17 +1196,30 @@ def main(argv=None):
         p.add_argument("--atol", type=float, default=1e-12, help="absolute float tolerance (default 1e-12)")
         p.add_argument(
             "--print-slack", type=float, default=1.0,
-            help="extra tolerance for floats in text, in units of the last printed digit (default 1; 0 disables)",
+            help="extra tolerance for floats in text with %d+ significant digits, in units of the last printed "
+            "digit (default 1; 0 disables). Shorter floats compare with --rtol only" % PRINT_SLACK_MIN_DIGITS,
         )
-        p.add_argument("--strict", action="store_true", help="NEW/MISSING/SKIPPED cases also fail")
         p.add_argument(
-            "--strict-order", action="store_true",
-            help="fail when stdout/stderr lines only differ in order (default: accepted, reported as 'reordered')",
+            "--allow-new", action="store_true",
+            help="NEW cases (in cases.json, not in the baseline) don't fail, e.g. before recording them "
+            "(MISSING cases always fail)",
         )
+        p.add_argument("--strict", action="store_true", help="no-op, kept for old command lines (now the default)")
+        p.add_argument(
+            "--lenient-order", action="store_true",
+            help="accept stdout/stderr lines that only differ in order in every case, reported as 'reordered' "
+            "(default: only in the streams a case lists in unordered_streams)",
+        )
+        p.add_argument("--strict-order", action="store_true", help="no-op, kept for old command lines (now the default)")
         p.add_argument("--report", help="write a JSON report to this file")
         if need_specs:
             p.add_argument("--specs", required=True, help="path to the specs binary")
-            p.add_argument("--unit-tests", help="path to the unit_tests (GoogleTest) binary")
+            g = p.add_mutually_exclusive_group()
+            g.add_argument("--unit-tests", help="path to the unit_tests (GoogleTest) binary")
+            g.add_argument(
+                "--no-unit-tests", action="store_true",
+                help="skip the gtest case explicitly (check fails when it is selected and neither option is given)",
+            )
             p.add_argument("--repo", default=str(DEFAULT_REPO), help="repo root (circuits/ is copied from here)")
             p.add_argument("--jobs", "-j", type=int, default=1, help="parallel cases (default 1)")
             p.add_argument("--tmpdir", default=None, help="where to create per-case working dirs")
@@ -1141,6 +1245,7 @@ def main(argv=None):
     common(p, need_specs=False)
     p.add_argument("--baseline", required=True)
     p.add_argument("--candidate", required=True)
+    p.add_argument("--no-unit-tests", action="store_true", help="skip the gtest case explicitly")
     p.set_defaults(func=cmd_compare)
 
     p = sub.add_parser("list", help="list cases")

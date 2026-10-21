@@ -274,6 +274,12 @@
    "only": "^(cir-json/add_drop_pyspecs|cir/add_drop_pyspecs|err/b148-mzi-args|err/b148-options-args|err/b148-pshift-args|err/b148-tran-args|err/b153-abstol-negative|err/b153-reltol-zero|err/b153-resolution-below-one|err/b153-resolution-negative|err/b153-timescale-out-of-range|err/b165-dc-stray-args|err/b165-dc-stray-kwarg|err/b165-op-stray-args|err/b165-op-stray-kwarg|opt/mode-sampled-time|opt/tol-resolution-overrides|opt/tracefile-o|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b036-vci-crow|regress/b131-nrings-crow|regress/b150-include-in-subckt|regress/b156-many-includes|tb/ac_crow|tb/det|tb/detector|tb/mesh)$",
    "gtest": true,
    "note": "B-065, B-173, B-026: debug prints removed (ws-cleanup C-08). stdout.txt edited in place: old baseline minus exactly the removed lines, proven by backlog/cleanup/C-08-proof.txt; output files untouched"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T01:00:37Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|opt/mode-fd|opt/mode-sampled-time|opt/multi-file|opt/tol-resolution-overrides|opt/tracefile-o|opt/vci|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b150-include-in-subckt|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg)$",
+   "gtest": false,
+   "note": "B-129: printed OpticalSignal IDs replaced by first-appearance ranks [#k] (canonical_ids); stored files rewritten in place, not re-run: line order and values unchanged"
   }
  ]
 }

@@ -225,25 +225,25 @@ trace wavelength: 1
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/X1/ring_bl (OPTICAL) = [0004]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out (OPTICAL) = [0007]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_br (OPTICAL) = [0010]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_tl (OPTICAL) = [0046]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/add (OPTICAL) = [0049]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_tr (OPTICAL) = [0052]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/drop (OPTICAL) = [0055]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X2/N00001 (OPTICAL) = [0058]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X2/N00002 (OPTICAL) = [0061]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out_ (OPTICAL) = [0064]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/in (OPTICAL) = [0001]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_bl (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_br (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tl (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/add (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tr (OPTICAL) = [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X2/N00001 (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X2/N00002 (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out_ (OPTICAL) = [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: [0070]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@1 ns, ROOT/VLSRC1 emitted: [0079]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-@2 ns, ROOT/VLSRC1 emitted: [1723]  @ 1550 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
-@3 ns, ROOT/VLSRC1 emitted: [3219]  @ 1550 nm (nan √W, nan W, nan rad)
-@4 ns, ROOT/VLSRC1 emitted: [3227]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: [#12]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@1 ns, ROOT/VLSRC1 emitted: [#13]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@2 ns, ROOT/VLSRC1 emitted: [#14]  @ 1550 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
+@3 ns, ROOT/VLSRC1 emitted: [#15]  @ 1550 nm (nan √W, nan W, nan rad)
+@4 ns, ROOT/VLSRC1 emitted: [#16]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 4163204 fs
 ╔═══════════════════╗
 ║        DONE       ║

@@ -1,5 +1,5 @@
 # B-126: golden `check` silently accepts any reordering of stdout lines for every case
-severity: med | category: test-gap | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: test-gap | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in b43e7cd (sprint 2026-10b P1)
 location: tests/golden/run_golden.py:755-773 (`compare_case`, condition at :766), :1096-1099 (`--strict-order` help), CLAUDE.md "Testing"
 ## Problem
 If stdout differs, `compare_case` also compares the sorted multiset of lines; if that matches, the difference is reported as a note ("reordered") and the case passes, for all cases, unless `--strict-order` is given. The command mandated in CLAUDE.md does not pass `--strict-order`. The justification (pointer-ordered iteration of `std::set<T*>`) applies to 4 cases only (tb/det, tb/detector under -O0; cir/subckt_tests and opt/vci under clang), but the testbench stdout is a chronological event log: swapping whole time blocks, i.e. making time run backwards or reordering events, still passes.

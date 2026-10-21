@@ -14,9 +14,11 @@ Requirements: Python >= 3.9, standard library only. Always run it isolated:
 ## Usage
 
 ```sh
-# Compare a build against the committed baseline (exit 0 = pass, 1 = fail)
+# Compare a build against the committed baseline (exit 0 = pass, 1 = fail,
+# 2 = --only selects nothing). Give --unit-tests, or --no-unit-tests to skip
+# the gtest case explicitly (without either, it fails as MISSING).
 python3 -I tests/golden/run_golden.py check \
-    --specs <builddir>/specs [--unit-tests <builddir>/src/test/unit_tests] \
+    --specs <builddir>/specs --unit-tests <builddir>/src/test/unit_tests \
     --baseline tests/golden/baseline [-j 4] [--keep /tmp/candidate] [--report report.json]
 
 # (Re-)record a baseline; --repeat N also re-runs everything N-1 times and
@@ -32,7 +34,9 @@ python3 -I tests/golden/run_golden.py list
 ```
 
 With Meson, `check` (default tolerances, `-j 4`, `--unit-tests` when the unit
-tests are built) is also registered as a test (`tests/golden/meson.build`):
+tests are built, `--no-unit-tests` otherwise) is also registered as a test
+(`tests/golden/meson.build`), next to `golden-harness`, the unit tests of
+`run_golden.py` itself (`test_run_golden.py`):
 
 ```sh
 meson test -C <builddir> --suite golden --print-errorlogs
@@ -43,16 +47,20 @@ Useful options (all sub-commands that compare):
 | option | default | meaning |
 |---|---|---|
 | `--rtol`, `--atol` | `1e-9`, `1e-12` | float tolerance: `|a-b| <= atol + rtol*max(|a|,|b|)` |
-| `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt): N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it |
-| `--strict-order` | off | fail if stdout/stderr lines differ only in **order** (see "Known nondeterminism") |
-| `--strict` | off | NEW cases (not in the baseline), MISSING cases and a SKIPPED gtest also fail |
-| `--only REGEX` | all | restrict to matching case ids |
+| `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt) with 5 or more significant digits: N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it. Shorter floats get no slack (B-128) |
+| `--lenient-order` | off | accept stdout/stderr lines that differ only in **order** in every case (reported as a note). By default only the streams a case lists in `unordered_streams` may be reordered (see "Determinism findings"). `--strict-order` is accepted as a no-op |
+| `--allow-new` | off | NEW cases (in `cases.json`, not in the baseline) are reported but don't fail, e.g. while adding a case before recording it. MISSING cases (in the baseline, no result) always fail. `--strict` is accepted as a no-op |
+| `--no-unit-tests` | off | (`check`, `compare`) skip the gtest case explicitly (reported as SKIPPED). Without it, a selected gtest case with no result fails as MISSING, also when the baseline has none |
+| `--only REGEX` | all | restrict to matching case ids (`gtest/unit_tests` included); exit 2 when it matches nothing |
 | `--max-file-bytes` | `1e6` | larger outputs are stored gzipped (deterministic, lossless). If still too large, only a lossy summary is kept: per-signal min/max/last for VCDs, line count for text |
 
 Re-record (and commit) the baseline when a change *intentionally* alters the
 output, e.g. a bug fix. Put the reason in `--note`; it is stored in
 `baseline/manifest.json` (for a partial re-record with `--only`, it is appended to
-the manifest's `rerecords` list together with the regex and the date).
+the manifest's `rerecords` list together with the regex and the date). The
+gtest case is only (re-)recorded when the regex matches `gtest/unit_tests`.
+To add a case: add it to `cases.json`, run `check --allow-new` (the new case is
+reported as NEW, everything else must pass), then `record --only '^<id>$'`.
 
 ## What a case is
 
@@ -77,6 +85,13 @@ For every case the harness records:
   * absolute paths become `<CWD>`, `<BUILD>`, `<REPO>`, `<HOME>`;
   * SystemC `In file: /…/x.cpp:123` becomes `In file: x.cpp`;
   * `-nan` becomes `nan`, and trailing blanks are stripped;
+  * printed OpticalSignal IDs (`[0042]  @ 1550 nm ...`, a global counter that every
+    copy also bumps) become `[#k]`, k = rank of the ID's first appearance in that
+    stream or file (B-129). Prints of the same signal keep the same rank; adding or
+    removing an `OpticalSignal` copy no longer changes the output. Ranks follow line
+    order, so streams compared as a multiset of lines (`unordered_streams`,
+    `--lenient-order`) compare the lines with their IDs masked, plus the ID structure:
+    for each ID, the lines it appears in (IDs and numbers masked);
 * every file created or modified in the working dir (`circuits/` copies excluded):
   * VCD: `$date` and `$version` blocks are stripped;
   * JSON (the `--json` export): stored verbatim and compared structurally;
@@ -88,7 +103,14 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 
 * **Text** (stdout/stderr/.txt) is compared line by line. Numbers embedded in
   text (not glued to identifiers such as `PS1`, `uut2`) use the float tolerance
-  plus the print slack. Integers must match exactly.
+  plus the print slack. Integers must match exactly. Floats with fewer than 5
+  significant digits on both sides (`PRINT_SLACK_MIN_DIGITS`: tolerances and
+  config echoes such as `1e-08` or `0.0001`, parameters, short fixed-point
+  values such as `0.000317`) get neither the print slack nor `--atol`, only
+  `--rtol`: with the default rtol they compare exactly, so `abstol: 1e-12` ->
+  `2e-12` fails (B-128). The threshold keeps the slack for the long computed
+  tokens where another compiler may flip the last digit, at most 1e-4 relative;
+  gcc, clang, gcc `-O0` and clang ASan builds need no slack at all (2026-10-21).
 * **VCD** files are parsed. Signals are matched by hierarchical name
   (`SystemC.PROBE{ROOT/out}.power`), not by id code or declaration order.
   Every signal is treated as a piecewise-constant function of time. Its value
@@ -103,10 +125,13 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * PASS -> FAIL and missing tests fail;
   * FAIL -> PASS and new tests are reported as notes ("improvement;
     re-record");
-  * without `--unit-tests` the gtest case is reported as SKIPPED.
+  * the gtest case is selected when `--only` is not given or matches
+    `gtest/unit_tests`; it then needs `--unit-tests`, otherwise it fails as
+    MISSING, unless `--no-unit-tests` skips it explicitly (SKIPPED).
 * Per-case keys in `cases.json`:
   * `vcd_ignore_values`: regexes on signal names excluded from the VCD comparison;
-  * `unordered_streams`: streams compared as a multiset of lines even with `--strict-order`;
+  * `unordered_streams`: streams compared as a multiset of lines (a reorder is
+    reported as a note); every other stream must keep its line order;
   * `ignore_streams`, `ignore_files` (globs), `timeout`;
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
@@ -189,11 +214,19 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   * the `--vci` dump;
   * the detector names printed while setting up tracing.
 
-  The order is stable for a given binary, but changes between builds:
-  `-O0` vs `-O3` swaps `uut`/`uut2` in `tb/det*`, and clang reorders the OP
-  listing of `cir/subckt_tests` and `opt/vci`. Reorder-only differences are
-  therefore accepted by default and reported as a note; use `--strict-order`
-  to make them fail. VCD comparison does not depend on declaration order.
+  The order is stable for a given binary (run-to-run identical), but changes
+  between builds (B-016). Line order is checked by default (B-126); the cases
+  whose order differs between the baseline and the gcc, clang and gcc `-O0`
+  Meson builds of 2026-10-21 (SystemC 3.0.2) declare `"unordered_streams":
+  ["stdout"]`: `cir/add_drop_pyspecs`, `cir/subckt_tests`, `opt/tracefile-o`,
+  `opt/mode-sampled-time`, `opt/multi-file`, `opt/vci`,
+  `regress/b031-mzi-bidir`, `regress/b006-empty-output`. These exceptions go
+  away once iteration is name-ordered (F-01). An ASan/UBSan (clang, `-O0`)
+  build also reorders `cir/add_drop`, `cir/subckt_test`, `cir-json/add_drop`,
+  `opt/mode-fd`, `opt/tol-resolution-overrides`, `regress/b150-include-in-subckt`
+  and `err/b017-json-unwritable` (element creation order, "unidir backlog");
+  use `--lenient-order` for such builds. VCD comparison does not depend on
+  declaration order.
 * **Cross-build check:** the same baseline passes for
   * CMake Release (GCC, `-O3`),
   * CMake Debug (`-O0`),
@@ -206,7 +239,8 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   The largest numeric deviation was 1.1e-13 relative. All of them also pass
   with `--atol 0`.
 * **Tolerance caveat:** with the default `atol=1e-12`, values below about 1e-3
-  are effectively compared with an absolute tolerance. For example, a
+  are effectively compared with an absolute tolerance (VCD, JSON, and text
+  floats with 5 or more significant digits). For example, a
   photocurrent of 1e-10 A may move by 1%. Use `--atol 0` (passes for every
   build above) for a tighter check.
 * A negative test (a wrapper that perturbs outputs) is caught: a VCD value
