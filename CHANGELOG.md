@@ -96,6 +96,7 @@
 
 Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT.md`).
 
+* Undefined behaviour on every netlist parse: `Variable` copied uninitialised members (found by gcc's UBSan; B-181)
 * Crashes: bidirectional active MZI elaboration (B-031), `specs -t mesh` segfault (B-047), `-o ""` (B-006),
   `X1` without a subcircuit name (B-149), `--vci` on CROW (B-036), output-port error paths (B-020)
 * Bad input now gives a clean error instead of an assert/core dump: positional-argument and config checks

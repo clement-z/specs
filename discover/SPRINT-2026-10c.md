@@ -1,4 +1,4 @@
-# Sprint 2026-10c — plan and status board (PREPARED, NOT LAUNCHED)
+# Sprint 2026-10c — plan and status board (A and B launched 2026-10-21)
 
 **Source of truth for this sprint.** Scope = `backlog/DECISIONS-2026-10-21.md`, sections "Follow-up decisions"
 (d5890f1) and, once answered, "F-15 decisions" (to be added). Branch `sprint/2026-10c`, stacked on
@@ -12,8 +12,8 @@ journal publication. Merges into `dev`/`master`, tags and pushes only on an expl
 ## Phases
 | # | Phase | Items | Workspace / branch | Model | Done marker | Blocked on | State |
 |---|---|---|---|---|---|---|---|
-| A | Decided follow-ups (v0.2.0) | B-146 land; B-014 error option (b); 64-bit integer literals (overflow → parse error); zero tolerances allowed (≥ 0, warning when both 0) | `ws-followups` / `ws/followups` | Opus 5.5 xhigh | `backlog/sprint-2026-10c/PA-REPORT.md` | "go" | prepared |
-| B | Sanitizer CI (gcc ASan/UBSan) green | reproduce locally with gcc (runtimes now installed), fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | "go" | prepared |
+| A | Decided follow-ups (v0.2.0) | B-146 land; B-014 error option (b); 64-bit integer literals (overflow → parse error); zero tolerances allowed (≥ 0, warning when both 0) | `ws-followups` / `ws/followups` (agent f8d8912f) | Opus 5.5 xhigh | `backlog/sprint-2026-10c/PA-REPORT.md` | — | running |
+| B | Sanitizer CI (gcc ASan/UBSan) green | reproduce locally with gcc (runtimes now installed), fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | — | in progress |
 | C | v0.2.0 release prep | CHANGELOG `[0.2.0]`, version `0.2.0` in `meson.build`, `CITATION.cff` citing the ECOC paper (no DOI per version) | coordinator (or Sonnet) | Opus 5.5 | release-prep commit; **stop before tag/merge** | A, B | prepared |
 | D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 xhigh | `PD1-REPORT.md` | C | prepared (F-15 answers confirmed) |
 | D2 | F-15 part 2: bit-identical refactors | squared-norm gate, per-λ S-parameter caches, time-only ordered pending events + single `sc_event` per port, `OpticalSignal` id behind a flag | `ws-engine2` / `ws/engine2` | Opus 5.5 xhigh | `PD2-REPORT.md` | D1 | prepared (F-15 answers confirmed) |
@@ -48,3 +48,4 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 - 2026-10-21 — pushed `sprint/2026-10b` (d5890f1) and `sprint/2026-10c`; 2026-10b workspaces archived, `ws/*` and `P*-wip/*` branches and `/tmp` scratch removed (`P*-ready/*` kept for phase A).
 - 2026-10-21 — Q8 decided: order by time only (same-time order unspecified, deterministic). All F-15 answers confirmed. Waiting for "go" on A/B.
 - 2026-10-21 — backlog B-179 recorded (PUF circuit ring coupling to align before benchmark use; needs-human, decision pending); integer-clamp entry of phase A renumbered B-180.
+- 2026-10-21 — **go for A and B**. A launched (agent f8d8912f, `ws/followups`); B started by the coordinator; coordinator heartbeat ac1c0a21 (5 min, 96 h, registry 2026-10c). C and D not approved yet.
