@@ -23,4 +23,5 @@ Base: `ws/devices` @ 51f0ca2 (= `sprint/2026-10b` after the P2 merge). Baseline 
   prompt + "continue from the current state of the worktree".
 
 ## Final verification
-- pending: fresh gcc + clang + gcc -O0 builds, meson test, golden `--atol 0` on each (line order of the new cases).
+- done: fresh gcc (/tmp/P3-fgcc), clang 19.1.7 (/tmp/P3-fclang), gcc -O0 (/tmp/P3-fdebug): meson test 12/12 and golden
+  134/134 `--atol 0` (0 notes) on each. Report: `backlog/sprint-2026-10b/P3-REPORT.md`. Worktrees removed.
