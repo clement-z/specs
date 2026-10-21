@@ -15,6 +15,31 @@ using spx::ea_signal_type;
 using spx::ed_signal_type;
 using spx::ed_bus_type;
 
+// Value of an .options keyword stored as an unsigned 64-bit integer (seed, maxiter). An integer
+// literal is exact over its whole range, 0 to 2^63 - 1 (B-180); other netlist numbers are doubles,
+// whose integers are exact up to 2^53 only.
+static uint64_t unsigned_integer_option(const string &kw, const Variable &val)
+{
+    if (val.type == Variable::INTEGER)
+    {
+        const int64_t i = val.as_integer();
+        if (i < 0)
+        {
+            cerr << "Error: .options: " << kw << " must be an integer between 0 and "
+                 << std::numeric_limits<int64_t>::max() << " (got " << i << ")" << endl;
+            exit(1);
+        }
+        return static_cast<uint64_t>(i);
+    }
+    const double v = val.as_double();
+    if (!(v >= 0 && v <= 9007199254740992.0 && v == std::trunc(v)))
+    {
+        cerr << "Error: .options: " << kw << " must be an integer between 0 and 2^53 (got " << v << ")" << endl;
+        exit(1);
+    }
+    return static_cast<uint64_t>(v);
+}
+
 void OPTIONSDirective::create() const
 {
     // Verify number of nodes
@@ -91,40 +116,19 @@ void OPTIONSDirective::create() const
         }
         else if (kw == "SEED")
         {
-            // F-01: master seed of the random streams. Netlist numbers are doubles: only the
-            // integers up to 2^53 are exact (specs --seed accepts any 64-bit value)
-            if (p.second.type == Variable::INTEGER && p.second.as_integer() == std::numeric_limits<int>::max())
-            {
-                // the lexer reads a digit string beyond the int range as INT_MAX, silently: such
-                // seeds would all give the same run
-                cerr << "Error: .options: " << kw << "=" << p.second.as_integer()
-                     << ": integer literals from 2147483647 up are read as 2147483647;"
-                     << " write the seed in exponent form (e.g. 3e9) or use specs --seed" << endl;
-                exit(1);
-            }
-            const double v = p.second.as_double();
-            if (!(v >= 0 && v <= 9007199254740992.0 && v == std::trunc(v)))
-            {
-                cerr << "Error: .options: " << kw << " must be an integer between 0 and 2^53 (got " << v << ")" << endl;
-                exit(1);
-            }
+            // F-01: master seed of the random streams (specs --seed accepts any 64-bit value)
+            const uint64_t seed = unsigned_integer_option(kw, p.second);
             // specs --seed takes priority over the netlist
             if (!specsGlobalConfig.seed_explicit)
-                specsGlobalConfig.seed = static_cast<uint64_t>(v);
+                specsGlobalConfig.seed = seed;
         }
         else if (kw == "MAXITER")
         {
-            // F-28: delta cycles allowed per .op/.dc fixed point (0: no limit). Netlist numbers
-            // are doubles: only the integers up to 2^53 are exact
-            const double v = p.second.as_double();
-            if (!(v >= 0 && v <= 9007199254740992.0 && v == std::trunc(v)))
-            {
-                cerr << "Error: .options: " << kw << " must be an integer between 0 and 2^53 (got " << v << ")" << endl;
-                exit(1);
-            }
+            // F-28: delta cycles allowed per .op/.dc fixed point (0: no limit)
+            const uint64_t max_iterations = unsigned_integer_option(kw, p.second);
             // specs --maxiter takes priority over the netlist
             if (!specsGlobalConfig.max_iterations_explicit)
-                specsGlobalConfig.max_iterations = static_cast<uint64_t>(v);
+                specsGlobalConfig.max_iterations = max_iterations;
         }
         else if (kw == "TEST_VARIABLE")
             cout << kw << "(" << p.second.kind() << "): " << p.second.get_str() << endl;

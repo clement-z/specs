@@ -67,8 +67,12 @@
   "err/b165-dc-stray-kwarg",
   "err/b165-op-stray-args",
   "err/b165-op-stray-kwarg",
+  "err/b180-int-literal-kwarg",
+  "err/b180-int-literal-net-name",
+  "err/b180-int-literal-positional",
+  "err/b180-pcmcell-k-beyond-int",
+  "err/b180-pcmcell-n-beyond-int",
   "err/f01-options-seed-huge-integer",
-  "err/f01-options-seed-int-max",
   "err/f01-options-seed-invalid",
   "err/f01-options-seed-negative",
   "err/f01-options-seed-too-large",
@@ -151,9 +155,13 @@
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
   "regress/b159-crossing-backward",
+  "regress/b180-numeric-net-names",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
+  "regress/f01-options-seed-int-literal",
+  "regress/f01-options-seed-int-max",
+  "regress/f01-options-seed-int64-max",
   "regress/f01-options-seed-large",
   "regress/f01-pdet-darkfield",
   "regress/f01-pdet-noise-default-seed",
@@ -612,6 +620,12 @@
    "only": "^(err/b014-delay-rounds-to-zero|err/b014-subckt-wg-rounds-to-zero|regress/b014-device-internal-rounds-to-zero|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-014 option (b): a netlist waveguide whose non-zero delay rounds to 0 is an error (regress/b014-delay-rounds-to-zero becomes err/b014-delay-rounds-to-zero; new err/b014-subckt-wg-rounds-to-zero); device-internal waveguides keep the warning (new regress/b014-device-internal-rounds-to-zero); gtest gains WaveguideDeathTest.DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T15:37:33Z",
+   "only": "^(err/f01-options-seed-huge-integer|regress/f01-options-seed-(int-max|int-literal|int64-max)|(err|regress)/b180-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-180: integer literals are 64-bit, beyond 9223372036854775807 a parse error: err/f01-options-seed-huge-integer gets the parse-error message; err/f01-options-seed-int-max becomes regress/f01-options-seed-int-max (.options seed=2147483647, the P4 guard removed); new regress/f01-options-seed-int-literal, regress/f01-options-seed-int64-max, err/b180-int-literal-{kwarg,positional,net-name}, regress/b180-numeric-net-names, err/b180-pcmcell-{n,k}-beyond-int; gtest gains IntegerLiterals*"
   }
  ]
 }

@@ -1,0 +1,3 @@
+Parsing error (tests/golden/netlists/b180-int-literal-positional.cir:6): integer literal 99999999999999999999 is out of range (the limit is 9223372036854775807)
+-- while parsing line: "cwsrc1 a 1.55e-6 99999999999999999999"
+

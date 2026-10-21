@@ -54,7 +54,7 @@ shared_ptr<sc_object> ParseNet::create_uni(const string &name) const
     return { nullptr };
 }
 
-string ParseNet::name_from_id(int id)
+string ParseNet::name_from_id(int64_t id)
 {
     assert(id >= 0);
     ostringstream ss;

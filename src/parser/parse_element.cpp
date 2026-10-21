@@ -3,6 +3,8 @@
 #include "specs.h"
 #include "utils/strutils.h"
 
+#include <cstdint>
+#include <limits>
 #include <string>
 
 /** ******************************************* **/
@@ -23,6 +25,20 @@ if (bidirectional)\
     obj = (element_type_base *)instantiate_and_connect_bi(pt_helper);\
 else\
     obj = (element_type_base *)instantiate_and_connect_uni(pt_helper);
+
+// Integer parameter stored as an int: a value beyond the int range is an error, not a wrapped value
+// (B-180). Values within it are checked by the device (min_valid is only for the message).
+static int int_parameter(const Variable &v, const string &elem_name, const string &what, int min_valid)
+{
+    const int64_t i = v.as_integer();
+    if (i < std::numeric_limits<int>::min() || i > std::numeric_limits<int>::max())
+    {
+        cerr << "Error (" << elem_name << "): " << what << " must be between " << min_valid << " and "
+             << std::numeric_limits<int>::max() << " (got " << i << ")" << endl;
+        exit(1);
+    }
+    return static_cast<int>(i);
+}
 
 /** ******************************************* **/
 /**               Waveguide                     **/
@@ -1268,7 +1284,7 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
     if(args.size() > 0)
         obj->m_meltEnergy = args[0].as_double();
     if(args.size() > 1)
-        obj->m_nStates = args[1].as_integer();
+        obj->m_nStates = int_parameter(args[1], name, "the number of states n", 1);
     if(args.size() > 2)
     {
         obj->m_Tc = args[2].as_double();
@@ -1288,9 +1304,9 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         if (kw == "MELT_ENERGY" || kw == "EMELT" || kw == "E_MELT")
             obj->m_meltEnergy = p.second.as_double();
         else if (kw == "N" || kw == "NSTATES" || kw == "NLEVELS" || kw == "N_STATES" || kw == "N_LEVELS")
-            obj->m_nStates = p.second.as_integer();
+            obj->m_nStates = int_parameter(p.second, name, "the number of states n", 1);
         else if (kw == "K" || kw == "INITIAL_STATE")
-            obj->m_stateCurrent = p.second.as_integer();
+            obj->m_stateCurrent = int_parameter(p.second, name, "the initial state k", 0);
         else if (kw == "SP" || kw == "TC" || kw == "T_C")
         {
             obj->m_Tc = p.second.as_double();

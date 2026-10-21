@@ -25,8 +25,8 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 | `snapfactor` | 10 | emitted fields below snapfactor·abstol become 0 | >= 0 (0: off) | none |
 | `timescale` (alias `ts`) | -13 | log10 of the engine time step in s: -13 is 100 fs | integer, -15 (1 fs) to 0 (1 s) | `-R`, `--resolution` |
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
-| `seed` | 0 | master seed of the random numbers (see below) | integer, 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
-| `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer, 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
+| `seed` | 0 | master seed of the random numbers (see below) | integer: a literal 0 to 9223372036854775807 (2^63 - 1), exponent form 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
+| `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer: a literal 0 to 2^63 - 1, exponent form 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
@@ -37,11 +37,11 @@ Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_d
   applied directly too and takes priority over `.options maxiter`.
 - `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
-  reproducible: the default seed is 0, and the same netlist and seed give the same values. Netlist numbers
-  are doubles, hence the 2^53 limit of `.options seed`; `--seed` takes any decimal unsigned 64-bit integer.
-  Write netlist seeds of 2147483647 or more in exponent form (`seed=3e9`): the netlist lexer reads longer
-  digit strings as 2147483647 without an error, so `.options seed` rejects that value. See
-  [reproducibility.md](reproducibility.md).
+  reproducible: the default seed is 0, and the same netlist and seed give the same values. An integer
+  literal (`seed=3000000000`) is taken exactly, 0 to 9223372036854775807 (a larger literal is a parse error,
+  B-180); a number with an exponent or a scale suffix (`seed=3e9`) is a double, exact as an integer up to
+  2^53 only, hence that limit. `--seed` takes any decimal unsigned 64-bit integer. The same holds for
+  `maxiter`. See [reproducibility.md](reproducibility.md).
 - `-R` sets the **timescale**, not `.options resolution`: `-R -14` is `.options timescale=-14`.
 - All optical output ports share these values. C++ testbenches can configure single ports differently.
 

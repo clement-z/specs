@@ -2399,10 +2399,10 @@
     "stdout"
    ],
    "expect": "fail",
-   "note": "F-01: .options seed=99999999999999999999 is rejected: the lexer reads digit strings beyond the int range as 2147483647 (pre-existing, P4 'Found, not done'), so .options seed rejects that integer literal with a hint (exponent form or --seed)"
+   "note": "F-01, B-180: .options seed=99999999999999999999 is a parse error: integer literals are 64-bit and this one is beyond 9223372036854775807 (Parsing error (file:7): integer literal ... is out of range (the limit is 9223372036854775807)), exit 1. It was read as 2147483647 and rejected by a guard in .options seed"
   },
   {
-   "id": "err/f01-options-seed-int-max",
+   "id": "regress/f01-options-seed-int-max",
    "setup": {
     "copy": [
      "circuits",
@@ -2416,11 +2416,163 @@
     "-f",
     "tests/golden/netlists/f01-options-seed-int-max.cir"
    ],
+   "note": "F-01, B-180: .options seed=2147483647 (f01-pdet-noise.cir included), the int maximum to which longer literals were clamped (it was rejected, as err/f01-options-seed-int-max): now an ordinary seed, taken exactly; the VCD is identical to the one of specs --seed 2147483647 on f01-pdet-noise.cir"
+  },
+  {
+   "id": "regress/f01-options-seed-int-literal",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int-literal.cir"
+   ],
+   "note": "F-01, B-180: .options seed=3000000000 as an integer literal (beyond the int range, was clamped to 2147483647): the VCD must be identical to the one of regress/f01-seed-large (--seed 3000000000) and regress/f01-options-seed-large (seed=3e9)"
+  },
+  {
+   "id": "regress/f01-options-seed-int64-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int64-max.cir"
+   ],
+   "note": "F-01, B-180: the largest integer literal, .options seed=9223372036854775807 (2^63 - 1), is a valid seed taken exactly (no conversion through double): the VCD is identical to the one of specs --seed 9223372036854775807 on f01-pdet-noise.cir"
+  },
+  {
+   "id": "err/b180-int-literal-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-kwarg.cir"
+   ],
    "ignore_streams": [
     "stdout"
    ],
    "expect": "fail",
-   "note": "F-01: .options seed=3000000000 (integer literal beyond the int range, read as 2147483647) is rejected with the same hint as err/f01-options-seed-huge-integer"
+   "note": "B-180: an integer literal beyond 9223372036854775807 in a keyword argument (power=9223372036854775808, i.e. 2^63) is a parse error with file:line and the limit, exit 1 (was clamped to 2147483647 silently)"
+  },
+  {
+   "id": "err/b180-int-literal-positional",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-positional.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: an integer literal beyond 9223372036854775807 in a positional argument (CWSRC power 99999999999999999999) is a parse error with file:line and the limit, exit 1 (was clamped to 2147483647 silently)"
+  },
+  {
+   "id": "err/b180-int-literal-net-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-net-name.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: a numeric net name beyond 9223372036854775807 (18446744073709551616, i.e. 2^64) is a parse error with file:line and the limit, exit 1 (was net N2147483647)"
+  },
+  {
+   "id": "regress/b180-numeric-net-names",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-numeric-net-names.cir"
+   ],
+   "note": "B-180: numeric net names use the full 64-bit range: nets 3000000000 and 9223372036854775807 are N3000000000 and N9223372036854775807 (3000000000 was N2147483647); 7 keeps its zero padding (N00007); .op gives 1 mW on all three"
+  },
+  {
+   "id": "err/b180-pcmcell-n-beyond-int",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-pcmcell-n-beyond-int.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: PCMCELL stores n as an int: n=3000000000 (a 64-bit integer literal beyond the int range) is rejected with Error (ROOT/PCMCELL1): the number of states n must be between 1 and 2147483647 (got 3000000000), exit 1 (was clamped to 2147483647)"
+  },
+  {
+   "id": "err/b180-pcmcell-k-beyond-int",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-pcmcell-k-beyond-int.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: PCMCELL stores the initial state k as an int: k=3e9 (a double beyond the int range) is rejected with Error (ROOT/PCMCELL1): the initial state k must be between 0 and 2147483647 (got 3000000000), exit 1 (the double-to-int conversion was undefined behaviour)"
   },
   {
    "id": "regress/f01-manifest",

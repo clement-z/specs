@@ -8,20 +8,20 @@
 -----------
 0 local assignments
 -----------
-1 elements
- - ROOT/PDET1 (PHOTODETECTOR) ROOT/a ROOT/v1 {} {nb (INTEGER) = 0, }
+2 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/PCMCELL1 (PCM CELL) ROOT/in ROOT/out {} {emelt (DOUBLE) = 1e-12, n (INTEGER) = 3000000000, ta (DOUBLE) = 0.95, tc (DOUBLE) = 0.85, }
 -----------
 2 named nets
- - ROOT/a: OANALOG<1>u (0|1)
- - ROOT/v1: EANALOG<1>u (0|0)
+ - ROOT/in: OANALOG<1>u (1|1)
+ - ROOT/out: OANALOG<1>u (1|0)
 -----------
-1 directives
- - DIRECTIVE[OPTIONS] {} {seed (INTEGER) = 2147483647, }
+0 directives
 -----------
 0 subcircuits
 -----------
 1 analyses
- - ANALYSIS[TRAN] {1e-11 (DOUBLE), } {}
+ - ANALYSIS[OP] {} {}
 ╔══════════════════════╗
 ║   BUILDING CIRCUIT   ║
 ╚══════════════════════╝
@@ -29,8 +29,8 @@ Flattening...
 Flattening ROOT
 Done (flattening)
 Done with bidirectional nets
-Elaborating network of ROOT/a...
-Creating ROOT/PDET1 (reason: connection to unidir net)
-Done creating ROOT/PDET1
-Done (elaborating network of ROOT/a)
+Elaborating network of ROOT/in...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/PCMCELL1 (reason: unidir backlog)
 

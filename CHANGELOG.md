@@ -42,7 +42,7 @@
 * `.options snapfactor=<x>`: emitted fields with |E| < snapfactor·abstol are emitted as 0 (default 10, as
   before; 0 disables the snap) (B-021)
 * Reproducible runs (F-01, `doc/reproducibility.md`):
-  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (0 to 2^53; `--seed` wins):
+  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (an integer literal 0 to 2^63 − 1, exponent form 0 to 2^53, B-180; `--seed` wins):
     one master seed for every random draw, **default 0**, so runs are reproducible by default. Each device
     draws from its own stream, derived from the seed and its hierarchical name (adding or reordering other
     devices does not change it); the streams are the same with every standard library (`std::mt19937_64`,
@@ -104,6 +104,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   splitter ratio (B-034), stray `.op`/`.dc` arguments (B-165), `.ic` (B-161), unwritable `--json` path (B-017);
   file-open errors name the file (B-064)
 * Parser: `.include` inside `.subckt` (B-150), files opened by `.include` are closed (B-156), memory leaks (B-170)
+* Integer literals are 64-bit (0 to 9223372036854775807) and a larger one is a parse error with its file and line;
+  they were clamped to 2147483647 silently (`.options seed=3000000000` was seed 2147483647, net `3000000000` was
+  `N2147483647`). `.options seed`/`maxiter` take integer literals exactly; PCMCELL `n`/`k` beyond the int range
+  are an error (B-180)
 * `--nrings_crow` sets the number of CROW rings (B-131); CROW children are prefixed with the instance name (B-072)
 * Detector readouts start at 0 instead of uninitialised memory (B-054); BitstreamSource saturation message (B-044)
 * JSON export writes the writers count, not the readers count (B-154)

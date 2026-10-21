@@ -1,8 +1,8 @@
-* F-01: .options seed=99999999999999999999 is rejected. The lexer reads a digit string beyond the
-* int range as 2147483647 without an error (pre-existing, held back for sign-off), so every such
-* seed would give the same run; .options seed rejects 2147483647 as an integer literal instead.
-* Expected: "Error: .options: SEED=2147483647: integer literals from 2147483647 up are read as
-*   2147483647; write the seed in exponent form (e.g. 3e9) or use specs --seed", exit 1
+* F-01, B-180: .options seed=99999999999999999999 is a parse error. Integer literals are 64-bit: a
+* literal beyond 9223372036854775807 is rejected by the lexer (it was read as 2147483647, silently).
+* Expected: "Parsing error (tests/golden/netlists/f01-options-seed-huge-integer.cir:7): integer literal
+*   99999999999999999999 is out of range (the limit is 9223372036854775807)", then
+*   -- while parsing line: ".options seed=99999999999999999999", exit 1
 pdet1 a v1 nb=0
 .options seed=99999999999999999999
 .tran 10e-12

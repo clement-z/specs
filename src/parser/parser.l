@@ -35,7 +35,11 @@ EOL {EOL_PORTABLE}
 
 %{
 #include <algorithm> // for std::clamp
+#include <charconv> // for std::from_chars (integer literals)
+#include <cstdint>
 #include <cstdlib> // for strtol
+#include <limits>
+#include <system_error> // for std::errc
 #include <string>
 #include <sstream> // for conversions of numbers from str
 #include <cstring> // for strcpy
@@ -384,8 +388,18 @@ string convert_special_char(char c)
 
 (?# [+-]?{D}+)
 {D}+ {
-    /* signed integer number */
-    yylval_param->i_val = from_string<int>(yytext);
+    /* integer number: 64-bit signed; a literal beyond its range is a parse error, not a clamped value (B-180) */
+    int64_t val = 0;
+    const auto res = std::from_chars(yytext, yytext + yyleng, val);
+    if (res.ec != std::errc())
+    {
+        stringstream msg;
+        msg << "integer literal " << yytext << " is out of range (the limit is "
+            << std::numeric_limits<int64_t>::max() << ")";
+        yylerror(yyscanner, msg.str().c_str());
+        exit(1);
+    }
+    yylval_param->i_val = val;
     return T_INT;
 }
 
