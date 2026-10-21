@@ -17,6 +17,7 @@
 #include "optical_output_port.h"
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
+#include <utils/version.h>
 
 class OpticalOutputPort;
 
@@ -224,6 +225,10 @@ int sc_main(int argc, char *argv[])
                           "export_json",
                           "Export json of completed circuit to file",
                           { "json" });
+    args::Flag print_version(parser,
+                          "version",
+                          "Output version information and exit",
+                          { "version" });
     args::Flag set_dry_run(parser,
                           "dry_run",
                           "Do not run simulation directives",
@@ -287,6 +292,10 @@ int sc_main(int argc, char *argv[])
 
     map<string,string> option_overrides;
 
+    if (print_version) {
+        std::cout << spx::version::full << std::endl;
+        return 0;
+    }
     if (set_simulator_mode) {
         const string &s = set_simulator_mode.Get();
         if (strutils::iequals(s, "event-driven") || strutils::iequals(s, "time-domain") || strutils::iequals(s, "td"))
