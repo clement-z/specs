@@ -94,6 +94,9 @@ public:
     // Simulation options
     EngineTimescale engine_timescale = HUNDRED_FS;
     OpticalOutputPortMode simulation_mode;
+    // Set when simulation_mode was chosen explicitly (specs -m): the analyses (.op/.dc/.tran)
+    // then keep it instead of applying their default mode (B-004)
+    bool simulation_mode_explicit = false;
     AnalysisType analysis_type;
     map<string, pair<function<void(double)>, vector<double>>> cw_sweep_orders;
     double tran_duration = std::numeric_limits<double>::infinity();
@@ -150,6 +153,9 @@ public:
             invalid("timescale must be between -15 (1 fs) and 0 (1 s)", engine_timescale);
         if (!(PORT_MODE_MINVAL < simulation_mode && simulation_mode < PORT_MODE_MAXVAL))
             invalid("unknown simulation mode", simulation_mode);
+        // B-002: OpticalOutputPort::delayedWriteSampledTime() is a TODO that drops every write
+        if (simulation_mode == SAMPLED_TIME)
+            invalid("sampled-time simulation mode is not implemented", simulation_mode);
         if (!(ANALYSIS_TYPE_MINVAL < analysis_type && analysis_type < ANALYSIS_TYPE_MAXVAL))
             invalid("unknown analysis type", analysis_type);
     }

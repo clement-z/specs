@@ -142,7 +142,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 |---|---|---|
 | `cir/*` (9) | every `circuits/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
 | `cir-json/*` (4) | `-n --json flat.json -f` on the 4 netlists that parse | flattened-netlist JSON export, dry run |
-| `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time`, `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
+| `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
 | `err/bNNN-*` (29) | bad inputs from the 2026-10 fix phase (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
@@ -157,6 +157,7 @@ is visible; re-record when it is fixed on purpose.
 * `cir/paul_3ring_puf`: the VLSRC values file
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
 * `cli/unknown-testbench`, `cli/missing-netlist`, `cli/bad-mode`: exit 1 by design.
+* `opt/mode-sampled-time`: `-m sampled-time` is not implemented and rejected (B-002), exit 1.
 * `err/*`: exit 1 by design. Most of them set `ignore_streams: [stdout]`, so only
   the exit status and the error message are compared.
 
@@ -219,8 +220,8 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   whose order differs between the baseline and the gcc, clang and gcc `-O0`
   Meson builds of 2026-10-21 (SystemC 3.0.2) declare `"unordered_streams":
   ["stdout"]`: `cir/add_drop_pyspecs`, `cir/subckt_tests`, `opt/tracefile-o`,
-  `opt/mode-sampled-time`, `opt/multi-file`, `opt/vci`,
-  `regress/b031-mzi-bidir`, `regress/b006-empty-output`. These exceptions go
+  `opt/multi-file`, `opt/vci`, `regress/b031-mzi-bidir`,
+  `regress/b006-empty-output`, `regress/b004-mode-fd-tran`. These exceptions go
   away once iteration is name-ordered (F-01). An ASan/UBSan (clang, `-O0`)
   build also reorders `cir/add_drop`, `cir/subckt_test`, `cir-json/add_drop`,
   `opt/mode-fd`, `opt/tol-resolution-overrides`, `regress/b150-include-in-subckt`

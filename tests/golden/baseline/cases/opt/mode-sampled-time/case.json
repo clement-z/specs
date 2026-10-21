@@ -5,14 +5,7 @@
   "-f",
   "circuits/add_drop_pyspecs.cir"
  ],
- "exit": 0,
- "files": {
-  "traces/delete_me.vcd": {
-   "bytes": 403590,
-   "kind": "vcd",
-   "sha256": "e1987f939106bfffca2c879b7b10557f2909da0d5c41673c9feed4d2da86acfa",
-   "stored": "files/traces/delete_me.vcd"
-  }
- },
+ "exit": 1,
+ "files": {},
  "id": "opt/mode-sampled-time"
 }

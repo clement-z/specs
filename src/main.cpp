@@ -219,8 +219,9 @@ int sc_main(int argc, char *argv[])
         }
         else if (strutils::iequals(s, "sampled-time"))
         {
-            cout << "Optical ports working in sampled-time mode by default" << endl;
-            specsGlobalConfig.simulation_mode = OpticalOutputPortMode::SAMPLED_TIME;
+            // B-002: OpticalOutputPort::delayedWriteSampledTime() is a TODO that drops every write
+            cerr << "Error: sampled-time mode is not implemented" << endl;
+            return 1;
         }
         else if (strutils::iequals(s, "frequency-domain") || strutils::iequals(s, "fd"))
         {
@@ -232,6 +233,8 @@ int sc_main(int argc, char *argv[])
             cerr << "Unknown mode: '" << s << "'" << endl;
             return 1;
         }
+        // B-004: an explicit -m takes priority over the default mode of the netlist's analysis
+        specsGlobalConfig.simulation_mode_explicit = true;
     }
 
     if (set_reltol) {

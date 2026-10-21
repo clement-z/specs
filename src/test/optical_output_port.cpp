@@ -118,3 +118,20 @@ TEST(OpticalOutputPort, FrequencyDomainWriteMergesBehindQueueTop)
     }
     SPECS_TEST_FOOTER();
 }
+
+// Sampled-time mode is not implemented (delayedWriteSampledTime() drops every
+// write): a port configured with it must be rejected when the configuration is
+// applied, with a clean error and exit 1, not per event (B-002).
+TEST(OpticalOutputPortDeathTest, ApplyConfigRejectsSampledTime)
+{
+    SPECS_TEST_HEADER()
+    {
+        OOPHarness h("h");
+        auto config = make_shared<OpticalOutputPortConfig>();
+        config->m_mode = OpticalOutputPortMode::SAMPLED_TIME;
+        h.m_out_writer.setConfig(config);
+
+        EXPECT_EXIT(h.m_out_writer.applyConfig(), testing::ExitedWithCode(1), "sampled-time mode is not implemented");
+    }
+    SPECS_TEST_FOOTER();
+}

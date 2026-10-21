@@ -70,6 +70,9 @@
   "opt/tracefile-o",
   "opt/vci",
   "regress/b001-fd-multilambda-stale",
+  "regress/b004-mode-fd-tran",
+  "regress/b004-mode-td-dc",
+  "regress/b004-mode-td-op",
   "regress/b006-empty-output",
   "regress/b031-mzi-bidir",
   "regress/b036-vci-crow",
@@ -333,6 +336,18 @@
    "only": "^gtest/unit_tests$",
    "gtest": true,
    "note": "B-060: new gtests PCMElementDeathTest.*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:30:10Z",
+   "only": "^(opt/mode-sampled-time|regress/b004-mode-(fd-tran|td-op|td-dc))$",
+   "gtest": false,
+   "note": "B-002/B-004: -m sampled-time is a clean error (exit 1); new cases: explicit -m overrides the analysis default mode (-m fd .tran, -m td .op/.dc)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:30:10Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "B-002: new gtest OpticalOutputPortDeathTest.ApplyConfigRejectsSampledTime"
   }
  ]
 }

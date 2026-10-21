@@ -50,6 +50,13 @@ void OpticalOutputPort::applyConfig() {
         cerr << "Did you forget to run prepareSimulation() ?" << endl;
         exit(1);
     }
+    if (m_config->m_mode == OpticalOutputPortMode::SAMPLED_TIME)
+    {
+        // B-002: delayedWriteSampledTime() is a TODO that drops every write. Rejected
+        // here, at configuration time, rather than in delayedWrite() (per event)
+        cerr << "Error: " << name() << ": sampled-time mode is not implemented" << endl;
+        exit(1);
+    }
 
     m_temporal_resolution = sc_time::from_value(m_config->m_timestep_value);
     m_mode = m_config->m_mode;
@@ -215,7 +222,7 @@ void OpticalOutputPort::delayedWriteSampledTime(const OpticalSignal &value, cons
     (void)value;
     (void)delay;
     (void)resolution_multiplier;
-    // TODO
+    // TODO (until then, SAMPLED_TIME is rejected by SPECSConfig::verifyConfig() and applyConfig(), B-002)
     // Goal here will be to manage, maybe, some averaging
     // i.e. when we output sampled-time, if we receive event-driven signals, we convert them
     // to sampled-time by averaging over the timestep and emitting the average

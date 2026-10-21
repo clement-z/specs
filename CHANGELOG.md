@@ -66,6 +66,9 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
   parameters (B-051)
 * PCMCELL rejects `n` <= 0 and an initial state `k` outside [0, n] (B-060; the PCM model itself is unchanged)
+* `-m sampled-time` is rejected with an error (it was not implemented and silently dropped every optical write);
+  an explicit `-m` now takes priority over the default mode of the netlist's `.op`/`.dc`/`.tran` (it was
+  silently overridden), e.g. `-m fd` runs a `.tran` in frequency domain (B-002, B-004)
 
 ### Removed
 

@@ -730,10 +730,11 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "unordered_streams": [
+   "ignore_streams": [
     "stdout"
    ],
-   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "expect": "fail",
+   "note": "B-002: sampled-time is not implemented (delayedWriteSampledTime() dropped every write): -m sampled-time is rejected with a clean error, exit 1 (was exit 0; before B-004 the .tran directive silently overrode the mode)"
   },
   {
    "id": "opt/mode-fd",
@@ -1410,6 +1411,48 @@
    ],
    "expect": "fail",
    "note": "B-060: PCMCELL with initial state k = n + 1 gives a clean error (was accepted)"
+  },
+  {
+   "id": "regress/b004-mode-fd-tran",
+   "args": [
+    "-m",
+    "fd",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-004: an explicit -m overrides the .tran default (time domain): the transient runs in frequency domain (NO_DELAY ports), i.e. a CW steady state at each source event (drop ~1 W from 500 ps to 2 ns, no ring build-up). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b004-mode-td-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-m",
+    "td",
+    "-f",
+    "tests/golden/netlists/b004-mode-td-op.cir"
+   ],
+   "note": "B-004: an explicit -m td is kept with .op (was overridden to frequency domain); the operating point is unchanged (OP runs every port in NO_DELAY mode)"
+  },
+  {
+   "id": "regress/b004-mode-td-dc",
+   "args": [
+    "-m",
+    "td",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "B-004: an explicit -m td is kept with .dc (was overridden to frequency domain); the sweep is unchanged (DC runs every port in NO_DELAY mode), only the printed and traced simulation_mode differ from cir/add_drop"
   }
  ]
 }

@@ -10,6 +10,7 @@
   "OpticalOutputPort.EmptyQueueStopsWithoutEmitting": "PASS",
   "OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop": "PASS",
   "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
+  "OpticalOutputPortDeathTest.ApplyConfigRejectsSampledTime": "PASS",
   "PCMElementDeathTest.CheckParametersRejectsInvalidStates": "PASS",
   "PCMElementDeathTest.StartOfSimulationChecksParameters": "PASS",
   "SPECSConfig.VerifyConfigAcceptsValidValues": "PASS",

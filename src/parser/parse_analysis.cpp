@@ -23,7 +23,9 @@ using spx::ed_bus_type;
 void OPAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::OP;
-    specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+    // default mode of the analysis, unless one was given explicitly (-m, B-004)
+    if (!specsGlobalConfig.simulation_mode_explicit)
+        specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
 
     if (args.size() > 0)
     {
@@ -42,7 +44,9 @@ void OPAnalysis::create() const
 void DCAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::DC;
-    specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+    // default mode of the analysis, unless one was given explicitly (-m, B-004)
+    if (!specsGlobalConfig.simulation_mode_explicit)
+        specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
 
     if (args.size() > 0)
     {
@@ -110,7 +114,9 @@ void DCAnalysis::create() const
 void TRANAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
-    specsGlobalConfig.simulation_mode = OpticalOutputPortMode::TIME_DOMAIN;
+    // default mode of the analysis, unless one was given explicitly (-m, B-004)
+    if (!specsGlobalConfig.simulation_mode_explicit)
+        specsGlobalConfig.simulation_mode = OpticalOutputPortMode::TIME_DOMAIN;
 
     if (args.size() > 1)
     {

@@ -40,6 +40,8 @@ TEST(SPECSConfigDeathTest, VerifyConfigRejectsInvalidValues)
         EXPECT_EXIT({ c.engine_timescale = SPECSConfig::EngineTimescale(-16); c.verifyConfig(); }, rejected, "invalid configuration: timescale");
         EXPECT_EXIT({ c.engine_timescale = SPECSConfig::EngineTimescale(1); c.verifyConfig(); }, rejected, "invalid configuration: timescale");
         EXPECT_EXIT({ c.simulation_mode = PORT_MODE_MAXVAL; c.verifyConfig(); }, rejected, "invalid configuration: .*simulation mode");
+        // B-002: not implemented (delayedWriteSampledTime() drops every write)
+        EXPECT_EXIT({ c.simulation_mode = SAMPLED_TIME; c.verifyConfig(); }, rejected, "invalid configuration: sampled-time simulation mode is not implemented");
         EXPECT_EXIT({ c.analysis_type = SPECSConfig::ANALYSIS_TYPE_MAXVAL; c.verifyConfig(); }, rejected, "invalid configuration: .*analysis type");
     }
     SPECS_TEST_FOOTER();
