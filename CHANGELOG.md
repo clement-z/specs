@@ -33,7 +33,8 @@
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)
 * SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
-* `doc/netlist.md`: nets, positional arguments and keywords of netlist elements (complements the cheatsheet)
+* `doc/netlist.md`: nets, positional arguments and keywords of COUPLER, CWSRC, VLSRC, EVLSRC and PCMCELL
+  (complements the cheatsheet)
 
 ### Fixed
 
@@ -70,6 +71,9 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
   parameters (B-051)
 * PCMCELL rejects `n` <= 0 and an initial state `k` outside [0, n] (B-060; the PCM model itself is unchanged)
+* COUPLER: `k` is documented as the field cross-coupling (P_cross = k²), `kp` the power ratio and `t` the through
+  field coefficient (`doc/netlist.md`; the paper's κ = 0.15 is a power ratio, i.e. `kp`); the misleading
+  per-instance "Warning: coupling power for DC currently set to field." is gone (B-037)
 * `-m sampled-time` is rejected with an error (it was not implemented and silently dropped every optical write);
   an explicit `-m` now takes priority over the default mode of the netlist's `.op`/`.dc`/`.tran` (it was
   silently overridden), e.g. `-m fd` runs a `.tran` in frequency domain (B-002, B-004)

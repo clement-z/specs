@@ -374,6 +374,12 @@
    "only": "^regress/b14[457]-",
    "gtest": false,
    "note": "B-144/B-145/B-147: new cases, next-free-slot convention on bidirectional nets (hand-checked values in the netlist headers)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:37:13Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/paul_3ring_puf|cir/subckt_tests|regress/b150-include-in-subckt|cir-json/add_drop|cir-json/add_drop_pyspecs|cir-json/subckt_tests|opt/tracefile-o|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|opt/vci|regress/b006-empty-output|err/b017-json-unwritable|regress/b004-mode-fd-tran|regress/b004-mode-td-op|regress/b004-mode-td-dc|regress/b145-upgrade-roles|err/b034-coupler-k-gt-1|err/b034-coupler-kp-negative)$",
+   "gtest": false,
+   "note": "B-037: the per-instance 'Warning: coupling power for DC currently set to field.' line is removed from stdout (verified: the only difference)"
   }
  ]
 }

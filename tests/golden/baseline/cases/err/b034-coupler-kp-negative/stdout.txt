@@ -34,5 +34,4 @@ Done (flattening)
 Done with bidirectional nets
 Elaborating network of ROOT/_0...
 Creating ROOT/COUPLER1 (reason: connection to unidir net)
-Warning: coupling power for DC currently set to field.
 

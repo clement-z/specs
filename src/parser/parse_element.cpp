@@ -286,9 +286,6 @@ INSTANTIATE_AND_CONNECT_BI(DCElement, pt_helper)
 
 sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
 {
-    // TODO: change from field to power?
-    cout << "Warning: coupling power for DC currently set to field." << endl;
-
     element_type_base *obj = nullptr;
 
     // Verify number of nets
@@ -310,10 +307,10 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
 
     // Parse positional arguments
     if(args.size() > 0)
-        // convert from cross-coupling field coef
+        // k, cross-coupling field coef (P_cross = k^2): through power = 1 - k^2
         obj->m_dc_through_coupling_power = 1 - pow(args[0].as_double(), 2);
     if(args.size() > 1)
-        obj->m_dc_loss = args[1].as_double();
+        obj->m_dc_loss = args[1].as_double(); // insertion loss in dB
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -321,16 +318,16 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "K" || kw == "KF" || kw == "KFIELD")
-            // convert from cross-coupling field coef
+            // k, cross-coupling field coef (P_cross = k^2): through power = 1 - k^2
             obj->m_dc_through_coupling_power = 1 - pow(p.second.as_double(), 2);
         else if (kw == "KP" || kw == "KPOW" || kw == "KPOWER")
-            // power cross-coupling coefficient
+            // kp, cross-coupling power ratio (P_cross = kp): through power = 1 - kp
             obj->m_dc_through_coupling_power = 1 - p.second.as_double();
         else if (kw == "T")
-            // through field coefficient
+            // t, through field coef (P_through = t^2): through power = t^2
             obj->m_dc_through_coupling_power = pow(p.second.as_double(), 2);
         else if (kw == "LOSS")
-            obj->m_dc_loss = p.second.as_double();
+            obj->m_dc_loss = p.second.as_double(); // insertion loss in dB
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);

@@ -46,14 +46,12 @@ Done (flattening)
 Done with bidirectional nets
 Elaborating network of ROOT/X1/ring_bl...
 Creating ROOT/X1/COUPLER1 (reason: connection to unidir net)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/X1/COUPLER1
 Creating ROOT/VLSRC1 (reason: unidir backlog)
 Done creating ROOT/VLSRC1
 Creating ROOT/X1/WG_RING_L (reason: unidir backlog)
 Done creating ROOT/X1/WG_RING_L
 Creating ROOT/X1/COUPLER2 (reason: unidir backlog)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/X1/COUPLER2
 Creating ROOT/X1/WG_RING_R (reason: unidir backlog)
 Done creating ROOT/X1/WG_RING_R
@@ -144,27 +142,6 @@ group delay = 0.00755089 ns
 phase delay = 0.00737544 ns (3.24293rad @1.55)
 ROOT/X2/N00002 --> ROOT/out_
 
-PROBE{ROOT/X1/ring_bl}:
-Signal: ROOT/X1/ring_bl
-trace power: 1
-trace modulus: 1
-trace phase: 1
-trace wavelength: 1
-
-PROBE{ROOT/out}:
-Signal: ROOT/out
-trace power: 1
-trace modulus: 1
-trace phase: 1
-trace wavelength: 1
-
-PROBE{ROOT/X1/ring_br}:
-Signal: ROOT/X1/ring_br
-trace power: 1
-trace modulus: 1
-trace phase: 1
-trace wavelength: 1
-
 PROBE{ROOT/X1/ring_tl}:
 Signal: ROOT/X1/ring_tl
 trace power: 1
@@ -221,21 +198,42 @@ trace modulus: 1
 trace phase: 1
 trace wavelength: 1
 
+PROBE{ROOT/X1/ring_bl}:
+Signal: ROOT/X1/ring_bl
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/out}:
+Signal: ROOT/out
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/X1/ring_br}:
+Signal: ROOT/X1/ring_br
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
 ╔═══════════════════╗
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/X1/ring_bl (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_br (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_tl (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/add (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_tr (OPTICAL) = [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/drop (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X2/N00001 (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X2/N00002 (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out_ (OPTICAL) = [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/in (OPTICAL) = [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tl (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/add (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tr (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X2/N00001 (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X2/N00002 (OPTICAL) = [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out_ (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_bl (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_br (OPTICAL) = [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/VLSRC1 was enabled

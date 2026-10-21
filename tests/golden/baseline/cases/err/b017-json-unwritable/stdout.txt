@@ -59,12 +59,10 @@ Done creating ROOT/X1/WG2
 Creating ROOT/CWSRC1 (reason: unidir backlog)
 Done creating ROOT/CWSRC1
 Creating ROOT/COUPLER1 (reason: unidir backlog)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/COUPLER1
 Creating ROOT/WG_RING_L (reason: unidir backlog)
 Done creating ROOT/WG_RING_L
 Creating ROOT/COUPLER2 (reason: unidir backlog)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/COUPLER2
 Creating ROOT/WG_RING_R (reason: unidir backlog)
 Done creating ROOT/WG_RING_R

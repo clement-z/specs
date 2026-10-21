@@ -39,7 +39,6 @@ Elaborating network of ROOT/in...
 Creating ROOT/CWSRC1 (reason: connection to unidir net)
 Done creating ROOT/CWSRC1
 Creating ROOT/COUPLER1 (reason: unidir backlog)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/COUPLER1
 Creating ROOT/WG_RING (reason: unidir backlog)
 Done creating ROOT/WG_RING

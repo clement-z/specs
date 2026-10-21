@@ -90,7 +90,6 @@ Done creating ROOT/CWSRC_RDC_A
 Creating - ROOT/MERGER_RDC (reason: bidir backlog)
 Done creating ROOT/MERGER_RDC
 Creating - ROOT/COUPLER_RDC (reason: bidir backlog)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/COUPLER_RDC
 Creating - ROOT/CWSRC_RDC_C (reason: bidir backlog)
 Done creating ROOT/CWSRC_RDC_C
@@ -121,7 +120,6 @@ Done creating ROOT/CWSRC_WDC_A
 Creating - ROOT/MERGER_WDC (reason: bidir backlog)
 Done creating ROOT/MERGER_WDC
 Creating - ROOT/COUPLER_WDC (reason: bidir backlog)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/COUPLER_WDC
 Creating - ROOT/CWSRC_WDC_E (reason: bidir backlog)
 Done creating ROOT/CWSRC_WDC_E

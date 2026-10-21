@@ -13,11 +13,11 @@ public:
     double m_delay_ns = 0;
     double m_through_phase_rad = 0;
     double m_cross_phase_rad = M_PI/2;
-    double m_dc_through_coupling_power;
+    double m_dc_through_coupling_power; // power ratio to the through ports, in [0, 1] (P_cross = 1 - this; netlist k/kp/t are converted to it)
 
     double m_through_power_dB;
     double m_cross_power_dB;
-    double m_dc_loss; // is in dB
+    double m_dc_loss; // insertion loss in dB (power), applied to both through and cross paths
 
     // Constructor
     DirectionalCouplerBase(sc_module_name name,
