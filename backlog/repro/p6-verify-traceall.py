@@ -53,7 +53,7 @@ for cid in sys.argv[4:]:
                 if not (set(ra.values()) == {"1"} and set(rb.values()) == {"0"}):
                     errs.append("%s: trace_all_optical_nets %s -> %s" % (rel, ra, rb))
                 continue
-            if name.split(".")[1] not in ("abstol", "reltol", "resolution_multiplier", "engine_timescale",
+            if name.split(".")[1].split(" ")[0] not in ("abstol", "reltol", "resolution_multiplier", "engine_timescale",
                                           "simulation_mode", "analysis_type", "verbose_component_initialization"):
                 nexplicit += 1
             ca = cb = None

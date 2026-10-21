@@ -378,9 +378,16 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
 
     if (trace_all_optical_nets)
     {
+        // nets that already have their automatic probe (.save, F-05) keep it
+        set<string> probe_names;
+        for (auto p: all_probes)
+            probe_names.insert(p->name());
+
         auto all_optical_sigs = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
         for (auto &sig: all_optical_sigs) {
             string signame = sig->name();
+            if (probe_names.count("PROBE{" + signame + "}"))
+                continue;
 
             // Check if the signal is explicitly marked as uninteresting
             stringstream ss (signame);

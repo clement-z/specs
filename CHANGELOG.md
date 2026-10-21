@@ -78,6 +78,10 @@
     automatic `PROBE{<net>}` probes of every optical net are added only when the netlist has no probe, or with
     an explicit `.options traceall=1` (`.options traceall=0` still disables them). Simulation results and the
     probed signals are unchanged; the VCD loses the automatic probes and `- trace all optical nets:` prints 0
+  * `.save net QTY(net) ...` traces the listed optical nets (the paper's `.save P(out) P(drop)` now parses): a net
+    alone traces power, modulus, phase and wavelength, `P(...)`, `E(...)`, `PHI(...)`, `WL(...)` one quantity
+    each; the probes are named `PROBE{<net>}` like the automatic ones. A netlist with `.save` traces only its
+    targets and probes
 
 ### Fixed
 

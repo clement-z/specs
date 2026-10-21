@@ -197,11 +197,22 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 - `.options key=value ...` (keys case-insensitive): `abstol`, `reltol`, `snapfactor`, `timescale` (alias `ts`),
   `resolution`, `seed`, `maxiter`: see [numerics.md](numerics.md). `traceall` (0 or 1): trace every optical net
   (automatic probes `PROBE{<net>}`). Without it, a netlist with probes (PROBE, MLPROBE, also inside a subcircuit)
-  traces only them, and a netlist with none traces every optical net (F-05, see "PROBE, MLPROBE and traced nets"
+  or `.save` targets traces only them, and a netlist with neither traces every optical net (F-05, see "PROBE, MLPROBE and traced nets"
   below). An unknown key stops with `Unknown keyword: foo (value: 1 (INTEGER))`.
 - `.nodeset`: disabled, stops with `NODESET is disabled pending bugfixes` (exit status 1).
 - `.ic`: rejected, `the .ic directive is not supported`.
-- `.save`: not supported yet, a syntax error (offending token `.save`).
+- `.save target ...` (F-05): trace the listed optical nets. A target is a net name (power, field modulus, phase
+  and wavelength, like a PROBE without arguments) or `QTY(net)` for one quantity, with the PROBE keywords
+  (case-insensitive): `P`/`POW`/`POWER`, `E`/`MOD`/`MODULUS`/`MAG`/`MAGNITUDE`, `PHI`/`PHASE`, `WL`/`WAVELENGTH`.
+  Example (the paper's Fig. 1b): `.save P(out) P(drop)`. Each saved net gets one probe named like the automatic
+  probes, `PROBE{<net>}` (a bidirectional net has two signals, `PROBE{<net>:0}` and `PROBE{<net>:1}`), so its VCD
+  variables are the same as with `traceall`; several targets on one net add up (`.save P(out) PHI(out)`). A
+  netlist with `.save` traces only its targets and probes (see `traceall`). With an explicit `.options
+  traceall=1`, the other nets keep their automatic probes and the saved nets trace what `.save` lists. Errors:
+  `Error: .save nope: no net named 'nope' in the netlist`, `... 'v' is not an optical net (EANALOG)`, and a parse
+  error for an unknown quantity (`I(out)`). Only top-level nets: like every directive, a `.save` inside a
+  subcircuit is ignored with a warning (`found a directive in subcircuit, ignoring.`), and the internal nets of a
+  subcircuit instance cannot be named.
 - `.title text` and `.end`: ignored (KiCad netlists). `.end` does not stop the parsing.
 
 ## Command line
@@ -419,9 +430,9 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
 
 `PROBE<name> <net> [power [abs [phase [wl]]]]` traces the last event of its net (power, field modulus, phase,
 wavelength); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and phase per listed wavelength
-(the wavelength must match exactly). A netlist without any probe traces every optical net through automatic
-probes, traced as `PROBE{<net>}`; a netlist with probes traces only those, unless `.options traceall=1` asks for
-the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
+(the wavelength must match exactly). A netlist without any probe or `.save` traces every optical net through
+automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
+`.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
 name starts with `_` get no automatic probe.
 
 In `.tran`, the probes are disabled during the operating point. When the transient starts, after the operating

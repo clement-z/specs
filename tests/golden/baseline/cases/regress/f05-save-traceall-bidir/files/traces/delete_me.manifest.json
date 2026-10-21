@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f05-save-traceall-bidir.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f05-save-traceall-bidir.cir", "sha256": "370b686eaf04470566a8d4677ef7b2d0a87cf1255ed8ffb88e0cce1f7b053ac2"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

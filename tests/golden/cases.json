@@ -2784,6 +2784,120 @@
     "tests/golden/netlists/f05-mlprobe-in-subckt.cir"
    ],
    "note": "F-05: the only probe is an MLPROBE inside a subcircuit and there is no .options traceall: only that probe is traced (no PROBE{<net>} auto-probes)"
+  },
+  {
+   "id": "regress/f05-save-paper-fig1b",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-paper-fig1b.cir"
+   ],
+   "note": "F-05: the paper's Fig. 1b netlist (DC part, couplers renamed) with .save P(out) P(drop): only those two power signals are traced, bit-identical to the old automatic probes of these nets"
+  },
+  {
+   "id": "regress/f05-save-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "note": "F-05: .save out e(ring_in) PHASE(ring_in) in .tran: PROBE{ROOT/out} with all four quantities, PROBE{ROOT/ring_in} with abs and phase only; bit-identical to the old automatic probes"
+  },
+  {
+   "id": "regress/f05-save-traceall-bidir",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-traceall-bidir.cir"
+   ],
+   "note": "F-05: .save P(a) with an explicit .options traceall=1 on bidirectional nets: every net keeps its automatic probe (both signals net:0, net:1), the saved net traces power only"
+  },
+  {
+   "id": "err/f05-save-unknown-net",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-unknown-net.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: .save of a net that does not exist: 'Error: .save nope: no net named 'nope' in the netlist', exit 1"
+  },
+  {
+   "id": "err/f05-save-electrical-net",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-electrical-net.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: .save of an electrical net: 'Error: .save P(v): 'v' is not an optical net (EANALOG)', exit 1"
+  },
+  {
+   "id": "err/f05-save-unknown-quantity",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-unknown-quantity.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: .save I(out): unknown quantity, parse error with file:line, exit 1"
   }
  ]
 }

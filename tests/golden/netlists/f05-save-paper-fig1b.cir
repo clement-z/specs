@@ -1,0 +1,16 @@
+* F-05: the netlist of the paper's Fig. 1b (ECOC 2023), frequency-domain part, with its
+* .save P(out) P(drop). Only change: the couplers dc1/dc2 are named coupler1/coupler2 (DC is not an
+* element prefix). Expected: 201 sweep points, 1549.9 to 1550.1 nm; the VCD declares only
+* PROBE{ROOT/out}.power and PROBE{ROOT/drop}.power (no automatic probe on the other nets, no abs,
+* phase or wavelength), with the same values as the automatic probes of these nets without .save.
+.param wl0=1.55e-6
+.save P(out) P(drop)
+* Circuit definition
+coupler1 in 1 out 2 k=0.15
+coupler2 add 3 drop 4 k=0.15
+wg_ring_l 4 1 length=300e-6
+wg_ring_r 2 3 length=300e-6
+
+* DC Sweep on CW source parameters
+cwsrc1 in wl={wl0} power=1
+.dc WL(cwsrc1) 1549.9e-9 1550.1e-9 1e-12

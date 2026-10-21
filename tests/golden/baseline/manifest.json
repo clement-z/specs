@@ -73,6 +73,9 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f05-save-electrical-net",
+  "err/f05-save-unknown-net",
+  "err/f05-save-unknown-quantity",
   "err/f12-dc-alias-unknown-attr",
   "err/f12-ends-name-mismatch",
   "err/f12-param-malformed",
@@ -149,6 +152,9 @@
   "regress/f01-seed-large",
   "regress/f01-seed-max",
   "regress/f05-mlprobe-in-subckt",
+  "regress/f05-save-paper-fig1b",
+  "regress/f05-save-traceall-bidir",
+  "regress/f05-save-tran",
   "regress/f12-dc-p-alias",
   "regress/f12-dc-wl-alias",
   "regress/f12-dc-wl-slash",
@@ -550,6 +556,12 @@
    "only": "^(regress/(b150-include-in-subckt|b052-vlsrc-positional|b004-mode-td-op|b144-bidir-source-first|b144-uni-writer-first|b144-uni-writer-second|b144-two-sources-one-net|b145-upgrade-reader|b145-upgrade-reader-ref|b145-upgrade-reader-case2|b145-upgrade-reader-case2-ref|b147-crossing-out-bidir|b033-crossing-two-lambda-tran|b124-allpass-ring-default-reltol|b124-allpass-ring-tight-reltol|f01-manifest|f28-maxiter-cli-priority|f28-maxiter-zero|f12-ends-name|f12-dc-wl-alias|f12-dc-wl-slash|f12-dc-p-alias|f12-param-override|f12-param-undefined|f12-include-relative|f12-include-both-differ|f05-mlprobe-in-subckt))$",
    "gtest": false,
    "note": "F-05: netlists with PROBE/MLPROBE and no .options traceall trace only their probes (auto-probes PROBE{<net>} removed, trace_all_optical_nets 1 -> 0; probed signals bit-identical, /tmp/P6-tools/verify_traceall.py); new regress/f05-mlprobe-in-subckt"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:42:50Z",
+   "only": "^(regress|err)/f05-save-",
+   "gtest": false,
+   "note": "F-05: .save directive, 6 new cases (probed values bit-identical to the old automatic probes, /tmp/P6-tools/vcd_subset.py)"
   }
  ]
 }

@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f05-save-traceall-bidir.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 443,
+   "kind": "json",
+   "sha256": "28339fa04dd80aa4c1d7d984b869ab5bd1fe6c3fcdfb8951922aaac96d367bb8",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 2007,
+   "kind": "vcd",
+   "sha256": "6ea3b57ee30fffeee1cdcad6bd58eee43c0c6df842a1e1672a527c53735e0ea4",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f05-save-traceall-bidir"
+}

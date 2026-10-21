@@ -1,0 +1,274 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Recorded sweep order for WL(CWSRC1) (201points)
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+1 local assignments
+ - wl0 (DOUBLE) = 1.55e-06
+-----------
+5 elements
+ - ROOT/COUPLER1 (DIRECTIONAL COUPLER (bidir)) ROOT/in ROOT/N00001 ROOT/out ROOT/N00002 {} {k (DOUBLE) = 0.15, }
+ - ROOT/COUPLER2 (DIRECTIONAL COUPLER (bidir)) ROOT/add ROOT/N00003 ROOT/drop ROOT/N00004 {} {k (DOUBLE) = 0.15, }
+ - ROOT/WG_RING_L (WAVEGUIDE (bidir)) ROOT/N00004 ROOT/N00001 {} {length (DOUBLE) = 0.0003, }
+ - ROOT/WG_RING_R (WAVEGUIDE (bidir)) ROOT/N00002 ROOT/N00003 {} {length (DOUBLE) = 0.0003, }
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+-----------
+8 named nets
+ - ROOT/N00001: OANALOG<1>u (1|1)
+ - ROOT/N00002: OANALOG<1>u (1|1)
+ - ROOT/N00003: OANALOG<1>u (1|1)
+ - ROOT/N00004: OANALOG<1>u (1|1)
+ - ROOT/add: OANALOG<1>u (0|1)
+ - ROOT/drop: OANALOG<1>u (1|0)
+ - ROOT/in: OANALOG<1>u (1|1)
+ - ROOT/out: OANALOG<1>u (1|0)
+-----------
+1 directives
+ - DIRECTIVE[SAVE] {P(out) (STRING), P(drop) (STRING), } {}
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[DC] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/N00001...
+Creating ROOT/COUPLER1 (reason: connection to unidir net)
+Done creating ROOT/COUPLER1
+Creating ROOT/WG_RING_L (reason: unidir backlog)
+Done creating ROOT/WG_RING_L
+Creating ROOT/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/COUPLER2
+Creating ROOT/WG_RING_R (reason: unidir backlog)
+Done creating ROOT/WG_RING_R
+Creating ROOT/CWSRC1 (reason: unidir backlog)
+Done creating ROOT/CWSRC1
+Done (elaborating network of ROOT/N00001)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven frequency-domain
+- analysis type: CW SWEEP
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+Starting sweep on WL(ROOT/CWSRC1) (201 points)
+ROOT/CWSRC1 emitted: [#1]  @ 1549.9 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#2]  @ 1549.901 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#3]  @ 1549.902 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#4]  @ 1549.903 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#5]  @ 1549.904 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#6]  @ 1549.905 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#7]  @ 1549.906 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#8]  @ 1549.907 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#9]  @ 1549.908 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#10]  @ 1549.909 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#11]  @ 1549.91 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#12]  @ 1549.911 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#13]  @ 1549.912 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#14]  @ 1549.913 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#15]  @ 1549.914 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#16]  @ 1549.915 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#17]  @ 1549.916 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#18]  @ 1549.917 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#19]  @ 1549.918 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#20]  @ 1549.919 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#21]  @ 1549.92 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#22]  @ 1549.921 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#23]  @ 1549.922 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#24]  @ 1549.923 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#25]  @ 1549.924 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#26]  @ 1549.925 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#27]  @ 1549.926 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#28]  @ 1549.927 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#29]  @ 1549.928 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#30]  @ 1549.929 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#31]  @ 1549.93 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#32]  @ 1549.931 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#33]  @ 1549.932 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#34]  @ 1549.933 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#35]  @ 1549.934 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#36]  @ 1549.935 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#37]  @ 1549.936 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#38]  @ 1549.937 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#39]  @ 1549.938 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#40]  @ 1549.939 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#41]  @ 1549.94 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#42]  @ 1549.941 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#43]  @ 1549.942 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#44]  @ 1549.943 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#45]  @ 1549.944 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#46]  @ 1549.945 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#47]  @ 1549.946 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#48]  @ 1549.947 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#49]  @ 1549.948 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#50]  @ 1549.949 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#51]  @ 1549.95 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#52]  @ 1549.951 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#53]  @ 1549.952 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#54]  @ 1549.953 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#55]  @ 1549.954 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#56]  @ 1549.955 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#57]  @ 1549.956 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#58]  @ 1549.957 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#59]  @ 1549.958 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#60]  @ 1549.959 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#61]  @ 1549.96 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#62]  @ 1549.961 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#63]  @ 1549.962 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#64]  @ 1549.963 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#65]  @ 1549.964 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#66]  @ 1549.965 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#67]  @ 1549.966 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#68]  @ 1549.967 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#69]  @ 1549.968 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#70]  @ 1549.969 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#71]  @ 1549.97 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#72]  @ 1549.971 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#73]  @ 1549.972 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#74]  @ 1549.973 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#75]  @ 1549.974 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#76]  @ 1549.975 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#77]  @ 1549.976 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#78]  @ 1549.977 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#79]  @ 1549.978 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#80]  @ 1549.979 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#81]  @ 1549.98 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#82]  @ 1549.981 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#83]  @ 1549.982 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#84]  @ 1549.983 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#85]  @ 1549.984 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#86]  @ 1549.985 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#87]  @ 1549.986 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#88]  @ 1549.987 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#89]  @ 1549.988 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#90]  @ 1549.989 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#91]  @ 1549.99 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#92]  @ 1549.991 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#93]  @ 1549.992 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#94]  @ 1549.993 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#95]  @ 1549.994 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#96]  @ 1549.995 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#97]  @ 1549.996 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#98]  @ 1549.997 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#99]  @ 1549.998 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#100]  @ 1549.999 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#101]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#102]  @ 1550.001 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#103]  @ 1550.002 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#104]  @ 1550.003 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#105]  @ 1550.004 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#106]  @ 1550.005 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#107]  @ 1550.006 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#108]  @ 1550.007 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#109]  @ 1550.008 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#110]  @ 1550.009 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#111]  @ 1550.01 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#112]  @ 1550.011 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#113]  @ 1550.012 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#114]  @ 1550.013 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#115]  @ 1550.014 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#116]  @ 1550.015 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#117]  @ 1550.016 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#118]  @ 1550.017 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#119]  @ 1550.018 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#120]  @ 1550.019 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#121]  @ 1550.02 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#122]  @ 1550.021 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#123]  @ 1550.022 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#124]  @ 1550.023 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#125]  @ 1550.024 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#126]  @ 1550.025 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#127]  @ 1550.026 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#128]  @ 1550.027 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#129]  @ 1550.028 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#130]  @ 1550.029 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#131]  @ 1550.03 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#132]  @ 1550.031 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#133]  @ 1550.032 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#134]  @ 1550.033 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#135]  @ 1550.034 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#136]  @ 1550.035 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#137]  @ 1550.036 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#138]  @ 1550.037 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#139]  @ 1550.038 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#140]  @ 1550.039 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#141]  @ 1550.04 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#142]  @ 1550.041 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#143]  @ 1550.042 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#144]  @ 1550.043 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#145]  @ 1550.044 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#146]  @ 1550.045 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#147]  @ 1550.046 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#148]  @ 1550.047 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#149]  @ 1550.048 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#150]  @ 1550.049 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#151]  @ 1550.05 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#152]  @ 1550.051 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#153]  @ 1550.052 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#154]  @ 1550.053 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#155]  @ 1550.054 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#156]  @ 1550.055 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#157]  @ 1550.056 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#158]  @ 1550.057 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#159]  @ 1550.058 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#160]  @ 1550.059 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#161]  @ 1550.06 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#162]  @ 1550.061 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#163]  @ 1550.062 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#164]  @ 1550.063 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#165]  @ 1550.064 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#166]  @ 1550.065 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#167]  @ 1550.066 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#168]  @ 1550.067 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#169]  @ 1550.068 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#170]  @ 1550.069 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#171]  @ 1550.07 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#172]  @ 1550.071 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#173]  @ 1550.072 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#174]  @ 1550.073 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#175]  @ 1550.074 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#176]  @ 1550.075 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#177]  @ 1550.076 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#178]  @ 1550.077 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#179]  @ 1550.078 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#180]  @ 1550.079 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#181]  @ 1550.08 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#182]  @ 1550.081 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#183]  @ 1550.082 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#184]  @ 1550.083 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#185]  @ 1550.084 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#186]  @ 1550.085 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#187]  @ 1550.086 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#188]  @ 1550.087 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#189]  @ 1550.088 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#190]  @ 1550.089 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#191]  @ 1550.09 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#192]  @ 1550.091 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#193]  @ 1550.092 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#194]  @ 1550.093 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#195]  @ 1550.094 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#196]  @ 1550.095 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#197]  @ 1550.096 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#198]  @ 1550.097 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#199]  @ 1550.098 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#200]  @ 1550.099 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#201]  @ 1550.1 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

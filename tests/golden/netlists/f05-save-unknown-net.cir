@@ -1,0 +1,5 @@
+* F-05: .save of a net that does not exist: error, exit 1
+cwsrc1 in wl=1.55e-6 power=1e-3
+wg1 in out length=10e-6
+.save out nope
+.op

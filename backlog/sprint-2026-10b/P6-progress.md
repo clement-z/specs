@@ -9,8 +9,8 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 ## Items
 | # | item | owner | status | commit | notes |
 |---|---|---|---|---|---|
-| 1 | trace-all fallback: PROBE/MLPROBE present → trace only those, unless `.options traceall` is explicit | orchestrator | done | (item-1 commit) | 26 cases re-recorded, all checked by `backlog/repro/p6-verify-traceall.py` (auto-probes gone, traceall 1→0, everything else bit-identical); new `regress/f05-mlprobe-in-subckt` |
-| 2 | `.save` directive (`.save out P(drop) ...` → `PROBE{<net>}` probes) | orchestrator | pending | | |
+| 1 | trace-all fallback: PROBE/MLPROBE present → trace only those, unless `.options traceall` is explicit | orchestrator | done | fd381fc | 26 cases re-recorded, all checked by `backlog/repro/p6-verify-traceall.py` (auto-probes gone, traceall 1→0, everything else bit-identical); new `regress/f05-mlprobe-in-subckt` |
+| 2 | `.save` directive (`.save out P(drop) ...` → `PROBE{<net>}` probes) | orchestrator | done | (item-2 commit) | 6 new cases; saved signals bit-identical to the old automatic probes (`backlog/repro/p6-vcd-subset.py`); paper Fig. 1b runs once dc1/dc2 are renamed coupler1/2 |
 | 3 | `--no-trace` | orchestrator | pending | | |
 | 4 | CSV / `.npz` table export (`--format`), harness `.npz` decoder | orchestrator | pending | | |
 | 5 | CROW bench (full tracing vs probes only), docs, backlog, report | orchestrator | pending | | |
@@ -20,3 +20,10 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 - "PROBEs" = PROBE and MLPROBE elements (also inside subcircuits). PDET and PWR meters are traced as before and do
   not count.
 - The rule applies to netlists only (the parser); `-t` testbenches and C++ users keep `trace_all_optical_nets`.
+- `.save` probes are created at elaboration (ParseTree::build_circuit), one per signal of the net, named
+  `PROBE{<signal>}` like the automatic probes; targets on one net OR their quantities. With an explicit
+  `traceall=1` the saved net's probe traces only what `.save` lists (it replaces that net's automatic probe).
+- `.save` targets: top-level nets only; a `.save` in a subcircuit body is ignored with the existing warning
+  (every directive is). No `.save all` (would clash with a net named `all`). Quantity keywords = PROBE's.
+- Unknown quantity: parse error (file:line); unknown net / electrical net: error after elaboration, exit 1.
+
