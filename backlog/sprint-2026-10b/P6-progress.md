@@ -12,8 +12,8 @@ Start: `ws/outputs` @ 43a50d7 (P1–P5 merged). Build: gcc `/tmp/P6-build`; pre-
 | 1 | trace-all fallback: PROBE/MLPROBE present → trace only those, unless `.options traceall` is explicit | orchestrator | done | fd381fc | 26 cases re-recorded, all checked by `backlog/repro/p6-verify-traceall.py` (auto-probes gone, traceall 1→0, everything else bit-identical); new `regress/f05-mlprobe-in-subckt` |
 | 2 | `.save` directive (`.save out P(drop) ...` → `PROBE{<net>}` probes) | orchestrator | done | 9feac83 | 6 new cases; saved signals bit-identical to the old automatic probes (`backlog/repro/p6-vcd-subset.py`); paper Fig. 1b runs once dc1/dc2 are renamed coupler1/2 |
 | 3 | `--no-trace` | orchestrator | done | 02a05de | new `regress/f05-no-trace`; `cli/help`, `cli/no-args` re-recorded (flag in the help) |
-| 4 | CSV / `.npz` table export (`--format`), harness `.npz` decoder | orchestrator; harness decoder by a Sonnet subagent (`/tmp/P6-wt/harness`, `P6-wip/harness` 45b069b, reviewed, squashed in) | done | (item-4 commit) | 6 new cases, gtest `TraceTable.*` (5); oracle `backlog/repro/p6-table-vs-vcd.py` OK on 9 netlists; VCD unchanged by `--format` |
-| 5 | CROW bench (full tracing vs probes only), docs, backlog, report | orchestrator | pending | | |
+| 4 | CSV / `.npz` table export (`--format`), harness `.npz` decoder | orchestrator; harness decoder by a Sonnet subagent (`/tmp/P6-wt/harness`, `P6-wip/harness` 45b069b, reviewed, squashed in) | done | 824702e | 6 new cases, gtest `TraceTable.*` (5); oracle `backlog/repro/p6-table-vs-vcd.py` OK on 9 netlists; VCD unchanged by `--format` |
+| 5 | CROW bench (full tracing vs probes only), docs, backlog, report | orchestrator | done | report commit | CROW-30: old default 19.45 s / 1003 MB → new default 5.28 s / 15.4 MB, probes identical; csv 4.88 s, npz 4.90 s, --no-trace 4.75 s; B-157 partly fixed, notes on B-057/B-062; clang cross-check |
 
 ## Decisions (running list, copied into the report)
 - An explicit `.options traceall=0|1` always wins; only its absence triggers the new rule.
