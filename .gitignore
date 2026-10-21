@@ -29,6 +29,7 @@ gmon.out
 *.exe
 *.cir
 !/circuits/*.cir
+!/circuits/legacy/*.cir
 tmp/
 # Meson: build dirs, and wrap downloads/lock in thirdparty/ (subproject_dir)
 builddir/

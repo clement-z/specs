@@ -537,6 +537,12 @@
    "only": "^(regress/f12-include-.*|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-12 (B-143): .include relative to the including file (new cases, gtest ParserState.*)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:07:05Z",
+   "only": "^cir/(double_ring|triple_ring|paul_simple_ring)$",
+   "gtest": false,
+   "note": "F-12: legacy ring netlists moved to circuits/legacy/ (args and the path in the parse error only)"
   }
  ]
 }

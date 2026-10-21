@@ -42,10 +42,10 @@
    "id": "cir/double_ring",
    "args": [
     "-f",
-    "circuits/double_ring.cir"
+    "circuits/legacy/double_ring.cir"
    ],
    "expect": "fail",
-   "note": "parse error: legacy netlist syntax ('one 0' at line 4) not supported by the current grammar"
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
   },
   {
    "id": "cir/paul_3ring_puf",
@@ -60,10 +60,10 @@
    "id": "cir/paul_simple_ring",
    "args": [
     "-f",
-    "circuits/paul_simple_ring.cir"
+    "circuits/legacy/paul_simple_ring.cir"
    ],
    "expect": "fail",
-   "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
   },
   {
    "id": "cir/subckt_test",
@@ -83,10 +83,10 @@
    "id": "cir/triple_ring",
    "args": [
     "-f",
-    "circuits/triple_ring.cir"
+    "circuits/legacy/triple_ring.cir"
    ],
    "expect": "fail",
-   "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
   },
   {
    "id": "err/b149-x-noargs",

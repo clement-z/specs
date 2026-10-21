@@ -150,7 +150,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 
 | group | cases | what it covers |
 |---|---|---|
-| `cir/*` (9) | every `circuits/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
+| `cir/*` (9) | every `circuits/*.cir` and `circuits/legacy/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
 | `cir-json/*` (4) | `-n --json flat.json -f` on the 4 netlists that parse | flattened-netlist JSON export, dry run |
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
@@ -163,7 +163,8 @@ Cases that are **expected to fail**. They are kept so that any behaviour change
 is visible; re-record when it is fixed on purpose.
 
 * `cir/double_ring`, `cir/triple_ring`, `cir/paul_simple_ring`: parse error
-  (legacy netlist syntax, `one 0` at line 4), exit 1.
+  (pre-release netlist syntax, `one 0` at line 4), exit 1. The netlists are kept for reference in
+  `circuits/legacy/` (moved there by F-12; the `cir/*` case ids are unchanged).
 * `cir/paul_3ring_puf`: the VLSRC values file
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
 * `cli/unknown-testbench`, `cli/missing-netlist`, `cli/bad-mode`: exit 1 by design.
