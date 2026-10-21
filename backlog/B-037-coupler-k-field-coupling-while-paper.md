@@ -1,5 +1,5 @@
 # B-037: COUPLER `k` is field coupling while the paper's κ is power: document it
-severity: low | category: docs | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: low | category: docs | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 8e30077 (sprint 2026-10b P2): documented in doc/netlist.md, warning removed
 location: src/parser/parse_element.cpp:281, src/parser/parse_element.cpp:303-322, doc/resources/cheatsheet.pdf, src/devices/crow.h:30
 ## Problem
 These are the facts. The only defect is that the same symbol and value mean different things in the paper and in the

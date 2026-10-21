@@ -17,7 +17,7 @@ Start state (d214196): `meson test` 12/12, golden `--atol 0` 81/81.
 | 6 | B-060 PCM validation | done | c22ff40 | `PCMElement::check_parameters()` (parser + `start_of_simulation`); n = 0 keeps its old message; 2 gtests + 5 golden cases; model untouched |
 | 7 | B-002 + B-004 sampled-time / `-m` | done | c6414ce | CLI + `verifyConfig` + `OpticalOutputPort::applyConfig` reject SAMPLED_TIME; `SPECSConfig::simulation_mode_explicit`; `opt/mode-sampled-time` re-recorded (exit 1); `opt/mode-fd` unchanged (its netlist is a `.dc`, already FD); 3 new cases + 1 gtest; help text unchanged |
 | 8 | B-058 remove TimeMonitor / `--mon` | done | 575209a | files, meson list, includes (also 2 unused tb includes) removed; `cli/help`, `cli/no-args` re-recorded (only the `--mon` line) |
-| 9 | B-037 coupler k docs | implementing (Sonnet, wt docs) | | |
+| 9 | B-037 coupler k docs | done | 8e30077 | warning + TODO removed, comments fixed (parse_element, directional_coupler.h, crow.h, generic_2x2_coupler.h); COUPLER section in `doc/netlist.md` (merged), Doxyfile INPUT; 21 coupler cases re-recorded, only the warning line differs (bit-exact compare) |
 
 ## Implementer worktrees (all branched from 7a99a64)
 | wt | path / branch | items | build dir | proposed golden cases |
