@@ -71,3 +71,11 @@ Push the branch after the final verification (no PR creation, no merge into `dev
 | F-15 Q6 `--progress` | **(b)** included: a passive periodic progress line on stderr (wall-clock period), which never advances simulated time or exits. |
 | F-15 Q7 target | **(a)** ≥ 1.5× on the CROW bench case C (N = 30), ratios on the development host; official numbers on a dedicated machine for v0.3. |
 | F-15 Q8 equal-time order | **Order by time only** (confirmed after review of the code and diagram). The order among entries with the same time is not specified (no ordering by \|E\|); it stays deterministic (D2 uses insertion order). Consequence: the D2 commit that drops the \|E\| comparison may change which wavelength a plain probe/VCD records on a multi-wavelength net (a net holds only the last write); that commit re-records exactly those cases, as the one predicted exception to Q1's bit-identity. FIFO-with-no-coalescing stays available as the ablation switch. |
+
+## Decisions of 2026-10-21, third round (build dependencies, before tagging v0.2.0)
+| Topic | Decision |
+|---|---|
+| SystemC source | **Meson subproject by default**: a plain `meson setup build` builds SystemC 3.0.2 as C++20 with SystemC's own CMake build, through Meson's cmake module (as the former fallback did). No prebuilt prefix, no `utils/build-systemc.sh` in CI or `install.sh`, no machine paths in `CLAUDE.md`. |
+| Installed SystemC | Used **only on explicit request**, through Meson's standard mechanism (`force_fallback_for` / `--wrap-mode`), still with the C++-standard ABI check. |
+| Layout and sources | `thirdparty/` is renamed **`subprojects/`** (Meson's default; `subproject_dir` dropped). SystemC 3.0.2 and taywee/args 6.4.7 come from **wrap files** (release tarballs with sha256), like gtest; the git submodules are removed. Offline: `meson subprojects download`. |
+| Release | Lands in v0.2.0, before the tag. Push, tag and merges still only on the maintainer's request. |
