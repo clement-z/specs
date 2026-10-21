@@ -8,7 +8,7 @@
   "traces/mzi_tb.vcd": {
    "bytes": 1795,
    "kind": "vcd",
-   "sha256": "8d6401ebcf9a6ff34303cc9800a38417c7e9464a92741c24a0ffbdcf4b5d0f8e",
+   "sha256": "1c830c680c28c381431452127ed4931136414dce2e299d2ff8892193bb76c489",
    "stored": "files/traces/mzi_tb.vcd"
   }
  },

@@ -18,6 +18,7 @@ if gtest_dep.found()
       'main.cpp',
       'optical_output_port.cpp',
       'specs_config.cpp',
+      'sysc_utils.cpp',
       'tran_start.cpp',
     ),
     cpp_args: ['-pedantic'],

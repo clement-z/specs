@@ -57,15 +57,15 @@ Current SPECS config:
 - trace all optical nets: 0
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
-ROOT/CWSRC2 emitted: [#1]  @ 1551 nm (0.015811 √W, 0.000250 W, 0.0000 rad)
-ROOT/CWSRC1 emitted: [#2]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC2 emitted: [#2]  @ 1551 nm (0.015811 √W, 0.000250 W, 0.0000 rad)
 ╔═══════════════════╗
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/b (OPTICAL) = [#3]  @ 1551 nm (0.015811 √W, 0.000250 W, 0.0000 rad)
-║ - ROOT/in (OPTICAL) = [#4]  @ 1551 nm (0.011180 √W, 0.000125 W, 0.0000 rad)
-║ - ROOT/a (OPTICAL) = [#5]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/a (OPTICAL) = [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/b (OPTICAL) = [#4]  @ 1551 nm (0.015811 √W, 0.000250 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#5]  @ 1551 nm (0.011180 √W, 0.000125 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/PDET1 was enabled

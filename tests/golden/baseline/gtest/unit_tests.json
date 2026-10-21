@@ -41,6 +41,7 @@
   "SPECSConfig.VerifyConfigAcceptsValidValues": "PASS",
   "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",
   "SplitterModel.EqualSplitWithLoss": "PASS",
+  "SysCUtils.CollectionsAreNameOrdered": "PASS",
   "TranStart.ProbesSampleAfterOperatingPointAndInitialConditions": "PASS",
   "Waveguide.Instantiation": "PASS",
   "Waveguide.OperatingPoint": "PASS",

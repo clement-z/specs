@@ -10,7 +10,7 @@
   "traces/freqsweep_tb.vcd": {
    "bytes": 111960,
    "kind": "vcd",
-   "sha256": "7f85acaaa16c52bb9011334047bfba36c588f1648489a1b48873dead62100f99",
+   "sha256": "04f626dbe284a620ef58143fbaf6863d561a5cda8082b853fe327097e3e9a6c2",
    "stored": "files/traces/freqsweep_tb.vcd"
   }
  },

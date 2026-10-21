@@ -79,17 +79,17 @@ Info: (I703) tracing timescale unit set: 1 fs (traces/delete_me.vcd)
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/X1/ring_tl (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/add (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_tr (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/drop (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_bl (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_br (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tl (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tr (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║ - ROOT/X2/N00001 (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║ - ROOT/X2/N00002 (OPTICAL) = [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out_ (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/in (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_bl (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/add (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║ - ROOT/out (OPTICAL) = [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/X1/ring_br (OPTICAL) = [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out_ (OPTICAL) = [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/VLSRC1 was enabled

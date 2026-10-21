@@ -8,7 +8,7 @@
   "traces/delete_me.vcd": {
    "bytes": 1601,
    "kind": "vcd",
-   "sha256": "d540d843714733f29bf726bc012ea09f4c601d0cd2cc74df061c475a019faf54",
+   "sha256": "00a2133e92a2cd9c4442c00c400a7e48a55545e9f6447120df49a9d077cd4ff8",
    "stored": "files/traces/delete_me.vcd"
   }
  },
