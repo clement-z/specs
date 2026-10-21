@@ -13,7 +13,7 @@ journal publication. Merges into `dev`/`master`, tags and pushes only on an expl
 | # | Phase | Items | Workspace / branch | Model | Done marker | Blocked on | State |
 |---|---|---|---|---|---|---|---|
 | A | Decided follow-ups (v0.2.0) | B-146 land; B-014 error option (b); 64-bit integer literals (overflow → parse error); zero tolerances allowed (≥ 0, warning when both 0) | `ws-followups` / `ws/followups` (agent f8d8912f) | Opus 5.5 xhigh | `backlog/sprint-2026-10c/PA-REPORT.md` | — | running |
-| B | Sanitizer CI (gcc ASan/UBSan) green | reproduce locally with gcc (runtimes now installed), fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | — | in progress |
+| B | Sanitizer CI (gcc ASan/UBSan) green | reproduce locally with gcc (runtimes now installed), fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | — | **done**: 8af20cc (B-181); CI run 39624029371 green on all jobs |
 | C | v0.2.0 release prep | CHANGELOG `[0.2.0]`, version `0.2.0` in `meson.build`, `CITATION.cff` citing the ECOC paper (no DOI per version) | coordinator (or Sonnet) | Opus 5.5 | release-prep commit; **stop before tag/merge** | A, B | prepared |
 | D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 xhigh | `PD1-REPORT.md` | C | prepared (F-15 answers confirmed) |
 | D2 | F-15 part 2: bit-identical refactors | squared-norm gate, per-λ S-parameter caches, time-only ordered pending events + single `sc_event` per port, `OpticalSignal` id behind a flag | `ws-engine2` / `ws/engine2` | Opus 5.5 xhigh | `PD2-REPORT.md` | D1 | prepared (F-15 answers confirmed) |
@@ -50,3 +50,4 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 - 2026-10-21 — backlog B-179 recorded (PUF circuit ring coupling to align before benchmark use; needs-human, decision pending); integer-clamp entry of phase A renumbered B-180.
 - 2026-10-21 — **go for A and B**. A launched (agent f8d8912f, `ws/followups`); B started by the coordinator; coordinator heartbeat ac1c0a21 (5 min, 96 h, registry 2026-10c). C and D not approved yet.
 - 2026-10-21 — B: reproduced with gcc 11 ASan+UBSan; one cause in all 146 failing golden cases: `Variable` copied an indeterminate bool (UB, parse_tree.h:277). Fixed in 8af20cc (B-181, member initialisers; outputs bit-identical); gcc ASan meson test 12/12 locally; pushed, CI run pending. Phase A agent told to merge sprint/2026-10c before widening `inum`.
+- 2026-10-21 — B done: GitHub CI run 39624029371 on 8af20cc green on all three jobs (gcc, clang, blocking gcc ASan/UBSan).
