@@ -1,5 +1,5 @@
 # B-051: PCMCELL/PCMElement is fully opaque by default (constructor Tc = Ta = 0)
-severity: high | category: physics | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: high | category: physics | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 344d60b (sprint 2026-10b P2)
 location: src/devices/pcm_device.h:26-27,53-54,59-60, src/devices/octane_cell.cpp:32,77, src/parser/parse_element.cpp:1231-1234
 ## Problem
 The member defaults say `m_Tc = 0`, `m_Ta = 1` (pcm_device.h:26-27). The constructor defaults `Tc = 0, Ta = 0` (pcm_device.h:53-54) override them, so T(k) = Tc + (Ta−Tc)·tanh(...) ≡ 0.

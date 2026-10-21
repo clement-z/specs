@@ -13,7 +13,7 @@ Start state (d214196): `meson test` 12/12, golden `--atol 0` 81/81.
 | 2 | B-144 + B-145 + B-147 bidir slots | implementing (Opus, wt bidir) | | |
 | 3 | B-146 subckt port nets via `nets_flat` | implementing (Opus, wt bidir, after item 2) | | |
 | 4 | B-052 positional args + 4 asserts | done | aaa02b3 | 4 positional + 4 too-many-args golden cases; `doc/netlist.md` created; existing cases unchanged |
-| 5 | B-051 PCMCELL requires tc/ta | implementing (Opus, wt pcm) | | |
+| 5 | B-051 PCMCELL requires tc/ta | done | 344d60b | presence check incl. aliases; PCMElement default Ta = 1; OctaneCell/Segment/Matrix take Tc/Ta as required params (meltEnergy/nStates defaults of OctaneCell/OctaneMatrix dropped: C++ forbids required after defaulted); 3 golden cases |
 | 6 | B-060 PCM validation | implementing (Opus, wt pcm) | | |
 | 7 | B-002 + B-004 sampled-time / `-m` | implementing (Opus, wt cli) | | |
 | 8 | B-058 remove TimeMonitor / `--mon` | implementing (Opus, wt cli) | | |
