@@ -4,8 +4,12 @@
 Stdlib only; run as `python3 -I tests/golden/test_run_golden.py` (also `meson test --suite golden`).
 """
 
+import contextlib
 import importlib.util
+import io
 import re
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -110,6 +114,75 @@ class LineOrder(unittest.TestCase):
         self.assertNotEqual(sorted(base.split("\n")), sorted(cand.split("\n")))
         diffs, _ = rg.compare_case(stored(base), stored(cand), {"unordered_streams": ["stdout"]}, DEFAULT_TOL)
         self.assertEqual(diffs, [])
+
+
+class Coverage(unittest.TestCase):
+    """B-127: NEW, MISSING and an unrequested gtest skip fail; --only must select something."""
+
+    CASES = [{"id": "cir/a"}, {"id": "cir/b"}]
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        root = Path(self.tmp.name)
+        self.base, self.cand = root / "base", root / "cand"
+        for d in (self.base, self.cand):
+            for c in self.CASES:
+                rg.store_result(d, {"id": c["id"], "args": [], "exit": 0, "stdout": "x 1.5", "stderr": "",
+                                    "files": {}}, 10**6)
+            rg.store_gtest(d, {"id": rg.GTEST_ID, "exit": 0, "tests": {"S.T": "PASS"}})
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_compare(self, gtest="compare", allow_new=False):
+        with contextlib.redirect_stdout(io.StringIO()):
+            out = rg.compare_dirs(self.base, self.cand, self.CASES, DEFAULT_TOL, gtest)
+            return out, rg.summarise(out, allow_new)
+
+    def test_all_present_passes(self):
+        out, rc = self.run_compare()
+        self.assertEqual((rc, len(out["passed"])), (0, 3))
+
+    def test_new_case_fails_unless_allowed(self):
+        shutil.rmtree(self.base / "cases" / "cir" / "b")
+        out, rc = self.run_compare()
+        self.assertEqual((out["new"], rc), (["cir/b"], 1))
+        self.assertEqual(self.run_compare(allow_new=True)[1], 0)
+
+    def test_missing_case_fails(self):
+        shutil.rmtree(self.cand / "cases" / "cir" / "b")
+        out, rc = self.run_compare(allow_new=True)
+        self.assertEqual((out["missing"], rc), (["cir/b"], 1))
+
+    def test_gtest_not_run_fails(self):
+        shutil.rmtree(self.cand / "gtest")
+        out, rc = self.run_compare(allow_new=True)
+        self.assertEqual((out["missing"], rc), ([rg.GTEST_ID], 1))
+
+    def test_gtest_skipped_explicitly(self):
+        shutil.rmtree(self.cand / "gtest")
+        out, rc = self.run_compare("skip")
+        self.assertEqual((out["skipped"], rc), ([rg.GTEST_ID], 0))
+
+    def test_gtest_not_selected(self):
+        shutil.rmtree(self.cand / "gtest")
+        out, rc = self.run_compare("off")
+        self.assertEqual((out["missing"], out["skipped"], rc), ([], [], 0))
+
+    def test_new_gtest_fails_unless_allowed(self):
+        shutil.rmtree(self.base / "gtest")
+        self.assertEqual(self.run_compare()[1], 1)
+        self.assertEqual(self.run_compare(allow_new=True)[1], 0)
+
+    def test_select(self):
+        self.assertEqual(rg.select(self.CASES, None), (self.CASES, True))
+        self.assertEqual(rg.select(self.CASES, "a$"), ([self.CASES[0]], False))
+        self.assertEqual(rg.select(self.CASES, "^gtest"), ([], True))
+
+    def test_select_nothing_exits_2(self):
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as cm:
+            rg.select(self.CASES, "no_such_case")
+        self.assertEqual(cm.exception.code, 2)
 
 
 if __name__ == "__main__":

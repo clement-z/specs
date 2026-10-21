@@ -14,9 +14,11 @@ Requirements: Python >= 3.9, standard library only. Always run it isolated:
 ## Usage
 
 ```sh
-# Compare a build against the committed baseline (exit 0 = pass, 1 = fail)
+# Compare a build against the committed baseline (exit 0 = pass, 1 = fail,
+# 2 = --only selects nothing). Give --unit-tests, or --no-unit-tests to skip
+# the gtest case explicitly (without either, it fails as MISSING).
 python3 -I tests/golden/run_golden.py check \
-    --specs <builddir>/specs [--unit-tests <builddir>/src/test/unit_tests] \
+    --specs <builddir>/specs --unit-tests <builddir>/src/test/unit_tests \
     --baseline tests/golden/baseline [-j 4] [--keep /tmp/candidate] [--report report.json]
 
 # (Re-)record a baseline; --repeat N also re-runs everything N-1 times and
@@ -32,7 +34,9 @@ python3 -I tests/golden/run_golden.py list
 ```
 
 With Meson, `check` (default tolerances, `-j 4`, `--unit-tests` when the unit
-tests are built) is also registered as a test (`tests/golden/meson.build`):
+tests are built, `--no-unit-tests` otherwise) is also registered as a test
+(`tests/golden/meson.build`), next to `golden-harness`, the unit tests of
+`run_golden.py` itself (`test_run_golden.py`):
 
 ```sh
 meson test -C <builddir> --suite golden --print-errorlogs
@@ -45,14 +49,18 @@ Useful options (all sub-commands that compare):
 | `--rtol`, `--atol` | `1e-9`, `1e-12` | float tolerance: `|a-b| <= atol + rtol*max(|a|,|b|)` |
 | `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt): N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it |
 | `--lenient-order` | off | accept stdout/stderr lines that differ only in **order** in every case (reported as a note). By default only the streams a case lists in `unordered_streams` may be reordered (see "Determinism findings"). `--strict-order` is accepted as a no-op |
-| `--strict` | off | NEW cases (not in the baseline), MISSING cases and a SKIPPED gtest also fail |
-| `--only REGEX` | all | restrict to matching case ids |
+| `--allow-new` | off | NEW cases (in `cases.json`, not in the baseline) are reported but don't fail, e.g. while adding a case before recording it. MISSING cases (in the baseline, no result) always fail. `--strict` is accepted as a no-op |
+| `--no-unit-tests` | off | skip the gtest case explicitly (reported as SKIPPED). Without it and without `--unit-tests`, a selected gtest case fails as MISSING |
+| `--only REGEX` | all | restrict to matching case ids (`gtest/unit_tests` included); exit 2 when it matches nothing |
 | `--max-file-bytes` | `1e6` | larger outputs are stored gzipped (deterministic, lossless). If still too large, only a lossy summary is kept: per-signal min/max/last for VCDs, line count for text |
 
 Re-record (and commit) the baseline when a change *intentionally* alters the
 output, e.g. a bug fix. Put the reason in `--note`; it is stored in
 `baseline/manifest.json` (for a partial re-record with `--only`, it is appended to
-the manifest's `rerecords` list together with the regex and the date).
+the manifest's `rerecords` list together with the regex and the date). The
+gtest case is only (re-)recorded when the regex matches `gtest/unit_tests`.
+To add a case: add it to `cases.json`, run `check --allow-new` (the new case is
+reported as NEW, everything else must pass), then `record --only '^<id>$'`.
 
 ## What a case is
 
@@ -110,7 +118,9 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * PASS -> FAIL and missing tests fail;
   * FAIL -> PASS and new tests are reported as notes ("improvement;
     re-record");
-  * without `--unit-tests` the gtest case is reported as SKIPPED.
+  * the gtest case is selected when `--only` is not given or matches
+    `gtest/unit_tests`; it then needs `--unit-tests`, otherwise it fails as
+    MISSING, unless `--no-unit-tests` skips it explicitly (SKIPPED).
 * Per-case keys in `cases.json`:
   * `vcd_ignore_values`: regexes on signal names excluded from the VCD comparison;
   * `unordered_streams`: streams compared as a multiset of lines (a reorder is

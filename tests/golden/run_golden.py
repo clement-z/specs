@@ -505,10 +505,19 @@ def load_cases(path):
 
 
 def select(cases, only):
+    """Returns (selected cases, whether the gtest case is selected).
+
+    Exits with status 2 when --only selects nothing (a typo must not pass).
+    """
     if not only:
-        return cases
+        return cases, True
     rx = re.compile(only)
-    return [c for c in cases if rx.search(c["id"])]
+    sel = [c for c in cases if rx.search(c["id"])]
+    gtest = bool(rx.search(GTEST_ID))
+    if not sel and not gtest:
+        print("error: --only %r matches no case (see `run_golden.py list`)" % only, file=sys.stderr)
+        sys.exit(2)
+    return sel, gtest
 
 
 def safe_rel(case_id):
@@ -904,7 +913,7 @@ def discover_uncovered(cases, specs, repo):
     return warnings
 
 
-def record_into(outdir, cases, gspec, args, verbose=True):
+def record_into(outdir, cases, gspec, args, with_gtest, verbose=True):
     outdir.mkdir(parents=True, exist_ok=True)
     specs = Path(args.specs).resolve()
     repo = Path(args.repo).resolve()
@@ -919,7 +928,7 @@ def record_into(outdir, cases, gspec, args, verbose=True):
             if verbose:
                 print("  ran %-40s exit=%-14s %6.2fs  files=%d" % (res["id"], res["exit"], res["elapsed"], len(res["files"])))
     gres = None
-    if args.unit_tests:
+    if with_gtest and args.unit_tests:
         gres = run_gtest(Path(args.unit_tests).resolve(), gspec, tmp_root)
         store_gtest(outdir, gres)
         if verbose:
@@ -946,7 +955,7 @@ def write_manifest(outdir, cases, args, gres, note):
 
 def cmd_record(args):
     spec, cases, gspec = load_cases(args.cases)
-    cases = select(cases, args.only)
+    cases, with_gtest = select(cases, args.only)
     outdir = Path(args.out).resolve()
     if outdir.exists() and not args.only:
         # Full re-record: start from a clean tree so stale cases disappear.
@@ -955,7 +964,9 @@ def cmd_record(args):
     print("Recording %d case(s) into %s" % (len(cases), outdir))
     for w in discover_uncovered(load_cases(args.cases)[1], Path(args.specs).resolve(), Path(args.repo).resolve()):
         print("  WARNING: " + w)
-    _, gres = record_into(outdir, cases, gspec, args)
+    if with_gtest and not args.unit_tests:
+        print("  WARNING: %s not recorded (no --unit-tests): `check` will fail on it" % GTEST_ID)
+    _, gres = record_into(outdir, cases, gspec, args, with_gtest)
     if args.only and (outdir / "manifest.json").exists():
         old = json.loads((outdir / "manifest.json").read_text(encoding="utf-8"))
         ids = sorted(set(old.get("cases", [])) | {c["id"] for c in cases})
@@ -975,18 +986,18 @@ def cmd_record(args):
     print("Baseline size: %.1f kB" % (size / 1024.0))
     rc = 0
     if args.repeat > 1:
-        rc = determinism_check(cases, gspec, args, outdir)
+        rc = determinism_check(cases, gspec, args, outdir, with_gtest)
     return rc
 
 
-def determinism_check(cases, gspec, args, first_dir):
+def determinism_check(cases, gspec, args, first_dir, with_gtest):
     tol = Tol(args.rtol, args.atol, args.print_slack)
     bad = 0
     for k in range(2, args.repeat + 1):
         with tempfile.TemporaryDirectory(prefix="specs-golden-rep-", dir=args.tmpdir) as td:
             print("Determinism: repeat %d/%d" % (k, args.repeat))
-            record_into(Path(td), cases, gspec, args, verbose=False)
-            res = compare_dirs(first_dir, Path(td), cases, tol, verbose=False)
+            record_into(Path(td), cases, gspec, args, with_gtest, verbose=False)
+            res = compare_dirs(first_dir, Path(td), cases, tol, "compare" if with_gtest else "off", verbose=False)
             for cid, diffs in res["failed"].items():
                 bad += 1
                 print("  NONDETERMINISTIC %s" % cid)
@@ -997,8 +1008,10 @@ def determinism_check(cases, gspec, args, first_dir):
     return 1 if bad else 0
 
 
-def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, lenient_order=False):
-    out = {"passed": [], "failed": {}, "new": [], "missing": [], "notes": {}}
+def compare_dirs(base_dir, cand_dir, cases, tol, gtest, verbose=True, lenient_order=False):
+    """gtest: "compare" (missing on either side is MISSING/NEW), "skip" (explicitly
+    not run: reported, not compared) or "off" (not selected by --only: ignored)."""
+    out = {"passed": [], "failed": {}, "new": [], "missing": [], "skipped": [], "notes": {}}
     for c in cases:
         cid = c["id"]
         b = load_stored(base_dir, cid)
@@ -1029,7 +1042,13 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, lenient_order=Fal
             if verbose:
                 print("PASS     %s%s" % (cid, ("  (" + "; ".join(notes) + ")") if notes else ""))
     gb, gk = load_gtest(base_dir), load_gtest(cand_dir)
-    if gb and gk:
+    if gtest == "off":
+        pass
+    elif gtest == "skip":
+        out["skipped"].append(GTEST_ID)
+        if verbose:
+            print("SKIPPED  %s (--no-unit-tests)" % GTEST_ID)
+    elif gb and gk:
         fatal, notes = compare_gtest(gb, gk)
         if fatal:
             out["failed"][GTEST_ID] = fatal
@@ -1044,7 +1063,7 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, lenient_order=Fal
     elif gb and not gk:
         out["missing"].append(GTEST_ID)
         if verbose:
-            print("SKIPPED  %s (no --unit-tests given / not run)" % GTEST_ID)
+            print("MISSING  %s (no result: give --unit-tests, or --no-unit-tests to skip it explicitly)" % GTEST_ID)
     elif gk and not gb:
         out["new"].append(GTEST_ID)
         if verbose:
@@ -1052,21 +1071,22 @@ def compare_dirs(base_dir, cand_dir, cases, tol, verbose=True, lenient_order=Fal
     return out
 
 
-def summarise(out, strict):
+def summarise(out, allow_new):
+    """Exit status: FAIL and MISSING always fail, NEW fails unless allow_new."""
     nfail = len(out["failed"])
     nnotes = len([c for c in out["notes"] if c not in out["failed"]])
     print(
-        "\nSummary: %d passed (%d with notes), %d failed, %d new, %d missing/skipped"
-        % (len(out["passed"]), nnotes, nfail, len(out["new"]), len(out["missing"]))
+        "\nSummary: %d passed (%d with notes), %d failed, %d new, %d missing, %d skipped"
+        % (len(out["passed"]), nnotes, nfail, len(out["new"]), len(out["missing"]), len(out["skipped"]))
     )
-    if strict and (out["new"] or out["missing"]):
-        return 1
-    return 1 if nfail else 0
+    if out["new"] and not allow_new:
+        print("NEW cases fail: record them (`record --only ...`), or pass --allow-new while adding cases")
+    return 1 if nfail or out["missing"] or (out["new"] and not allow_new) else 0
 
 
 def cmd_check(args):
     spec, cases, gspec = load_cases(args.cases)
-    cases = select(cases, args.only)
+    cases, with_gtest = select(cases, args.only)
     base = Path(args.baseline).resolve()
     if not (base / "manifest.json").exists():
         raise SystemExit("no manifest.json in baseline %s" % base)
@@ -1085,9 +1105,10 @@ def cmd_check(args):
         cand = Path(td.name)
     try:
         print("Running %d case(s) against baseline %s" % (len(cases), base))
-        record_into(cand, cases, gspec, args, verbose=False)
+        record_into(cand, cases, gspec, args, with_gtest, verbose=False)
         write_manifest(cand, cases, args, load_gtest(cand), "candidate")
-        out = compare_dirs(base, cand, cases, tol, lenient_order=args.lenient_order)
+        gtest = "off" if not with_gtest else ("skip" if args.no_unit_tests else "compare")
+        out = compare_dirs(base, cand, cases, tol, gtest, lenient_order=args.lenient_order)
     finally:
         if td:
             td.cleanup()
@@ -1095,29 +1116,32 @@ def cmd_check(args):
         print("STALE    %s (in baseline but not in cases.json)" % s)
     if args.report:
         Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
-    return summarise(out, args.strict)
+    return summarise(out, args.allow_new)
 
 
 def cmd_compare(args):
     spec, cases, gspec = load_cases(args.cases)
-    cases = select(cases, args.only)
+    cases, with_gtest = select(cases, args.only)
     tol = Tol(args.rtol, args.atol, args.print_slack)
-    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, lenient_order=args.lenient_order)
+    out = compare_dirs(Path(args.baseline), Path(args.candidate), cases, tol, "compare" if with_gtest else "off",
+                       lenient_order=args.lenient_order)
     if args.report:
         Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
-    return summarise(out, args.strict)
+    return summarise(out, args.allow_new)
 
 
 def cmd_list(args):
     spec, cases, gspec = load_cases(args.cases)
-    for c in select(cases, args.only):
+    cases, with_gtest = select(cases, args.only)
+    for c in cases:
         extra = []
         if c.get("expect"):
             extra.append("expect=" + c["expect"])
         if c.get("vcd_ignore_values"):
             extra.append("vcd_ignore_values")
         print("%-40s specs %s %s" % (c["id"], " ".join(c.get("args", [])), " ".join(extra)))
-    print("%-40s (only with --unit-tests)" % GTEST_ID)
+    if with_gtest:
+        print("%-40s (only with --unit-tests)" % GTEST_ID)
     return 0
 
 
@@ -1134,7 +1158,12 @@ def main(argv=None):
             "--print-slack", type=float, default=1.0,
             help="extra tolerance for floats in text, in units of the last printed digit (default 1; 0 disables)",
         )
-        p.add_argument("--strict", action="store_true", help="NEW/MISSING/SKIPPED cases also fail")
+        p.add_argument(
+            "--allow-new", action="store_true",
+            help="NEW cases (in cases.json, not in the baseline) don't fail, e.g. before recording them "
+            "(MISSING cases always fail)",
+        )
+        p.add_argument("--strict", action="store_true", help="no-op, kept for old command lines (now the default)")
         p.add_argument(
             "--lenient-order", action="store_true",
             help="accept stdout/stderr lines that only differ in order in every case, reported as 'reordered' "
@@ -1144,7 +1173,12 @@ def main(argv=None):
         p.add_argument("--report", help="write a JSON report to this file")
         if need_specs:
             p.add_argument("--specs", required=True, help="path to the specs binary")
-            p.add_argument("--unit-tests", help="path to the unit_tests (GoogleTest) binary")
+            g = p.add_mutually_exclusive_group()
+            g.add_argument("--unit-tests", help="path to the unit_tests (GoogleTest) binary")
+            g.add_argument(
+                "--no-unit-tests", action="store_true",
+                help="skip the gtest case explicitly (check fails when it is selected and neither option is given)",
+            )
             p.add_argument("--repo", default=str(DEFAULT_REPO), help="repo root (circuits/ is copied from here)")
             p.add_argument("--jobs", "-j", type=int, default=1, help="parallel cases (default 1)")
             p.add_argument("--tmpdir", default=None, help="where to create per-case working dirs")
