@@ -49,3 +49,4 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 - 2026-10-21 — Q8 decided: order by time only (same-time order unspecified, deterministic). All F-15 answers confirmed. Waiting for "go" on A/B.
 - 2026-10-21 — backlog B-179 recorded (PUF circuit ring coupling to align before benchmark use; needs-human, decision pending); integer-clamp entry of phase A renumbered B-180.
 - 2026-10-21 — **go for A and B**. A launched (agent f8d8912f, `ws/followups`); B started by the coordinator; coordinator heartbeat ac1c0a21 (5 min, 96 h, registry 2026-10c). C and D not approved yet.
+- 2026-10-21 — B: reproduced with gcc 11 ASan+UBSan; one cause in all 146 failing golden cases: `Variable` copied an indeterminate bool (UB, parse_tree.h:277). Fixed in 8af20cc (B-181, member initialisers; outputs bit-identical); gcc ASan meson test 12/12 locally; pushed, CI run pending. Phase A agent told to merge sprint/2026-10c before widening `inum`.
