@@ -209,7 +209,8 @@ Maintainer decision in `backlog/DECISIONS-2026-10-21.md` ("third round"); implem
     or prefix cache, no submodules. CI keeps `CC`/`CXX` per matrix entry, prefixed with `ccache` (Meson only
     adds ccache itself when they are unset), caches `subprojects/packagecache` (GitHub: keyed on the
     `.wrap` files; GitLab: a fixed key, Meson checks the hashes) and `.ccache`, and clones the full
-    history for `git describe`. The binaries artefact ships `build/subprojects/systemc-*/libsystemc.so*`.
+    history for `git describe`. The binaries artefact ships `build/subprojects/systemc-*/libsystemc.so.[0-9]*[0-9]`
+    (`libsystemc.so*` would also match the `libsystemc.so.<version>.p/` object directory).
     `install.sh` is plain setup/compile/test.
 38. **The SystemC subproject is never sanitized** (`set_override_option('b_sanitize', 'none')`). Sanitizer builds
     used to link an unsanitized, installed SystemC. Built from the wrap, SystemC inherited

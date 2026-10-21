@@ -37,7 +37,8 @@ default:
             - .ccache/
 
 # specs and libspx.so need libsystemc.so.3.0 at run time: it is shipped in the artefacts
-# (build/subprojects/systemc-*/), use LD_LIBRARY_PATH to run them elsewhere.
+# (build/subprojects/systemc-*/; the pattern skips the libsystemc.so.<version>.p/ object
+# directory), use LD_LIBRARY_PATH to run them elsewhere.
 build:
     stage: build
     script:
@@ -47,7 +48,7 @@ build:
         paths:
             - build/specs
             - build/libspx.so
-            - build/subprojects/systemc-*/libsystemc.so*
+            - build/subprojects/systemc-*/libsystemc.so.[0-9]*[0-9]
         expire_in: 1 week
 
 # A build dir does not survive being passed as an artefact (fresh checkout timestamps, absolute
