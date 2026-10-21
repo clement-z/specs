@@ -16,7 +16,7 @@ Start: `ws/netlist` @ 0dee6b2 (P1–P4 merged). Builds: gcc `/tmp/P5-gcc`.
 | 6 | F-12 `--param name=value` overrides `.param` | `semantics` | done | a64b445 | 3 new cases; cli/help, cli/no-args |
 | 7 | F-12 `.include` relative to the including file, then the cwd; warning if both exist and differ | `semantics` | done | 062399c | 2 new cases; gtest ParserState.*; no existing case changed |
 | 8 | F-12 legacy ring netlists to `circuits/legacy/` + README note; golden case paths | orchestrator | done | 829894f | 3 cases re-recorded: path only (args, parse-error message) |
-| 9 | docs (netlist syntax, numerics, README, CHANGELOG, golden README), backlog status, report | orchestrator (+ Sonnet for doc/netlist.md syntax) | in progress | | |
+| 9 | docs (netlist syntax, numerics, README, CHANGELOG, golden README), backlog status, report | orchestrator (+ Sonnet for doc/netlist.md syntax) | done | 1be5a5c, 0a5fe9f, 50f3266, bb1b7e5, report | residual-order fix 0a5fe9f found by the clang run |
 
 ## Decisions (running list, copied into the report)
 - F-28 iteration = one delta cycle of the current time step (`runFixedPoint()` steps `sc_start(SC_ZERO_TIME)`); default
@@ -49,3 +49,5 @@ Start: `ws/netlist` @ 0dee6b2 (P1–P4 merged). Builds: gcc `/tmp/P5-gcc`.
 - 2026-10-21 — item 1 (F-28) committed 1be5a5c; meson test 12/12, golden 162/162 `--atol 0`.
 - 2026-10-21 — items 2-4 cherry-picked (cases.json merged), new cases recorded: 6c837e5, e80bba4, b00b8ae; golden 171/171 `--atol 0`.
 - 2026-10-21 — items 5-7 cherry-picked (a67deb3, a64b445, 062399c), item 8 committed 829894f; meson test 12/12, golden 176/176 `--atol 0`.
+- 2026-10-21 — clang 19 run: residual line order differed (equal ratios up to last bits) -> fix 0a5fe9f (order of magnitude, then name). Docs 50f3266, bb1b7e5 (Sonnet netlist syntax, reviewed, examples re-run).
+- 2026-10-21 — final: gcc incremental + fresh, clang 19: meson test 12/12, golden 176/176 `--atol 0`; clang ASan+UBSan golden 176/176. Worktrees /tmp/P5-wt/* removed. Report committed; heartbeat 50c26c63 deleted after it.
