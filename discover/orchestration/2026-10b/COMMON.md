@@ -3,6 +3,18 @@
 You run unattended in your own paseo worktree, on the phase branch named in your phase prompt, branched from
 `sprint/2026-10b`. The coordinator merges your branch after an independent check. **Never `git push`.**
 
+## Heartbeat (set it up first, before any other work)
+Usage limits can stop you (and your subagents) at any time. Create your own heartbeat so you resume on your own:
+```
+paseo heartbeat create --cron "*/5 * * * *" --expires-in 48h --name "<Pn>-heartbeat" \
+  "[heartbeat <Pn>] If you are in the middle of work, ignore this and continue. If you were stopped (usage limit,
+   error, cut-off subagents), resume: read backlog/sprint-2026-10b/<Pn>-progress.md, resume or relaunch the
+   subagents that were cut off, and continue with the next item. If <Pn>-REPORT.md is already committed, delete
+   this heartbeat (paseo heartbeat delete <id>) and stop."
+```
+Note its id in `<Pn>-progress.md`. Delete it right after committing your report. Keep heartbeat turns short
+when nothing needs doing.
+
 ## Read first
 `CLAUDE.md`, `discover/SPRINT-2026-10b.md` (board), **`backlog/DECISIONS-2026-10-21.md` (the maintainer's
 decisions — they define what to build)**, the backlog files of your items (`backlog/B-NNN-*.md`), and for features the
