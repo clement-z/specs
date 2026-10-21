@@ -10,8 +10,8 @@ golden 134/134 `--atol 0`, 0 notes.
 | # | item | owner | status | commit | notes |
 |---|---|---|---|---|---|
 | 1 | B-176 element creation backlog in netlist order | orchestrator | done | 7c12a61 | 9 cases re-recorded (stdout line order only, multiset-equal; paul_3ring_puf error stop point 2 elements earlier) |
-| 2 | B-016 name-ordered `sc_get_all_*` (init, OP listing, auto-probes, VCD order) + golden re-record (ordering only, proven) | orchestrator | in progress | | |
-| 3 | `test(golden)`: drop every `unordered_streams` exception | orchestrator | pending | | P1's 8 + later B-016 ones |
+| 2 | B-016 name-ordered `sc_get_all_*` (init, OP listing, auto-probes, VCD order) + golden re-record (ordering only, proven) | orchestrator | done | 5c6d742 | 56 cases: 55 reordered (proof script), b144-three-writers explained; tb/det, tb/detector left for item 4 |
+| 3 | `test(golden)`: drop every `unordered_streams` exception | orchestrator | done | (see log) | 14 cases (P1's 8 + 6 later) |
 | 4 | F-01 seeds: `--seed`, `.options seed`, `spx::rng_for`, Detector streams per name, `darkfield` option (B-055, B-056) | Opus implementer a96cbaf6240d36dfe, `/tmp/P4-wt/rng` (`P4-wip/rng`) | running | | |
 | 5 | F-01 run manifest `<trace>.manifest.json` + `--print-manifest` | Opus implementer a8aba4f323342d840, `/tmp/P4-wt/manifest` (`P4-wip/manifest`) | running | | |
 | 6 | verification: `check --strict` twice, clang ASan/UBSan, `record --repeat 3` | orchestrator | pending | | |
@@ -27,3 +27,4 @@ golden 134/134 `--atol 0`, 0 notes.
 ## Log
 - 2026-10-21 — heartbeat 99a0d01d created; context read; baseline build green.
 - 2026-10-21 — item 1 (B-176) committed 7c12a61; golden 134/134 `--atol 0`, 0 notes.
+- 2026-10-21 — items 2 (5c6d742) and 3 committed; 134/134 strict, 0 notes. upgrade_signal assert did not fire (creation order = netlist order). clang ASan build started in /tmp/P4-asan.
