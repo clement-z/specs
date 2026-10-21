@@ -514,6 +514,12 @@
    "only": "^(regress/f12-dc-(wl-alias|wl-slash|p-alias)|err/f12-dc-alias-unknown-attr)$",
    "gtest": false,
    "note": "F-12: .dc ATTR(elem) alias cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:03:51Z",
+   "only": "^(cir/add_drop|cir-json/add_drop|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|err/b017-json-unwritable|regress/b004-mode-td-dc|regress/f12-dc-wl-alias|regress/f12-dc-wl-slash|regress/f12-dc-p-alias|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-12: .dc includes the stop value (SPICE semantics, maintainer decision 2026-10-21): every .dc sweep with an integer (stop-start)/step gains its stop point at the end; earlier points unchanged (same accumulation, B-009 open)"
   }
  ]
 }

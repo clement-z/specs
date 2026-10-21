@@ -1,7 +1,7 @@
 ╔═══════════════════╗
 ║  PARSING CIRCUIT  ║
 ╚═══════════════════╝
-Recorded sweep order for WL(CWSRC1) (4points)
+Recorded sweep order for WL(CWSRC1) (5points)
 -----------
 2 global assignments
  - c (DOUBLE) = 2.99792e+08
@@ -65,11 +65,12 @@ Current SPECS config:
 - trace all optical nets: 1
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
-Starting sweep on WL(ROOT/CWSRC1) (4 points)
+Starting sweep on WL(ROOT/CWSRC1) (5 points)
 ROOT/CWSRC1 emitted: [#1]  @ 1549 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 ROOT/CWSRC1 emitted: [#2]  @ 1549.5 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 ROOT/CWSRC1 emitted: [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 ROOT/CWSRC1 emitted: [#4]  @ 1550.5 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#5]  @ 1551 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 ╔═══════════════════╗
 ║        DONE       ║
 ╚═══════════════════╝

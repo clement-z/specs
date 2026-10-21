@@ -103,7 +103,7 @@ void DCAnalysis::create() const
             cerr << "Unknown attribute for " << sweep_order.first.first << ": " << attribute_name << endl;
             exit(1);
         }
-        auto values = range(sweep_order.second[0], sweep_order.second[1], sweep_order.second[2]);
+        auto values = sweep_values(sweep_order.second[0], sweep_order.second[1], sweep_order.second[2]);
         auto order = pair<function<void(double)>, vector<double>>(f, values);
         auto order_name = attribute_name + "(" + element_name + ")";
         specsGlobalConfig.cw_sweep_orders.emplace(order_name, order);
