@@ -1,0 +1,10 @@
+* B-146 reference (repro: backlog/repro/a4-x-shared-net-flat.cir): flat equivalent of
+* b146-x-shared-net; it must give the same values (worked before the fix).
+* Expected: see b146-x-shared-net (mid:0 = mid:1 = 1 mW at -2.1890 rad; in1:1 = in2:1 = 1 mW
+* at 0; in1:0 = in2:0 = 1 mW at 1.9052 rad).
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2 wl=1.55e-6 power=1e-3
+wg1 in1 mid length=1e-4
+wg2 in2 mid length=1e-4
+.tran 1e-11

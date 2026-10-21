@@ -1,0 +1,82 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+5 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in1 {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/CWSRC2 (CW SOURCE) ROOT/in2_ {} {power (DOUBLE) = 0.002, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/WGD (WAVEGUIDE (bidir)) ROOT/in2_ ROOT/in2 {} {length (DOUBLE) = 0.01, }
+ - ROOT/WG1 (WAVEGUIDE (bidir)) ROOT/in1 ROOT/mid {} {length (DOUBLE) = 0.0001, }
+ - ROOT/WG2 (WAVEGUIDE (bidir)) ROOT/in2 ROOT/mid {} {length (DOUBLE) = 0.0001, }
+-----------
+4 named nets
+ - ROOT/in1: OANALOG<1>u (1|1)
+ - ROOT/in2: OANALOG<1>u (1|1)
+ - ROOT/in2_: OANALOG<1>u (1|1)
+ - ROOT/mid: OANALOG<1>b (2|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {1e-09 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Elaborating network of ROOT/mid...
+Creating ROOT/WG1 (reason: connection to bidir net)
+Done creating ROOT/WG1
+Creating - ROOT/CWSRC1 (reason: bidir backlog)
+Done creating ROOT/CWSRC1
+Creating - ROOT/WG2 (reason: bidir backlog)
+Done creating ROOT/WG2
+Creating - ROOT/WGD (reason: bidir backlog)
+Done creating ROOT/WGD
+Creating - ROOT/CWSRC2 (reason: bidir backlog)
+Done creating ROOT/CWSRC2
+Done (elaborating network of ROOT/mid)
+Done with bidirectional nets
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC2 emitted: [#2]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/in1:0 (OPTICAL) = [#3]  @ 1550 nm (0.044721 √W, 0.002000 W, 2.9186 rad)
+║ - ROOT/in1:1 (OPTICAL) = [#4]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/in2:0 (OPTICAL) = [#5]  @ 1550 nm (0.031623 √W, 0.001000 W, 1.9052 rad)
+║ - ROOT/in2:1 (OPTICAL) = [#6]  @ 1550 nm (0.044721 √W, 0.002000 W, 1.0134 rad)
+║ - ROOT/in2_:0 (OPTICAL) = [#7]  @ 1550 nm (0.031623 √W, 0.001000 W, 2.9186 rad)
+║ - ROOT/in2_:1 (OPTICAL) = [#8]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+║ - ROOT/mid:0 (OPTICAL) = [#9]  @ 1550 nm (0.031623 √W, 0.001000 W, -2.1890 rad)
+║ - ROOT/mid:1 (OPTICAL) = [#10]  @ 1550 nm (0.044721 √W, 0.002000 W, -1.1756 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+Simulated 1 ns
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

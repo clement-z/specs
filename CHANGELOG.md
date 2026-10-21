@@ -120,6 +120,8 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   depends on the netlist line order: a source or other unidirectional writer listed before the bidirectional
   device no longer loses its light, two sources on one net run (was E115), a net upgraded to bidirectional keeps
   its reader on the device's output, and crossing outputs on bidirectional nets propagate (B-144, B-145, B-147)
+* Subcircuit instances that share a port net now behave like the flat netlist (was E115 or last write wins, and
+  no net type check) (B-146)
 * Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
   at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
   positional arguments is a clean error (B-052)

@@ -1,0 +1,111 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaabg  abstol       $end
+$var real    1  aaabh  reltol       $end
+$var wire   32  aaabi  resolution_multiplier [31:0]  $end
+$var wire   32  aaabj  engine_timescale [31:0]  $end
+$var wire   32  aaabk  simulation_mode [31:0]  $end
+$var wire   32  aaabl  analysis_type [31:0]  $end
+$var wire    1  aaabm  trace_all_optical_nets       $end
+$var wire    1  aaabn  verbose_component_initialization       $end
+$scope module PROBE{ROOT/in1:0} $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in1:1} $end
+$var real    1  aaaae  power       $end
+$var real    1  aaaaf  abs       $end
+$var real    1  aaaag  phase       $end
+$var real    1  aaaah  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2:0} $end
+$var real    1  aaaai  power       $end
+$var real    1  aaaaj  abs       $end
+$var real    1  aaaak  phase       $end
+$var real    1  aaaal  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2:1} $end
+$var real    1  aaaam  power       $end
+$var real    1  aaaan  abs       $end
+$var real    1  aaaao  phase       $end
+$var real    1  aaaap  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2_:0} $end
+$var real    1  aaaaq  power       $end
+$var real    1  aaaar  abs       $end
+$var real    1  aaaas  phase       $end
+$var real    1  aaaat  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in2_:1} $end
+$var real    1  aaaau  power       $end
+$var real    1  aaaav  abs       $end
+$var real    1  aaaaw  phase       $end
+$var real    1  aaaax  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/mid:0} $end
+$var real    1  aaaay  power       $end
+$var real    1  aaaaz  abs       $end
+$var real    1  aaaba  phase       $end
+$var real    1  aaabb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/mid:1} $end
+$var real    1  aaabc  power       $end
+$var real    1  aaabd  abs       $end
+$var real    1  aaabe  phase       $end
+$var real    1  aaabf  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.002 aaaaa
+r0.04472135954999579 aaaab
+r2.918640916887003 aaaac
+r1.55e-06 aaaad
+r0.0009999999999999998 aaaae
+r0.03162277660168379 aaaaf
+r0 aaaag
+r1.55e-06 aaaah
+r0.0009999999999999998 aaaai
+r0.03162277660168379 aaaaj
+r1.905223931854829 aaaak
+r1.55e-06 aaaal
+r0.002 aaaam
+r0.04472135954999579 aaaan
+r1.013416985032175 aaaao
+r1.55e-06 aaaap
+r0.0009999999999999996 aaaaq
+r0.03162277660168378 aaaar
+r2.918640916887003 aaaas
+r1.55e-06 aaaat
+r0.002 aaaau
+r0.04472135954999579 aaaav
+r0 aaaaw
+r1.55e-06 aaaax
+r0.0009999999999999998 aaaay
+r0.03162277660168379 aaaaz
+r-2.188980687662379 aaaba
+r1.55e-06 aaabb
+r0.002 aaabc
+r0.04472135954999579 aaabd
+r-1.175563702630204 aaabe
+r1.55e-06 aaabf
+r1e-08 aaabg
+r0.0001 aaabh
+b1 aaabi
+b11111111111111111111111111110011 aaabj
+b1 aaabk
+b10 aaabl
+1aaabm
+0aaabn
+$end
+

@@ -1671,6 +1671,95 @@
    "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
   },
   {
+   "id": "regress/b146-x-shared-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: two subckt instances driving one net merge against nets_flat; mid is bidirectional as in the flat netlist (mid:0 = mid:1 = 1 mW at -2.1890 rad; was E115, exit 1)."
+  },
+  {
+   "id": "regress/b146-x-shared-net-flat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-net-flat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: flat reference for b146-x-shared-net (same values)."
+  },
+  {
+   "id": "regress/b146-x-shared-delayed",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-delayed.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: two subckt instances writing one net at different times; mid is bidirectional as in the flat netlist (mid:0 = 1 mW, mid:1 = 2 mW; was unidirectional, last write wins, mid = 2 mW)."
+  },
+  {
+   "id": "regress/b146-x-shared-delayed-flat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-delayed-flat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: flat reference for b146-x-shared-delayed (same values)."
+  },
+  {
+   "id": "err/b146-x-net-type-mismatch",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-net-type-mismatch.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-146: a net optical in one subckt instance and electrical in another is rejected while flattening ('Could not reconcile nets: ROOT/X2/e and ROOT/n', exit 1; was 'Wrong signal type for 0 connected to ROOT/n' at elaboration; message wording is B-155)"
+  },
+  {
    "id": "regress/b032-crossing-passive",
    "args": [
     "-f",

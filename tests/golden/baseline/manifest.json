@@ -43,6 +43,7 @@
   "err/b060-pcmcell-n-zero",
   "err/b064-evlsrc-missing-file",
   "err/b131-nrings-crow-zero",
+  "err/b146-x-net-type-mismatch",
   "err/b148-crossing-args",
   "err/b148-mlprobe-args",
   "err/b148-mzi-args",
@@ -137,6 +138,10 @@
   "regress/b145-upgrade-reader-case2-ref",
   "regress/b145-upgrade-reader-ref",
   "regress/b145-upgrade-roles",
+  "regress/b146-x-shared-delayed",
+  "regress/b146-x-shared-delayed-flat",
+  "regress/b146-x-shared-net",
+  "regress/b146-x-shared-net-flat",
   "regress/b147-crossing-out-bidir",
   "regress/b147-crossing-out-explicit-splitter",
   "regress/b147-crossing-out-explicit-splitter-first",
@@ -581,6 +586,24 @@
    "only": "^((regress|err)/f05-format-|cli/help$|cli/no-args$|gtest/unit_tests$)",
    "gtest": true,
    "note": "F-05: --format vcd|csv|npz (6 new cases; cli/help and cli/no-args gain the flag; gtest gains TraceTable.*)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:39:58Z",
+   "only": "^(regress|err)/b146-",
+   "gtest": false,
+   "note": "B-146: new cases, subckt port nets merged against nets_flat (hierarchical == flat)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:39:58Z",
+   "only": "^cir-json/subckt_tests$",
+   "gtest": false,
+   "note": "B-146 (needs sign-off, not predicted by the P2 table): JSON writers of ROOT/out and ROOT/X2/N00001 0 -> 1, the flat-equivalent count"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T15:08:11Z",
+   "only": "^(cir-json/subckt_tests|(regress|err)/b146-.*)$",
+   "gtest": false,
+   "note": "B-146 (landed in sprint 2026-10c phase A, maintainer decision 'land P2-ready/b146 as is'): cir-json/subckt_tests JSON writers of ROOT/out and ROOT/X2/N00001 0 -> 1 (flat-equivalent count); the 5 b146 cases recorded with the current build (strict line order)"
   }
  ]
 }

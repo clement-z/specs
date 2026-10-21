@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b146-x-net-type-mismatch.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b146-x-net-type-mismatch"
+}
