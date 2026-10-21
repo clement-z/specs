@@ -263,7 +263,8 @@ def compare_text(a, b, tol, label, limit=10):
                 if max(sig_digits(tx), sig_digits(ty)) < PRINT_SLACK_MIN_DIGITS:
                     close = Tol(tol.rtol, 0.0, 0.0).floats_close(fx, fy)
                 else:
-                    close = tol.floats_close(fx, fy, tol.slack * max(printed_ulp(tx), printed_ulp(ty)))
+                    # The longer token sets the slack: "1" vs "1.99999" must not get a slack of 1.
+                    close = tol.floats_close(fx, fy, tol.slack * min(printed_ulp(tx), printed_ulp(ty)))
                 if not close:
                     ok = False
                     break

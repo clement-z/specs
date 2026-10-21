@@ -56,12 +56,12 @@ expect 1 "check (default print slack)" "${G[@]}" check "${S[@]}" --no-unit-tests
 fresh; sed -i 's/^- default reltol: 1e-06$/- default reltol: 2e-06/' "$W/base/cases/cir/add_drop/stdout.txt"
 expect 1 "check, reltol 1e-06 -> 2e-06" "${G[@]}" check "${S[@]}" --no-unit-tests --baseline "$W/base" --only '^cir/add_drop$'
 
-echo "== B-128 control: last digit of a 6-digit computed token changed (still within the print slack)"
+echo "== B-128 control: last digit of a long (5+ significant digits) computed token changed (within the print slack)"
 fresh
 python3 -I - "$W/base/cases/tb/wg/stdout.txt" <<'PY'
 import re, sys
 p = sys.argv[1]; s = open(p).read()
-m = re.search(r"(?<![\d.])(\d\.\d{5})(\d)(?= )", s)   # first 6-significant-digit token such as 0.707107
+m = re.search(r"(?<![\d.])(\d\.\d{5})(\d)(?= )", s)   # first token with 6 decimals, such as 0.707107
 assert m, "no 6-digit token"
 d = int(m.group(2)); s = s[:m.start(2)] + str(d + 1 if d < 9 else d - 1) + s[m.end(2):]
 open(p, "w").write(s)

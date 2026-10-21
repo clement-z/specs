@@ -233,6 +233,12 @@ class PrintSlack(unittest.TestCase):
         # Trailing zeros dropped by %g on one side: the longer token sets the slack.
         self.assertTrue(self.same("x = 0.12345", "x = 0.123451"))
         self.assertFalse(self.same("P = 0.707107 W", "P = 0.707109 W"))
+        self.assertTrue(self.same("x = 0.1", "x = 0.0999999"))
+
+    def test_mixed_lengths_use_the_longer_token(self):
+        for a, b in [("1", "1.99999"), ("0", "0.99999"), ("0.1", "0.199999"), ("1550", "1550.9999"),
+                     ("1e+10", "1.0002e+10")]:
+            self.assertFalse(self.same("v = " + a, "v = " + b), (a, b))
 
     def test_short_tokens_use_rtol(self):
         self.assertTrue(self.same("-0.0000 rad", "0.0000 rad"))
