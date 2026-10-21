@@ -15,6 +15,9 @@
 #include "devices/generic_transmission_device.h"
 #include "run_manifest.h"
 
+#include <algorithm>
+#include <cmath>
+
 using std::string;
 
 SPECSConfig specsGlobalConfig { "SPX" };
@@ -297,9 +300,11 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
     {
         return oop->m_last_emission_change / oop->m_last_emission_threshold;
     };
-    // largest change relative to its threshold first (name order between equal ones)
+    // largest change relative to its threshold first, by order of magnitude, then in name order:
+    // the ratios of a loop's ports differ only in the last bits, which differ between compilers
+    auto decade = [&ratio](const OpticalOutputPort *oop) { return std::floor(std::log10(ratio(oop))); };
     std::stable_sort(changing.begin(), changing.end(),
-                     [&ratio](const OpticalOutputPort *a, const OpticalOutputPort *b) { return ratio(a) > ratio(b); });
+                     [&decade](const OpticalOutputPort *a, const OpticalOutputPort *b) { return decade(a) > decade(b); });
 
     cerr << "Error: " << what << " did not converge within " << max_iterations
          << " iterations (delta cycles, .options maxiter)" << endl;

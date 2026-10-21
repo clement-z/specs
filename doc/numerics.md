@@ -123,8 +123,9 @@ being the relative threshold of the previous section, so a weakly coupled lossle
 5e-9) needs about 2e9 round trips, and a loop with r = 1 never stops. To keep such a circuit from running
 for hours, the fixed point stops after `maxiter` iterations (default 1000000, `.options maxiter`,
 `--maxiter`; 0 is no limit) with an error and exit status 1. The message gives the residual: the output
-ports that still emitted in the last tenth of the iterations, sorted by their last change relative to its
-threshold (`tests/golden/netlists/f28-lossless-ring-op.cir`):
+ports that still emitted in the last tenth of the iterations, the largest last change relative to its
+threshold first (by order of magnitude, then by name; at most 10 are listed)
+(`tests/golden/netlists/f28-lossless-ring-op.cir`):
 
     Error: .op: the operating point did not converge within 1000000 iterations (delta cycles, .options maxiter)
     Residual: 2 optical output port(s) changed in the last 100000 delta cycles. Last change |dE| and emission threshold max(abstol, reltol*|E_last|), in sqrt(W):
