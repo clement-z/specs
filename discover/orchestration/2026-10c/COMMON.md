@@ -58,6 +58,9 @@ Read only what your prompt names. Never copy files, text or data from outside th
   (`README.md`, `doc/`, cheatsheet sources if any) and `CHANGELOG.md` `[unreleased]` for user-visible changes.
 
 ## Subagents
+Choose the model per task (haiku for trivial lookups, sonnet for mechanical or documentation work, opus for
+engine, parser, physics and review) and give every subagent an explicit effort, medium or high (maintainer request,
+2026-10-21).
 Use the Agent tool for independent strands (Opus for engine/parser/physics, Sonnet for mechanical work). Never use
 `isolation: "worktree"` (it creates worktrees in the maintainer's main checkout): create your own with
 `git worktree add /tmp/<phase>-wt/<name> -b <phase>-wip/<name> <your branch>`, cherry-pick from them, and review every
