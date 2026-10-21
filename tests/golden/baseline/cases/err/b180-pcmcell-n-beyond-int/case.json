@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b180-pcmcell-n-beyond-int.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b180-pcmcell-n-beyond-int"
+}

@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b180-numeric-net-names.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 441,
+   "kind": "json",
+   "sha256": "0b11ba2b6475a35cfb968328e9f3c391dd8523c88da9718d10849edc106afb1f",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b180-numeric-net-names"
+}

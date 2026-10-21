@@ -41,8 +41,12 @@
   resonators versus reltol and how to choose it, time resolution and delay rounding (B-021, B-124, B-014)
 * `.options snapfactor=<x>`: emitted fields with |E| < snapfactor·abstol are emitted as 0 (default 10, as
   before; 0 disables the snap) (B-021)
+* Zero tolerances: `abstol` and `reltol` may be 0 (`.options`, `--abstol`, `--reltol`; negative values stay
+  errors), e.g. to compare with a fixed-step discrete model; with both at 0 nothing is gated or snapped and
+  one warning says that feedback circuits may not quiesce and `.op`/`.dc` may stop at `maxiter`
+  (`doc/numerics.md`) (B-018, B-153)
 * Reproducible runs (F-01, `doc/reproducibility.md`):
-  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (0 to 2^53; `--seed` wins):
+  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (an integer literal 0 to 2^63 − 1, exponent form 0 to 2^53, B-180; `--seed` wins):
     one master seed for every random draw, **default 0**, so runs are reproducible by default. Each device
     draws from its own stream, derived from the seed and its hierarchical name (adding or reordering other
     devices does not change it); the streams are the same with every standard library (`std::mt19937_64`,
@@ -104,6 +108,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   splitter ratio (B-034), stray `.op`/`.dc` arguments (B-165), `.ic` (B-161), unwritable `--json` path (B-017);
   file-open errors name the file (B-064)
 * Parser: `.include` inside `.subckt` (B-150), files opened by `.include` are closed (B-156), memory leaks (B-170)
+* Integer literals are 64-bit (0 to 9223372036854775807) and a larger one is a parse error with its file and line;
+  they were clamped to 2147483647 silently (`.options seed=3000000000` was seed 2147483647, net `3000000000` was
+  `N2147483647`). `.options seed`/`maxiter` take integer literals exactly; PCMCELL `n`/`k` beyond the int range
+  are an error (B-180)
 * `--nrings_crow` sets the number of CROW rings (B-131); CROW children are prefixed with the instance name (B-072)
 * Detector readouts start at 0 instead of uninitialised memory (B-054); BitstreamSource saturation message (B-044)
 * JSON export writes the writers count, not the readers count (B-154)
@@ -121,6 +129,8 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   depends on the netlist line order: a source or other unidirectional writer listed before the bidirectional
   device no longer loses its light, two sources on one net run (was E115), a net upgraded to bidirectional keeps
   its reader on the device's output, and crossing outputs on bidirectional nets propagate (B-144, B-145, B-147)
+* Subcircuit instances that share a port net now behave like the flat netlist (was E115 or last write wins, and
+  no net type check) (B-146)
 * Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
   at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
   positional arguments is a clean error (B-052)
@@ -155,7 +165,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * Delays that the time resolution rounds by more than 10 % (e.g. a 53 fs ring round trip run at 100 fs: +87 %), or
   to 0 (the loop then collapses into one time step), are reported on stderr once per waveguide in `.tran` and
   testbenches, with the `.options timescale` to use; they were rounded silently and the check meant to catch it
-  could never fire (B-014; an error for delays that round to 0 is pending, see `backlog/B-014-*.md`)
+  could never fire (B-014)
+* A waveguide written in the netlist (also inside a `.subckt`) whose non-zero delay rounds to 0 at the time
+  resolution is an error (exit 1, before the simulation, with the `.options timescale` to use); waveguides that
+  devices create internally (MZI arms, ...) keep the warning (B-014)
 
 * Output order no longer depends on heap addresses: the operating-point listing, the `--vci` dump, the
   automatic probes and VCD declarations, `init()` calls and the enable order of the analyses follow

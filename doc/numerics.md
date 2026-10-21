@@ -20,13 +20,13 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 
 | `.options` keyword (case-insensitive) | Default | Meaning | Valid | CLI |
 | --- | --- | --- | --- | --- |
-| `abstol` | 1e-8 | absolute emission threshold, optical **field**, √W | > 0 | `--abstol` |
-| `reltol` | 1e-4 | relative emission threshold | > 0 | `--reltol` |
+| `abstol` | 1e-8 | absolute emission threshold, optical **field**, √W | >= 0 (see [Zero tolerances](#zero-tolerances)) | `--abstol` |
+| `reltol` | 1e-4 | relative emission threshold | >= 0 (see [Zero tolerances](#zero-tolerances)) | `--reltol` |
 | `snapfactor` | 10 | emitted fields below snapfactor·abstol become 0 | >= 0 (0: off) | none |
 | `timescale` (alias `ts`) | -13 | log10 of the engine time step in s: -13 is 100 fs | integer, -15 (1 fs) to 0 (1 s) | `-R`, `--resolution` |
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
-| `seed` | 0 | master seed of the random numbers (see below) | integer, 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
-| `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer, 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
+| `seed` | 0 | master seed of the random numbers (see below) | integer: a literal 0 to 9223372036854775807 (2^63 - 1), exponent form 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
+| `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer: a literal 0 to 2^63 - 1, exponent form 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
@@ -37,11 +37,11 @@ Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_d
   applied directly too and takes priority over `.options maxiter`.
 - `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
-  reproducible: the default seed is 0, and the same netlist and seed give the same values. Netlist numbers
-  are doubles, hence the 2^53 limit of `.options seed`; `--seed` takes any decimal unsigned 64-bit integer.
-  Write netlist seeds of 2147483647 or more in exponent form (`seed=3e9`): the netlist lexer reads longer
-  digit strings as 2147483647 without an error, so `.options seed` rejects that value. See
-  [reproducibility.md](reproducibility.md).
+  reproducible: the default seed is 0, and the same netlist and seed give the same values. An integer
+  literal (`seed=3000000000`) is taken exactly, 0 to 9223372036854775807 (a larger literal is a parse error,
+  B-180); a number with an exponent or a scale suffix (`seed=3e9`) is a double, exact as an integer up to
+  2^53 only, hence that limit. `--seed` takes any decimal unsigned 64-bit integer. The same holds for
+  `maxiter`. See [reproducibility.md](reproducibility.md).
 - `-R` sets the **timescale**, not `.options resolution`: `-R -14` is `.options timescale=-14`.
 - All optical output ports share these values. C++ testbenches can configure single ports differently.
 
@@ -138,11 +138,55 @@ Each net is shown with the device that writes it. In a `.dc` the first line name
 `.tran: the operating point before the transient`. A circuit that converges is not affected: same results,
 same output.
 
-The default leaves a wide margin: the golden cases need at most 869 iterations (the all-pass ring of B-124),
-a chain of 1000 such rings about 1e5, a CROW of 10 rings 3.5e4. A circuit of a few devices runs 1e6
-iterations in about 0.25 s; a large one is slower per iteration (a 100-ring CROW took 30 s). If a large
-circuit stops while the residual keeps decreasing, raise `maxiter`; if the residual stays at the size of the
-signal, the loop does not converge (r = 1 or a gain).
+The default leaves a wide margin: at the default tolerances the golden cases need at most 869 iterations (the
+all-pass ring of B-124), a chain of 1000 such rings about 1e5, a CROW of 10 rings 3.5e4. A circuit of a few
+devices runs 1e6 iterations in about 0.25 s; a large one is slower per iteration (a 100-ring CROW took 30 s).
+If a large circuit stops while the residual keeps decreasing, raise `maxiter`; if the residual stays at the
+size of the signal, the loop does not converge (r = 1 or a gain).
+
+## Zero tolerances
+
+`abstol` and `reltol` may be 0: `.options abstol=0 reltol=0`, `--abstol 0 --reltol 0`. A negative value or NaN
+is an error (`Error: .options: ABSTOL must be >= 0 (got -1)`, `Invalid abs_tol value`). 0 was rejected by the
+checks added for B-018 and B-153; before them only builds without asserts (NDEBUG) accepted it.
+
+- `abstol = 0`: the abstol test passes for any change, and the snap never applies (snapfactor·abstol = 0): a
+  decaying field is followed down to the smallest double instead of being cut at snapfactor·abstol.
+- `reltol = 0`: the reltol test passes for any change.
+- Both 0: the emission gate is off. A port emits every value that differs from the last one it emitted (as a
+  complex number, in any bit), and only those. With only one of them at 0, the other one still gates.
+
+When both are 0, stderr shows this once per run (also when the zeros come from `--abstol`/`--reltol`, and
+for testbenches and C++ code that call `prepareSimulation()`):
+
+    Warning: abstol = 0 and reltol = 0: the emission gate is off, every change of a value is emitted; a circuit with feedback may never quiesce in .tran (it stops only when its values repeat exactly), and .op/.dc may stop at .options maxiter with a non-convergence error
+
+What to expect (examples in `tests/golden/netlists/b153-zerotol-*.cir`):
+
+- Without feedback, nothing is truncated and the run ends as usual. In `b153-zerotol-open-loop.cir` a
+  relative change of 5e-7 and a 1e-20 W value reach the probes; the default tolerances drop the first and
+  snap the second to 0.
+- `.tran` with feedback: the activity stops only when every value in the loop repeats exactly. A lossy loop
+  without input decays geometrically until its field underflows to 0 (or rounds to a value that repeats),
+  after about ln(|E|/2.5e-324)/ln(1/r) round trips, r being the round-trip field transmission: 280 round
+  trips for r = 0.07 in `b153-zerotol-lossy-ring-tran.cir`. A contracting loop driven by a source usually
+  reaches an exact floating-point fixed point (the B-124 ring after a 1 W step: about 470 round trips), but
+  nothing guarantees it: the last bits can cycle, and a loop with r close to 1 needs about ln(1e-16)/ln(r)
+  round trips. Give such runs a `.tran` duration.
+- `.op` and `.dc` need an exact repeat too. The B-124 ring converges in 1865 delta cycles (869 at the
+  default tolerances) to the exact result, 1.000000 W out and 24.626059 W in the ring
+  (`b153-zerotol-ring-op.cir`). The weakly coupled ring of F-28 stops at `maxiter`
+  (`b153-zerotol-lossless-ring-op.cir`); the threshold in the residual is 0 and the ratio reads `inf`:
+
+      ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 9.99999e-05 > 0 (inf x)
+
+- The phase traced for a field of exactly 0 can read π: a zero field multiplied by a complex transmission
+  can come out as (-0, +0), whose argument is π. With abstol > 0 (and snapfactor > 0) the snap writes it as +0.
+
+Use: comparing SPECS with a fixed-step discrete model of the same circuit (same delays, same time step). With
+the gate off no event is dropped, so the differences left come from the models, the delay rounding and the
+floating-point rounding, not from the tolerances. Keep non-zero tolerances for normal runs: they bound the
+number of events and make feedback circuits quiesce.
 
 ## Time resolution
 
@@ -165,11 +209,21 @@ port time step. If rounding changes it by more than 10 %, stderr shows (`ROOT/WG
 
     Warning (ROOT/WGR): delay 5.33703e-14 s rounded to 1e-13 s (+87.4 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
 
-A non-zero delay that rounds to 0 gives a second form (this case may become an error):
+A non-zero delay that rounds to 0 is an **error** for a waveguide written in the netlist (also inside a
+`.subckt`): the run stops before the simulation, with exit status 1:
 
-    Warning (ROOT/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-15
+    Error (ROOT/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events would happen in the same time step); use a finer time resolution, e.g. .options timescale=-15
 
-"Time resolution" in the message is the port time step. The simulation runs anyway.
+For a waveguide that a device creates internally (the arms of an MZI, the waveguides of OCTANE cells, CROWs
+and meshes) and for waveguides built by testbenches, it is a warning, and the simulation runs:
+
+    Warning (ROOT/MZI1/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+
+The device decides its own internal lengths, and these are feed-forward (an MZI arm only shifts arrival times by
+less than a time step), so they are not rejected. The distinction is where the waveguide comes from, not its
+name: the parser marks the waveguides it creates from netlist lines.
+
+"Time resolution" in the messages is the port time step. Apart from the error above, the simulation runs anyway.
 
 - Checked once per waveguide, only where delays matter: `.tran` and event-driven testbenches. `.op`, `.dc`
   and `-m fd` ignore delays, so nothing is reported there. Only waveguides are checked; couplers have no delay.

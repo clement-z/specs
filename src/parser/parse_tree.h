@@ -3,6 +3,7 @@
 #include "specs.h"
 #include "utils/strutils.h"
 
+#include <cstdint>
 #include <initializer_list>
 #include <utility>
 #include <memory>
@@ -43,7 +44,7 @@ struct Variable {
     Type type = NONE;
     double num = 0;
     complex<double> cnum = 0;
-    int inum = 0;
+    int64_t inum = 0; // integer literals are 64-bit (B-180)
     bool bnum = false;
     string str;
     vector<Variable> vec;
@@ -52,7 +53,9 @@ struct Variable {
     Variable(Type type): type(type) {}
     Variable(double num = 0): type(DOUBLE), num(num) {}
     explicit Variable(const complex<double> &cnum): type(COMPLEX_DOUBLE), cnum(cnum) {}
-    explicit Variable(int inum): type(INTEGER), inum(inum) {}
+    explicit Variable(int64_t inum): type(INTEGER), inum(inum) {}
+    // an int stays an INTEGER (without it, Variable(1) would be ambiguous with double and bool)
+    explicit Variable(int inum): Variable(static_cast<int64_t>(inum)) {}
     explicit Variable(bool bnum): type(BOOLEAN), bnum(bnum) {}
     explicit Variable(const string &str): type(STRING), str(str) {}
     explicit Variable(const vector<Variable> &vec): type(LIST), vec(vec) {}
@@ -179,10 +182,21 @@ struct Variable {
         exit(1);
     }
 
-    int as_integer() const
+    // A DOUBLE is truncated toward zero; outside the 64-bit range (or NaN) it is an error, as the
+    // cast would be undefined (B-180). Consumers that store a narrower type check their own range.
+    int64_t as_integer() const
     {
         if (type == DOUBLE)
-            return num;
+        {
+            // -2^63 and 2^63 are exact doubles
+            if (!(num >= -9223372036854775808.0 && num < 9223372036854775808.0))
+            {
+                cerr << "Variable cannot be converted to an integer value: " << get_str()
+                     << " (outside the 64-bit integer range)" << endl;
+                exit(1);
+            }
+            return static_cast<int64_t>(num);
+        }
         if (type == INTEGER)
             return inum;
         if (type == BOOLEAN)
@@ -492,7 +506,7 @@ struct ParseNet {
     shared_ptr<sc_object> create_uni(const string &name) const;
 
     /* Get a generic net name from net number (different from id) */
-    static string name_from_id(int net_number);
+    static string name_from_id(int64_t net_number);
 };
 
 struct ParseTreeCreationHelper;
@@ -631,7 +645,7 @@ struct ParseTree {
         return full_net_name;
     }
 
-    string get_or_create_net(int i, unsigned int size = 1,
+    string get_or_create_net(int64_t i, unsigned int size = 1,
                              ParseNet::Type type = ParseNet::NONE)
     {
         return get_or_create_net(ParseNet::name_from_id(i), size, type);

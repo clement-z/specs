@@ -1,0 +1,28 @@
+* B-153 / decision 2026-10-21: zero tolerances, open loop (no feedback). With .options abstol=0 reltol=0
+* the emission gate is off: every change of a value is emitted, and nothing is snapped to 0
+* (|E| < snapfactor * abstol = 0 never holds). The run ends, since nothing loops back, and stderr holds
+* exactly one line, the zero-tolerance warning.
+* vlsrc1 (1550 nm): 1 mW at 0, 1.000001 mW at 10 ps, 1e-20 W at 20 ps, 0 at 30 ps.
+* wg1: 1 mm at 100 dB/cm = 10 dB (power x 0.1, field x 0.316228); ng = 3: delay 1e-3 * 3 / c = 10.007 ps,
+*   rounded to 10 ps (100 fs steps). splitter1, ratio 0.25: out1 gets 0.25 of the power, out2 0.75.
+* Expected (power in W, probe1 out1 / probe2 out2):
+*   10 ps: 2.5e-05 / 7.5e-05 (|E| = 0.005 / 0.00866025 sqrt(W))
+*   20 ps: 2.5000025e-05 / 7.5000075e-05 (|E| = 0.0050000025 / 0.00866026 sqrt(W))
+*   30 ps: 2.5e-22 / 7.5e-22 (|E| = 1.58114e-11 / 2.73861e-11 sqrt(W))
+*   40 ps: 0 / 0 (the phase traces read pi there: the zero field leaves the waveguide as (-0, +0) and
+*   arg(-0 + 0j) = pi; with abstol > 0 and snapfactor > 0 the snap writes it as +0)
+* The default tolerances (abstol 1e-8, reltol 1e-4) would truncate two of these changes at the source: the
+* 10 ps change of the field, 0.0316228 * 5e-7 = 1.6e-8 sqrt(W), is below max(1e-8, 1e-4 * 0.0316228) =
+* 3.2e-6 and is not emitted; the 20 ps field 1e-10 sqrt(W) is below the snap, 10 * abstol = 1e-7, and is
+* emitted as 0. That gives 2.5e-05 / 7.5e-05 from 10 ps and 0 from 30 ps.
+* vlsrc2 (net unused, read by nobody) only makes a later event at 50 ps: SystemC does not dump the last
+* time step of an open-ended run to the VCD, so without it the 40 ps zeros would not be traced.
+* "Simulated 50 ps".
+vlsrc1 in values=[[0, 1e-3, 1.55e-6], [10e-12, 1.000001e-3, 1.55e-6], [20e-12, 1e-20, 1.55e-6], [30e-12, 0, 1.55e-6]]
+wg1 in mid length=1e-3 att=100 neff=3 ng=3
+splitter1 mid out1 out2 ratio=0.25
+probe1 out1
+probe2 out2
+vlsrc2 unused values=[[50e-12, 1e-3, 1.55e-6]]
+.options abstol=0 reltol=0
+.tran

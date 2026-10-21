@@ -583,7 +583,7 @@
    "note": "B-153: .options abstol=-1 is rejected (verifyConfig assert / accepted with NDEBUG)"
   },
   {
-   "id": "err/b153-reltol-zero",
+   "id": "regress/b153-reltol-zero",
    "setup": {
     "copy": [
      "circuits",
@@ -597,11 +597,147 @@
     "-f",
     "tests/golden/netlists/b153-reltol-zero.cir"
    ],
+   "note": "B-153, decision 2026-10-21 (zero tolerances): .options reltol=0 is allowed (replaces err/b153-reltol-zero, same netlist). abstol keeps its default 1e-8, so stderr is empty (only abstol = reltol = 0 warns); probe1 b = 1 mW from t = 0, 'Simulated 10 ps'"
+  },
+  {
+   "id": "regress/b153-zerotol-open-loop",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-open-loop.cir"
+   ],
+   "note": "B-153: .options abstol=0 reltol=0 on a feed-forward circuit (value list -> 10 dB waveguide -> 25/75 splitter): every change is emitted unsnapped, out1/out2 = 2.5e-05/7.5e-05 W at 10 ps, 2.5000025e-05/7.5000075e-05 W at 20 ps (truncated by the default reltol), 2.5e-22/7.5e-22 W at 30 ps (snapped to 0 by default), 0 at 40 ps; open-ended .tran ends ('Simulated 50 ps'); stderr: exactly one zero-tolerance warning"
+  },
+  {
+   "id": "regress/b153-zerotol-cli",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--abstol",
+    "0",
+    "--reltol",
+    "0",
+    "-f",
+    "tests/golden/netlists/b153-zerotol-cli.cir"
+   ],
+   "note": "B-153: specs --abstol 0 --reltol 0 overrides the netlist's .options abstol=1e-6 reltol=1e-3 (footer): same traces as regress/b153-zerotol-open-loop, config printout abstol 0 / reltol 0, and exactly one warning line on stderr although verifyConfig() runs twice (runAnalysis(), prepareSimulation())"
+  },
+  {
+   "id": "regress/b153-zerotol-lossy-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"
+   ],
+   "timeout": 30,
+   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| only; stderr: one warning. Short timeout so that a regression (never quiescing) fails fast"
+  },
+  {
+   "id": "err/b153-zerotol-lossless-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-lossless-ring-op.cir"
+   ],
    "ignore_streams": [
     "stdout"
    ],
    "expect": "fail",
-   "note": "B-153: .options reltol=0 is rejected (verifyConfig assert / accepted with NDEBUG)"
+   "note": "B-153: the F-28 weakly coupled lossless ring in .op at abstol = reltol = 0 with .options maxiter=1000: the zero-tolerance warning, then the F-28 non-convergence error, residual of 3 ports (out, ring_br, ring_bl), each '> 0 (inf x)' (zero threshold), exit 1"
+  },
+  {
+   "id": "regress/b153-zerotol-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-ring-op.cir"
+   ],
+   "note": "B-153 (optional case): the B-124 all-pass ring in .op at abstol = reltol = 0 converges (the contracting floating-point iteration repeats exactly) to the exact result, out = 1.000000 W, ring = 24.626059 W (default tolerances: 0.995098 W, 24.563207 W); stderr: one warning"
+  },
+  {
+   "id": "err/b153-zerotol-cli-abstol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--abstol",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: specs --abstol -1 is still rejected before parsing ('Invalid abs_tol value'), exit 1; 0 is now allowed"
+  },
+  {
+   "id": "err/b153-zerotol-cli-reltol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--reltol",
+    "-1e-3",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: specs --reltol -1e-3 is still rejected before parsing ('Invalid reltol value'), exit 1; 0 is now allowed"
   },
   {
    "id": "err/b161-ic-unsupported",
@@ -1671,6 +1807,95 @@
    "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
   },
   {
+   "id": "regress/b146-x-shared-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: two subckt instances driving one net merge against nets_flat; mid is bidirectional as in the flat netlist (mid:0 = mid:1 = 1 mW at -2.1890 rad; was E115, exit 1)."
+  },
+  {
+   "id": "regress/b146-x-shared-net-flat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-net-flat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: flat reference for b146-x-shared-net (same values)."
+  },
+  {
+   "id": "regress/b146-x-shared-delayed",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-delayed.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: two subckt instances writing one net at different times; mid is bidirectional as in the flat netlist (mid:0 = 1 mW, mid:1 = 2 mW; was unidirectional, last write wins, mid = 2 mW)."
+  },
+  {
+   "id": "regress/b146-x-shared-delayed-flat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-delayed-flat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: flat reference for b146-x-shared-delayed (same values)."
+  },
+  {
+   "id": "err/b146-x-net-type-mismatch",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-net-type-mismatch.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-146: a net optical in one subckt instance and electrical in another is rejected while flattening ('Could not reconcile nets: ROOT/X2/e and ROOT/n', exit 1; was 'Wrong signal type for 0 connected to ROOT/n' at elaboration; message wording is B-155)"
+  },
+  {
    "id": "regress/b032-crossing-passive",
    "args": [
     "-f",
@@ -1859,7 +2084,7 @@
    "note": "B-048: probes on an undriven net in .tran: the sample taken at TRAN start is skipped silently (PROBE2, PROBE{ROOT/nc}, MLPROBE2 stay 0; no 'received unsupported signal (lambda = 1.55e-06m)' although wavelength id 0 aliases 1550 nm, B-012); the CW net next to it reads 1 mW from t = 0"
   },
   {
-   "id": "regress/b014-delay-rounds-to-zero",
+   "id": "err/b014-delay-rounds-to-zero",
    "setup": {
     "copy": [
      "circuits",
@@ -1873,7 +2098,49 @@
     "-f",
     "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
    ],
-   "note": "B-014: a 13 fs ring round trip rounds to 0 at 100 fs (the response collapses into delta cycles at 1 ps): reported on stderr (was silent); decided as an error, a warning until regress/b031-mzi-bidir is settled"
+   "note": "B-014: a 13 fs ring round trip of a waveguide written in the netlist rounds to 0 at 100 fs (the response collapsed into delta cycles at 1 ps, silently; a warning in sprint 2026-10b): clean error before the simulation, exit 1 (decision option (b))",
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "err/b014-subckt-wg-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-subckt-wg-rounds-to-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-014: a waveguide inside a .subckt is written in the netlist too: its 13 fs delay rounding to 0 at 100 fs is an error (ROOT/X1/WGR), exit 1 (decision option (b))"
+  },
+  {
+   "id": "regress/b014-device-internal-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-device-internal-rounds-to-zero.cir"
+   ],
+   "note": "B-014: the arms of an MZI (created by the device, 43 fs) round to 0 at 100 fs: a warning only, the run goes on (decision option (b)); the netlist waveguide (755 fs) gives no message"
   },
   {
    "id": "regress/b014-delay-rounding-warning",
@@ -2268,10 +2535,10 @@
     "stdout"
    ],
    "expect": "fail",
-   "note": "F-01: .options seed=99999999999999999999 is rejected: the lexer reads digit strings beyond the int range as 2147483647 (pre-existing, P4 'Found, not done'), so .options seed rejects that integer literal with a hint (exponent form or --seed)"
+   "note": "F-01, B-180: .options seed=99999999999999999999 is a parse error: integer literals are 64-bit and this one is beyond 9223372036854775807 (Parsing error (file:7): integer literal ... is out of range (the limit is 9223372036854775807)), exit 1. It was read as 2147483647 and rejected by a guard in .options seed"
   },
   {
-   "id": "err/f01-options-seed-int-max",
+   "id": "regress/f01-options-seed-int-max",
    "setup": {
     "copy": [
      "circuits",
@@ -2285,11 +2552,163 @@
     "-f",
     "tests/golden/netlists/f01-options-seed-int-max.cir"
    ],
+   "note": "F-01, B-180: .options seed=2147483647 (f01-pdet-noise.cir included), the int maximum to which longer literals were clamped (it was rejected, as err/f01-options-seed-int-max): now an ordinary seed, taken exactly; the VCD is identical to the one of specs --seed 2147483647 on f01-pdet-noise.cir"
+  },
+  {
+   "id": "regress/f01-options-seed-int-literal",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int-literal.cir"
+   ],
+   "note": "F-01, B-180: .options seed=3000000000 as an integer literal (beyond the int range, was clamped to 2147483647): the VCD must be identical to the one of regress/f01-seed-large (--seed 3000000000) and regress/f01-options-seed-large (seed=3e9)"
+  },
+  {
+   "id": "regress/f01-options-seed-int64-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int64-max.cir"
+   ],
+   "note": "F-01, B-180: the largest integer literal, .options seed=9223372036854775807 (2^63 - 1), is a valid seed taken exactly (no conversion through double): the VCD is identical to the one of specs --seed 9223372036854775807 on f01-pdet-noise.cir"
+  },
+  {
+   "id": "err/b180-int-literal-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-kwarg.cir"
+   ],
    "ignore_streams": [
     "stdout"
    ],
    "expect": "fail",
-   "note": "F-01: .options seed=3000000000 (integer literal beyond the int range, read as 2147483647) is rejected with the same hint as err/f01-options-seed-huge-integer"
+   "note": "B-180: an integer literal beyond 9223372036854775807 in a keyword argument (power=9223372036854775808, i.e. 2^63) is a parse error with file:line and the limit, exit 1 (was clamped to 2147483647 silently)"
+  },
+  {
+   "id": "err/b180-int-literal-positional",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-positional.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: an integer literal beyond 9223372036854775807 in a positional argument (CWSRC power 99999999999999999999) is a parse error with file:line and the limit, exit 1 (was clamped to 2147483647 silently)"
+  },
+  {
+   "id": "err/b180-int-literal-net-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-net-name.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: a numeric net name beyond 9223372036854775807 (18446744073709551616, i.e. 2^64) is a parse error with file:line and the limit, exit 1 (was net N2147483647)"
+  },
+  {
+   "id": "regress/b180-numeric-net-names",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-numeric-net-names.cir"
+   ],
+   "note": "B-180: numeric net names use the full 64-bit range: nets 3000000000 and 9223372036854775807 are N3000000000 and N9223372036854775807 (3000000000 was N2147483647); 7 keeps its zero padding (N00007); .op gives 1 mW on all three"
+  },
+  {
+   "id": "err/b180-pcmcell-n-beyond-int",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-pcmcell-n-beyond-int.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: PCMCELL stores n as an int: n=3000000000 (a 64-bit integer literal beyond the int range) is rejected with Error (ROOT/PCMCELL1): the number of states n must be between 1 and 2147483647 (got 3000000000), exit 1 (was clamped to 2147483647)"
+  },
+  {
+   "id": "err/b180-pcmcell-k-beyond-int",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-pcmcell-k-beyond-int.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: PCMCELL stores the initial state k as an int: k=3e9 (a double beyond the int range) is rejected with Error (ROOT/PCMCELL1): the initial state k must be between 0 and 2147483647 (got 3000000000), exit 1 (the double-to-int conversion was undefined behaviour)"
   },
   {
    "id": "regress/f01-manifest",

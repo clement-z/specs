@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b146-x-shared-net-flat.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 441,
+   "kind": "json",
+   "sha256": "f5bd5059b249908fb5e7da5f02289b387f757b1f3a415c8403f73b329da793d8",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 2559,
+   "kind": "vcd",
+   "sha256": "34ef1412b30086918b85be1e3ff173fd59c2747d0560184422f0f2926698053e",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b146-x-shared-net-flat"
+}

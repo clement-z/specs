@@ -1,0 +1,32 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+2 elements
+ - ROOT/X1 (SUBCIRCUIT) {n (STRING), so (STRING), } {}
+ - ROOT/X2 (SUBCIRCUIT) {n (STRING), se (STRING), } {}
+-----------
+0 named nets
+-----------
+0 directives
+-----------
+2 subcircuits
+ - SO (SUBCIRCUIT DEFINITION) o {}
+ - SE (SUBCIRCUIT DEFINITION) e {}
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {1e-11 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/X1
+Flattening ROOT/X2
+

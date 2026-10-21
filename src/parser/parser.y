@@ -51,7 +51,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 
 %union {
     double                  d_val;
-    int                     i_val;
+    int64_t                 i_val; // T_INT: integer literals are 64-bit (B-180)
     char                    c_val;
     string                 *s_ptr;
     pair<string, Variable> *assig_ptr;

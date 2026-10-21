@@ -6,8 +6,9 @@ using namespace std;
 void WaveguideUni::start_of_simulation()
 {
     // B-014: check once how the group delay is rounded to the time step. With dispersion
-    // (m_D != 0) the delay depends on the wavelength: the nominal one (1.55 um) is checked
-    m_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9);
+    // (m_D != 0) the delay depends on the wavelength: the nominal one (1.55 um) is checked.
+    // Rounding to 0 is an error only for a waveguide written in the netlist
+    m_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9, m_from_netlist);
 }
 
 void WaveguideUni::on_port_in_changed()
@@ -110,7 +111,7 @@ void WaveguideUni::on_port_in_changed()
 void WaveguideBi::start_of_simulation()
 {
     // B-014: as WaveguideUni. Same delay in both directions: checked (and reported) once
-    m_p1_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9);
+    m_p1_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9, m_from_netlist);
 }
 
 void WaveguideBi::on_p0_in_changed()

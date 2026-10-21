@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-reltol-zero.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 429,
+   "kind": "json",
+   "sha256": "3a541dc19dc0b5c95eefe0d4f6f80775fdca407fb139225f16e8642638da8235",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1024,
+   "kind": "vcd",
+   "sha256": "155e65e3002635fccb7bca328fe9c785bb973274be17b04be520f2d3c04da687",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b153-reltol-zero"
+}

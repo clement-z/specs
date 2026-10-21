@@ -1,5 +1,5 @@
 # B-014: Sub-tick delays are silently rounded (to zero); the OOP check meant to catch it is dead
-severity: med | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: warnings fixed in c527d7d (sprint 2026-10b P3); error for delays rounding to 0 held back, needs-human (P3-ready/b014-error)
+severity: med | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in c527d7d (warnings, sprint 2026-10b P3) and a23e4f9 (error for netlist waveguides, option (b), sprint 2026-10c phase A)
 location: src/optical_output_port.cpp:329-331, src/devices/waveguide.cpp:72,98
 ## Problem
 Delays become `sc_time(double, SC_NS)`, which rounds to the nearest tick (100 fs by default) without any warning.
@@ -42,3 +42,14 @@ top of c527d7d; 134/134 golden `--atol 0` with its own baseline): the error, `er
 b031 run at `.options timescale=-14` (arms 40 fs / 90 fs, no message, same OP values; stdout gains the directive
 and the timescale lines, VCD timescale 10 fs). Options for the maintainer: (a) take the branch as is; (b) keep
 the warning for device-internal delays (MZI arms) and error only for netlist waveguides; (c) keep the warning.
+
+## Sprint 2026-10c phase A (fixed, option (b))
+Maintainer decision (2026-10-21, follow-up round): option (b). Done in a23e4f9, adapted from
+`P3-ready/b014-error` without its timescale change to b031. `WaveguideBase::m_from_netlist` records where the
+waveguide comes from: the parser sets it in `WGElement::create()` (netlist lines, also inside a `.subckt`); every
+other waveguide (MZI arms, OCTANE, CROW, meshes, testbenches, C++ users) keeps the default `false`.
+`checkDelayRounding(name, delay, zero_is_error)`: a non-zero delay that rounds to 0 is an error (exit 1, before
+the simulation) for netlist waveguides and the existing warning otherwise. `regress/b031-mzi-bidir` is unchanged
+(its 18 MZI-arm warnings stay). Golden: `regress/b014-delay-rounds-to-zero` became
+`err/b014-delay-rounds-to-zero`; new `err/b014-subckt-wg-rounds-to-zero` and
+`regress/b014-device-internal-rounds-to-zero`.

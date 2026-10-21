@@ -71,8 +71,11 @@ a syntax error).
 
 ## Numbers
 
-Integers (`100`), decimals (`0.5`, `.5`) and exponents (`1.55e-6`). `5.` is not a number. An integer literal of
-2147483647 or more is silently read as 2147483647: write `3e9` or `3g`.
+Integers (`100`), decimals (`0.5`, `.5`) and exponents (`1.55e-6`). `5.` is not a number.
+
+Integer literals (digits only) are 64-bit signed integers, 0 to 9223372036854775807: a larger one is a parse
+error that gives its file and line (B-180). A parameter stored in a narrower type checks its own range (PCMCELL
+`n` and `k`: at most 2147483647). A number with an exponent or a scale suffix (`3e9`, `3g`) is a double.
 
 SI scale suffixes go directly after the number, in any case, as in SPICE:
 

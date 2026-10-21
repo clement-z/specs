@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 447,
+   "kind": "json",
+   "sha256": "aaa29f8c360c7af14eb83501822947bafeaeee8a7d73dc8d17215827600e7072",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "err/b014-delay-rounds-to-zero"
+}

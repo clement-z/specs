@@ -54,7 +54,7 @@ shared_ptr<sc_object> ParseNet::create_uni(const string &name) const
     return { nullptr };
 }
 
-string ParseNet::name_from_id(int id)
+string ParseNet::name_from_id(int64_t id)
 {
     assert(id >= 0);
     ostringstream ss;
@@ -972,11 +972,13 @@ void ParseTree::flatten()
             // add current prefix
             external_net_name = name_prefix() + net_base;
 
-            // see if the net was already defined (was used by another device)
-            if (nets.find(external_net_name) != nets.end())
+            // see if the net was already defined (was used by another device,
+            // or by a subcircuit instance flattened before this one: look it up
+            // in nets_flat, so that the result is the same as the flat netlist)
+            if (nets_flat.find(external_net_name) != nets_flat.end())
             {
                 // if so, combined the previously defined net with the internal one
-                bool ok = sub_pt.nets[internal_net_name].combine_with(nets.at(external_net_name));
+                bool ok = sub_pt.nets[internal_net_name].combine_with(nets_flat.at(external_net_name));
                 if (!ok)
                 {
                     cerr << "Could not reconcile nets: " << internal_net_name;

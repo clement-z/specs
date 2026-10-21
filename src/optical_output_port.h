@@ -105,7 +105,9 @@ public:
     // (88 fs at 100 fs), the B-014 failure mode by 87 % (53 fs -> 100 fs). 10 % warns
     // only for delays shorter than 5 time steps
     static constexpr double DELAY_ROUNDING_WARN_THRESHOLD = 0.1;
-    void checkDelayRounding(const char *device_name, double delay_s) const;
+    // A non-zero delay that rounds to 0 is an error (exit 1) when zero_is_error is set (delays
+    // written in the netlist), a warning otherwise (delays a device creates internally)
+    void checkDelayRounding(const char *device_name, double delay_s, bool zero_is_error) const;
     sc_time snap_to_next_valid_time(const sc_time &t, const unsigned int resolution_multiplier=1);
     void delayedWriteEventDriven(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
     void delayedWriteSampledTime(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
@@ -156,7 +158,8 @@ public:
 // value (same wavelength) by more than abstol AND by more than reltol relative to it:
 //   |desired - last| > max(abstol, reltol * |last|)
 // (not SPICE's abstol + reltol * max(|new|, |old|)). The tolerances are thresholds below
-// which a change need not be propagated, not solver tolerances. Defined here (inline) so
+// which a change need not be propagated, not solver tolerances. Both may be 0 (B-153):
+// with abstol = reltol = 0 every change is emitted. Defined here (inline) so
 // that the unit tests can call them.
 inline bool OpticalOutputPort::check_emit_by_abstol(const OpticalSignal::field_type &desired,
                                                     const OpticalSignal::field_type &last)
@@ -173,6 +176,10 @@ inline bool OpticalOutputPort::check_emit_by_reltol(const OpticalSignal::field_t
     // Nothing (or 0) emitted yet: any change passes, no change doesn't. Same result as
     // the division below gave (x/0 = inf > reltol, 0/0 = NaN > reltol is false)
     if (last_size == 0)
+        return vector_distance > 0;
+    // reltol = 0 (B-153): any change passes, also one so small next to |last| that the
+    // division below underflows to 0
+    if (m_reltol == 0)
         return vector_distance > 0;
     return (vector_distance/last_size) > m_reltol;
 }

@@ -165,6 +165,59 @@ TEST(OpticalOutputPort, EmissionGateWithZeroLast)
     SPECS_TEST_FOOTER();
 }
 
+// Zero tolerances (B-153): with abstol = reltol = 0 the gate is off: any change is emitted
+// (also one whose relative size underflows to 0) and an identical value is not. The snap
+// (|E| < snap_factor * abstol) never applies.
+TEST(OpticalOutputPort, EmissionGateWithZeroTolerances)
+{
+    SPECS_TEST_HEADER()
+    {
+        OOPHarness h("h");
+        auto &oop = h.m_out_writer;
+        typedef OpticalSignal::field_type F;
+        auto config = make_shared<OpticalOutputPortConfig>();
+        config->m_abstol = 0;
+        config->m_reltol = 0; // default snap factor (10)
+        oop.setConfig(config);
+        oop.applyConfig();
+
+        const double ulp1 = 2.220446049250313e-16; // 1 + ulp1 is the double after 1
+        EXPECT_TRUE(oop.check_emit_by_abstol(F(1 + ulp1, 0), F(1, 0)));
+        EXPECT_TRUE(oop.check_emit_by_reltol(F(1 + ulp1, 0), F(1, 0)));
+        EXPECT_TRUE(oop.check_emit_by_abstol(F(0, 5e-324), F(0, 0)));
+        EXPECT_TRUE(oop.check_emit_by_reltol(F(0, 5e-324), F(0, 0)));
+        EXPECT_TRUE(oop.check_emit_by_reltol(F(0, 0), F(1, 0)));
+        // |dE| / |last| = 1e-320 / 1e10 underflows to 0: still a change
+        EXPECT_TRUE(oop.check_emit_by_abstol(F(1e10, 1e-320), F(1e10, 0)));
+        EXPECT_TRUE(oop.check_emit_by_reltol(F(1e10, 1e-320), F(1e10, 0)));
+        // identical values
+        EXPECT_FALSE(oop.check_emit_by_abstol(F(0.5, -0.25), F(0.5, -0.25)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(F(0.5, -0.25), F(0.5, -0.25)));
+        EXPECT_FALSE(oop.check_emit_by_abstol(F(0, 0), F(0, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(F(0, 0), F(0, 0)));
+
+        // Through the port
+        auto write = [&](F field) {
+            oop.delayedWrite(OpticalSignal(field, 1.55e-6), sc_time(1, SC_NS));
+            sc_start(2, SC_NS);
+            return h.out.read().m_field;
+        };
+        sc_start(SC_ZERO_TIME); // applies the config again (start_of_simulation)
+        EXPECT_EQ(oop.m_abstol, 0);
+        EXPECT_EQ(oop.m_reltol, 0);
+        EXPECT_EQ(write(F(1e-9, 0)), F(1e-9, 0)) << "below the default abstol and snap (1e-7): emitted as is";
+        EXPECT_EQ(write(F(1e-9, 1e-25)), F(1e-9, 1e-25)) << "relative change 1e-16: emitted";
+        EXPECT_EQ(write(F(5e-324, 0)), F(5e-324, 0)) << "smallest subnormal: emitted, not snapped";
+        EXPECT_EQ(oop.m_last_emission_threshold, 0);
+        const sc_dt::uint64 last_emission = oop.m_last_emission_delta;
+        EXPECT_EQ(write(F(5e-324, 0)), F(5e-324, 0));
+        EXPECT_EQ(oop.m_last_emission_delta, last_emission) << "identical value: not emitted";
+        EXPECT_EQ(write(F(0, 0)), F(0, 0)) << "back to 0: emitted";
+        EXPECT_GT(oop.m_last_emission_delta, last_emission);
+    }
+    SPECS_TEST_FOOTER();
+}
+
 // Snap to 0 (B-021): an emitted value with |E| < snap_factor * abstol is replaced
 // by 0; the factor comes from the port configuration (default 10, 0 disables it).
 TEST(OpticalOutputPort, SnapFactorFromConfig)
@@ -255,7 +308,9 @@ TEST(DelayRounding, MatchesSystemCRounding)
 }
 
 // checkDelayRounding(): a message only where delays are honoured (event-driven
-// ports in a time-domain analysis), and only above the threshold
+// ports in a time-domain analysis), and only above the threshold. A delay that
+// rounds to 0 is an error for netlist waveguides (zero_is_error), a warning
+// for device-internal ones
 TEST(DelayRoundingDeathTest, CheckDelayRounding)
 {
     SPECS_TEST_HEADER()
@@ -267,8 +322,8 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
         auto config = make_shared<OpticalOutputPortConfig>();
         oop.setConfig(config);
         const auto ok = testing::ExitedWithCode(0);
-        auto check = [&](double delay_s) {
-            oop.checkDelayRounding("dev", delay_s);
+        auto check = [&](double delay_s, bool zero_is_error = false) {
+            oop.checkDelayRounding("dev", delay_s, zero_is_error);
             std::cerr << "end";
             exit(0);
         };
@@ -280,8 +335,16 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
                     "use a finer time resolution, e.g. .options timescale=-14\nend$");
         EXPECT_EXIT(check(13.34e-15), ok,
                     "^Warning \\(dev\\): delay 1.334e-14 s rounds to 0 at the time resolution 1e-13 s [^\n]*timescale=-15\nend$");
+        EXPECT_EXIT(check(13.34e-15, true), testing::ExitedWithCode(1),
+                    "^Error \\(dev\\): delay 1.334e-14 s rounds to 0 at the time resolution 1e-13 s "
+                    "\\(the delayed events would happen in the same time step\\); "
+                    "use a finer time resolution, e.g. .options timescale=-15\n$");
+        // only a rounding to 0 is an error: the other verdicts are the same for both origins
+        EXPECT_EXIT(check(53.37e-15, true), ok, "^Warning \\(dev\\): delay 5.337e-14 s rounded to 1e-13 s [^\n]*\nend$");
         EXPECT_EXIT(check(755.09e-15), ok, "^end$");
+        EXPECT_EXIT(check(755.09e-15, true), ok, "^end$");
         EXPECT_EXIT(check(0), ok, "^end$");
+        EXPECT_EXIT(check(0, true), ok, "^end$");
 
         // with a resolution multiplier, events are on multiples of 10 ticks = 1 ps
         config->m_timestep_value = 10;
@@ -292,12 +355,12 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
 
         // delays ignored: frequency-domain ports, .op, .dc
         config->m_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
-        EXPECT_EXIT(check(13.34e-15), ok, "^end$");
+        EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
         config->m_mode = OpticalOutputPortMode::EVENT_DRIVEN;
         specsGlobalConfig.analysis_type = SPECSConfig::OP;
-        EXPECT_EXIT(check(13.34e-15), ok, "^end$");
+        EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
         specsGlobalConfig.analysis_type = SPECSConfig::DC;
-        EXPECT_EXIT(check(13.34e-15), ok, "^end$");
+        EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
     }
     SPECS_TEST_FOOTER();
 }

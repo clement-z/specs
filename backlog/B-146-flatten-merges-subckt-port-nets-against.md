@@ -1,5 +1,5 @@
 # B-146: Flatten merges subckt port nets against the pre-flatten map (E115, lost type check)
-severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: needs-human: fix ready on branch P2-ready/b146 (8129020), held back in sprint 2026-10b P2 (unpredicted cir-json/subckt_tests change)
+severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 5912b6a (sprint 2026-10c phase A; cherry-pick of P2-ready/b146 8129020)
 location: src/parser/parse_tree.cpp:899, src/parser/parse_tree.cpp:902, src/parser/parser.y:513-541
 ## Problem
 `flatten()` looks up the external net in `nets` (the parent map before flattening), not in `nets_flat`. X-element
@@ -65,3 +65,11 @@ readers count in both fields.
 Ready to land: branch `P2-ready/b146` (8129020, one commit on top of `ws/engine` 4083a49): fix, 5 golden cases
 (`regress/b146-x-shared-{net,delayed}(-flat)`, `err/b146-x-net-type-mismatch`), the `cir-json/subckt_tests`
 re-record and a CHANGELOG line; golden check 120/120 at `--atol 0`. Sign-off needed: accept the JSON count change.
+
+## Sprint 2026-10c phase A (fixed)
+Maintainer decision (2026-10-21, follow-up round): land `P2-ready/b146` as is, accepting the JSON `writers` change.
+Cherry-picked as 5912b6a, code unchanged. The 5 golden cases were re-recorded with the current build (their branch
+baselines predated the B-048 OP sampling and the F-01 name ordering and manifests) and lost their
+`unordered_streams` (ordering is name-based since F-01). The only existing-case change is the predicted one:
+`cir-json/subckt_tests` `flat.json`, `writers` of `ROOT/out` and `ROOT/X2/N00001` 0 → 1. The hierarchical cases'
+OP listings and VCD value sections are identical to their flat references.

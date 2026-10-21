@@ -128,3 +128,32 @@ TEST(WaveguideDeathTest, DelayRoundingReportedOncePerDevice)
     }
     SPECS_TEST_FOOTER();
 }
+
+// B-014: a delay that rounds to 0 time steps is an error for a waveguide written in
+// the netlist (m_from_netlist, set by the parser) and a warning for one created by a
+// device or a testbench (the default)
+TEST(WaveguideDeathTest, DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides)
+{
+    SPECS_TEST_HEADER()
+    {
+        specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
+        specsGlobalConfig.engine_timescale = SPECSConfig::HUNDRED_FS;
+        specsGlobalConfig.applyEngineResolution();
+
+        WaveguideTest tb;
+        tb.uut.m_ng = 4;
+        tb.uut.m_length_cm = 1e-4; // 1 um: L*ng/c = 13.3 fs -> 0
+        auto config = make_shared<OpticalOutputPortConfig>();
+        tb.uut.m_p0_out_writer.setConfig(config);
+        tb.uut.m_p1_out_writer.setConfig(config);
+
+        EXPECT_FALSE(tb.uut.m_from_netlist);
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(0),
+                    "^Warning \\(uut\\): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s[^\n]*\nend$");
+
+        tb.uut.m_from_netlist = true;
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(1),
+                    "^Error \\(uut\\): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s[^\n]*\n$");
+    }
+    SPECS_TEST_FOOTER();
+}

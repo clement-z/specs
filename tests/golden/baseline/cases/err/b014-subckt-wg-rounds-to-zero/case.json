@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b014-subckt-wg-rounds-to-zero.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 455,
+   "kind": "json",
+   "sha256": "91889942ecfa22bc1656b189013ec77870102f522352e2db4e2c904877beb5d3",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "err/b014-subckt-wg-rounds-to-zero"
+}

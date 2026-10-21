@@ -1,0 +1,15 @@
+* B-146 regression (repro: backlog/repro/a4-x-net-type-mismatch.cir): net n is optical in
+* x1 and electrical in x2. flatten() used to merge each instance against the pre-flatten
+* map, so no type check ran and elaboration failed later with "Wrong signal type for 0
+* connected to ROOT/n". It now merges against nets_flat: the second instance is rejected
+* while flattening, "Could not reconcile nets: ROOT/X2/e and ROOT/n", exit 1 (a better
+* message is B-155; the flat netlist gives "net already exists with a different type").
+.subckt so o
+probe1 o
+.ends
+.subckt se e
+evlsrc1 e values=[[0,1]]
+.ends
+x1 n so
+x2 n se
+.tran 1e-11

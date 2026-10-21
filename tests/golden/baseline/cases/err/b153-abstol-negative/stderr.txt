@@ -1,2 +1,2 @@
-Error: .options: ABSTOL must be > 0 (got -1)
+Error: .options: ABSTOL must be >= 0 (got -1)
 

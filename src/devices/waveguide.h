@@ -26,6 +26,12 @@ public:
     /** The group velocity dispersion Dlambda of the waveguide in [s/m/m] */
     double m_D;
 
+    /** True for a waveguide written in the netlist (set by the parser, WGElement::create()),
+     * false for the waveguides that devices create internally (MZI arms, OCTANE, CROW,
+     * meshes) and for testbenches. B-014: a non-zero group delay that rounds to 0 time
+     * steps is an error for the former and a warning for the latter */
+    bool m_from_netlist = false;
+
     /** Constructor for WaveguideBase
      *
      * @param name name of the module

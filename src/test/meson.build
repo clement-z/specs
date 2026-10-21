@@ -17,6 +17,7 @@ if gtest_dep.found()
       'devices/waveguide.cpp',
       'fixed_point.cpp',
       'general_utils.cpp',
+      'integer_literals.cpp',
       'main.cpp',
       'optical_output_port.cpp',
       'parser_state.cpp',
@@ -29,7 +30,8 @@ if gtest_dep.found()
       'utils/sha256.cpp',
     ),
     cpp_args: ['-pedantic'],
-    dependencies: [gtest_dep, systemc_dep],
+    # parser_dep: the netlist lexer and parser (integer_literals.cpp)
+    dependencies: [gtest_dep, systemc_dep, parser_dep],
     link_with: spx_lib,
     implicit_include_directories: false,
   )

@@ -12,7 +12,7 @@ Every random draw comes from one master seed:
 | Where | Syntax | Notes |
 | --- | --- | --- |
 | command line | `specs --seed N -f circuit.cir` | N: decimal integer, 0 to 2^64 − 1. Also applies to `-t` testbenches. Wins over `.options seed` |
-| netlist | `.options seed=N` | N: integer, 0 to 2^53 (netlist numbers are doubles). From 2147483647 up, write it in exponent form (`3e9`): the lexer reads longer digit strings as 2147483647, so that value is rejected |
+| netlist | `.options seed=N` | N: integer. An integer literal (`3000000000`) is exact from 0 to 9223372036854775807 (2^63 − 1; a larger literal is a parse error); in exponent form (`3e9`) N is a double, 0 to 2^53 |
 | default | — | **0** |
 
 Each device draws from its own stream, derived from the master seed and the device's hierarchical instance name
