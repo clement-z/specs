@@ -1,5 +1,5 @@
 # B-021: Tolerance gate: undocumented AND rule, hard 10·abstol zero-snap, reltol divides by 0
-severity: low | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED
+severity: low | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in c527d7d (sprint 2026-10b P3)
 location: src/optical_output_port.cpp:60-73,160-170
 ## Problem
 The gate emits only if `|Δ| > abstol` **and** `|Δ|/|last| > reltol`, which is `max(abstol, reltol·|last|)`. SPICE

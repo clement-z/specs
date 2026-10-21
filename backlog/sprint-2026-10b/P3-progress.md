@@ -12,7 +12,7 @@ Base: `ws/devices` @ 51f0ca2 (= `sprint/2026-10b` after the P2 merge). Baseline 
 | 1 | B-032 + B-033 + B-159 crossing | **done** | 04c7819 | from `P3-wip/crossing` 496818c; golden: 4 `b147-crossing-out-*` re-recorded (a/b/d slot split only), 5 new cases, gtest; 120/120 `--atol 0`; docs `doc/netlist.md` CROSSING |
 | 2 | B-049 + B-050 event-driven PDET | **done** | be96f26 | from `P3-wip/pdet` 81ccd4c + tb self-check threshold 1e-7 → 1e-12 (0.3 % flake); golden: tb/det, tb/detector re-recorded (3/3, noisy readouts in vcd_ignore_values), 3 new cases, gtest; 123/123; docs `doc/netlist.md` PDET |
 | 3 | B-048 probe sampling (IC-proof) | **done** | 65129a7 | from `P3-wip/probes` 8521e6b; `applyInitialConditions()`/`ic_orders` before the probe enables; golden: 10 regress .tran cases re-recorded (t=0 OP values only, 2 checkers), 3 new, gtest; 126/126 |
-| 4 | B-021 + B-014 + B-124 numerics | in progress | | `/tmp/P3-wt/numerics` (`P3-wip/numerics`); docs after the code |
+| 4 | B-021 + B-014 + B-124 numerics | **done** (B-014 error part held back, needs-human) | c527d7d | from `P3-wip/numerics` 7678d33; the decided error (non-zero delay → 0) makes `regress/b031-mzi-bidir` exit 1 → parked on `P3-ready/b014-error` (cfe0eb0 + cc1614c, 134/134 own baseline); golden: 4 cases stderr-only warnings, b033 stdout unordered, 8 new, gtest; 134/134; docs `doc/numerics.md` |
 
 ## Resume notes
 - Implementer agent ids (Agent tool, SendMessage to resume): crossing a7a716e5b802628f9, pdet afe95174b3cb6aab9,
@@ -21,3 +21,6 @@ Base: `ws/devices` @ 51f0ca2 (= `sprint/2026-10b` after the P2 merge). Baseline 
   onto `ws/devices` in order 1→4, records the golden cases and does the bookkeeping.
 - If an implementer was cut off: check its worktree (`git -C /tmp/P3-wt/<name> status/log`), relaunch with the same
   prompt + "continue from the current state of the worktree".
+
+## Final verification
+- pending: fresh gcc + clang + gcc -O0 builds, meson test, golden `--atol 0` on each (line order of the new cases).
