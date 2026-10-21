@@ -4,8 +4,8 @@ Builds: `/tmp/P1-gcc` (Meson default, gcc 11.5), `/tmp/P1-clang` (clang 19.1.7),
 
 | item | status | commit | notes |
 |---|---|---|---|
-| B-129 | in progress | | |
-| B-126 | pending | | |
+| B-129 | done | 23797a8 | baseline rewritten in place (30 files, IDs only); unordered streams re-ranked in sorted order |
+| B-126 | in progress | | |
 | B-127 | pending | | |
 | B-128 | pending | | |
 

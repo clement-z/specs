@@ -1,5 +1,5 @@
 # B-129: golden stdout contains global OpticalSignal IDs that are compared exactly, so any change in the number of OpticalSignal copies breaks 25 baselines
-severity: med | category: test-gap | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: test-gap | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 23797a8 (sprint 2026-10b P1)
 location: tests/golden/run_golden.py:93-108 (`normalise_text`), :59-61 (`NUM_RE`), :201-204 (integers compared exactly), src/optical_signal.h:28,55-62,231
 ## Problem
 `operator<<(OpticalSignal)` prints `[NNNN]` = `m_id`, a value taken from a static counter by `getNewId()`, which is called by every constructor and, notably, by the copy constructor (optical_signal.h:55-56). So the printed numbers depend on exactly how many `OpticalSignal` objects the program created/copied before. `normalise_text` does not touch them and `compare_text` treats them as integers that must match exactly. Any refactor that adds or removes a copy (`const auto&` instead of `auto`, an extra temporary, an elided move) shifts all later IDs and fails every case that prints signals with identical physical values. 955 ID tokens in 25 of the 44 stdout baselines are affected.
