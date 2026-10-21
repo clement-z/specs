@@ -43,6 +43,8 @@ Done with bidirectional nets
 Elaborating network of ROOT/X1/X1/ring_bl...
 Creating ROOT/X1/X1/COUPLER1 (reason: connection to unidir net)
 Done creating ROOT/X1/X1/COUPLER1
+Creating ROOT/CWSRC1 (reason: unidir backlog)
+Done creating ROOT/CWSRC1
 Creating ROOT/X1/X1/WG_RING_L (reason: unidir backlog)
 Done creating ROOT/X1/X1/WG_RING_L
 Creating ROOT/X1/X1/COUPLER2 (reason: unidir backlog)
@@ -57,8 +59,6 @@ Creating ROOT/X2/X1/COUPLER2 (reason: unidir backlog)
 Done creating ROOT/X2/X1/COUPLER2
 Creating ROOT/X2/X1/WG_RING_R (reason: unidir backlog)
 Done creating ROOT/X2/X1/WG_RING_R
-Creating ROOT/CWSRC1 (reason: unidir backlog)
-Done creating ROOT/CWSRC1
 Creating ROOT/PROBE1 (reason: unidir backlog)
 Done creating ROOT/PROBE1
 Creating ROOT/PROBE2 (reason: unidir backlog)

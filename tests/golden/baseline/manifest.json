@@ -423,6 +423,12 @@
    "only": "^(cir/add_drop_pyspecs|opt/tracefile-o|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b033-crossing-two-lambda|regress/b014-.*|regress/b021-.*|err/b021-.*|regress/b124-.*|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-021/B-014/B-124: stderr gains delay-rounding warnings (10 % threshold; non-zero delays rounding to 0 reported as warnings, the decided error is held back: b031) in cir/add_drop_pyspecs, opt/tracefile-o, regress/b006-empty-output, regress/b031-mzi-bidir (stderr unordered); regress/b033-crossing-two-lambda: stdout unordered (pointer-ordered OP listing, B-016); new snapfactor, delay-rounding and tight-reltol cases; gtest"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:15:57Z",
+   "only": "^(cir/add_drop|cir/paul_3ring_puf|regress/b150-include-in-subckt|cir-json/add_drop|opt/tol-resolution-overrides|opt/mode-fd|err/b017-json-unwritable|regress/b004-mode-td-dc|opt/multi-file)$",
+   "gtest": false,
+   "note": "B-176: element creation backlog in netlist order (was heap-address order); only the 'Creating ...' line order changes (opt/multi-file: stdout already unordered, re-recorded for the same reason), paul_3ring_puf (missing VLSRC file) reaches VLSRC1 two elements earlier"
   }
  ]
 }

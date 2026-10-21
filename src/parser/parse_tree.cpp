@@ -125,7 +125,7 @@ vector<ParseElement *>::iterator ParseTreeCreationHelper::next_fresh_element_bou
             continue;
 
         // Check if element is part of backlog set
-        if (elements_backlog.find(elem) != elements_backlog.cend())
+        if (elements_backlog.count(it - pt->elements.begin()))
             continue;
 
         // Check if net_name is in element nets
@@ -167,7 +167,7 @@ void ParseTreeCreationHelper::create_signals(const ParseElement *elem)
             auto it = next_fresh_element_bound_to(net, {elem});
             while (it != pt->elements.end())
             {
-                elements_backlog.insert(*it);
+                elements_backlog.insert(it - pt->elements.begin());
                 it = next_fresh_element_bound_to(net, {elem});
             }
         }
@@ -736,21 +736,21 @@ void ParseTree::build_circuit()
             while ( !elements_backlog.empty() )
             {
                 auto it = elements_backlog.begin();
-                auto &backlog_elem = *it;
+                const ParseElement *backlog_elem = elements.at(*it);
                 cout << "Creating - " << backlog_elem->name << " (reason: bidir backlog)" << endl;
                 auto mod = backlog_elem->create(pt_helper);
                 cout << "Done creating " << backlog_elem->name << endl;
 
-                if (mod->name() != (*it)->name)
+                if (mod->name() != backlog_elem->name)
                 {
-                    cerr << "Error: a module with name '" << (*it)->name << "' already exists or";
+                    cerr << "Error: a module with name '" << backlog_elem->name << "' already exists or";
                     cerr << " it was renamed due to a bad naming." << endl;
                     cerr << "Make sure there is no naming conflict in the netlist" << endl;
                     exit(1);
                 }
 
                 circuit_modules.emplace(mod->name(), mod);
-                elements_backlog.erase(*it);
+                elements_backlog.erase(it);
             }
             elem = pt_helper.next_fresh_element_bound_to(next_net->first);
         }
@@ -789,21 +789,21 @@ void ParseTree::build_circuit()
             while ( !elements_backlog.empty() )
             {
                 auto it = elements_backlog.begin();
-                auto &backlog_elem = *it;
+                const ParseElement *backlog_elem = elements.at(*it);
                 cout << "Creating " << backlog_elem->name << " (reason: unidir backlog)" << endl;
                 auto mod = backlog_elem->create(pt_helper);
                 cout << "Done creating " << backlog_elem->name << endl;
 
-                if (mod->name() != (*it)->name)
+                if (mod->name() != backlog_elem->name)
                 {
-                    cerr << "Error: a module with name '" << (*it)->name << "' already exists or";
+                    cerr << "Error: a module with name '" << backlog_elem->name << "' already exists or";
                     cerr << " it was renamed due to a bad naming." << endl;
                     cerr << "Make sure there is no naming conflict in the netlist" << endl;
                     exit(1);
                 }
 
                 circuit_modules.emplace(mod->name(), mod);
-                elements_backlog.erase(*it);
+                elements_backlog.erase(it);
             }
             elem = pt_helper.next_fresh_element_bound_to(next_net->first);
         }
