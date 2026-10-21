@@ -35,10 +35,14 @@ uncommitted work, relaunch an implementer on that worktree with the same brief (
 Shared new doc file: `doc/netlist.md` (pcm writes CWSRC/VLSRC/EVLSRC/PCMCELL sections, docs writes COUPLER):
 merge both at integration.
 
+## Phase state
+All items handled: 1, 2, 4-9 done on `ws/engine`; 3 (B-146) stopped, ready on `P2-ready/b146` (8129020).
+Implementer worktrees removed (branches kept). Report: `backlog/sprint-2026-10b/P2-REPORT.md`.
+
 ## Decisions taken
 - Integration order 1, 4..9, then 2, 3: the bidir implementer (items 2-3) took longer and items 4-9 do not depend
   on it (constraints B-147 with B-144 and B-146 after B-144 are kept). Each item still has its own commit and
   its own golden re-record, so every baseline change stays attributable.
 
 ## Found, not done
-- (none yet)
+- See P2-REPORT.md.
