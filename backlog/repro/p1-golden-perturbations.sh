@@ -48,3 +48,24 @@ expect 1 "compare, candidate without gtest/"  "${G[@]}" compare --baseline "$W/b
 echo "== B-127: --only matching nothing"
 expect 2 "check --only no_such_case"   "${G[@]}" check "${S[@]}" --no-unit-tests --baseline "$W/base" --only no_such_case
 expect 2 "compare --only no_such_case" "${G[@]}" compare --baseline "$W/base" --candidate "$W/base" --only no_such_case
+
+echo "== B-128: one digit of a tolerance printout changed in the baseline (cir/add_drop: '- abstol: 1e-12')"
+fresh; sed -i 's/^- abstol: 1e-12$/- abstol: 2e-12/' "$W/base/cases/cir/add_drop/stdout.txt"
+grep -q '^- abstol: 2e-12$' "$W/base/cases/cir/add_drop/stdout.txt" || echo "UNEXPECTED: perturbation not applied"
+expect 1 "check (default print slack)" "${G[@]}" check "${S[@]}" --no-unit-tests --baseline "$W/base" --only '^cir/add_drop$'
+fresh; sed -i 's/^- default reltol: 1e-06$/- default reltol: 2e-06/' "$W/base/cases/cir/add_drop/stdout.txt"
+expect 1 "check, reltol 1e-06 -> 2e-06" "${G[@]}" check "${S[@]}" --no-unit-tests --baseline "$W/base" --only '^cir/add_drop$'
+
+echo "== B-128 control: last digit of a 6-digit computed token changed (still within the print slack)"
+fresh
+python3 -I - "$W/base/cases/tb/wg/stdout.txt" <<'PY'
+import re, sys
+p = sys.argv[1]; s = open(p).read()
+m = re.search(r"(?<![\d.])(\d\.\d{5})(\d)(?= )", s)   # first 6-significant-digit token such as 0.707107
+assert m, "no 6-digit token"
+d = int(m.group(2)); s = s[:m.start(2)] + str(d + 1 if d < 9 else d - 1) + s[m.end(2):]
+open(p, "w").write(s)
+print("           | changed %s%s by one unit" % (m.group(1), m.group(2)))
+PY
+expect 0 "check (default print slack)" "${G[@]}" check "${S[@]}" --no-unit-tests --baseline "$W/base" --only '^tb/wg$'
+expect 1 "check --print-slack 0"       "${G[@]}" check "${S[@]}" --no-unit-tests --baseline "$W/base" --only '^tb/wg$' --print-slack 0

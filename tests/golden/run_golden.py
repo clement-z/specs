@@ -210,9 +210,26 @@ def is_int_token(tok):
     return not any(c in tok for c in ".eE")
 
 
+# Text floats with fewer significant digits than this (B-128) get neither the
+# print slack nor atol: tolerances and config echoes ("1e-08", "0.0001"),
+# parameters, short fixed-point values.  With the default rtol they compare
+# exactly.  Longer tokens keep the slack, at most 1e-4 relative.  gcc, clang,
+# -O0 and ASan builds need no slack at all (2026-10-21).
+PRINT_SLACK_MIN_DIGITS = 5
+FLOAT_TOKEN_RE = re.compile(r"[-+]?(\d*)(?:\.(\d*))?(?:[eE]([-+]?\d+))?$")
+
+
+def sig_digits(tok):
+    """Number of printed significant digits of a number token ("0.00120" -> 3)."""
+    m = FLOAT_TOKEN_RE.match(tok)
+    if not m:
+        return 0
+    return len(((m.group(1) or "") + (m.group(2) or "")).lstrip("0"))
+
+
 def printed_ulp(tok):
     """Value of one unit in the last printed digit of a float token."""
-    m = re.match(r"[-+]?(\d*)(?:\.(\d*))?(?:[eE]([-+]?\d+))?$", tok)
+    m = FLOAT_TOKEN_RE.match(tok)
     if not m:
         return 0.0
     decimals = len(m.group(2) or "")
@@ -243,8 +260,11 @@ def compare_text(a, b, tol, label, limit=10):
                         break
                     continue
                 fx, fy = float(tx), float(ty)
-                extra = tol.slack * max(printed_ulp(tx), printed_ulp(ty))
-                if not tol.floats_close(fx, fy, extra):
+                if max(sig_digits(tx), sig_digits(ty)) < PRINT_SLACK_MIN_DIGITS:
+                    close = Tol(tol.rtol, 0.0, 0.0).floats_close(fx, fy)
+                else:
+                    close = tol.floats_close(fx, fy, tol.slack * max(printed_ulp(tx), printed_ulp(ty)))
+                if not close:
                     ok = False
                     break
         if not ok:
@@ -1172,7 +1192,8 @@ def main(argv=None):
         p.add_argument("--atol", type=float, default=1e-12, help="absolute float tolerance (default 1e-12)")
         p.add_argument(
             "--print-slack", type=float, default=1.0,
-            help="extra tolerance for floats in text, in units of the last printed digit (default 1; 0 disables)",
+            help="extra tolerance for floats in text with %d+ significant digits, in units of the last printed "
+            "digit (default 1; 0 disables). Shorter floats compare with --rtol only" % PRINT_SLACK_MIN_DIGITS,
         )
         p.add_argument(
             "--allow-new", action="store_true",

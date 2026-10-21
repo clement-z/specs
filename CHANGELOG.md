@@ -24,6 +24,11 @@
 * The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed)
 * Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 80 `specs` cases
   (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
+  * Stricter by default (sprint 2026-10b, B-126..B-129): line order is checked (except per-case
+    `unordered_streams`; `--lenient-order`), NEW/MISSING cases and an unrequested gtest skip fail
+    (`--allow-new`, `--no-unit-tests`), an `--only` that matches nothing exits 2, floats printed with
+    fewer than 5 significant digits compare exactly, and printed OpticalSignal IDs are normalised to
+    first-appearance ranks (`[#k]`). `--strict`/`--strict-order` are accepted as no-ops
 * Paper reference (ECOC 2023, hal-04302200) in the README and `doc/papers/`
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)

@@ -201,5 +201,45 @@ class Coverage(unittest.TestCase):
         self.assertEqual(cm.exception.code, 2)
 
 
+class PrintSlack(unittest.TestCase):
+    """B-128: no print slack for tokens with fewer than PRINT_SLACK_MIN_DIGITS significant digits."""
+
+    def same(self, a, b):
+        return not rg.compare_text(a, b, DEFAULT_TOL, "stdout")
+
+    def test_threshold(self):
+        self.assertEqual(rg.PRINT_SLACK_MIN_DIGITS, 5)
+        for tok, n in [("1e-08", 1), ("0.0001", 1), ("-0.8107", 4), ("0.000317", 3), ("0.00120", 3),
+                       ("-2.6045", 5), ("1.000000", 7), ("0.000000", 0), ("1550", 4)]:
+            self.assertEqual(rg.sig_digits(tok), n, tok)
+        self.assertAlmostEqual(rg.printed_ulp("-2.6045"), 1e-4)
+        self.assertAlmostEqual(rg.printed_ulp("0.707107"), 1e-6)
+        self.assertAlmostEqual(rg.printed_ulp("6.73913e-07"), 1e-12)
+        self.assertAlmostEqual(rg.printed_ulp("1.000000e-09"), 1e-15)
+
+    def test_config_digit_changes_fail(self):
+        for a, b in [("- abstol: 1e-08", "- abstol: 2e-08"), ("- abstol: 1e-08", "- abstol: 1e-07"),
+                     ("- default reltol: 0.0001", "- default reltol: 0.0002"),
+                     ("reltol (DOUBLE) = 1e-05,", "reltol (DOUBLE) = 2e-05,"),
+                     ("resolution (DOUBLE) = 0.5,", "resolution (DOUBLE) = 0.6,"), ("pulse 2.0 W", "pulse 2.1 W"),
+                     # below the default atol (1e-12): short tokens don't get it either
+                     ("- abstol: 1e-12", "- abstol: 2e-12"), ("- abstol: 1e-12", "- abstol: 0")]:
+            self.assertFalse(self.same(a, b), (a, b))
+
+    def test_last_digit_of_long_tokens_still_tolerated(self):
+        self.assertTrue(self.same("P = 0.707107 W", "P = 0.707108 W"))
+        self.assertTrue(self.same("phi = -2.6045 rad", "phi = -2.6044 rad"))
+        self.assertTrue(self.same("t = 6.73913e-07", "t = 6.73914e-07"))
+        # Trailing zeros dropped by %g on one side: the longer token sets the slack.
+        self.assertTrue(self.same("x = 0.12345", "x = 0.123451"))
+        self.assertFalse(self.same("P = 0.707107 W", "P = 0.707109 W"))
+
+    def test_short_tokens_use_rtol(self):
+        self.assertTrue(self.same("-0.0000 rad", "0.0000 rad"))
+        loose = rg.Tol(1e-3, 1e-12, 1.0)
+        self.assertFalse(rg.compare_text("k = 0.5", "k = 0.5001", loose, "stdout"))
+        self.assertTrue(rg.compare_text("k = 0.5", "k = 0.6", loose, "stdout"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

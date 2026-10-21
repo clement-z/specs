@@ -47,7 +47,7 @@ Useful options (all sub-commands that compare):
 | option | default | meaning |
 |---|---|---|
 | `--rtol`, `--atol` | `1e-9`, `1e-12` | float tolerance: `|a-b| <= atol + rtol*max(|a|,|b|)` |
-| `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt): N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it |
+| `--print-slack` | `1` | extra tolerance for floats in **text** (stdout, .txt) with 5 or more significant digits: N units of the last printed digit (`0.707107` may become `0.707106` or `0.707108`). `0` disables it. Shorter floats get no slack (B-128) |
 | `--lenient-order` | off | accept stdout/stderr lines that differ only in **order** in every case (reported as a note). By default only the streams a case lists in `unordered_streams` may be reordered (see "Determinism findings"). `--strict-order` is accepted as a no-op |
 | `--allow-new` | off | NEW cases (in `cases.json`, not in the baseline) are reported but don't fail, e.g. while adding a case before recording it. MISSING cases (in the baseline, no result) always fail. `--strict` is accepted as a no-op |
 | `--no-unit-tests` | off | skip the gtest case explicitly (reported as SKIPPED). Without it and without `--unit-tests`, a selected gtest case fails as MISSING |
@@ -103,7 +103,14 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 
 * **Text** (stdout/stderr/.txt) is compared line by line. Numbers embedded in
   text (not glued to identifiers such as `PS1`, `uut2`) use the float tolerance
-  plus the print slack. Integers must match exactly.
+  plus the print slack. Integers must match exactly. Floats with fewer than 5
+  significant digits on both sides (`PRINT_SLACK_MIN_DIGITS`: tolerances and
+  config echoes such as `1e-08` or `0.0001`, parameters, short fixed-point
+  values such as `0.000317`) get neither the print slack nor `--atol`, only
+  `--rtol`: with the default rtol they compare exactly, so `abstol: 1e-12` ->
+  `2e-12` fails (B-128). The threshold keeps the slack for the long computed
+  tokens where another compiler may flip the last digit, at most 1e-4 relative;
+  gcc, clang, gcc `-O0` and clang ASan builds need no slack at all (2026-10-21).
 * **VCD** files are parsed. Signals are matched by hierarchical name
   (`SystemC.PROBE{ROOT/out}.power`), not by id code or declaration order.
   Every signal is treated as a piecewise-constant function of time. Its value
@@ -232,7 +239,8 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   The largest numeric deviation was 1.1e-13 relative. All of them also pass
   with `--atol 0`.
 * **Tolerance caveat:** with the default `atol=1e-12`, values below about 1e-3
-  are effectively compared with an absolute tolerance. For example, a
+  are effectively compared with an absolute tolerance (VCD, JSON, and text
+  floats with 5 or more significant digits). For example, a
   photocurrent of 1e-10 A may move by 1%. Use `--atol 0` (passes for every
   build above) for a tighter check.
 * A negative test (a wrapper that perturbs outputs) is caught: a VCD value
