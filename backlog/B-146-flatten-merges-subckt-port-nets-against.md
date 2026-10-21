@@ -1,5 +1,5 @@
 # B-146: Flatten merges subckt port nets against the pre-flatten map (E115, lost type check)
-severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: needs-human: fix ready on branch P2-ready/b146 (8129020), held back in sprint 2026-10b P2 (unpredicted cir-json/subckt_tests change)
 location: src/parser/parse_tree.cpp:899, src/parser/parse_tree.cpp:902, src/parser/parser.y:513-541
 ## Problem
 `flatten()` looks up the external net in `nets` (the parent map before flattening), not in `nets_flat`. X-element
@@ -51,3 +51,17 @@ Changes needed:
 The fix itself is unique and local, and the location lines are correct.
 
 **Orchestrator:** Reclassified easy-unattended -> needs-human: the fix (correctly) changes the results of netlists that run today.
+
+## Sprint 2026-10b P2 (needs-human)
+The approved fix (both lookups use `nets_flat`) works: `a4-x-shared-net` and `v7-x-shared-delayed` give the same
+OP listing and VCD as their flat netlists, and `a4-x-net-type-mismatch` gives "Could not reconcile nets: ROOT/X2/e
+and ROOT/n". It was **not landed** on `ws/engine` because it changes an existing golden case that the P2 table
+predicted unchanged: `cir-json/subckt_tests`, `flat.json` `writers` of `ROOT/out` and `ROOT/X2/N00001` goes from 0
+to 1. Each of these nets is written by one subckt instance and read by another, so 1 is the flat-equivalent count
+(the second instance used to overwrite the first one's counts). The stdout and VCD of `cir/subckt_tests` are
+unchanged. The "byte-identical JSON" of the second check predates B-154 (0dcfda3), when the export printed the
+readers count in both fields.
+
+Ready to land: branch `P2-ready/b146` (8129020, one commit on top of `ws/engine` 4083a49): fix, 5 golden cases
+(`regress/b146-x-shared-{net,delayed}(-flat)`, `err/b146-x-net-type-mismatch`), the `cir-json/subckt_tests`
+re-record and a CHANGELOG line; golden check 120/120 at `--atol 0`. Sign-off needed: accept the JSON count change.
