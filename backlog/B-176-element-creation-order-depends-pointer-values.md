@@ -1,5 +1,5 @@
 # B-176: Element creation order depends on pointer values (std::set<const ParseElement*>)
-severity: low | category: determinism | effort: XS | fix-class: needs-design | verdict: PLAUSIBLE
+severity: low | category: determinism | effort: XS | fix-class: needs-design | verdict: PLAUSIBLE | status: fixed in 7c12a61 (sprint 2026-10b P4, F-01): backlog ordered by netlist position
 location: src/parser/parse_tree.h:749, src/parser/parse_tree.cpp:724-742, :777-795
 ## Problem
 `elements_backlog` is a `set<const ParseElement*>`, so elements are created in heap-address order. Because of
