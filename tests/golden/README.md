@@ -88,10 +88,10 @@ For every case the harness records:
   * printed OpticalSignal IDs (`[0042]  @ 1550 nm ...`, a global counter that every
     copy also bumps) become `[#k]`, k = rank of the ID's first appearance in that
     stream or file (B-129). Prints of the same signal keep the same rank; adding or
-    removing an `OpticalSignal` copy no longer changes the output. In streams compared
-    as a multiset of lines (`unordered_streams`), both sides are renumbered by first
-    appearance in the lines sorted with their IDs masked, so the ranks don't depend on
-    line order;
+    removing an `OpticalSignal` copy no longer changes the output. Ranks follow line
+    order, so streams compared as a multiset of lines (`unordered_streams`,
+    `--lenient-order`) compare the lines with their IDs masked, plus the ID structure:
+    for each ID, the lines it appears in (IDs and numbers masked);
 * every file created or modified in the working dir (`circuits/` copies excluded):
   * VCD: `$date` and `$version` blocks are stripped;
   * JSON (the `--json` export): stored verbatim and compared structurally;

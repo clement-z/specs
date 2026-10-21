@@ -68,12 +68,13 @@ class SignalIds(unittest.TestCase):
         text = "matrix [1234] [0015] x\n[0015]  @ 1550 nm"
         self.assertEqual(rg.canonical_ids(text), "matrix [1234] [0015] x\n[#1]  @ 1550 nm")
 
-    def test_sort_lines_independent_of_order(self):
+    def test_profiles_independent_of_order(self):
         lines = SIGNALS.split("\n")
         swapped = "\n".join([lines[3], lines[1], lines[2], lines[0]])
-        a = sorted(rg.canonical_ids(SIGNALS, sort_lines=True).split("\n"))
-        b = sorted(rg.canonical_ids(rg.canonical_ids(swapped), sort_lines=True).split("\n"))
-        self.assertEqual(a, b)
+        self.assertEqual(rg.id_profiles(rg.canonical_ids(swapped)), rg.id_profiles(rg.canonical_ids(SIGNALS)))
+        # OUT's second print now shows the IN signal: same lines with IDs masked, other structure.
+        other = SIGNALS.replace("t=1 s  OUT: [0015]", "t=1 s  OUT: [0012]")
+        self.assertNotEqual(rg.id_profiles(other), rg.id_profiles(SIGNALS))
 
 
 class LineOrder(unittest.TestCase):
@@ -105,6 +106,21 @@ class LineOrder(unittest.TestCase):
         diffs, _ = rg.compare_case(stored(self.A), stored(self.B.replace("= 4", "= 5")),
                                    {"unordered_streams": ["stdout"]}, DEFAULT_TOL)
         self.assertTrue(diffs)
+
+    def test_reordered_identical_prints(self):
+        # Lines that only differ by their signal ID (same values, e.g. a testbench event log),
+        # with whole time blocks swapped: ranks are permuted but the structure is the same.
+        log = "\n".join(["0 s:", "OUT: [0003]  @ 1550 nm (1.0 W)", "IN: [0001]  @ 1550 nm (1.0 W)",
+                         "1 s:", "OUT: [0007]  @ 1550 nm (1.0 W)", "IN: [0005]  @ 1550 nm (1.0 W)"])
+        L = log.split("\n")
+        swapped = "\n".join(L[3:] + L[:3])
+        base, cand = rg.canonical_ids(log), rg.canonical_ids(swapped)
+        self.assertTrue(rg.compare_case(stored(base), stored(cand), {}, DEFAULT_TOL)[0])
+        diffs, notes = rg.compare_case(stored(base), stored(cand), {}, DEFAULT_TOL, lenient_order=True)
+        self.assertEqual((diffs, len(notes)), ([], 1))
+        # Same multiset of masked lines, but OUT at 1 s now repeats the 0 s signal: must fail.
+        bad = rg.canonical_ids(swapped.replace("[0007]", "[0003]"))
+        self.assertTrue(rg.compare_case(stored(base), stored(bad), {}, DEFAULT_TOL, lenient_order=True)[0])
 
     def test_reordered_signal_prints(self):
         # The first print of a signal moves: its rank changes, the multiset comparison must not care.

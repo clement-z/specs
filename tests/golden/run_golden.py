@@ -112,23 +112,38 @@ def normalise_text(text, pathmap):
     return canonical_ids("\n".join(out))
 
 
-def canonical_ids(text, sort_lines=False):
+def canonical_ids(text):
     """Replace every printed OpticalSignal ID by "[#k]", k = rank of its first appearance.
 
     Prints of the same signal keep the same rank, absolute counter values vanish.
-    With sort_lines, the ranks follow the lines sorted with their IDs masked, so that
-    they don't depend on line order (streams compared as a multiset of lines).
     """
-    lines = text.split("\n")
-    if sort_lines:
-        lines = sorted(lines, key=lambda l: SIGNAL_ID_RE.sub("[#]", l))
     ranks = {}
-    for line in lines:
-        for m in SIGNAL_ID_RE.finditer(line):
-            ranks.setdefault(m.group(1), "[#%d]" % (len(ranks) + 1))
+    for m in SIGNAL_ID_RE.finditer(text):
+        ranks.setdefault(m.group(1), "[#%d]" % (len(ranks) + 1))
     if not ranks:
         return text
     return SIGNAL_ID_RE.sub(lambda m: ranks[m.group(1)], text)
+
+
+def mask_ids(text):
+    return SIGNAL_ID_RE.sub("[#]", text)
+
+
+def id_profiles(text):
+    """Order-independent identity structure of the signal IDs of a text.
+
+    For each ID, the sorted list of the lines it appears in (IDs and numbers
+    masked); returns the sorted list of these profiles.  Ranks follow line
+    order, so streams compared as a multiset of lines use this instead.
+    """
+    groups = {}
+    for line in text.split("\n"):
+        ids = SIGNAL_ID_RE.findall(line)
+        if ids:
+            shape = NUM_RE.sub("N", mask_ids(line))
+            for i in ids:
+                groups.setdefault(i, []).append(shape)
+    return sorted(sorted(v) for v in groups.values())
 
 
 VCD_DROP_BLOCKS = ("$date", "$version")
@@ -797,10 +812,11 @@ def compare_case(base, cand, case, tol, lenient_order=False):
         d = compare_text(ta, tb_, tol, stream)
         if not d:
             continue
-        # Signal ID ranks follow the line order: renumber them independently of it.
-        sa = "\n".join(sorted(canonical_ids(ta, sort_lines=True).split("\n")))
-        sb = "\n".join(sorted(canonical_ids(tb_, sort_lines=True).split("\n")))
-        if not compare_text(sa, sb, tol, stream):
+        # Signal ID ranks follow the line order: compare the lines with their IDs
+        # masked, and the ID structure separately (id_profiles).
+        sa = "\n".join(sorted(mask_ids(ta).split("\n")))
+        sb = "\n".join(sorted(mask_ids(tb_).split("\n")))
+        if not compare_text(sa, sb, tol, stream) and id_profiles(ta) == id_profiles(tb_):
             # Same multiset of lines (within tolerance): only the order differs.
             # SPECS iterates SystemC objects in pointer order (std::set<T*>),
             # so listing order depends on memory layout (compiler, flags,
