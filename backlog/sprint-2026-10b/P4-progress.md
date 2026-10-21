@@ -13,9 +13,9 @@ golden 134/134 `--atol 0`, 0 notes.
 | 2 | B-016 name-ordered `sc_get_all_*` (init, OP listing, auto-probes, VCD order) + golden re-record (ordering only, proven) | orchestrator | done | 5c6d742 | 56 cases: 55 reordered (proof script), b144-three-writers explained; tb/det, tb/detector left for item 4 |
 | 3 | `test(golden)`: drop every `unordered_streams` exception | orchestrator | done | (see log) | 14 cases (P1's 8 + 6 later) |
 | 4 | F-01 seeds: `--seed`, `.options seed`, `spx::rng_for`, Detector streams per name, `darkfield` option (B-055, B-056) | Opus implementer a96cbaf6240d36dfe, `/tmp/P4-wt/rng` (`P4-wip/rng`) | done | 083c8be | 22feaa5 cherry-picked + .options seed INT_MAX guard; lexer fix d6e81d4 held back (to park as P4-ready/lexer-int-overflow); 17 new cases, tb/det(ector) compared |
-| 5 | F-01 run manifest `<trace>.manifest.json` + `--print-manifest` | Opus implementer a8aba4f323342d840, `/tmp/P4-wt/manifest` (`P4-wip/manifest`) | integrating | | commits ff19964 (seed placeholder, drop), 2815930, 72eedeb |
+| 5 | F-01 run manifest `<trace>.manifest.json` + `--print-manifest` | Opus implementer a8aba4f323342d840, `/tmp/P4-wt/manifest` (`P4-wip/manifest`) | done | 4e3e87d | 2815930 + 72eedeb squashed with the re-record; 84 cases gain only the manifest |
 | 6 | verification: `check --strict` twice, clang ASan/UBSan, `record --repeat 3` | orchestrator | pending | | |
-| 7 | docs, backlog status, CHANGELOG, report | orchestrator | pending | | |
+| 7 | docs, backlog status, CHANGELOG, report | orchestrator | docs done (e05090d), report pending | | |
 
 ## Decisions (running list, copied into the report)
 - Default seed when no `--seed`/`.options seed`: **0** (fixed, documented).
@@ -31,3 +31,4 @@ golden 134/134 `--atol 0`, 0 notes.
 - 2026-10-21 — clang 19 ASan+UBSan -O0 (/tmp/P4-asan, ASAN_OPTIONS=detect_leaks=0) at 5c6d742 code: check --atol 0 --strict: 134 passed, 0 notes (no --lenient-order).
 - 2026-10-21 — same code: clang 19 release (/tmp/P4-clang) and gcc -O0 (/tmp/P4-debug): check --atol 0 --strict 134/134, 0 notes.
 - 2026-10-21 — item 4 (seeds) committed 083c8be; golden 151/151 --atol 0; meson 12/12. Next: integrate the manifest (P4-wip/manifest).
+- 2026-10-21 — item 5 (manifest) 4e3e87d, docs e05090d; golden 153/153 --atol 0. Next: park lexer fix (P4-ready/lexer-int-overflow), final verification (fresh builds, strict x2, ASan, record --repeat 3).
