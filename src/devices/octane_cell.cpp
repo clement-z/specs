@@ -26,7 +26,7 @@ void OctaneCell::init_full()
 
     m_merger = make_unique<Merger>(spx_child_name(this, "_Y_", 0).c_str(), loss_merger);
 
-    m_pcm = make_unique<PCMElement>(spx_child_name(this, "_PCM_", 0).c_str(), m_meltEnergy, m_nStates, 0);
+    m_pcm = make_unique<PCMElement>(spx_child_name(this, "_PCM_", 0).c_str(), m_meltEnergy, m_nStates, 0, m_Tc, m_Ta);
 
     m_pd = make_unique<Detector>(spx_child_name(this, "_PD_", 0).c_str());
 
@@ -71,7 +71,7 @@ void OctaneCell::init_compact()
 
     m_merger = make_unique<Merger>(spx_child_name(this, "_Y_", 0).c_str(), loss_merger);
 
-    m_pcm = make_unique<PCMElement>(spx_child_name(this, "_PCM_", 0).c_str(), m_meltEnergy, m_nStates, 0);
+    m_pcm = make_unique<PCMElement>(spx_child_name(this, "_PCM_", 0).c_str(), m_meltEnergy, m_nStates, 0, m_Tc, m_Ta);
 
     m_pd = make_unique<Detector>(spx_child_name(this, "_PD_", 0).c_str());
 

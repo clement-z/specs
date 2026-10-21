@@ -62,6 +62,9 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
   at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
   positional arguments is a clean error (B-052)
+* PCMCELL requires `tc` and `ta` (a cell without them was silently opaque: Tc = Ta = 0); the C++ PCM
+  constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
+  parameters (B-051)
 
 ### Removed
 

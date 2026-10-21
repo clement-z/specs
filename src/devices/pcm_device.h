@@ -51,7 +51,7 @@ public:
                int nStates = 0,
                int state = 0,
                double Tc = 0,
-               double Ta = 0,
+               double Ta = 1,
                double influence_window_ns = 1,
                double speed = 3)
         : spx_module(name)

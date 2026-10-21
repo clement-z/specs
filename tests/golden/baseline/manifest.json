@@ -30,6 +30,8 @@
   "err/b034-coupler-k-gt-1",
   "err/b034-coupler-kp-negative",
   "err/b034-splitter-ratio-gt-1",
+  "err/b051-pcmcell-no-ta",
+  "err/b051-pcmcell-no-tc",
   "err/b052-cwsrc-args",
   "err/b052-evlsrc-args",
   "err/b052-pcmcell-args",
@@ -67,6 +69,7 @@
   "regress/b006-empty-output",
   "regress/b031-mzi-bidir",
   "regress/b036-vci-crow",
+  "regress/b051-pcmcell-tc-zero",
   "regress/b052-cwsrc-positional",
   "regress/b052-evlsrc-positional",
   "regress/b052-pcmcell-positional",
@@ -307,6 +310,12 @@
    "only": "^(regress|err)/b052-",
    "gtest": false,
    "note": "B-052: new cases, positional args of CWSRC/VLSRC/EVLSRC/PCMCELL and too-many-args errors"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:26:47Z",
+   "only": "^(regress|err)/b051-",
+   "gtest": false,
+   "note": "B-051: new cases, PCMCELL requires tc/ta (tc=0 valid)"
   }
  ]
 }

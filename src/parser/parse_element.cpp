@@ -1241,15 +1241,25 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
+    // Tc and Ta are required (B-051): no physical default
+    bool tc_given = false;
+    bool ta_given = false;
+
     // Parse positional arguments (emelt n tc ta)
     if(args.size() > 0)
         obj->m_meltEnergy = args[0].as_double();
     if(args.size() > 1)
         obj->m_nStates = args[1].as_integer();
     if(args.size() > 2)
+    {
         obj->m_Tc = args[2].as_double();
+        tc_given = true;
+    }
     if(args.size() > 3)
+    {
         obj->m_Ta = args[3].as_double();
+        ta_given = true;
+    }
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -1263,9 +1273,15 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         else if (kw == "K" || kw == "INITIAL_STATE")
             obj->m_stateCurrent = p.second.as_integer();
         else if (kw == "SP" || kw == "TC" || kw == "T_C")
+        {
             obj->m_Tc = p.second.as_double();
+            tc_given = true;
+        }
         else if (kw == "EP" || kw == "TA" || kw == "T_A")
+        {
             obj->m_Ta = p.second.as_double();
+            ta_given = true;
+        }
         else if (kw == "TANH_COEF")
             obj->m_speed = p.second.as_double();
         else {
@@ -1276,6 +1292,12 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
     if (obj->m_meltEnergy == 0 || obj->m_nStates == 0)
     {
         cerr << "PCM Cell needs values for both Emelt and Nstates" << endl;
+        exit(1);
+    }
+    if (!tc_given || !ta_given)
+    {
+        const char *missing = (!tc_given && !ta_given) ? "tc, ta" : (!tc_given ? "tc" : "ta");
+        cerr << "Error (" << name << "): PCM Cell needs values for both Tc and Ta (missing: " << missing << ")" << endl;
         exit(1);
     }
     return obj;

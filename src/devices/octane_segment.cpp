@@ -86,7 +86,7 @@ void OctaneSegment::init_full()
 
     // cout << "Initializing submodules of " << name() << endl;
     
-    m_oct = make_unique<OctaneCell>(spx_child_name(this, "_OCT_", 0).c_str(), m_meltEnergy, m_nStates, m_isCompact);
+    m_oct = make_unique<OctaneCell>(spx_child_name(this, "_OCT_", 0).c_str(), m_meltEnergy, m_nStates, m_Tc, m_Ta, m_isCompact);
     m_oct->init();
 
     if (m_term_row && m_term_col)
@@ -283,7 +283,7 @@ void OctaneSegment::init_compact()
 
     // cout << "Initializing submodules of " << name() << endl;
     
-    m_oct = make_unique<OctaneCell>(spx_child_name(this, "_OCT_", 0).c_str(), m_meltEnergy, m_nStates, m_isCompact);
+    m_oct = make_unique<OctaneCell>(spx_child_name(this, "_OCT_", 0).c_str(), m_meltEnergy, m_nStates, m_Tc, m_Ta, m_isCompact);
     m_oct->init();
 
     if (m_term_row && m_term_col)

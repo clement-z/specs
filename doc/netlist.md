@@ -63,6 +63,7 @@ Phase-change memory cell: `PCMCELL<name> <in> <out> [emelt [n [tc [ta]]]] [keywo
   - `TANH_COEF`: shape of the transmission curve, default 3.
 
   A keyword overrides the positional value.
-- Required: `emelt` and `n` (both non-zero). Without `tc` and `ta` the cell is opaque (B-051).
+- Required: `emelt` and `n` (both non-zero), `tc` and `ta` (positionally or by any alias; `tc=0` is
+  valid). There is no default transmission.
 - Power transmission in state k: `tc + (ta - tc) * tanh(TANH_COEF * k / n)`.
 - Example: `pcmcell1 in out 1e-12 10 0.85 0.95` is `pcmcell1 in out emelt=1e-12 n=10 tc=0.85 ta=0.95`.

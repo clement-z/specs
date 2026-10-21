@@ -1250,6 +1250,65 @@
    ],
    "expect": "fail",
    "note": "B-052: PCMCELL with 5 positional args gives a clean error (at most 4: emelt n tc ta)"
+  },
+  {
+   "id": "regress/b051-pcmcell-tc-zero",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-tc-zero.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-051: tc/ta are a presence check: t_c=0 ep=1 (aliases) is valid; out = tanh(1.5) mW = 0.000905 W at k=5, n=10"
+  },
+  {
+   "id": "err/b051-pcmcell-no-tc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-no-tc.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-051: PCMCELL without tc gives a clean error (was fully opaque: constructor defaults Tc = Ta = 0)"
+  },
+  {
+   "id": "err/b051-pcmcell-no-ta",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-no-ta.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-051: PCMCELL without ta (tc given positionally) gives a clean error (was T(0) = tc, ta silently 0)"
   }
  ]
 }

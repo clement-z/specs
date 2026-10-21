@@ -28,6 +28,8 @@ public:
     double m_meltEnergy;
     bool m_isCompact;
     int m_nStates;
+    double m_Tc; /* PCM power transmission in the crystalline state */
+    double m_Ta; /* PCM power transmission in the amorphous state */
 
     // Wires
     sc_signal<OpticalSignal> m_merg_in1, m_merg_in2, m_merg_out, m_pcm_in, m_pcm_out, m_pd_in;
@@ -49,12 +51,16 @@ public:
      * @param name name of the module
      * @param meltEnergy energy needed to amorphize by one step
      * @param nStates number of internal states supported by the PCM
+     * @param Tc power transmission (W/W) of the PCM in the crystalline state (required, no default)
+     * @param Ta power transmission (W/W) of the PCM in the amorphous state (required, no default)
      * */
-    OctaneCell(sc_module_name name, double meltEnergy = 10e-12, int nStates = 63, bool isCompact = false)
+    OctaneCell(sc_module_name name, double meltEnergy, int nStates, double Tc, double Ta, bool isCompact = false)
         : sc_module(name)
         , m_meltEnergy(meltEnergy)
         , m_isCompact(isCompact)
         , m_nStates(nStates)
+        , m_Tc(Tc)
+        , m_Ta(Ta)
     {
     }
 
