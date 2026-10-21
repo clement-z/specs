@@ -12,7 +12,7 @@ Start state (d214196): `meson test` 12/12, golden `--atol 0` 81/81.
 | 1 | B-001 FD queue merge | done | b2bd836 | validated patch; gtest + golden `regress/b001-fd-multilambda-stale`; existing cases unchanged |
 | 2 | B-144 + B-145 + B-147 bidir slots | implementing (Opus, wt bidir) | | |
 | 3 | B-146 subckt port nets via `nets_flat` | implementing (Opus, wt bidir, after item 2) | | |
-| 4 | B-052 positional args + 4 asserts | implementing (Opus, wt pcm) | | |
+| 4 | B-052 positional args + 4 asserts | done | aaa02b3 | 4 positional + 4 too-many-args golden cases; `doc/netlist.md` created; existing cases unchanged |
 | 5 | B-051 PCMCELL requires tc/ta | implementing (Opus, wt pcm) | | |
 | 6 | B-060 PCM validation | implementing (Opus, wt pcm) | | |
 | 7 | B-002 + B-004 sampled-time / `-m` | implementing (Opus, wt cli) | | |
@@ -36,7 +36,9 @@ Shared new doc file: `doc/netlist.md` (pcm writes CWSRC/VLSRC/EVLSRC/PCMCELL sec
 merge both at integration.
 
 ## Decisions taken
-- (none yet)
+- Integration order 1, 4..9, then 2, 3: the bidir implementer (items 2-3) took longer and items 4-9 do not depend
+  on it (constraints B-147 with B-144 and B-146 after B-144 are kept). Each item still has its own commit and
+  its own golden re-record, so every baseline change stays attributable.
 
 ## Found, not done
 - (none yet)
