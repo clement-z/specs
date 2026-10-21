@@ -28,3 +28,5 @@ golden 134/134 `--atol 0`, 0 notes.
 - 2026-10-21 — heartbeat 99a0d01d created; context read; baseline build green.
 - 2026-10-21 — item 1 (B-176) committed 7c12a61; golden 134/134 `--atol 0`, 0 notes.
 - 2026-10-21 — items 2 (5c6d742) and 3 committed; 134/134 strict, 0 notes. upgrade_signal assert did not fire (creation order = netlist order). clang ASan build started in /tmp/P4-asan.
+- 2026-10-21 — clang 19 ASan+UBSan -O0 (/tmp/P4-asan, ASAN_OPTIONS=detect_leaks=0) at 5c6d742 code: check --atol 0 --strict: 134 passed, 0 notes (no --lenient-order).
+- 2026-10-21 — same code: clang 19 release (/tmp/P4-clang) and gcc -O0 (/tmp/P4-debug): check --atol 0 --strict 134/134, 0 notes.
