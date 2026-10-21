@@ -5,6 +5,8 @@ For the moment, refer to [the online documentation](https://demo.zrounba.fr/spec
 
 Netlist element arguments (e.g. COUPLER `k`/`kp`/`t`) are documented in [`doc/netlist.md`](doc/netlist.md).
 Tolerances and time resolution (`abstol`, `reltol`, `timescale`, ...) are documented in [`doc/numerics.md`](doc/numerics.md).
+Seeds (`--seed`, `.options seed`), the order of outputs and the run manifest written next to each trace are
+documented in [`doc/reproducibility.md`](doc/reproducibility.md).
 
 ## Building
 

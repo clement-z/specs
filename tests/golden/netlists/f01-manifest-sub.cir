@@ -1,0 +1,6 @@
+* F-01: included by f01-manifest.cir. The body of f01wg includes f01-manifest-leaf.cir, which is
+* opened again for each instance while flattening (B-150) and listed once in the run manifest.
+.subckt f01wg a b
+.include tests/golden/netlists/f01-manifest-leaf.cir
+wg1 a b length=100e-6 neff=2.2 ng=4.2
+.ends

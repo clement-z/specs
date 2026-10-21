@@ -59,6 +59,13 @@ NEG_NAN_RE = re.compile(r"-nan\b")
 # structure is meaningful.  Also matches the canonical "[#3]" form (see canonical_ids).
 SIGNAL_ID_RE = re.compile(r"\[(\d{4,}|#\d+)\](?= +@ )")
 
+# Run manifest of specs (F-01, src/run_manifest.h): <trace>.manifest.json next to the default
+# trace, and `specs --print-manifest` on stdout. Its "specs_version" changes with every commit.
+RUN_MANIFEST_SUFFIX = ".manifest.json"
+SPECS_VERSION_RE = re.compile(r'("specs_version"\s*:\s*)"(?:[^"\\]|\\.)*"')
+SPECS_VERSION_LINE_RE = re.compile(r'^(\s*"specs_version"\s*:\s*)"(?:[^"\\]|\\.)*"')
+VERSION_MASK = r'\1"<VERSION>"'
+
 # Numbers embedded in text: not glued to identifiers (PS1, COL_0, uut2 ...).
 NUM_RE = re.compile(
     r"(?<![A-Za-z0-9_.])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![A-Za-z0-9_.])"
@@ -104,12 +111,21 @@ def normalise_text(text, pathmap):
         line = IN_FILE_RE.sub(r"In file: \1", line)
         line = RUNTIME_RE.sub("Total runtime: <DURATION> ms", line)
         line = NEG_NAN_RE.sub("nan", line)
+        line = SPECS_VERSION_LINE_RE.sub(VERSION_MASK, line)
         out.append(line.rstrip())
     while out and out[0] == "":
         out.pop(0)
     while len(out) > 1 and out[-1] == "" and out[-2] == "":
         out.pop()
     return canonical_ids("\n".join(out))
+
+
+def normalise_run_manifest(text, pathmap):
+    """<trace>.manifest.json: the value of "specs_version" becomes "<VERSION>" and absolute paths
+    are mapped as in stdout (argv[0] is absolute in rlimit_nofile cases). Everything else is kept
+    verbatim; the file is still compared as JSON."""
+    text = SPECS_VERSION_RE.sub(VERSION_MASK, text.replace("\r\n", "\n"), count=1)
+    return pathmap.apply(text)
 
 
 def canonical_ids(text):
@@ -657,6 +673,8 @@ def run_case(case, specs, repo, tmp_root):
                     kind = "binary"
             if kind == "vcd":
                 content = normalise_vcd(decode(raw))
+            elif kind == "json" and rel.endswith(RUN_MANIFEST_SUFFIX):
+                content = normalise_run_manifest(decode(raw), pathmap)
             elif kind in ("text", "json"):
                 content = normalise_text(decode(raw), pathmap) if kind == "text" else decode(raw)
             else:

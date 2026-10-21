@@ -25,12 +25,21 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 | `snapfactor` | 10 | emitted fields below snapfactor·abstol become 0 | >= 0 (0: off) | none |
 | `timescale` (alias `ts`) | -13 | log10 of the engine time step in s: -13 is 100 fs | integer, -15 (1 fs) to 0 (1 s) | `-R`, `--resolution` |
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
+| `seed` | 0 | master seed of the random numbers (see below) | integer, 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
 - An invalid value is an error and the simulation does not start.
 - With `-f`, the CLI values are appended to the netlist as `.options` lines, so they override the netlist.
-  They are ignored by the legacy testbenches (`-t`).
+  They are ignored by the legacy testbenches (`-t`), except `--seed`, which is applied directly: it also
+  sets the seed of the testbenches and takes priority over a netlist's `.options seed`.
+- `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
+  from a stream derived from the master seed and the hierarchical name of the device, so a run is
+  reproducible: the default seed is 0, and the same netlist and seed give the same values. Netlist numbers
+  are doubles, hence the 2^53 limit of `.options seed`; `--seed` takes any decimal unsigned 64-bit integer.
+  Write netlist seeds of 2147483647 or more in exponent form (`seed=3e9`): the netlist lexer reads longer
+  digit strings as 2147483647 without an error, so `.options seed` rejects that value. See
+  [reproducibility.md](reproducibility.md).
 - `-R` sets the **timescale**, not `.options resolution`: `-R -14` is `.options timescale=-14`.
 - All optical output ports share these values. C++ testbenches can configure single ports differently.
 

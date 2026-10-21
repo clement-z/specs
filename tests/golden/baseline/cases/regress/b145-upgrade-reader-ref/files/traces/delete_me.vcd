@@ -12,64 +12,64 @@ $var wire   32  aaabx  analysis_type [31:0]  $end
 $var wire    1  aaaby  trace_all_optical_nets       $end
 $var wire    1  aaabz  verbose_component_initialization       $end
 $scope module PROBE{ROOT/a:0} $end
-$var real    1  aaabk  power       $end
-$var real    1  aaabl  abs       $end
-$var real    1  aaabm  phase       $end
-$var real    1  aaabn  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/a:1} $end
-$var real    1  aaabo  power       $end
-$var real    1  aaabp  abs       $end
-$var real    1  aaabq  phase       $end
-$var real    1  aaabr  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/c} $end
-$var real    1  aaaaq  power       $end
-$var real    1  aaaar  abs       $end
-$var real    1  aaaas  phase       $end
-$var real    1  aaaat  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/e} $end
-$var real    1  aaaay  power       $end
-$var real    1  aaaaz  abs       $end
-$var real    1  aaaba  phase       $end
-$var real    1  aaabb  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/f} $end
-$var real    1  aaabc  power       $end
-$var real    1  aaabd  abs       $end
-$var real    1  aaabe  phase       $end
-$var real    1  aaabf  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/out} $end
-$var real    1  aaaau  power       $end
-$var real    1  aaaav  abs       $end
-$var real    1  aaaaw  phase       $end
-$var real    1  aaaax  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/s1:0} $end
-$var real    1  aaabg  power       $end
-$var real    1  aaabh  abs       $end
-$var real    1  aaabi  phase       $end
-$var real    1  aaabj  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/s1:1} $end
 $var real    1  aaaae  power       $end
 $var real    1  aaaaf  abs       $end
 $var real    1  aaaag  phase       $end
 $var real    1  aaaah  wavelength       $end
 $upscope $end
-$scope module PROBE{ROOT/s2:0} $end
+$scope module PROBE{ROOT/a:1} $end
 $var real    1  aaaai  power       $end
 $var real    1  aaaaj  abs       $end
 $var real    1  aaaak  phase       $end
 $var real    1  aaaal  wavelength       $end
 $upscope $end
-$scope module PROBE{ROOT/s2:1} $end
+$scope module PROBE{ROOT/c} $end
 $var real    1  aaaam  power       $end
 $var real    1  aaaan  abs       $end
 $var real    1  aaaao  phase       $end
 $var real    1  aaaap  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/e} $end
+$var real    1  aaaaq  power       $end
+$var real    1  aaaar  abs       $end
+$var real    1  aaaas  phase       $end
+$var real    1  aaaat  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/f} $end
+$var real    1  aaaau  power       $end
+$var real    1  aaaav  abs       $end
+$var real    1  aaaaw  phase       $end
+$var real    1  aaaax  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out} $end
+$var real    1  aaaay  power       $end
+$var real    1  aaaaz  abs       $end
+$var real    1  aaaba  phase       $end
+$var real    1  aaabb  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/s1:0} $end
+$var real    1  aaabc  power       $end
+$var real    1  aaabd  abs       $end
+$var real    1  aaabe  phase       $end
+$var real    1  aaabf  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/s1:1} $end
+$var real    1  aaabg  power       $end
+$var real    1  aaabh  abs       $end
+$var real    1  aaabi  phase       $end
+$var real    1  aaabj  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/s2:0} $end
+$var real    1  aaabk  power       $end
+$var real    1  aaabl  abs       $end
+$var real    1  aaabm  phase       $end
+$var real    1  aaabn  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/s2:1} $end
+$var real    1  aaabo  power       $end
+$var real    1  aaabp  abs       $end
+$var real    1  aaabq  phase       $end
+$var real    1  aaabr  wavelength       $end
 $upscope $end
 $scope module ROOT/PROBE1 $end
 $var real    1  aaaaa  power       $end
@@ -91,43 +91,43 @@ r2.426093191994195 aaaac
 r1.55e-06 aaaad
 r0.0009999999999999998 aaaae
 r0.03162277660168379 aaaaf
-r0 aaaag
+r-2.188980687662379 aaaag
 r1.55e-06 aaaah
 r0.0009999999999999998 aaaai
 r0.03162277660168379 aaaaj
-r1.905223931854829 aaaak
+r-2.188980687662379 aaaak
 r1.55e-06 aaaal
-r0.0009999999999999998 aaaam
-r0.03162277660168379 aaaan
-r0 aaaao
+r0.003999999999999999 aaaam
+r0.06324555320336758 aaaan
+r1.905223931854829 aaaao
 r1.55e-06 aaaap
 r0.003999999999999999 aaaaq
 r0.06324555320336758 aaaar
-r1.905223931854829 aaaas
+r-2.188980687662379 aaaas
 r1.55e-06 aaaat
-r0.001340887011859964 aaaau
-r0.03661812408985425 aaaav
-r2.426093191994195 aaaaw
+r0.003999999999999999 aaaau
+r0.06324555320336758 aaaav
+r0 aaaaw
 r1.55e-06 aaaax
-r0.003999999999999999 aaaay
-r0.06324555320336758 aaaaz
-r-2.188980687662379 aaaba
+r0.001340887011859964 aaaay
+r0.03661812408985425 aaaaz
+r2.426093191994195 aaaba
 r1.55e-06 aaabb
-r0.003999999999999999 aaabc
-r0.06324555320336758 aaabd
-r0 aaabe
+r0.0009999999999999998 aaabc
+r0.03162277660168379 aaabd
+r1.905223931854829 aaabe
 r1.55e-06 aaabf
 r0.0009999999999999998 aaabg
 r0.03162277660168379 aaabh
-r1.905223931854829 aaabi
+r0 aaabi
 r1.55e-06 aaabj
 r0.0009999999999999998 aaabk
 r0.03162277660168379 aaabl
-r-2.188980687662379 aaabm
+r1.905223931854829 aaabm
 r1.55e-06 aaabn
 r0.0009999999999999998 aaabo
 r0.03162277660168379 aaabp
-r-2.188980687662379 aaabq
+r0 aaabq
 r1.55e-06 aaabr
 r1e-08 aaabs
 r0.0001 aaabt

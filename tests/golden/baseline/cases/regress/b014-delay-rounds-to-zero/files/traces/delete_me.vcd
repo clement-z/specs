@@ -12,10 +12,10 @@ $var wire   32  aaaav  analysis_type [31:0]  $end
 $var wire    1  aaaaw  trace_all_optical_nets       $end
 $var wire    1  aaaax  verbose_component_initialization       $end
 $scope module PROBE{ROOT/in} $end
-$var real    1  aaaam  power       $end
-$var real    1  aaaan  abs       $end
-$var real    1  aaaao  phase       $end
-$var real    1  aaaap  wavelength       $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
 $upscope $end
 $scope module PROBE{ROOT/out} $end
 $var real    1  aaaae  power       $end
@@ -24,16 +24,16 @@ $var real    1  aaaag  phase       $end
 $var real    1  aaaah  wavelength       $end
 $upscope $end
 $scope module PROBE{ROOT/r1} $end
-$var real    1  aaaaa  power       $end
-$var real    1  aaaab  abs       $end
-$var real    1  aaaac  phase       $end
-$var real    1  aaaad  wavelength       $end
-$upscope $end
-$scope module PROBE{ROOT/r2} $end
 $var real    1  aaaai  power       $end
 $var real    1  aaaaj  abs       $end
 $var real    1  aaaak  phase       $end
 $var real    1  aaaal  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/r2} $end
+$var real    1  aaaam  power       $end
+$var real    1  aaaan  abs       $end
+$var real    1  aaaao  phase       $end
+$var real    1  aaaap  wavelength       $end
 $upscope $end
 $upscope $end
 $enddefinitions  $end
@@ -70,19 +70,19 @@ b10 aaaav
 $end
 
 #10
-r0.07198581747906861 aaaaa
-r0.2683017284310122 aaaab
-r-1.625140153307007 aaaac
+r1 aaaaa
+r1 aaaab
 r1.55e-06 aaaad
 r1.000077558665494 aaaae
 r1.000038778580858 aaaaf
 r-0.007251966182094706 aaaag
 r1.55e-06 aaaah
-r0.0719858174790686 aaaai
-r0.2683017284310121 aaaaj
-r1.617794198785685 aaaak
+r0.07198581747906861 aaaai
+r0.2683017284310122 aaaaj
+r-1.625140153307007 aaaak
 r1.55e-06 aaaal
-r1 aaaam
-r1 aaaan
+r0.0719858174790686 aaaam
+r0.2683017284310121 aaaan
+r1.617794198785685 aaaao
 r1.55e-06 aaaap
 

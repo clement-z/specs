@@ -3,64 +3,60 @@
 #include <string>
 
 
-// Return vector containing all children objects (expanded) of obj
-set<sc_object *> sc_collect_children_object(sc_object* obj)
+// Return vector containing all children objects (expanded) of obj, in hierarchy order
+vector<sc_object *> sc_collect_children_object(sc_object* obj)
 {
-    auto v = obj->get_child_objects();
-    auto children = set<sc_object *>(v.begin(), v.end());
-    auto all_children = children;
-    for (auto child : children)
+    vector<sc_object *> all_children;
+    for (auto child : obj->get_child_objects())
         if ( child )
         {
+            all_children.push_back(child);
             auto children_children = sc_collect_children_object(child);
-            for (auto child_child : children_children)
-                all_children.insert(child_child);
+            all_children.insert(all_children.end(), children_children.begin(), children_children.end());
         }
     return all_children;
 }
 
-// Return vector containing all children objects (expanded) of obj
-set<sc_module *> sc_collect_children_module(sc_module* obj)
+// Return vector containing all children modules (expanded) of obj, in hierarchy order
+vector<sc_module *> sc_collect_children_module(sc_module* obj)
 {
-    auto v = obj->get_child_objects();
-    auto children = set<sc_object *>(v.begin(), v.end());
-    set<sc_module *> all_children;
-    for (auto obj: children)
+    vector<sc_module *> all_children;
+    for (auto child: obj->get_child_objects())
     {
-        auto mod = dynamic_cast<sc_module *>(obj);
+        auto mod = dynamic_cast<sc_module *>(child);
         if(mod) {
-            all_children.insert(mod);
+            all_children.push_back(mod);
             auto children2 = sc_collect_children_module(mod);
-            all_children.insert(children2.begin(), children2.end());
+            all_children.insert(all_children.end(), children2.begin(), children2.end());
         }
     }
     return all_children;
 }
 
-set<sc_module *> sc_get_all_module() {
-    set<sc_module *> all_modules;
+vector<sc_module *> sc_get_all_module() {
+    vector<sc_module *> all_modules;
 
     for ( auto obj : sc_get_top_level_objects() ) {
         auto mod = dynamic_cast<sc_module *>(obj);
         if (mod)
         {
-            all_modules.insert(mod);
+            all_modules.push_back(mod);
             auto all_children = sc_collect_children_module(mod);
-            for (auto child : all_children)
-                all_modules.insert(child);
+            all_modules.insert(all_modules.end(), all_children.begin(), all_children.end());
         }
     }
+    std::stable_sort(all_modules.begin(), all_modules.end(), sc_object_name_less);
     return all_modules;
 }
 
-set<sc_object *> sc_get_all_object() {
-    set<sc_object *> all_objects;
+vector<sc_object *> sc_get_all_object() {
+    vector<sc_object *> all_objects;
 
     for ( auto obj : sc_get_top_level_objects() ) {
-        all_objects.insert(obj);
+        all_objects.push_back(obj);
         auto all_children = sc_collect_children_object(obj);
-        for (auto child : all_children)
-            all_objects.insert(child);
+        all_objects.insert(all_objects.end(), all_children.begin(), all_children.end());
     }
+    std::stable_sort(all_objects.begin(), all_objects.end(), sc_object_name_less);
     return all_objects;
 }

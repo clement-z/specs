@@ -68,8 +68,11 @@ reported as NEW, everything else must pass), then `record --only '^<id>$'`.
 `specs`) in a **fresh temporary working directory**. Before the run, `circuits/`
 is copied in (netlists use `.include circuits/...`, which resolves relative to
 the cwd) and an empty `traces/` is created. Testbenches and the default trace
-file write to `traces/<name>.vcd` relative to the cwd. If `traces/` is missing,
-SystemC fails with `E701 cannot open trace file`.
+file write to `traces/<name>.vcd` relative to the cwd, with the run manifest
+(F-01: version, seed, command line, netlist file hashes) next to it as
+`traces/<name>.manifest.json`. If `traces/` is missing, specs fails (exit 1) with
+`Error: cannot open run manifest file` (before F-01: SystemC `E701 cannot open
+trace file`).
 
 Netlists that only exist to test a fix (error paths, regressions) live in
 `tests/golden/netlists/`, not in `circuits/` (the examples). Their cases override
@@ -85,6 +88,8 @@ For every case the harness records:
   * absolute paths become `<CWD>`, `<BUILD>`, `<REPO>`, `<HOME>`;
   * SystemC `In file: /…/x.cpp:123` becomes `In file: x.cpp`;
   * `-nan` becomes `nan`, and trailing blanks are stripped;
+  * the `"specs_version": "..."` line printed by `specs --print-manifest` becomes
+    `"specs_version": "<VERSION>"` (the version changes with every commit);
   * printed OpticalSignal IDs (`[0042]  @ 1550 nm ...`, a global counter that every
     copy also bumps) become `[#k]`, k = rank of the ID's first appearance in that
     stream or file (B-129). Prints of the same signal keep the same rank; adding or
@@ -95,6 +100,11 @@ For every case the harness records:
 * every file created or modified in the working dir (`circuits/` copies excluded):
   * VCD: `$date` and `$version` blocks are stripped;
   * JSON (the `--json` export): stored verbatim and compared structurally;
+  * run manifests (`*.manifest.json`, F-01): JSON as well, but the value of
+    `"specs_version"` becomes `"<VERSION>"` and absolute paths are mapped as in
+    stdout (`argv[0]` is absolute in `rlimit_nofile` cases); the rest is verbatim, so
+    the SHA-256 of the netlist files is compared: editing a netlist, even a comment,
+    changes the manifest of every case that reads it;
   * anything else: compared as text, or as bytes if binary.
 
 The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=DISABLE`.
@@ -136,7 +146,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (133 `specs` cases + 1 gtest case)
+## Case list (152 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
@@ -145,8 +155,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*` (40) | bad inputs from the 2026-10 and 2026-10b fix phases (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
-| `regress/bNNN-*` (48) | regression cases of the 2026-10 and 2026-10b fix phases | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, ...); hand-computed expected values are in the netlist headers |
+| `err/bNNN-*`, `err/f01-*` (49) | bad inputs from the 2026-10 and 2026-10b fix phases (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
+| `regress/bNNN-*`, `regress/f01-*` (58) | regression cases of the 2026-10 and 2026-10b fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
@@ -206,31 +216,25 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   `m_cur_readout_no_interf` (`src/devices/detector.h`) were never
   initialised and were dumped at t=0, for example `r6.92e-310` (stale pointer
   bits). Since B-049/B-050 the testbench's detectors are enabled and write
-  their readout, with the `random_device`-seeded noise ON: the readout values
-  (`READOUT`, `uut*.readout*`) differ from run to run and are excluded through
-  `vcd_ignore_values`, and the testbench prints them with 3 decimals (far
-  above the noise), so its stdout, self-checks included, is reproducible.
-  Reproducible seeds are planned (P4, F-01).
-* **Pointer-ordered iteration.** `sc_get_all_object_by_type<T>()` and
-  `sc_get_all_module_by_type<T>()` (`src/utils/sysc_utils.h`) return
-  `std::set<T*>`, so the following are listed in memory-address order:
-  * the operating-point listing (`printOPAnalysisResult`);
-  * the `--vci` dump;
-  * the detector names printed while setting up tracing.
-
-  The order is stable for a given binary (run-to-run identical), but changes
-  between builds (B-016). Line order is checked by default (B-126); the cases
-  whose order differs between the baseline and the gcc, clang and gcc `-O0`
-  Meson builds of 2026-10-21 (SystemC 3.0.2) declare `"unordered_streams":
-  ["stdout"]`: `cir/add_drop_pyspecs`, `cir/subckt_tests`, `opt/tracefile-o`,
-  `opt/multi-file`, `opt/vci`, `regress/b031-mzi-bidir`,
-  `regress/b006-empty-output`, `regress/b004-mode-fd-tran`. These exceptions go
-  away once iteration is name-ordered (F-01). An ASan/UBSan (clang, `-O0`)
-  build also reorders `cir/add_drop`, `cir/subckt_test`, `cir-json/add_drop`,
-  `opt/mode-fd`, `opt/tol-resolution-overrides`, `regress/b150-include-in-subckt`
-  and `err/b017-json-unwritable` (element creation order, "unidir backlog");
-  use `--lenient-order` for such builds. VCD comparison does not depend on
-  declaration order.
+  their readout, with noise ON. Until F-01 (sprint 2026-10b P4) the noise came
+  from `random_device` seeds and the readout values (`READOUT`,
+  `uut*.readout*`) were excluded through `vcd_ignore_values`; now each detector
+  draws from a stream derived from the master seed (default 0) and its name,
+  so the values are reproducible and compared. The testbench still prints
+  them with 3 decimals.
+* **Name-ordered iteration (F-01, sprint 2026-10b P4).** Until then,
+  `sc_get_all_object_by_type<T>()` / `sc_get_all_module_by_type<T>()`
+  (`src/utils/sysc_utils.h`) returned `std::set<T*>` and the parser created
+  backlog elements from a `std::set<const ParseElement*>`, so the OP listing,
+  the `--vci` dump, `init()` calls, auto-probes and VCD declarations, and the
+  "Creating ..." lines followed heap addresses and changed between builds
+  (B-016, B-176; 14 cases had to declare `unordered_streams`). Now the
+  collections are sorted by hierarchical name (`strcmp`) and elements are
+  created in netlist order, so every case checks its line order and no case
+  declares `unordered_streams`. The one-time re-record was proven to change
+  ordering only with `backlog/repro/p4-ordering-proof.py` (same lines with IDs
+  masked, same set of (signal, waveform) pairs). `unordered_streams` and
+  `--lenient-order` stay available for new nondeterminism.
 * **Cross-build check:** the same baseline passes for
   * CMake Release (GCC, `-O3`),
   * CMake Debug (`-O0`),

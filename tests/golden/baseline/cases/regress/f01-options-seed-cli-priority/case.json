@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--seed",
+  "0",
+  "-f",
+  "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 602,
+   "kind": "json",
+   "sha256": "2c0b23df0084839ef4169870049e4c549720ccebe083678a263e94e4e8d574cb",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1478,
+   "kind": "vcd",
+   "sha256": "7c3d94aa0b56eb96ab08c02d7619e3562256a6c08a8e3847f0fbc1b6ffc1eb0a",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f01-options-seed-cli-priority"
+}

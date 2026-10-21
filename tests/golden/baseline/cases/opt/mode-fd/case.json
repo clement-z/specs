@@ -7,10 +7,16 @@
  ],
  "exit": 0,
  "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 399,
+   "kind": "json",
+   "sha256": "90130adb36e6243d4e6b7fe0a0747f159136e8d674f64fa03aac7e683aedaa8a",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
   "traces/delete_me.vcd": {
    "bytes": 26332,
    "kind": "vcd",
-   "sha256": "306c4520d19ed260dafd56ebc924cd8751f4099650d170d75185e905a496fd08",
+   "sha256": "f3b7119f109bea1e9f19565ca3568060f78f132d849c82c70aadfab08f34d09f",
    "stored": "files/traces/delete_me.vcd"
   }
  },

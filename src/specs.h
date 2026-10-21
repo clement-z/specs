@@ -5,6 +5,7 @@
 #include "optical_output_port.h"
 
 #include <systemc.h>
+#include <cstdint>
 #include <vector>
 #include <map>
 #include <utility>
@@ -103,6 +104,12 @@ public:
     AnalysisType analysis_type;
     map<string, pair<function<void(double)>, vector<double>>> cw_sweep_orders;
     double tran_duration = std::numeric_limits<double>::infinity();
+    // Master seed of the random streams (F-01): each noisy device draws from
+    // spx::rng_for(seed, <its hierarchical name>) (utils/rng.h). Default 0: runs are reproducible
+    static constexpr uint64_t DEFAULT_SEED = 0;
+    uint64_t seed = DEFAULT_SEED;
+    // Set when the seed was chosen explicitly (specs --seed): .options seed is then ignored
+    bool seed_explicit = false;
 
     // Port options
     double default_abstol = 1e-8;
@@ -118,6 +125,11 @@ public:
     string trace_filename = "";
     sc_trace_file *default_trace_file = nullptr;
     bool trace_all_optical_nets = 1;
+
+    // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
+    vector<string> command_line; // argv as received by sc_main
+    vector<string> netlist_files; // files opened by the parser (-f, .include), in first-open order
+    bool print_run_manifest = false; // also print the run manifest to stdout, once (--print-manifest)
 
     // other
     // Unused since ws-cleanup C-01; kept because removing it shifts the printed

@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "circuits/add_drop_sub.cir"],
+  "netlist_files": [
+    {"path": "circuits/add_drop_sub.cir", "sha256": "a5167fd51cf4cc306ca3ecb17bc368ba90c636243831841fb022454d367712ce"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

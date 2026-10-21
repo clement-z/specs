@@ -1,0 +1,5 @@
+* F-01: .options seed must be >= 0.
+* Expected: "Error: .options: SEED must be an integer between 0 and 2^53 (got -1)", exit 1
+pdet1 a v1 nb=0
+.options seed=-1
+.tran 10e-12

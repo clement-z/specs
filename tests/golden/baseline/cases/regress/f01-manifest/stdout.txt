@@ -1,0 +1,78 @@
+Using trace file: traces/m
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Including file: tests/golden/netlists/f01-manifest-sub.cir
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+4 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/X1 (SUBCIRCUIT) {in (STRING), mid (STRING), f01wg (STRING), } {}
+ - ROOT/X2 (SUBCIRCUIT) {mid (STRING), out (STRING), f01wg (STRING), } {}
+ - ROOT/PROBE1 (PROBE) ROOT/out {} {}
+-----------
+2 named nets
+ - ROOT/in: OANALOG<1>u (1|0)
+ - ROOT/out: OANALOG<1>u (0|1)
+-----------
+0 directives
+-----------
+1 subcircuits
+ - F01WG (SUBCIRCUIT DEFINITION) a b {}
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {1e-11 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Including file: tests/golden/netlists/f01-manifest-leaf.cir
+Flattening ROOT/X1
+Including file: tests/golden/netlists/f01-manifest-leaf.cir
+Flattening ROOT/X2
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/in...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/X1/WG1 (reason: unidir backlog)
+Done creating ROOT/X1/WG1
+Creating ROOT/X2/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/WG1
+Creating ROOT/PROBE1 (reason: unidir backlog)
+Done creating ROOT/PROBE1
+Done (elaborating network of ROOT/in)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/m.vcd)
+ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/in (OPTICAL) = [#2]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/mid (OPTICAL) = [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, -0.4054 rad)
+║ - ROOT/out (OPTICAL) = [#4]  @ 1550 nm (0.031623 √W, 0.001000 W, -0.8107 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+Simulated 10 ps
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

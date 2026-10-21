@@ -1,0 +1,7 @@
+* F-01: .options seed=12345 on the circuit of f01-pdet-noise.cir (included).
+* Expected: regress/f01-options-seed gives exactly the values of specs --seed 12345 on
+*   f01-pdet-noise.cir (regress/f01-pdet-noise-seed). specs --seed takes priority over it:
+*   regress/f01-options-seed-cli-priority (--seed 0) gives the default-seed values
+*   (regress/f01-pdet-noise-default-seed).
+.include tests/golden/netlists/f01-pdet-noise.cir
+.options seed=12345

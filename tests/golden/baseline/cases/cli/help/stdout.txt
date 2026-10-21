@@ -21,11 +21,19 @@
       --output=[set_tracefile]          Set the default trace file
       --json=[export_json]              Export json of completed circuit to file
       --version                         Output version information and exit
+      --print-manifest                  Print the run manifest (version, seed,
+                                        command line, netlist file hashes) to
+                                        stdout. It is also written next to the
+                                        default trace file, as
+                                        <trace>.manifest.json
       -n, --dryrun                      Do not run simulation directives
       --reltol=[set_reltol]             Set the value of the relative tolerance
                                         parameter for field
       --abstol=[set_abstol]             Set the value of the absolute tolerance
                                         parameter for field
+      --seed=[set_seed]                 Set the master seed of the random
+                                        streams (decimal integer, 0 to 2^64-1,
+                                        default 0); overrides .options seed
       --nrings_crow=[set_nrings_crow]   temporary
       --vci, --verbose_ci               Print components detail before starting
                                         simulation

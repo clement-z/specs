@@ -86,6 +86,29 @@ void OPTIONSDirective::create() const
             }
             specsGlobalConfig.default_resolution_multiplier = v;
         }
+        else if (kw == "SEED")
+        {
+            // F-01: master seed of the random streams. Netlist numbers are doubles: only the
+            // integers up to 2^53 are exact (specs --seed accepts any 64-bit value)
+            if (p.second.type == Variable::INTEGER && p.second.as_integer() == std::numeric_limits<int>::max())
+            {
+                // the lexer reads a digit string beyond the int range as INT_MAX, silently: such
+                // seeds would all give the same run
+                cerr << "Error: .options: " << kw << "=" << p.second.as_integer()
+                     << ": integer literals from 2147483647 up are read as 2147483647;"
+                     << " write the seed in exponent form (e.g. 3e9) or use specs --seed" << endl;
+                exit(1);
+            }
+            const double v = p.second.as_double();
+            if (!(v >= 0 && v <= 9007199254740992.0 && v == std::trunc(v)))
+            {
+                cerr << "Error: .options: " << kw << " must be an integer between 0 and 2^53 (got " << v << ")" << endl;
+                exit(1);
+            }
+            // specs --seed takes priority over the netlist
+            if (!specsGlobalConfig.seed_explicit)
+                specsGlobalConfig.seed = static_cast<uint64_t>(v);
+        }
         else if (kw == "TEST_VARIABLE")
             cout << kw << "(" << p.second.kind() << "): " << p.second.get_str() << endl;
         else {

@@ -57,8 +57,8 @@ ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/out (OPTICAL) = [#2]  @ 1550 nm (0.031623 √W, 0.001000 W, -0.4054 rad)
-║ - ROOT/in (OPTICAL) = [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#2]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, -0.4054 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 Simulated 1 ns

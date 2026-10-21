@@ -1,0 +1,14 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-o", "traces/m", "-f", "tests/golden/netlists/f01-manifest.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f01-manifest.cir", "sha256": "4ee4ad07d39c258bf8f70f910989f026d179931a90f649e1a557dd30aae607ae"},
+    {"path": "tests/golden/netlists/f01-manifest-sub.cir", "sha256": "4ff4ac4d7351edd5cb44e5b7ca78ba64f46dbde7128b80a19cf563bc92a861fc"},
+    {"path": "tests/golden/netlists/f01-manifest-leaf.cir", "sha256": "230123448010cf7d663dac808d49c27a08ebc207c7dda6ffd8db3af87f52de26"}
+  ],
+  "trace_file": "traces/m.vcd"
+}

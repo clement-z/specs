@@ -39,6 +39,18 @@
   resonators versus reltol and how to choose it, time resolution and delay rounding (B-021, B-124, B-014)
 * `.options snapfactor=<x>`: emitted fields with |E| < snapfactor·abstol are emitted as 0 (default 10, as
   before; 0 disables the snap) (B-021)
+* Reproducible runs (F-01, `doc/reproducibility.md`):
+  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (0 to 2^53; `--seed` wins):
+    one master seed for every random draw, **default 0**, so runs are reproducible by default. Each device
+    draws from its own stream, derived from the seed and its hierarchical name (adding or reordering other
+    devices does not change it); the streams are the same with every standard library (`std::mt19937_64`,
+    `std::seed_seq`, SPECS's own uniform/normal). Future `gauss()`/Monte-Carlo draws will use the same seed
+  * PDET `darkfield` keyword: the 1e-20 √W dark-field injection on a detector whose total field is exactly 0
+    stays on by default and is now seeded; `darkfield=0` turns it off (the readout is then exactly the dark
+    current) (B-056)
+  * Run manifest: every run that writes the default trace also writes `<trace>.manifest.json` (SPECS and
+    SystemC versions, seed, command line, SHA-256 of every netlist and `.include` file, trace file);
+    `--print-manifest` prints it on stdout
 
 ### Fixed
 
@@ -103,6 +115,13 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   to 0 (the loop then collapses into one time step), are reported on stderr once per waveguide in `.tran` and
   testbenches, with the `.options timescale` to use; they were rounded silently and the check meant to catch it
   could never fire (B-014; an error for delays that round to 0 is pending, see `backlog/B-014-*.md`)
+
+* Output order no longer depends on heap addresses: the operating-point listing, the `--vci` dump, the
+  automatic probes and VCD declarations, `init()` calls and the enable order of the analyses follow
+  hierarchical names (they changed with the compiler, build type or a sanitizer), and elements are created in
+  netlist order (B-016, B-176)
+* Photodetector noise (`nb=0`) and the dark-field value were seeded from `std::random_device` (twice), so they
+  differed between runs; they now come from the seeded per-device streams (B-055, B-056)
 
 ### Removed
 

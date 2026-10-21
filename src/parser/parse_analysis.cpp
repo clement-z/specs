@@ -67,8 +67,7 @@ void DCAnalysis::create() const
         exit(1);
     }
 
-    set<CWSource *>  all_cws = sc_get_all_object_by_type<CWSource>();
-    vector<CWSource *>  all_cws_vec(all_cws.begin(), all_cws.end());
+    vector<CWSource *>  all_cws_vec = sc_get_all_object_by_type<CWSource>();
 
     for (const auto &sweep_order: sweep_orders)
     {

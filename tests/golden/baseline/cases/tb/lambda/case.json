@@ -5,6 +5,12 @@
  ],
  "exit": 0,
  "files": {
+  "traces/lambda_tb.manifest.json": {
+   "bytes": 253,
+   "kind": "json",
+   "sha256": "c5a1c6ed31719d4dc8a2a9b43bad739f2184ebbaffe39d8153359f4c2677f819",
+   "stored": "files/traces/lambda_tb.manifest.json"
+  },
   "traces/lambda_tb.vcd": {
    "bytes": 5405,
    "kind": "vcd",

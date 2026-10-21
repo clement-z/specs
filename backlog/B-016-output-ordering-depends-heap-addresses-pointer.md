@@ -1,5 +1,5 @@
 # B-016: Output ordering depends on heap addresses (pointer-ordered `std::set`)
-severity: low | category: determinism | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: determinism | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 5c6d742 (sprint 2026-10b P4, F-01): name-ordered vectors
 location: src/utils/sysc_utils.h:26-66, src/specs.cpp:359-361,282-298,348-353
 ## Problem
 `sc_get_all_{module,object}_by_type` return `std::set<T*>`, ordered by pointer. This order drives `init()`

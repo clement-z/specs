@@ -6,6 +6,13 @@
   "tests/golden/netlists/b004-mode-td-op.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 439,
+   "kind": "json",
+   "sha256": "46bd1a184a998ecb8fe9028e175235d6c8551a1af231d0987ebdd4db14c9607b",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b004-mode-td-op"
 }

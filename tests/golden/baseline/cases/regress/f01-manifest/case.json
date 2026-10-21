@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-o",
+  "traces/m",
+  "-f",
+  "tests/golden/netlists/f01-manifest.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/m.manifest.json": {
+   "bytes": 708,
+   "kind": "json",
+   "sha256": "6e875b47bb56db0149031791e04f60e5f619b3f0597ee73814b0ac61ebc26ff6",
+   "stored": "files/traces/m.manifest.json"
+  },
+  "traces/m.vcd": {
+   "bytes": 1894,
+   "kind": "vcd",
+   "sha256": "9274899b5749d52d2babed41ddecb3431fbaed53def215cc7210a9820aafec10",
+   "stored": "files/traces/m.vcd"
+  }
+ },
+ "id": "regress/f01-manifest"
+}

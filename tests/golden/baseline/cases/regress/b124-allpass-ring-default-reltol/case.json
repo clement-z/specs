@@ -4,6 +4,13 @@
   "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 461,
+   "kind": "json",
+   "sha256": "c7f7e4d8e12b4fd3773f237669436347c54f187b786d7058bb4398094567e5f7",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b124-allpass-ring-default-reltol"
 }

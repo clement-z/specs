@@ -4,6 +4,13 @@
   "tests/golden/netlists/b147-crossing-out-explicit-wg.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 455,
+   "kind": "json",
+   "sha256": "3110a910cc10de9dacae3af11b35512e7e3ed411293682d97fa44c85d3b7a036",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b147-crossing-out-explicit-wg"
 }

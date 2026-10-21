@@ -7,10 +7,16 @@
  ],
  "exit": 0,
  "files": {
+  "traces/custom.manifest.json": {
+   "bytes": 423,
+   "kind": "json",
+   "sha256": "c69de2ba13f6235f2582184b9ab04ff5b37738f53ecd339f2bee5c266bec927e",
+   "stored": "files/traces/custom.manifest.json"
+  },
   "traces/custom.vcd": {
    "bytes": 403590,
    "kind": "vcd",
-   "sha256": "45a027def2c2a871275a4b3fa894ca86813d26eb77bc3aef78bfcede34ea1342",
+   "sha256": "1afdc4b4bb412eb12a338b9383cc5f3b22eac02ebe623b3c18be6cf8b74f03e0",
    "stored": "files/traces/custom.vcd"
   }
  },

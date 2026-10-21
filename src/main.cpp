@@ -1,5 +1,6 @@
 #include <sstream>
 #include <chrono>
+#include <charconv>
 
 #include <systemc.h>
 #include <args.hxx>
@@ -13,6 +14,7 @@
 #include "optical_output_port.h"
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
+#include "run_manifest.h"
 #include <utils/version.h>
 
 using namespace std;
@@ -60,6 +62,8 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
 {
     yyscan_t scanner;
     ParserState *parser_state = new ParserState();
+    // run manifest (F-01): every netlist file opened by the scanners goes to pt's list
+    parser_state->input_files = &pt.input_files;
     yylex_init_extra(parser_state, &scanner);
 
     for(const auto &fname: filenames)
@@ -142,6 +146,12 @@ int sc_main(int argc, char *argv[])
                           "version",
                           "Output version information and exit",
                           { "version" });
+    args::Flag print_manifest(parser,
+                          "print_manifest",
+                          "Print the run manifest (version, seed, command line, netlist file hashes) "
+                          "to stdout. It is also written next to the default trace file, as "
+                          "<trace>.manifest.json",
+                          { "print-manifest" });
     args::Flag set_dry_run(parser,
                           "dry_run",
                           "Do not run simulation directives",
@@ -158,6 +168,11 @@ int sc_main(int argc, char *argv[])
                           "set_abstol",
                           "Set the value of the absolute tolerance parameter for field",
                           { "abstol" });
+    args::ValueFlag<string> set_seed(parser,
+                          "set_seed",
+                          "Set the master seed of the random streams (decimal integer, 0 to 2^64-1, "
+                          "default 0); overrides .options seed",
+                          { "seed" });
 
     args::ValueFlag<size_t> set_nrings_crow(parser,
                           "set_nrings_crow",
@@ -200,6 +215,10 @@ int sc_main(int argc, char *argv[])
 
 
     map<string,string> option_overrides;
+
+    // run manifest (F-01)
+    specsGlobalConfig.command_line.assign(argv, argv + argc);
+    specsGlobalConfig.print_run_manifest = print_manifest.Get();
 
     if (print_version) {
         std::cout << spx::version::full << std::endl;
@@ -254,6 +273,20 @@ int sc_main(int argc, char *argv[])
             return 1;
         }
         option_overrides["abstol"] = set_abstol.Get();
+    }
+    if (set_seed) {
+        // F-01: set directly (not as a footer .options line), so that it also applies to the
+        // testbenches (-t) and keeps the full 64-bit range (netlist numbers are doubles)
+        const string &s = set_seed.Get();
+        uint64_t seed_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), seed_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid seed value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.seed = seed_val;
+        // takes priority over the netlist's .options seed
+        specsGlobalConfig.seed_explicit = true;
     }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();
@@ -310,6 +343,14 @@ int sc_main(int argc, char *argv[])
         {
             cerr << "Parsing failed with code " << parse_result << endl;
             exit(parse_result);
+        }
+        // after build_circuit(): the .include files of subcircuit bodies are opened while flattening (B-150)
+        specsGlobalConfig.netlist_files = pt.input_files;
+        if (set_dry_run.Get() && specsGlobalConfig.print_run_manifest)
+        {
+            // no prepareSimulation() in a dry run, and no trace file is written
+            cout << RunManifest(specsGlobalConfig, "").to_json() << flush;
+            specsGlobalConfig.print_run_manifest = false;
         }
         string json_filename = export_json.Get();
         if (!json_filename.empty())

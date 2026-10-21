@@ -28,11 +28,7 @@
    "args": [
     "-f",
     "circuits/add_drop_pyspecs.cir"
-   ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   ]
   },
   {
    "id": "cir/add_drop_sub",
@@ -81,11 +77,7 @@
    "args": [
     "-f",
     "circuits/subckt_tests.cir"
-   ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   ]
   },
   {
    "id": "cir/triple_ring",
@@ -703,10 +695,7 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "note": "-o overrides the default trace file name. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "-o overrides the default trace file name."
   },
   {
    "id": "opt/tol-resolution-overrides",
@@ -753,10 +742,7 @@
     "-f",
     "circuits/add_drop.cir"
    ],
-   "note": "several -f files are concatenated. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "several -f files are concatenated."
   },
   {
    "id": "opt/vci",
@@ -765,10 +751,7 @@
     "-f",
     "circuits/subckt_tests.cir"
    ],
-   "note": "verbose component initialisation. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "verbose component initialisation."
   },
   {
    "id": "regress/b031-mzi-bidir",
@@ -785,11 +768,7 @@
      "traces"
     ]
    },
-   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered. B-014: stderr has one delay-rounding warning per MZI-internal waveguide (arms of 43 fs round to 0, 88 fs to 100 fs at the default 100 fs); they are created by MZI init() in pointer order (B-016), hence stderr is unordered too",
-   "unordered_streams": [
-    "stdout",
-    "stderr"
-   ]
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-014: stderr has one delay-rounding warning per MZI-internal waveguide (arms of 43 fs round to 0, 88 fs to 100 fs at the default 100 fs); they are created by the MZI init() calls, in name order since F-01 (B-016)"
   },
   {
    "id": "regress/b036-vci-crow",
@@ -873,10 +852,7 @@
     "-t",
     "det"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
-   "vcd_ignore_values": [
-    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
-   ]
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON, drawn from the seeded per-detector streams (F-01, default seed 0), so the readout VCD values are reproducible and compared; the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)"
   },
   {
    "id": "tb/detector",
@@ -884,10 +860,7 @@
     "-t",
     "detector"
    ],
-   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON with random_device seeds, so the readout VCD values are not reproducible (ignored here until P4, F-01, seeds the RNG) and the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)",
-   "vcd_ignore_values": [
-    "^SystemC\\.(READOUT|uut2?\\.readout(_no_interference)?)$"
-   ]
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON, drawn from the seeded per-detector streams (F-01, default seed 0), so the readout VCD values are reproducible and compared; the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)"
   },
   {
    "id": "tb/pcm",
@@ -1041,10 +1014,7 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file)."
   },
   {
    "id": "err/b017-json-unwritable",
@@ -1427,10 +1397,7 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-004: an explicit -m overrides the .tran default (time domain): the transient runs in frequency domain (NO_DELAY ports), i.e. a CW steady state at each source event (drop ~1 W from 500 ps to 2 ns, no ring build-up). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-004: an explicit -m overrides the .tran default (time domain): the transient runs in frequency domain (NO_DELAY ports), i.e. a CW steady state at each source event (drop ~1 W from 500 ps to 2 ns, no ring build-up)."
   },
   {
    "id": "regress/b004-mode-td-op",
@@ -1476,7 +1443,7 @@
      "traces"
     ]
    },
-   "note": "B-144: uni source created before a bidirectional WG on an explicit '&' net; the light now reaches the WG (out:0 = 1 W at -2.1890 rad, was 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-144: uni source created before a bidirectional WG on an explicit '&' net; the light now reaches the WG (out:0 = 1 W at -2.1890 rad, was 0)."
   },
   {
    "id": "regress/b144-uni-writer-first",
@@ -1493,7 +1460,7 @@
      "traces"
     ]
    },
-   "note": "B-144: uni writer created first on a bidirectional net takes slot :0 (b:0 = 1 mW at -2.1890 rad, was 0); same values as b144-uni-writer-second. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-144: uni writer created first on a bidirectional net takes slot :0 (b:0 = 1 mW at -2.1890 rad, was 0); same values as b144-uni-writer-second."
   },
   {
    "id": "regress/b144-uni-writer-second",
@@ -1510,7 +1477,7 @@
      "traces"
     ]
    },
-   "note": "B-144: same circuit as b144-uni-writer-first, WG created first (b:0 = 1 mW at -2.1890 rad, unchanged by the fix). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-144: same circuit as b144-uni-writer-first, WG created first (b:0 = 1 mW at -2.1890 rad, unchanged by the fix)."
   },
   {
    "id": "regress/b144-two-sources-one-net",
@@ -1527,7 +1494,7 @@
      "traces"
     ]
    },
-   "note": "B-144: two sources on one net take slots :0 and :1 (a:0 = 1 mW, a:1 = 2 mW, exit 0; was E115, exit 1). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-144: two sources on one net take slots :0 and :1 (a:0 = 1 mW, a:1 = 2 mW, exit 0; was E115, exit 1)."
   },
   {
    "id": "regress/b144-three-writers",
@@ -1565,7 +1532,7 @@
      "traces"
     ]
    },
-   "note": "B-145: a bidirectional WG that writes a net with a uni reader already bound no longer swaps the signals (out = 1.3409 mW at 2.4261 rad, was 0.5 mW); same as b145-upgrade-reader-ref. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-145: a bidirectional WG that writes a net with a uni reader already bound no longer swaps the signals (out = 1.3409 mW at 2.4261 rad, was 0.5 mW); same as b145-upgrade-reader-ref."
   },
   {
    "id": "regress/b145-upgrade-reader-ref",
@@ -1582,7 +1549,7 @@
      "traces"
     ]
    },
-   "note": "B-145: reference for b145-upgrade-reader without '&' (out = 1.3409 mW at 2.4261 rad). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-145: reference for b145-upgrade-reader without '&' (out = 1.3409 mW at 2.4261 rad)."
   },
   {
    "id": "regress/b145-upgrade-reader-case2",
@@ -1599,7 +1566,7 @@
      "traces"
     ]
    },
-   "note": "B-145: counter-case, a bidirectional WG that reads the upgraded net still swaps (out = 1.3409 mW at -0.5209 rad, unchanged by the fix); same as b145-upgrade-reader-case2-ref. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-145: counter-case, a bidirectional WG that reads the upgraded net still swaps (out = 1.3409 mW at -0.5209 rad, unchanged by the fix); same as b145-upgrade-reader-case2-ref."
   },
   {
    "id": "regress/b145-upgrade-reader-case2-ref",
@@ -1616,7 +1583,7 @@
      "traces"
     ]
    },
-   "note": "B-145: reference for b145-upgrade-reader-case2 without '&' (out = 1.3409 mW at -0.5209 rad). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-145: reference for b145-upgrade-reader-case2 without '&' (out = 1.3409 mW at -0.5209 rad)."
   },
   {
    "id": "regress/b145-upgrade-roles",
@@ -1633,7 +1600,7 @@
      "traces"
     ]
    },
-   "note": "B-145: role-aware upgrade for PSHIFT, COUPLER and MZI, writing (no swap) and reading (swap) the upgraded net; out_wps = out_r* = 4.5 mW, out_wdc = 3.38 mW, out_wmzi = 2.5 mW at 1.1071 rad (were 0 / 2 mW). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-145: role-aware upgrade for PSHIFT, COUPLER and MZI, writing (no swap) and reading (swap) the upgraded net; out_wps = out_r* = 4.5 mW, out_wdc = 3.38 mW, out_wmzi = 2.5 mW at 1.1071 rad (were 0 / 2 mW)."
   },
   {
    "id": "regress/b147-crossing-out-bidir",
@@ -1650,7 +1617,7 @@
      "traces"
     ]
    },
-   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Since B-159 the crossing is a CrossingBi there (a, b, d become bidirectional: a:1 = b:1 = 1 mW from the sources, crossing backward outputs a:0 = b:0 = 0, d:0 = 1 mW); values follow the passive crossing model (B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Since B-159 the crossing is a CrossingBi there (a, b, d become bidirectional: a:1 = b:1 = 1 mW from the sources, crossing backward outputs a:0 = b:0 = 0, d:0 = 1 mW); values follow the passive crossing model (B-032, defaults t = 1, x = 0)."
   },
   {
    "id": "regress/b147-crossing-out-explicit-wg",
@@ -1667,7 +1634,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
   },
   {
    "id": "regress/b147-crossing-out-explicit-splitter",
@@ -1684,7 +1651,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
   },
   {
    "id": "regress/b147-crossing-out-explicit-splitter-first",
@@ -1701,7 +1668,7 @@
      "traces"
     ]
    },
-   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
   },
   {
    "id": "regress/b032-crossing-passive",
@@ -1752,10 +1719,7 @@
      "traces"
     ]
    },
-   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016; it changed when OpticalOutputPort gained a member, B-021); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
-   "unordered_streams": [
-    "stdout"
-   ]
+   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm."
   },
   {
    "id": "regress/b033-crossing-two-lambda-tran",
@@ -1943,10 +1907,7 @@
     "-f",
     "tests/golden/netlists/b021-snapfactor-default.cir"
    ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-021: with abstol=1e-2, fields below 10 * abstol are emitted as 0 (default snapfactor 10): out_a = out_b = 0, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-021: with abstol=1e-2, fields below 10 * abstol are emitted as 0 (default snapfactor 10): out_a = out_b = 0, out_c = 0.2 sqrt(W)."
   },
   {
    "id": "regress/b021-snapfactor",
@@ -1963,10 +1924,7 @@
     "-f",
     "tests/golden/netlists/b021-snapfactor.cir"
    ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-021: .options snapfactor=4 (abstol=1e-2): only fields below 0.04 sqrt(W) are emitted as 0: out_a = 0, out_b = 0.06, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-021: .options snapfactor=4 (abstol=1e-2): only fields below 0.04 sqrt(W) are emitted as 0: out_a = 0, out_b = 0.06, out_c = 0.2 sqrt(W)."
   },
   {
    "id": "regress/b021-snapfactor-zero",
@@ -1983,10 +1941,7 @@
     "-f",
     "tests/golden/netlists/b021-snapfactor-zero.cir"
    ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-021: .options snapfactor=0 disables the snap to 0: out_a = 0.03, out_b = 0.06, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-021: .options snapfactor=0 disables the snap to 0: out_a = 0.03, out_b = 0.06, out_c = 0.2 sqrt(W)."
   },
   {
    "id": "err/b021-snapfactor-negative",
@@ -2024,10 +1979,7 @@
     "-f",
     "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
    ],
-   "unordered_streams": [
-    "stdout"
-   ],
-   "note": "B-124: lossless all-pass ring .op with the default reltol 1e-4: out = 0.995098 W instead of 1 W (truncation error about 49 x reltol). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "note": "B-124: lossless all-pass ring .op with the default reltol 1e-4: out = 0.995098 W instead of 1 W (truncation error about 49 x reltol)."
   },
   {
    "id": "regress/b124-allpass-ring-tight-reltol",
@@ -2044,10 +1996,338 @@
     "-f",
     "tests/golden/netlists/b124-allpass-ring-tight-reltol.cir"
    ],
-   "unordered_streams": [
+   "note": "B-124: same ring with .options reltol=1e-9: out = 1.000000 W."
+  },
+  {
+   "id": "regress/f01-pdet-noise-default-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01 (B-055): two PDETs with noise (nb=0) on the same input, no --seed: default seed 0. The noise is drawn from rng_for(seed, instance name), so the readouts are reproducible (were seeded from std::random_device) and pdet1 and pdet2 get different noise. One record per input event (0, 10, 20, 30 ps): P * 1 A/W plus a noise of about 0.7 uA"
+  },
+  {
+   "id": "regress/f01-pdet-noise-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "12345",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: same netlist as regress/f01-pdet-noise-default-seed with --seed 12345: same record times, different noise values"
+  },
+  {
+   "id": "regress/f01-options-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+   ],
+   "note": "F-01: .options seed=12345 (f01-pdet-noise.cir included): the VCD must be identical to the one of regress/f01-pdet-noise-seed (--seed 12345); stdout differs only by the .include and the extra directive"
+  },
+  {
+   "id": "regress/f01-options-seed-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "0",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+   ],
+   "note": "F-01: --seed takes priority over .options seed: --seed 0 with .options seed=12345 gives the VCD of regress/f01-pdet-noise-default-seed (seed 0)"
+  },
+  {
+   "id": "regress/f01-seed-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "18446744073709551615",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: --seed accepts the full unsigned 64-bit range (2^64 - 1 here): other noise values than seed 0 and 12345"
+  },
+  {
+   "id": "regress/f01-pdet-darkfield",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-darkfield.cir"
+   ],
+   "note": "F-01 (B-056): dark PDETs (0 W input). darkfield=0: readout exactly 0 (no dark-field injection). darkfield=1 (default): one readout of about 1e-40 A (1e-20 * N(0,1) sqrt(W) field), now seeded and reproducible (was random at every run)"
+  },
+  {
+   "id": "err/f01-seed-invalid",
+   "args": [
+    "--seed",
+    "abc",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed must be a decimal unsigned 64-bit integer: 'abc' is rejected (Invalid seed value), exit 1"
+  },
+  {
+   "id": "err/f01-seed-negative",
+   "args": [
+    "--seed",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed -1 is rejected (Invalid seed value), exit 1"
+  },
+  {
+   "id": "err/f01-seed-not-integer",
+   "args": [
+    "--seed",
+    "1.5",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed 1.5 is rejected (trailing characters after the integer), exit 1"
+  },
+  {
+   "id": "err/f01-seed-overflow",
+   "args": [
+    "--seed",
+    "18446744073709551616",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed 2^64 is rejected (out of the unsigned 64-bit range), exit 1"
+  },
+  {
+   "id": "err/f01-options-seed-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-invalid.cir"
+   ],
+   "ignore_streams": [
     "stdout"
    ],
-   "note": "B-124: same ring with .options reltol=1e-9: out = 1.000000 W. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "expect": "fail",
+   "note": "F-01: .options seed=1.5 is rejected (must be an integer between 0 and 2^53)"
+  },
+  {
+   "id": "err/f01-options-seed-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=-1 is rejected (must be an integer between 0 and 2^53)"
+  },
+  {
+   "id": "err/f01-options-seed-too-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-too-large.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=1e16 is rejected (above 2^53, the netlist number would not be exact)"
+  },
+  {
+   "id": "regress/f01-seed-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "3000000000",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: --seed 3000000000 (beyond the int range), reference for regress/f01-options-seed-large"
+  },
+  {
+   "id": "regress/f01-options-seed-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-large.cir"
+   ],
+   "note": "F-01: .options seed=3e9 (a large netlist seed in exponent form): the VCD must be identical to the one of regress/f01-seed-large (--seed 3000000000)"
+  },
+  {
+   "id": "err/f01-options-seed-huge-integer",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-huge-integer.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=99999999999999999999 is rejected: the lexer reads digit strings beyond the int range as 2147483647 (pre-existing, P4 'Found, not done'), so .options seed rejects that integer literal with a hint (exponent form or --seed)"
+  },
+  {
+   "id": "err/f01-options-seed-int-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int-max.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=3000000000 (integer literal beyond the int range, read as 2147483647) is rejected with the same hint as err/f01-options-seed-huge-integer"
+  },
+  {
+   "id": "regress/f01-manifest",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-o",
+    "traces/m",
+    "-f",
+    "tests/golden/netlists/f01-manifest.cir"
+   ],
+   "note": "F-01: run manifest traces/m.manifest.json next to traces/m.vcd: seed, argv, trace file, and the SHA-256 of the 3 netlist files opened by the parser (-f file, .include, .include in a subcircuit body opened twice while flattening, listed once); specs_version masked by the harness"
+  },
+  {
+   "id": "regress/f01-print-manifest",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--print-manifest",
+    "-n",
+    "-f",
+    "tests/golden/netlists/f01-manifest.cir"
+   ],
+   "note": "F-01: --print-manifest in a dry run prints the run manifest on stdout after building the circuit, with \"trace_file\": null; no file is written"
   }
  ]
 }

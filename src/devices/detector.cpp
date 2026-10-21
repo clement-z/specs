@@ -1,6 +1,5 @@
 #include "specs.h"
 #include "devices/detector.h"
-#include <random>
 #include <complex>
 
 using namespace std;
@@ -9,9 +8,6 @@ void Detector::on_port_in_changed()
 {
     // always initialize memory
     m_memory_in[0] = 0;
-
-    // rng seed
-    init();
 
     while (true) {
         // Wait for a new input signal
@@ -119,8 +115,8 @@ void Detector::compute_readout(double &readout, double &readout_no_interf)
             total_field += field.second * exp(complex<double>(0, 2 * M_PI * freq * tk));
         }
 
-        if (norm(total_field) == 0)
-            total_field = 1e-20*m_rngDist(m_rngGen);
+        if (norm(total_field) == 0 && m_dark_field_injection)
+            total_field = 1e-20*m_rng.normal();
 
         photocurrent = norm(total_field) * m_responsivity_A_W;
     }
@@ -128,9 +124,9 @@ void Detector::compute_readout(double &readout, double &readout_no_interf)
     {
         // At most one non-zero wavelength: no beat, use sum_k |E_k|^2 (exact, no ulp jitter
         // from e^{j2pi f t})
-        if (total_power == 0)
+        if (total_power == 0 && m_dark_field_injection)
         {
-            total_field = 1e-20*m_rngDist(m_rngGen);
+            total_field = 1e-20*m_rng.normal();
             photocurrent = norm(total_field) * m_responsivity_A_W;
         }
         else
@@ -174,11 +170,10 @@ double Detector::noise_gen(const double &noiseless_readout)
 
     // mean = noiseless, std = sqrt(variance)
     // the second element of the product is the gaussian(0,1)
-    return sqrt(inoise_rms) * m_rngDist(m_rngGen);
+    return sqrt(inoise_rms) * m_rng.normal();
 }
 
-void Detector::init()
+void Detector::start_of_simulation()
 {
-    std::random_device rd;  // Will be used to obtain a seed for the random number engine
-    m_rngGen.seed(rd());
+    m_rng = spx::rng_for(specsGlobalConfig.seed, name());
 }

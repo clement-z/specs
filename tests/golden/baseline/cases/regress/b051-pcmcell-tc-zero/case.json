@@ -4,6 +4,13 @@
   "tests/golden/netlists/b051-pcmcell-tc-zero.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "607e99b97c9b3b3b063fdcbcf846862bb6d82078b19945f9b258971ebf3f113e",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b051-pcmcell-tc-zero"
 }

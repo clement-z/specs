@@ -1,5 +1,5 @@
 # B-056: A dark photodetector injects a random 1e-20 field: nondeterministic readout and a VCD write every Ts
-severity: med | category: determinism | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: determinism | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 083c8be (sprint 2026-10b P4, F-01): kept as a documented option, on by default (PDET darkfield=0 turns it off), now seeded and reproducible
 location: src/devices/detector.cpp:74-75
 ## Problem
 `if (norm(total_field) == 0) total_field = 1e-20*m_rngDist(m_rngGen);` runs even with `noiseBypass`, which is the default. Every Ts sample of a dark detector produces a different random readout around 1e-41..1e-40 A.

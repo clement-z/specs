@@ -4,6 +4,13 @@
   "tests/golden/netlists/b033-crossing-two-lambda.cir"
  ],
  "exit": 0,
- "files": {},
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 445,
+   "kind": "json",
+   "sha256": "200cd9ac476c2ead51158f8c7d7d0eeb763c4a9ff83ddcec06274df25b08c168",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
  "id": "regress/b033-crossing-two-lambda"
 }

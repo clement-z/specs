@@ -1,0 +1,10 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-t", "merg"],
+  "netlist_files": [],
+  "trace_file": "traces/merger_tb.vcd"
+}

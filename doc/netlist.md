@@ -155,11 +155,22 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
   | `r`, `responsivity`, `gain` | responsivity, A/W | 1 |
   | `nb`, `noise_bypass` | boolean: `true` means no noise | true |
   | `fop`, `frequency` | operating frequency used by the noise model, Hz | 1e9 |
+  | `darkfield` | boolean: dark-field injection (see below) | true |
 
   The dark current is 0 and cannot be set from a netlist.
 - Readout: R·|E_total|², plus noise when `nb=false`. With one wavelength (or several where at most one has
   a non-zero field) this is R·Σ|E_k|², exact. With two or more wavelengths with non-zero fields, they beat:
   the readout is R·|Σ E_k·e^(j2πf_k·t)|² and depends on time.
+- Dark field: when the total field is exactly 0, a field of 1e-20·N(0,1) √W is used instead, so a dark
+  detector reads about 1e-40 A instead of 0. It is on by default (`darkfield=true`, the historical
+  behaviour); with `darkfield=false` a dark detector reads exactly R·0 + the dark current, that is 0
+  (plus the noise when `nb=false`).
+- Random numbers (noise, dark field) are reproducible: each detector draws from its own stream, derived
+  from the master seed (`specs --seed N` or `.options seed=N`, default seed 0, see `doc/numerics.md`) and
+  its hierarchical instance name (e.g. `ROOT/PDET1`). The same netlist and seed give the same values in
+  every run, and adding, removing or reordering other devices does not change the random values a
+  detector draws. A different seed gives other values. With `nb=false` a new noise value is drawn each
+  time the readout is computed.
 - The readout is written to `out` (and traced as `<name>.readout` in the VCD; `<name>.readout_no_interference`
   is R·Σ|E_k|²):
   - on every input event;
@@ -173,10 +184,9 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
   on one PDET) never goes quiet, so give a duration.
 - `.op` and `.dc`: detectors are disabled and do not write `out`. Testbenches and C++ users get an enabled
   `Detector`.
-- Caveats: a detector whose total field is exactly 0 writes a tiny random value (about 1e-40 A, a "dark
-  field" injection; reproducible random numbers are planned). With `nb=false` the noise is drawn each time
-  the readout is computed, so its values differ between runs. Before B-049/B-050, `out` was never written
-  (a PSHIFT or MZI driven by a PDET saw 0) and two detectors made an open-ended `.tran` run forever.
+- History: before F-01 (B-055, B-056) the random numbers were seeded from `std::random_device`, so the
+  noise and the dark-field value differed between runs. Before B-049/B-050, `out` was never written (a
+  PSHIFT or MZI driven by a PDET saw 0) and two detectors made an open-ended `.tran` run forever.
 - Example: `pdet1 in vout` then `pshift1 a b vout sensitivity=1000`. With 1 mW on `in` (R = 1 A/W), `vout`
   is 1 mA and the phase shifter adds 1000 rad/A · 1 mA = 1 rad.
 

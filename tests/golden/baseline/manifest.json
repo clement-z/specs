@@ -64,6 +64,15 @@
   "err/b165-dc-stray-kwarg",
   "err/b165-op-stray-args",
   "err/b165-op-stray-kwarg",
+  "err/f01-options-seed-huge-integer",
+  "err/f01-options-seed-int-max",
+  "err/f01-options-seed-invalid",
+  "err/f01-options-seed-negative",
+  "err/f01-options-seed-too-large",
+  "err/f01-seed-invalid",
+  "err/f01-seed-negative",
+  "err/f01-seed-not-integer",
+  "err/f01-seed-overflow",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -118,6 +127,16 @@
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
   "regress/b159-crossing-backward",
+  "regress/f01-manifest",
+  "regress/f01-options-seed",
+  "regress/f01-options-seed-cli-priority",
+  "regress/f01-options-seed-large",
+  "regress/f01-pdet-darkfield",
+  "regress/f01-pdet-noise-default-seed",
+  "regress/f01-pdet-noise-seed",
+  "regress/f01-print-manifest",
+  "regress/f01-seed-large",
+  "regress/f01-seed-max",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -423,6 +442,36 @@
    "only": "^(cir/add_drop_pyspecs|opt/tracefile-o|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b033-crossing-two-lambda|regress/b014-.*|regress/b021-.*|err/b021-.*|regress/b124-.*|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-021/B-014/B-124: stderr gains delay-rounding warnings (10 % threshold; non-zero delays rounding to 0 reported as warnings, the decided error is held back: b031) in cir/add_drop_pyspecs, opt/tracefile-o, regress/b006-empty-output, regress/b031-mzi-bidir (stderr unordered); regress/b033-crossing-two-lambda: stdout unordered (pointer-ordered OP listing, B-016); new snapfactor, delay-rounding and tight-reltol cases; gtest"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:15:57Z",
+   "only": "^(cir/add_drop|cir/paul_3ring_puf|regress/b150-include-in-subckt|cir-json/add_drop|opt/tol-resolution-overrides|opt/mode-fd|err/b017-json-unwritable|regress/b004-mode-td-dc|opt/multi-file)$",
+   "gtest": false,
+   "note": "B-176: element creation backlog in netlist order (was heap-address order); only the 'Creating ...' line order changes (opt/multi-file: stdout already unordered, re-recorded for the same reason), paul_3ring_puf (missing VLSRC file) reaches VLSRC1 two elements earlier"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:21:03Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|opt/mode-fd|opt/multi-file|opt/tol-resolution-overrides|opt/tracefile-o|opt/vci|regress/b001-fd-multilambda-stale|regress/b004-mode-fd-tran|regress/b004-mode-td-dc|regress/b004-mode-td-op|regress/b006-empty-output|regress/b014-delay-rounding-warning|regress/b014-delay-rounds-to-zero|regress/b021-snapfactor|regress/b021-snapfactor-default|regress/b021-snapfactor-zero|regress/b031-mzi-bidir|regress/b032-crossing-isolation-sign|regress/b032-crossing-passive|regress/b033-crossing-two-lambda|regress/b033-crossing-two-lambda-tran|regress/b048-probe-cw-tran|regress/b048-undriven-tran|regress/b049-pdet-drives-net|regress/b050-pdet-beat|regress/b050-pdet-two-open-tran|regress/b051-pcmcell-tc-zero|regress/b052-pcmcell-positional|regress/b060-pcmcell-k-eq-n|regress/b124-allpass-ring-default-reltol|regress/b124-allpass-ring-tight-reltol|regress/b131-nrings-crow|regress/b144-bidir-source-first|regress/b144-three-writers|regress/b144-two-sources-one-net|regress/b144-uni-writer-first|regress/b144-uni-writer-second|regress/b145-upgrade-reader|regress/b145-upgrade-reader-case2|regress/b145-upgrade-reader-case2-ref|regress/b145-upgrade-reader-ref|regress/b145-upgrade-roles|regress/b147-crossing-out-bidir|regress/b147-crossing-out-explicit-splitter|regress/b147-crossing-out-explicit-splitter-first|regress/b147-crossing-out-explicit-wg|regress/b150-include-in-subckt|regress/b159-crossing-backward|tb/ac_add_drop|tb/ac_add_drop-fd|tb/ac_crow|tb/mesh|tb/mzi)$",
+   "gtest": false,
+   "note": "B-016 (F-01 name-ordered iteration): sc_get_all_* return name-ordered vectors; OP listing, --vci dump, auto-probe/VCD declaration order, init() and enable order follow the hierarchical names. Ordering only: line multisets (IDs masked) and (signal, waveform) sets unchanged (backlog/repro/p4-ordering-proof.py); regress/b144-three-writers (expected E115, stdout ignored): sources emit in name order, E115 names other drivers"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:23:09Z",
+   "only": "^gtest",
+   "gtest": true,
+   "note": "B-016: gtest SysCUtils.CollectionsAreNameOrdered"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:39:40Z",
+   "only": "^(cli/help|cli/no-args|tb/det|tb/detector|regress/f01-.*|err/f01-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-01 seeds (B-055, B-056): --seed in the help text (cli/help, cli/no-args); tb/det, tb/detector readouts drawn from seeded streams, now compared (vcd_ignore_values removed); new f01 seed/darkfield cases; gtest (rng, detector streams)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T04:44:51Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/add_drop_sub|cir/subckt_test|cir/subckt_tests|cli/help|cli/no-args|opt/mode-fd|opt/multi-file|opt/tol-resolution-overrides|opt/tracefile-o|opt/vci|regress/b001-fd-multilambda-stale|regress/b004-mode-fd-tran|regress/b004-mode-td-dc|regress/b004-mode-td-op|regress/b014-delay-rounding-warning|regress/b014-delay-rounds-to-zero|regress/b021-snapfactor|regress/b021-snapfactor-default|regress/b021-snapfactor-zero|regress/b031-mzi-bidir|regress/b032-crossing-isolation-sign|regress/b032-crossing-passive|regress/b033-crossing-two-lambda|regress/b033-crossing-two-lambda-tran|regress/b036-vci-crow|regress/b048-mlprobe-cw-tran|regress/b048-probe-cw-tran|regress/b048-undriven-tran|regress/b049-pdet-drives-net|regress/b050-pdet-beat|regress/b050-pdet-two-open-tran|regress/b051-pcmcell-tc-zero|regress/b052-cwsrc-positional|regress/b052-evlsrc-positional|regress/b052-pcmcell-positional|regress/b052-vlsrc-positional|regress/b060-pcmcell-k-eq-n|regress/b124-allpass-ring-default-reltol|regress/b124-allpass-ring-tight-reltol|regress/b131-nrings-crow|regress/b144-bidir-source-first|regress/b144-three-writers|regress/b144-two-sources-one-net|regress/b144-uni-writer-first|regress/b144-uni-writer-second|regress/b145-upgrade-reader|regress/b145-upgrade-reader-case2|regress/b145-upgrade-reader-case2-ref|regress/b145-upgrade-reader-ref|regress/b145-upgrade-roles|regress/b147-crossing-out-bidir|regress/b147-crossing-out-explicit-splitter|regress/b147-crossing-out-explicit-splitter-first|regress/b147-crossing-out-explicit-wg|regress/b150-include-in-subckt|regress/b159-crossing-backward|regress/f01-manifest|regress/f01-options-seed|regress/f01-options-seed-cli-priority|regress/f01-options-seed-large|regress/f01-pdet-darkfield|regress/f01-pdet-noise-default-seed|regress/f01-pdet-noise-seed|regress/f01-print-manifest|regress/f01-seed-large|regress/f01-seed-max|tb/ac_add_drop|tb/ac_add_drop-fd|tb/ac_crow|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-01 run manifest: every run that writes the default trace also writes <trace>.manifest.json (84 cases gain only that file, specs_version masked by the harness); --print-manifest in the help text (cli/help, cli/no-args); new regress/f01-manifest, regress/f01-print-manifest; gtest (Sha256, RunManifest)"
   }
  ]
 }

@@ -1376,6 +1376,8 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
             obj->m_noiseBypass = p.second.as_boolean();
         else if (kw == "FREQUENCY" || kw == "FOP")
             obj->m_opFreq_Hz = p.second.as_double();            
+        else if (kw == "DARKFIELD")
+            obj->m_dark_field_injection = p.second.as_boolean();
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);
