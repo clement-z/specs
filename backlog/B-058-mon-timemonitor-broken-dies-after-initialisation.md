@@ -1,5 +1,5 @@
 # B-058: `--mon` (TimeMonitor) is broken: it dies after initialisation, shifts time, and calls exit(1) on its first report
-severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 575209a (sprint 2026-10b P2): TimeMonitor and --mon removed
 location: src/devices/time_monitor.cpp:33-37,38-57,67-108, src/main.cpp:374-380
 ## Problem
 1. Once the first report is due (wall-clock period 0.5 s, main.cpp:377/379), it prints "Time monitor incompatible with new multi-wavelength features" and calls `exit(1)` (time_monitor.cpp:107-108).

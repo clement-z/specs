@@ -16,7 +16,7 @@ Start state (d214196): `meson test` 12/12, golden `--atol 0` 81/81.
 | 5 | B-051 PCMCELL requires tc/ta | done | 344d60b | presence check incl. aliases; PCMElement default Ta = 1; OctaneCell/Segment/Matrix take Tc/Ta as required params (meltEnergy/nStates defaults of OctaneCell/OctaneMatrix dropped: C++ forbids required after defaulted); 3 golden cases |
 | 6 | B-060 PCM validation | done | c22ff40 | `PCMElement::check_parameters()` (parser + `start_of_simulation`); n = 0 keeps its old message; 2 gtests + 5 golden cases; model untouched |
 | 7 | B-002 + B-004 sampled-time / `-m` | done | c6414ce | CLI + `verifyConfig` + `OpticalOutputPort::applyConfig` reject SAMPLED_TIME; `SPECSConfig::simulation_mode_explicit`; `opt/mode-sampled-time` re-recorded (exit 1); `opt/mode-fd` unchanged (its netlist is a `.dc`, already FD); 3 new cases + 1 gtest; help text unchanged |
-| 8 | B-058 remove TimeMonitor / `--mon` | implementing (Opus, wt cli) | | |
+| 8 | B-058 remove TimeMonitor / `--mon` | done | 575209a | files, meson list, includes (also 2 unused tb includes) removed; `cli/help`, `cli/no-args` re-recorded (only the `--mon` line) |
 | 9 | B-037 coupler k docs | implementing (Sonnet, wt docs) | | |
 
 ## Implementer worktrees (all branched from 7a99a64)
