@@ -37,18 +37,18 @@ All initial values are dumped below at time 0 sec = 0 timescale units.
 $end
 
 $dumpvars
-r0 aaaaa
-r0 aaaab
+r0.002 aaaaa
+r0.04472135954999579 aaaab
 r0 aaaac
-r0 aaaad
-r0 aaaae
-r0 aaaaf
+r1.55e-06 aaaad
+r0.0009999999999999998 aaaae
+r0.03162277660168379 aaaaf
 r0 aaaag
-r0 aaaah
-r0 aaaai
-r0 aaaaj
+r1.55e-06 aaaah
+r0.002 aaaai
+r0.04472135954999579 aaaaj
 r0 aaaak
-r0 aaaal
+r1.55e-06 aaaal
 r1e-08 aaaam
 r0.0001 aaaan
 b1 aaaao

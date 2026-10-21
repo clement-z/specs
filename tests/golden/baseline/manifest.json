@@ -80,6 +80,9 @@
   "regress/b033-crossing-two-lambda",
   "regress/b033-crossing-two-lambda-tran",
   "regress/b036-vci-crow",
+  "regress/b048-mlprobe-cw-tran",
+  "regress/b048-probe-cw-tran",
+  "regress/b048-undriven-tran",
   "regress/b049-pdet-drives-net",
   "regress/b050-pdet-beat",
   "regress/b050-pdet-two-open-tran",
@@ -400,6 +403,12 @@
    "only": "^(tb/det|tb/detector|regress/b049-.*|regress/b050-.*|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-049/B-050: event-driven PDET (readout written on input events/enable, Ts sampling only while beating, enabled by default); tb/det, tb/detector: detectors enabled, self-checks pass 3/3, readouts printed with 3 decimals, noisy readout VCD signals ignored (vcd_ignore_values); new PDET cases; gtest Detector*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T03:30:25Z",
+   "only": "^(regress/b031-mzi-bidir|regress/b144-uni-writer-first|regress/b144-uni-writer-second|regress/b144-two-sources-one-net|regress/b145-upgrade-reader(-ref|-case2|-case2-ref)?|regress/b147-crossing-out-bidir|regress/b150-include-in-subckt|regress/b048-.*|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-048: probes (PROBE, MLPROBE, auto-probes) sample their net when enabled at TRAN start: .tran VCDs of constant nets show their OP value from t = 0 (was 0), waveforms unchanged afterwards; new B-048 cases; gtest Probe*, MLambdaProbe*, TranStart*"
   }
  ]
 }

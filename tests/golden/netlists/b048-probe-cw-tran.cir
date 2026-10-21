@@ -1,0 +1,12 @@
+* B-048: PROBE and traceall auto-probes on a constant CW path in .tran. The probes are disabled
+* during the OP; at TRAN start they sample the current (OP) value of their net. They used to read 0
+* (r0 in $dumpvars, never written again) for the whole transient.
+* Expected at t = 0, constant until 1 ns, equal to the OP listing on stdout:
+*   ROOT/in  (PROBE{ROOT/in}): power 1e-3 W, abs sqrt(1e-3) = 0.031623 sqrt(W), phase 0, wavelength 1.55e-6
+*   ROOT/out (ROOT/PROBE1, PROBE{ROOT/out}): power 1e-3 W (lossless), abs 0.031623 sqrt(W),
+*     phase 2*pi*neff*L/lambda = 2*pi*2.2*100e-6/1.55e-6 = 891.807 rad = -0.40537 rad (wrapped), wavelength 1.55e-6
+cwsrc1 in wl=1.55e-6 power=1e-3
+wg1 in out length=100e-6 neff=2.2 ng=4.2
+probe1 out
+.options traceall=1
+.tran 1e-9

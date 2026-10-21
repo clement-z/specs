@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b048-mlprobe-cw-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 975,
+   "kind": "vcd",
+   "sha256": "2cff952f489b3abf182f114f5e51802e41f04dc5898981c66feeaf63c61299e5",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b048-mlprobe-cw-tran"
+}

@@ -91,6 +91,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   An open-ended `.tran` with two or more detectors now ends (it never did), and a constant input gives one VCD
   record instead of one per sample (B-050). Detectors are enabled by default for C++ and testbench users;
   `detector_tb` enables them and its self-checks pass. Documented in `doc/netlist.md` (PDET)
+* `.tran`: PROBE, MLPROBE and the `traceall` automatic probes trace their net's operating-point value from t = 0
+  (they read 0 until the net's next event, so a CW path stayed at 0 in the VCD for the whole transient). Each
+  probe samples its net when it is enabled at the start of the transient, after the operating point and any
+  initial conditions (B-048; `doc/netlist.md`)
 
 ### Removed
 

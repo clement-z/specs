@@ -1,0 +1,79 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaaat  abstol       $end
+$var real    1  aaaau  reltol       $end
+$var wire   32  aaaav  resolution_multiplier [31:0]  $end
+$var wire   32  aaaaw  engine_timescale [31:0]  $end
+$var wire   32  aaaax  simulation_mode [31:0]  $end
+$var wire   32  aaaay  analysis_type [31:0]  $end
+$var wire    1  aaaaz  trace_all_optical_nets       $end
+$var wire    1  aaaba  verbose_component_initialization       $end
+$scope module PROBE{ROOT/a} $end
+$var real    1  aaaap  power       $end
+$var real    1  aaaaq  abs       $end
+$var real    1  aaaar  phase       $end
+$var real    1  aaaas  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/nc} $end
+$var real    1  aaaal  power       $end
+$var real    1  aaaam  abs       $end
+$var real    1  aaaan  phase       $end
+$var real    1  aaaao  wavelength       $end
+$upscope $end
+$scope module ROOT/MLPROBE2 $end
+$var real    1  aaaai  power@1300_000000       $end
+$var real    1  aaaaj  abs@1300_000000       $end
+$var real    1  aaaak  phase@1300_000000       $end
+$upscope $end
+$scope module ROOT/PROBE1 $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$scope module ROOT/PROBE2 $end
+$var real    1  aaaae  power       $end
+$var real    1  aaaaf  abs       $end
+$var real    1  aaaag  phase       $end
+$var real    1  aaaah  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.0009999999999999998 aaaaa
+r0.03162277660168379 aaaab
+r0 aaaac
+r1.55e-06 aaaad
+r0 aaaae
+r0 aaaaf
+r0 aaaag
+r0 aaaah
+r0 aaaai
+r0 aaaaj
+r0 aaaak
+r0 aaaal
+r0 aaaam
+r0 aaaan
+r0 aaaao
+r0.0009999999999999998 aaaap
+r0.03162277660168379 aaaaq
+r0 aaaar
+r1.55e-06 aaaas
+r1e-08 aaaat
+r0.0001 aaaau
+b1 aaaav
+b11111111111111111111111111110011 aaaaw
+b1 aaaax
+b10 aaaay
+1aaaaz
+0aaaba
+$end
+

@@ -1838,6 +1838,57 @@
     ]
    },
    "note": "B-050: two CW wavelengths (1550/1551 nm) on one PDET are sampled every Ts = 1 ps while they beat: readout 0.625 + 0.5 cos(2 pi 124.703 GHz t) mA (period 8.019 ps, between 0.125 and 1.125 mA)"
+  },
+  {
+   "id": "regress/b048-probe-cw-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-probe-cw-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: PROBE and traceall auto-probes on a CW path in .tran sample the OP value of their net at TRAN start: ROOT/in = 1 mW, 0.031623 sqrt(W), 0 rad; ROOT/out = 1 mW, 0.031623 sqrt(W), -0.40537 rad (2*pi*2.2*100e-6/1.55e-6 wrapped), 1.55e-6, from t = 0 (was 0 for the whole transient)"
+  },
+  {
+   "id": "regress/b048-mlprobe-cw-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-mlprobe-cw-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: MLPROBE wl=[1.55e-6] on a CW net in .tran samples the OP value at TRAN start: power@1550 = 1 mW, abs 0.031623 sqrt(W), phase 0.5 rad from t = 0 (was 0 for the whole transient)"
+  },
+  {
+   "id": "regress/b048-undriven-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-undriven-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: probes on an undriven net in .tran: the sample taken at TRAN start is skipped silently (PROBE2, PROBE{ROOT/nc}, MLPROBE2 stay 0; no 'received unsupported signal (lambda = 1.55e-06m)' although wavelength id 0 aliases 1550 nm, B-012); the CW net next to it reads 1 mW from t = 0"
   }
  ]
 }

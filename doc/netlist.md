@@ -179,3 +179,16 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
   (a PSHIFT or MZI driven by a PDET saw 0) and two detectors made an open-ended `.tran` run forever.
 - Example: `pdet1 in vout` then `pshift1 a b vout sensitivity=1000`. With 1 mW on `in` (R = 1 A/W), `vout`
   is 1 mA and the phase shifter adds 1000 rad/A · 1 mA = 1 rad.
+
+## PROBE, MLPROBE and traced nets in `.tran`
+
+`PROBE<name> <net> [power [abs [phase [wl]]]]` traces the last event of its net (power, field modulus, phase,
+wavelength); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and phase per listed wavelength
+(the wavelength must match exactly). With `.options traceall=1` (the default) every optical net also gets an
+automatic probe, traced as `PROBE{<net>}`.
+
+In `.tran`, the probes are disabled during the operating point. When the transient starts, after the operating
+point (`.nodeset` included) and after any initial conditions, every probe samples the current value of its net
+(B-048, sprint 2026-10b): a net set by a CW source shows its operating-point value from t = 0, as printed in the
+operating-point listing on stdout. Before, such a net read 0 in the VCD for the whole transient. A net that was
+never written (undriven, or fed only by sources that start later) stays at 0 until its first event.

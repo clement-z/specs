@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b048-undriven-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 2022,
+   "kind": "vcd",
+   "sha256": "4ff3a2fa194bcb2c7608f2395c121faa72ad5dc4398ac2f40a99569dfe673657",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b048-undriven-tran"
+}

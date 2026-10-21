@@ -192,20 +192,31 @@ void SPECSConfig::runTRANAnalysis()
     auto all_vl_src = sc_get_all_module_by_type<VLSource>();
     auto all_evl_src = sc_get_all_module_by_type<EVLSource>();
 
-    // Run OP analysis
+    // TRAN start sequence (B-048):
+    // (a) operating point, .nodeset values included
+    // (b) initial conditions
+    // (c) enable the probes: each one samples the current value of its net at that point
+    //     (and the photodetectors, which write their readout)
+    // (b) must stay before (c), so that the probes trace the post-OP, post-IC state at t = 0
+    // (B-048 maintainer condition, see TranStart.ProbesSampleAfterOperatingPointAndInitialConditions)
+
+    // (a) Run OP analysis
     runOPAnalysis();
 
-    // Enable probes
+    // (b) Apply initial conditions
+    applyInitialConditions();
+
+    // (c) Enable probes
     for (auto probe: all_probes) {
         probe->enable = sc_logic(1);
     }
 
-    // Enable ML probes
+    // (c) Enable ML probes
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(1);
     }
 
-    // Enable photodetectors
+    // (c) Enable photodetectors: each one writes the readout of the fields it stored (B-049)
     for (auto pdet: all_photodetectors) {
         pdet->enable = sc_logic(1);
     }
@@ -228,6 +239,19 @@ void SPECSConfig::runTRANAnalysis()
         sc_start();
 
     cout << "Simulated " << sc_time_stamp() << endl;
+}
+
+void SPECSConfig::applyInitialConditions()
+{
+    // Set values of signals according to the initial conditions (same mechanism as
+    // nodeset_orders, but applied after the OP). The writes take effect at the next
+    // sc_start(), in the same update phase as the probe enables of runTRANAnalysis().
+    // ic_orders is only filled from C++ for now: the parser rejects .ic (B-161). A future
+    // .ic directive must fill ic_orders, or keep this order (B-048).
+    for (auto &ic_order : ic_orders)
+    {
+        ic_order.second.first->write(ic_order.second.second);
+    }
 }
 
 void SPECSConfig::applyDefaultOpticalOutputPortConfig() {

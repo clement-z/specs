@@ -90,6 +90,9 @@ public:
     // Hold simulation objects
     vector<shared_ptr<sc_object>> additional_objects;
     map<string, pair<sc_signal<OpticalSignal, SC_MANY_WRITERS> *, OpticalSignal>> nodeset_orders;
+    // Initial conditions of a .tran, written after the OP (applyInitialConditions). Only filled
+    // from C++ for now: the parser rejects .ic (B-161)
+    map<string, pair<sc_signal<OpticalSignal, SC_MANY_WRITERS> *, OpticalSignal>> ic_orders;
 
     // Simulation options
     EngineTimescale engine_timescale = HUNDRED_FS;
@@ -128,6 +131,7 @@ public:
     void runOPAnalysis();
     void runDCAnalysis();
     void runTRANAnalysis();
+    void applyInitialConditions();
 
     void applyEngineResolution() {
         // set engine time resolution
