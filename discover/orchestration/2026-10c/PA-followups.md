@@ -13,4 +13,4 @@ section "Follow-up decisions". Read the P2, P3 and P4 reports in `backlog/sprint
 
 Docs: `doc/numerics.md` (zero tolerances, delay rounding error rule), `doc/netlist.md` (integer limits),
 CHANGELOG `[unreleased]`, backlog status of B-146, B-014, B-018, B-153 and the integer item (add a backlog entry
-`B-179` for the integer clamp if none exists).
+`B-180` for the integer clamp if none exists; B-179 is taken).
