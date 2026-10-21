@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 using std::string;
 
@@ -305,6 +306,10 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
     }
     auto ratio = [](const OpticalOutputPort *oop)
     {
+        // zero threshold (abstol = 0, and reltol = 0 or |E_last| = 0, B-153): any change is
+        // infinitely above it (said explicitly rather than divided by 0)
+        if (oop->m_last_emission_threshold == 0)
+            return std::numeric_limits<double>::infinity();
         return oop->m_last_emission_change / oop->m_last_emission_threshold;
     };
     // largest change relative to its threshold first, by order of magnitude, then in name order:
@@ -458,6 +463,19 @@ void SPECSConfig::printConfig() const
     cout << "- default reltol: " << default_reltol << endl;
     cout << "- resolution multiplier: " << default_resolution_multiplier << endl;
     cout << "- trace all optical nets: " << trace_all_optical_nets << endl;
+}
+
+// Zero tolerances are allowed (B-153, decision 2026-10-21), e.g. to compare with a fixed-step
+// discrete model. With both at 0 nothing is gated: say so once per run (verifyConfig() is called
+// from runAnalysis() and from prepareSimulation())
+void SPECSConfig::warnZeroTolerances()
+{
+    if (zero_tolerances_warned || default_abstol != 0 || default_reltol != 0)
+        return;
+    zero_tolerances_warned = true;
+    cerr << "Warning: abstol = 0 and reltol = 0: the emission gate is off, every change of a value is emitted;"
+         << " a circuit with feedback may never quiesce in .tran (it stops only when its values repeat exactly),"
+         << " and .op/.dc may stop at .options maxiter with a non-convergence error" << endl;
 }
 
 void SPECSConfig::printOPAnalysisResult() const

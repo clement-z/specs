@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b153-zerotol-open-loop.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b153-zerotol-open-loop.cir", "sha256": "b6240c63d0db95aa5cd3fcd5dd8f2919be053b6fa065cbed2eac233a1482b325"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

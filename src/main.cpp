@@ -323,7 +323,8 @@ int sc_main(int argc, char *argv[])
         ss << set_reltol.Get();
         ss >> reltol_val;
         //cout << ss.good() << " " << ss.eof() << " " << ss.fail() << " " << ss.bad() << endl;
-        if (!ss.eof() || ss.fail() || reltol_val <= 0) {
+        // 0 is allowed (B-153, decision 2026-10-21), negative values are not
+        if (!ss.eof() || ss.fail() || !(reltol_val >= 0)) {
             cerr << "Invalid reltol value" << endl;
             return 1;
         }
@@ -334,7 +335,7 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_abstol.Get();
         ss >> abstol_val;
-        if (!ss.eof() || ss.fail() || abstol_val <= 0) {
+        if (!ss.eof() || ss.fail() || !(abstol_val >= 0)) {
             cerr << "Invalid abs_tol value" << endl;
             return 1;
         }

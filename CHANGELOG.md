@@ -41,6 +41,10 @@
   resonators versus reltol and how to choose it, time resolution and delay rounding (B-021, B-124, B-014)
 * `.options snapfactor=<x>`: emitted fields with |E| < snapfactor·abstol are emitted as 0 (default 10, as
   before; 0 disables the snap) (B-021)
+* Zero tolerances: `abstol` and `reltol` may be 0 (`.options`, `--abstol`, `--reltol`; negative values stay
+  errors), e.g. to compare with a fixed-step discrete model; with both at 0 nothing is gated or snapped and
+  one warning says that feedback circuits may not quiesce and `.op`/`.dc` may stop at `maxiter`
+  (`doc/numerics.md`) (B-018, B-153)
 * Reproducible runs (F-01, `doc/reproducibility.md`):
   * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (an integer literal 0 to 2^63 − 1, exponent form 0 to 2^53, B-180; `--seed` wins):
     one master seed for every random draw, **default 0**, so runs are reproducible by default. Each device

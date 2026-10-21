@@ -20,8 +20,8 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 
 | `.options` keyword (case-insensitive) | Default | Meaning | Valid | CLI |
 | --- | --- | --- | --- | --- |
-| `abstol` | 1e-8 | absolute emission threshold, optical **field**, √W | > 0 | `--abstol` |
-| `reltol` | 1e-4 | relative emission threshold | > 0 | `--reltol` |
+| `abstol` | 1e-8 | absolute emission threshold, optical **field**, √W | >= 0 (see [Zero tolerances](#zero-tolerances)) | `--abstol` |
+| `reltol` | 1e-4 | relative emission threshold | >= 0 (see [Zero tolerances](#zero-tolerances)) | `--reltol` |
 | `snapfactor` | 10 | emitted fields below snapfactor·abstol become 0 | >= 0 (0: off) | none |
 | `timescale` (alias `ts`) | -13 | log10 of the engine time step in s: -13 is 100 fs | integer, -15 (1 fs) to 0 (1 s) | `-R`, `--resolution` |
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
@@ -138,11 +138,55 @@ Each net is shown with the device that writes it. In a `.dc` the first line name
 `.tran: the operating point before the transient`. A circuit that converges is not affected: same results,
 same output.
 
-The default leaves a wide margin: the golden cases need at most 869 iterations (the all-pass ring of B-124),
-a chain of 1000 such rings about 1e5, a CROW of 10 rings 3.5e4. A circuit of a few devices runs 1e6
-iterations in about 0.25 s; a large one is slower per iteration (a 100-ring CROW took 30 s). If a large
-circuit stops while the residual keeps decreasing, raise `maxiter`; if the residual stays at the size of the
-signal, the loop does not converge (r = 1 or a gain).
+The default leaves a wide margin: at the default tolerances the golden cases need at most 869 iterations (the
+all-pass ring of B-124), a chain of 1000 such rings about 1e5, a CROW of 10 rings 3.5e4. A circuit of a few
+devices runs 1e6 iterations in about 0.25 s; a large one is slower per iteration (a 100-ring CROW took 30 s).
+If a large circuit stops while the residual keeps decreasing, raise `maxiter`; if the residual stays at the
+size of the signal, the loop does not converge (r = 1 or a gain).
+
+## Zero tolerances
+
+`abstol` and `reltol` may be 0: `.options abstol=0 reltol=0`, `--abstol 0 --reltol 0`. A negative value or NaN
+is an error (`Error: .options: ABSTOL must be >= 0 (got -1)`, `Invalid abs_tol value`). 0 was rejected by the
+checks added for B-018 and B-153; before them only builds without asserts (NDEBUG) accepted it.
+
+- `abstol = 0`: the abstol test passes for any change, and the snap never applies (snapfactor·abstol = 0): a
+  decaying field is followed down to the smallest double instead of being cut at snapfactor·abstol.
+- `reltol = 0`: the reltol test passes for any change.
+- Both 0: the emission gate is off. A port emits every value that differs from the last one it emitted (as a
+  complex number, in any bit), and only those. With only one of them at 0, the other one still gates.
+
+When both are 0, stderr shows this once per run (also when the zeros come from `--abstol`/`--reltol`, and
+for testbenches and C++ code that call `prepareSimulation()`):
+
+    Warning: abstol = 0 and reltol = 0: the emission gate is off, every change of a value is emitted; a circuit with feedback may never quiesce in .tran (it stops only when its values repeat exactly), and .op/.dc may stop at .options maxiter with a non-convergence error
+
+What to expect (examples in `tests/golden/netlists/b153-zerotol-*.cir`):
+
+- Without feedback, nothing is truncated and the run ends as usual. In `b153-zerotol-open-loop.cir` a
+  relative change of 5e-7 and a 1e-20 W value reach the probes; the default tolerances drop the first and
+  snap the second to 0.
+- `.tran` with feedback: the activity stops only when every value in the loop repeats exactly. A lossy loop
+  without input decays geometrically until its field underflows to 0 (or rounds to a value that repeats),
+  after about ln(|E|/2.5e-324)/ln(1/r) round trips, r being the round-trip field transmission: 280 round
+  trips for r = 0.07 in `b153-zerotol-lossy-ring-tran.cir`. A contracting loop driven by a source usually
+  reaches an exact floating-point fixed point (the B-124 ring after a 1 W step: about 470 round trips), but
+  nothing guarantees it: the last bits can cycle, and a loop with r close to 1 needs about ln(1e-16)/ln(r)
+  round trips. Give such runs a `.tran` duration.
+- `.op` and `.dc` need an exact repeat too. The B-124 ring converges in 1865 delta cycles (869 at the
+  default tolerances) to the exact result, 1.000000 W out and 24.626059 W in the ring
+  (`b153-zerotol-ring-op.cir`). The weakly coupled ring of F-28 stops at `maxiter`
+  (`b153-zerotol-lossless-ring-op.cir`); the threshold in the residual is 0 and the ratio reads `inf`:
+
+      ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 9.99999e-05 > 0 (inf x)
+
+- The phase traced for a field of exactly 0 can read π: a zero field multiplied by a complex transmission
+  can come out as (-0, +0), whose argument is π. With abstol > 0 (and snapfactor > 0) the snap writes it as +0.
+
+Use: comparing SPECS with a fixed-step discrete model of the same circuit (same delays, same time step). With
+the gate off no event is dropped, so the differences left come from the models, the delay rounding and the
+floating-point rounding, not from the tolerances. Keep non-zero tolerances for normal runs: they bound the
+number of events and make feedback circuits quiesce.
 
 ## Time resolution
 

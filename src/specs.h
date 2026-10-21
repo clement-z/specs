@@ -121,9 +121,12 @@ public:
     // Set when it was chosen explicitly (specs --maxiter): .options maxiter is then ignored
     bool max_iterations_explicit = false;
 
-    // Port options
+    // Port options. Tolerances >= 0 (B-153): with both at 0 the emission gate is off
     double default_abstol = 1e-8;
     double default_reltol = 1e-4;
+    // Set once verifyConfig() has warned that both tolerances are 0: it runs twice per netlist
+    // run (runAnalysis(), prepareSimulation()) and the warning is printed once per run
+    bool zero_tolerances_warned = false;
     // values with |E| < default_snap_factor * default_abstol are emitted as 0 (.options snapfactor, B-021)
     double default_snap_factor = 10;
     sc_time::value_type default_resolution_multiplier = 1;
@@ -182,10 +185,11 @@ public:
             std::cerr << "Error: invalid configuration: " << what << " (got " << value << ")" << std::endl;
             exit(1);
         };
-        if (!(default_abstol > 0))
-            invalid("abstol must be > 0", default_abstol);
-        if (!(default_reltol > 0))
-            invalid("reltol must be > 0", default_reltol);
+        // 0 is allowed (B-153, decision 2026-10-21), negative values and NaN are not
+        if (!(default_abstol >= 0))
+            invalid("abstol must be >= 0", default_abstol);
+        if (!(default_reltol >= 0))
+            invalid("reltol must be >= 0", default_reltol);
         if (!(default_snap_factor >= 0))
             invalid("snap factor must be >= 0", default_snap_factor);
         if (!(default_resolution_multiplier >= 1))
@@ -199,7 +203,9 @@ public:
             invalid("sampled-time simulation mode is not implemented", simulation_mode);
         if (!(ANALYSIS_TYPE_MINVAL < analysis_type && analysis_type < ANALYSIS_TYPE_MAXVAL))
             invalid("unknown analysis type", analysis_type);
+        warnZeroTolerances();
     }
+    void warnZeroTolerances();
     string analysisTypeDesc() const;
     void printConfig() const;
     void printOPAnalysisResult() const;

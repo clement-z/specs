@@ -583,7 +583,7 @@
    "note": "B-153: .options abstol=-1 is rejected (verifyConfig assert / accepted with NDEBUG)"
   },
   {
-   "id": "err/b153-reltol-zero",
+   "id": "regress/b153-reltol-zero",
    "setup": {
     "copy": [
      "circuits",
@@ -597,11 +597,147 @@
     "-f",
     "tests/golden/netlists/b153-reltol-zero.cir"
    ],
+   "note": "B-153, decision 2026-10-21 (zero tolerances): .options reltol=0 is allowed (replaces err/b153-reltol-zero, same netlist). abstol keeps its default 1e-8, so stderr is empty (only abstol = reltol = 0 warns); probe1 b = 1 mW from t = 0, 'Simulated 10 ps'"
+  },
+  {
+   "id": "regress/b153-zerotol-open-loop",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-open-loop.cir"
+   ],
+   "note": "B-153: .options abstol=0 reltol=0 on a feed-forward circuit (value list -> 10 dB waveguide -> 25/75 splitter): every change is emitted unsnapped, out1/out2 = 2.5e-05/7.5e-05 W at 10 ps, 2.5000025e-05/7.5000075e-05 W at 20 ps (truncated by the default reltol), 2.5e-22/7.5e-22 W at 30 ps (snapped to 0 by default), 0 at 40 ps; open-ended .tran ends ('Simulated 50 ps'); stderr: exactly one zero-tolerance warning"
+  },
+  {
+   "id": "regress/b153-zerotol-cli",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--abstol",
+    "0",
+    "--reltol",
+    "0",
+    "-f",
+    "tests/golden/netlists/b153-zerotol-cli.cir"
+   ],
+   "note": "B-153: specs --abstol 0 --reltol 0 overrides the netlist's .options abstol=1e-6 reltol=1e-3 (footer): same traces as regress/b153-zerotol-open-loop, config printout abstol 0 / reltol 0, and exactly one warning line on stderr although verifyConfig() runs twice (runAnalysis(), prepareSimulation())"
+  },
+  {
+   "id": "regress/b153-zerotol-lossy-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"
+   ],
+   "timeout": 30,
+   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| only; stderr: one warning. Short timeout so that a regression (never quiescing) fails fast"
+  },
+  {
+   "id": "err/b153-zerotol-lossless-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-lossless-ring-op.cir"
+   ],
    "ignore_streams": [
     "stdout"
    ],
    "expect": "fail",
-   "note": "B-153: .options reltol=0 is rejected (verifyConfig assert / accepted with NDEBUG)"
+   "note": "B-153: the F-28 weakly coupled lossless ring in .op at abstol = reltol = 0 with .options maxiter=1000: the zero-tolerance warning, then the F-28 non-convergence error, residual of 3 ports (out, ring_br, ring_bl), each '> 0 (inf x)' (zero threshold), exit 1"
+  },
+  {
+   "id": "regress/b153-zerotol-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-ring-op.cir"
+   ],
+   "note": "B-153 (optional case): the B-124 all-pass ring in .op at abstol = reltol = 0 converges (the contracting floating-point iteration repeats exactly) to the exact result, out = 1.000000 W, ring = 24.626059 W (default tolerances: 0.995098 W, 24.563207 W); stderr: one warning"
+  },
+  {
+   "id": "err/b153-zerotol-cli-abstol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--abstol",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: specs --abstol -1 is still rejected before parsing ('Invalid abs_tol value'), exit 1; 0 is now allowed"
+  },
+  {
+   "id": "err/b153-zerotol-cli-reltol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--reltol",
+    "-1e-3",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: specs --reltol -1e-3 is still rejected before parsing ('Invalid reltol value'), exit 1; 0 is now allowed"
   },
   {
    "id": "err/b161-ic-unsupported",

@@ -1,4 +1,9 @@
-* B-153: invalid .options value (reltol=0) must be rejected
+* B-153 / decision 2026-10-21 (zero tolerances): .options reltol=0 is allowed. It was rejected after
+* B-018/B-153 (and accepted with NDEBUG before them). abstol keeps its default, 1e-8, so a change is
+* emitted when |dE| > max(1e-8, 0 * |E_last|) = 1e-8, and nothing is printed on stderr: only
+* abstol = reltol = 0 gives the zero-tolerance warning.
+* Expected: exit 0, stderr empty; probe1 b = 1 mW (|E| = 0.0316228 sqrt(W), lossless 100 um waveguide)
+* from t = 0 (operating point); "Simulated 10 ps".
 cwsrc1 a wl=1.55e-6 power=1e-3
 wg1 a b length=1e-4
 probe1 b

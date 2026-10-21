@@ -1,0 +1,8 @@
+Warning: abstol = 0 and reltol = 0: the emission gate is off, every change of a value is emitted; a circuit with feedback may never quiesce in .tran (it stops only when its values repeat exactly), and .op/.dc may stop at .options maxiter with a non-convergence error
+Error: .op: the operating point did not converge within 1000 iterations (delta cycles, .options maxiter)
+Residual: 3 optical output port(s) changed in the last 100 delta cycles. Last change |dE| and emission threshold max(abstol, reltol*|E_last|), in sqrt(W):
+  ROOT/out (ROOT/COUPLER1) @ 1550 nm: |dE| = 9.99999e-09 > 0 (inf x)
+  ROOT/ring_br (ROOT/COUPLER1) @ 1550 nm: |dE| = 9.99999e-05 > 0 (inf x)
+  ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 9.99999e-05 > 0 (inf x)
+A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss
+

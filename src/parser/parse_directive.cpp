@@ -61,20 +61,22 @@ void OPTIONSDirective::create() const
         }
         else if (kw == "ABSTOL")
         {
+            // 0 is allowed (B-153, decision 2026-10-21; with reltol = 0 too: no emission gate)
             const double v = p.second.as_double();
-            if (!(v > 0))
+            if (!(v >= 0))
             {
-                cerr << "Error: .options: " << kw << " must be > 0 (got " << v << ")" << endl;
+                cerr << "Error: .options: " << kw << " must be >= 0 (got " << v << ")" << endl;
                 exit(1);
             }
             specsGlobalConfig.default_abstol = v;
         }
         else if (kw == "RELTOL")
         {
+            // 0 is allowed, as for ABSTOL
             const double v = p.second.as_double();
-            if (!(v > 0))
+            if (!(v >= 0))
             {
-                cerr << "Error: .options: " << kw << " must be > 0 (got " << v << ")" << endl;
+                cerr << "Error: .options: " << kw << " must be >= 0 (got " << v << ")" << endl;
                 exit(1);
             }
             specsGlobalConfig.default_reltol = v;

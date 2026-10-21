@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir", "sha256": "fd832034ad06e8d398712bf10f5b7482d3c11fb9ad637753709c9795b3e21a5a"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}
