@@ -12,8 +12,8 @@
 | P3 | Devices/physics | B-032/033/159 (crossing), B-049/050 (PDET), B-048 (probes, IC-proof), B-021/B-014/B-124 (tolerance docs + delay warnings) | `ws-devices` / `ws/devices` (agent a8c73097) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P3-REPORT.md` | done, merged (3fc4f94); B-014 error awaits sign-off |
 | P4 | F-01 reproducible runs (fixes B-016) | seeds, name-ordered iteration, manifest | `ws-repro` / `ws/repro` (agent 87116f2a) | Opus 5.5 xhigh | `backlog/sprint-2026-10b/P4-REPORT.md` | done, merged (0dee6b2); lexer fix awaits sign-off |
 | P5 | F-28 + F-12 | `.op`/`.dc` convergence; netlist pack (SPICE semantics) | `ws-netlist` / `ws/netlist` (agent e01d0c83) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P5-REPORT.md` | done, merged (43a50d7) |
-| P6 | F-05 outputs/tracing | `.save`, `--no-trace`, CSV/`.npz`, trace-all fallback | `ws-outputs` / `ws/outputs` (agent 5532f8fc) | Opus 5.5 high | `backlog/sprint-2026-10b/P6-REPORT.md` | running |
-| P7 | CI: sanitizer job blocking | after P4 removes the ordering noise | coordinator | Opus 5.5 | CI green with blocking sanitizer job | pending |
+| P6 | F-05 outputs/tracing | `.save`, `--no-trace`, CSV/`.npz`, trace-all fallback | `ws-outputs` / `ws/outputs` (agent 5532f8fc) | Opus 5.5 high | `backlog/sprint-2026-10b/P6-REPORT.md` | done, merged |
+| P7 | CI: sanitizer job blocking | after P4 removes the ordering noise | coordinator | Opus 5.5 | CI green with blocking sanitizer job | in progress (coordinator) |
 | P8 | Final docs + verification + push | cheatsheet/README/CHANGELOG, full re-verification, push branch | coordinator | Opus 5.5 | pushed `origin/sprint/2026-10b` | pending |
 
 Why sequential: P2–P6 all re-record golden outputs and touch `parse_element.cpp`/`specs.cpp`; one phase at a time
@@ -66,3 +66,4 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 - 2026-10-21 — P3 merged (3fc4f94): gate = gcc+clang meson test 12/12, golden 134/134 `--atol 0`; vs pre-P3 baseline exactly the 18 predicted cases (stderr-only warnings; 472 VCD signals follow the B-048 pattern; b147 slot split; tb/det 3/3). P4 launched (agent 87116f2a).
 - 2026-10-21 — P4 merged (0dee6b2): gate = gcc, clang, clang ASan meson test 12/12, golden 153/153 `--atol 0`, no unordered exemptions; old→new audit: ordering-only + manifests + seeded readouts + predicted cases. P5 launched (agent e01d0c83).
 - 2026-10-21 — P5 merged (43a50d7): gate = gcc+clang meson test 12/12, golden 176/176 `--atol 0`; vs pre-P5 baseline exactly 12 predicted cases (7 `.dc` old-prefix + stop point, 3 legacy path-only, help lines added). P6 launched (agent 5532f8fc).
+- 2026-10-21 — P6 merged: gate = gcc+clang meson test 12/12, golden 190/190 `--atol 0`; vs pre-P6 baseline exactly 28 predicted cases (26 auto-PROBE removal + traceall echo, 2 help). Agent phases done; P7 started by the coordinator.
