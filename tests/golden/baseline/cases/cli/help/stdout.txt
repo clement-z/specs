@@ -34,6 +34,10 @@
       --seed=[set_seed]                 Set the master seed of the random
                                         streams (decimal integer, 0 to 2^64-1,
                                         default 0); overrides .options seed
+      --param=[name=value...]           Set the netlist parameter <name>, parsed
+                                        as in .param name=value; overrides the
+                                        netlist's .param/.assign of the same
+                                        name (repeatable)
       --maxiter=[set_maxiter]           Set the maximum number of iterations
                                         (delta cycles) of the .op/.dc fixed
                                         point, per operating point or sweep

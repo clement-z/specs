@@ -2682,6 +2682,57 @@
    ],
    "expect": "fail",
    "note": "F-12: .dc Q(cwsrc1) is rejected with the existing message of the /elem/ATTR form (Unknown attribute for CWSRC1: Q), exit 1"
+  },
+  {
+   "id": "regress/f12-param-override",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "pin=4e-3/2",
+    "--param",
+    "att=0",
+    "-f",
+    "tests/golden/netlists/f12-param-override.cir"
+   ],
+   "note": "F-12: --param overrides the root-level .param/.assign of the same name whatever the order (uses before and after the netlist's second .param pin both see 0.002 W), the value is parsed as in .param (4e-3/2, att=0 INTEGER); the subcircuit parameter pin keeps its default (0.005 W)"
+  },
+  {
+   "id": "regress/f12-param-undefined",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "pin=2e-3",
+    "-f",
+    "tests/golden/netlists/f12-param-undefined.cir"
+   ],
+   "note": "F-12: --param of a name the netlist never assigns at root level is defined anyway ({pin} = 0.002 W), with the warning 'Warning: --param pin: the netlist has no .param pin' on stderr"
+  },
+  {
+   "id": "err/f12-param-malformed",
+   "args": [
+    "--param",
+    "lambda-min=1.54e-6",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-12: --param needs name=value with an identifier name ('-' is not allowed): Invalid --param value, exit 1"
   }
  ]
 }

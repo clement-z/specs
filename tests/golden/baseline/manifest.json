@@ -75,6 +75,7 @@
   "err/f01-seed-overflow",
   "err/f12-dc-alias-unknown-attr",
   "err/f12-ends-name-mismatch",
+  "err/f12-param-malformed",
   "err/f12-si-unit-letters",
   "err/f28-lossless-ring-dc",
   "err/f28-lossless-ring-op",
@@ -151,6 +152,8 @@
   "regress/f12-dc-wl-alias",
   "regress/f12-dc-wl-slash",
   "regress/f12-ends-name",
+  "regress/f12-param-override",
+  "regress/f12-param-undefined",
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
   "regress/f28-maxiter-cli-priority",
@@ -520,6 +523,12 @@
    "only": "^(cir/add_drop|cir-json/add_drop|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|err/b017-json-unwritable|regress/b004-mode-td-dc|regress/f12-dc-wl-alias|regress/f12-dc-wl-slash|regress/f12-dc-p-alias|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-12: .dc includes the stop value (SPICE semantics, maintainer decision 2026-10-21): every .dc sweep with an integer (stop-start)/step gains its stop point at the end; earlier points unchanged (same accumulation, B-009 open)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T06:04:57Z",
+   "only": "^(cli/help|cli/no-args|regress/f12-param-.*|err/f12-param-.*)$",
+   "gtest": false,
+   "note": "F-12: --param name=value (help lines, new cases)"
   }
  ]
 }
