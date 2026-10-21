@@ -41,10 +41,9 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 
 ## Pending maintainer input
 - **F-15**: Q2 and Q5 confirmed; Q8 (equal-time order) pending the maintainer's review of the code excerpt and diagram.
-- Unpushed local commits on `sprint/2026-10b` (bca9c50, d5890f1) and everything on `sprint/2026-10c`: push only on request.
-- Housekeeping of the 2026-10b phase workspaces and `ws/*`, `P*-wip/*` branches.
 
 ## Log
 - 2026-10-21 — sprint prepared (board, prompts, heartbeat registry); not launched ("no go, just prepare").
 - 2026-10-21 — maintainer answers recorded (e6c443e): sanitizer runtimes installed, no DOI per version (ECOC paper stays the citation), 64-bit integer literals, F-15 Q1–Q8. Prompts updated; still no go.
 - 2026-10-21 — Q2, Q5 confirmed; Q8 under review. Push of `sprint/2026-10b` and `sprint/2026-10c` and housekeeping of the 2026-10b workspaces authorised.
+- 2026-10-21 — pushed `sprint/2026-10b` (d5890f1) and `sprint/2026-10c`; 2026-10b workspaces archived, `ws/*` and `P*-wip/*` branches and `/tmp` scratch removed (`P*-ready/*` kept for phase A).
