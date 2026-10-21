@@ -8,3 +8,7 @@ Builds: `/tmp/P1-gcc` (Meson default, gcc 11.5), `/tmp/P1-clang` (clang 19.1.7),
 | B-126 | pending | | |
 | B-127 | pending | | |
 | B-128 | pending | | |
+
+Heartbeat: **not created**. `paseo heartbeat create ... --name P1-heartbeat` (coordinator rule) was denied by the
+Claude Code auto-mode permission classifier ("Unauthorized Persistence"); no workaround attempted. The coordinator
+must resume this agent manually after an interruption.
