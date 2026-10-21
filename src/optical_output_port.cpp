@@ -227,27 +227,24 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
     //    return;
 
     const sc_time &now = sc_time_stamp();
-    if (m_queue.empty() || m_queue.cbegin()->first != now) {
-        // if the queue is empty, or contains no event for current time,
-        // push the signal directly
+
+    // find a scheduled signal with this timestamp and this lambda anywhere in
+    // the queue, not only at its top: another wavelength can be on top (B-001)
+    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&now](const auto &x) {
+            return now == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
+            });
+
+    if (it == m_queue.end()) {
+        // if not, schedule the signal for the current time
         m_queue.push(make_pair(now, value));
         m_event_queue.notify(SC_ZERO_TIME);
     }
     else {
-        // if the queue is contains an event for current time
-        if (m_queue.cbegin()->second.m_wavelength_id == value.m_wavelength_id) {
-            // if wavelengths are equal, just replace or sum with the old one
-            if (m_use_deltas)
-                m_queue.begin()->second += value;
-            else
-                m_queue.begin()->second = value;
-            //m_event_queue_fd.cancel_all();
-            //m_event_queue_fd.notify(SC_ZERO_TIME);
-        } else {
-            // otherwise just schedule event separately
-            m_queue.push(make_pair(now, value));
-            m_event_queue.notify(SC_ZERO_TIME);
-        }
+        // if yes, just replace or sum with the old one
+        if (m_use_deltas)
+            it->second += value;
+        else
+            it->second = value;
     }
 }
 

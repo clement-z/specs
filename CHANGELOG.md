@@ -56,6 +56,8 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * Docs: Doxygen config/mainpage and stale `@param`/`@sa` references (B-083, B-100, B-102); KiCad symbol
   templates (B-082); `.gitignore` no longer hides new `circuits/*.cir` (B-114); flex/bison warnings (B-109, B-177)
 * gtest fork harness: pipe deadlock above 64 KiB, escaping assertions/exceptions (B-125); angle check (B-123)
+* Multi-wavelength `.op`/`.dc` (and the OP phase of `.tran`): a stale partial value of one wavelength could be
+  emitted as the converged result when another wavelength shared the output port (B-001)
 
 ### Removed
 

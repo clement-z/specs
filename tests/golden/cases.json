@@ -1081,6 +1081,23 @@
    ],
    "expect": "fail",
    "note": "B-131: --nrings_crow outside 1..1024 is rejected"
+  },
+  {
+   "id": "regress/b001-fd-multilambda-stale",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-001: multi-wavelength .op; a stale partial value of one wavelength used to be emitted as the converged value (m = o = 0.25 W at 1550 nm instead of 0.5625 W)"
   }
  ]
 }

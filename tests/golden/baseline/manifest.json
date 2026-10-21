@@ -59,6 +59,7 @@
   "opt/tol-resolution-overrides",
   "opt/tracefile-o",
   "opt/vci",
+  "regress/b001-fd-multilambda-stale",
   "regress/b006-empty-output",
   "regress/b031-mzi-bidir",
   "regress/b036-vci-crow",
@@ -280,6 +281,18 @@
    "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|opt/mode-fd|opt/mode-sampled-time|opt/multi-file|opt/tol-resolution-overrides|opt/tracefile-o|opt/vci|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b150-include-in-subckt|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg)$",
    "gtest": false,
    "note": "B-129: printed OpticalSignal IDs replaced by first-appearance ranks [#k] (canonical_ids); stored files rewritten in place, not re-run: line order and values unchanged"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T01:58:51Z",
+   "only": "^regress/b001-fd-multilambda-stale$",
+   "gtest": false,
+   "note": "B-001: new case, multi-wavelength .op FD queue merge (m = o = 0.5625 W at 1550 nm)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T01:59:10Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "B-001: new gtest OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop"
   }
  ]
 }

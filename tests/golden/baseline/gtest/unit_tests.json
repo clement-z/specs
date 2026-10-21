@@ -8,6 +8,7 @@
   "MergerModel.CoherentSum": "PASS",
   "OpticalOutputPort.DesyncStopsWithoutEmitting": "PASS",
   "OpticalOutputPort.EmptyQueueStopsWithoutEmitting": "PASS",
+  "OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop": "PASS",
   "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
   "SPECSConfig.VerifyConfigAcceptsValidValues": "PASS",
   "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",
