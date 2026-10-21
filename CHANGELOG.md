@@ -22,7 +22,7 @@
 * CI: GitHub Actions and GitLab CI on Ubuntu 24.04 with Meson (gcc and clang, golden check);
   `install.sh` rewritten for Meson
 * The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed)
-* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 80 `specs` cases
+* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 114 `specs` cases
   (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
   * Stricter by default (sprint 2026-10b, B-126..B-129): line order is checked (except per-case
     `unordered_streams`; `--lenient-order`), NEW/MISSING cases and an unrequested gtest skip fail

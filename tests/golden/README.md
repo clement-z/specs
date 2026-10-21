@@ -136,7 +136,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (80 `specs` cases + 1 gtest case)
+## Case list (114 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
@@ -145,8 +145,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*` (29) | bad inputs from the 2026-10 fix phase (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
-| `regress/bNNN-*` (6) | regression cases of the 2026-10 fix phase | behaviour that a fix made work (bidirectional MZI, `--vci` on CROW, many includes, ...) |
+| `err/bNNN-*` (39) | bad inputs from the 2026-10 and 2026-10b fix phases (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
+| `regress/bNNN-*` (30) | regression cases of the 2026-10 and 2026-10b fix phases | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
@@ -158,6 +158,7 @@ is visible; re-record when it is fixed on purpose.
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
 * `cli/unknown-testbench`, `cli/missing-netlist`, `cli/bad-mode`: exit 1 by design.
 * `opt/mode-sampled-time`: `-m sampled-time` is not implemented and rejected (B-002), exit 1.
+* `regress/b144-three-writers`: three writers on one optical net still give SystemC E115 (known limitation, kept so a change is visible), exit 1.
 * `err/*`: exit 1 by design. Most of them set `ignore_streams: [stdout]`, so only
   the exit status and the error message are compared.
 
