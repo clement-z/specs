@@ -1,5 +1,5 @@
 # B-004: `.op`/`.dc`/`.tran` silently override the `-m` CLI mode
-severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in c6414ce (sprint 2026-10b P2): explicit -m overrides the analysis default
 location: src/parser/parse_analysis.cpp:26,32,85, src/main.cpp:290-312
 ## Problem
 `-m` writes `specsGlobalConfig.simulation_mode`. Every analysis `create()` then overwrites it unconditionally

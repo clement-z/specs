@@ -1,5 +1,5 @@
 # B-002: `-m sampled-time` silently drops every optical write when it takes effect
-severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: cli | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in c6414ce (sprint 2026-10b P2): rejected at configuration time
 location: src/optical_output_port.cpp:360-369,413-415, src/main.cpp:204-207,297-301
 ## Problem
 `delayedWriteSampledTime` is an empty TODO. When `-m sampled-time` is in effect, every device output is
