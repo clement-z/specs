@@ -14,8 +14,8 @@ golden 134/134 `--atol 0`, 0 notes.
 | 3 | `test(golden)`: drop every `unordered_streams` exception | orchestrator | done | (see log) | 14 cases (P1's 8 + 6 later) |
 | 4 | F-01 seeds: `--seed`, `.options seed`, `spx::rng_for`, Detector streams per name, `darkfield` option (B-055, B-056) | Opus implementer a96cbaf6240d36dfe, `/tmp/P4-wt/rng` (`P4-wip/rng`) | done | 083c8be | 22feaa5 cherry-picked + .options seed INT_MAX guard; lexer fix d6e81d4 held back (to park as P4-ready/lexer-int-overflow); 17 new cases, tb/det(ector) compared |
 | 5 | F-01 run manifest `<trace>.manifest.json` + `--print-manifest` | Opus implementer a8aba4f323342d840, `/tmp/P4-wt/manifest` (`P4-wip/manifest`) | done | 4e3e87d | 2815930 + 72eedeb squashed with the re-record; 84 cases gain only the manifest |
-| 6 | verification: `check --strict` twice, clang ASan/UBSan, `record --repeat 3` | orchestrator | pending | | |
-| 7 | docs, backlog status, CHANGELOG, report | orchestrator | docs done (e05090d), report pending | | |
+| 6 | verification: `check --strict` twice, clang ASan/UBSan, `record --repeat 3` | orchestrator | done | | gcc/clang/-O0/ASan 153/153 strict; record --repeat 3 byte-identical to the baseline |
+| 7 | docs, backlog status, CHANGELOG, report | orchestrator | done | e05090d, 1eb606c, report | |
 
 ## Decisions (running list, copied into the report)
 - Default seed when no `--seed`/`.options seed`: **0** (fixed, documented).
@@ -32,3 +32,4 @@ golden 134/134 `--atol 0`, 0 notes.
 - 2026-10-21 — same code: clang 19 release (/tmp/P4-clang) and gcc -O0 (/tmp/P4-debug): check --atol 0 --strict 134/134, 0 notes.
 - 2026-10-21 — item 4 (seeds) committed 083c8be; golden 151/151 --atol 0; meson 12/12. Next: integrate the manifest (P4-wip/manifest).
 - 2026-10-21 — item 5 (manifest) 4e3e87d, docs e05090d; golden 153/153 --atol 0. Next: park lexer fix (P4-ready/lexer-int-overflow), final verification (fresh builds, strict x2, ASan, record --repeat 3).
+- 2026-10-21 — lexer fix parked on P4-ready/lexer-int-overflow @ 7c49a98 (cherry-picks cleanly on HEAD). Final verification green. Worktrees /tmp/P4-wt/* removed. Report committed; heartbeat 99a0d01d deleted after it.
