@@ -103,7 +103,7 @@ jobs:
   sanitizers:
     name: asan + ubsan (debug, gcc)
     runs-on: ubuntu-24.04
-    continue-on-error: true
+    # Blocking: LeakSanitizer suppressions in tests/sanitizers/lsan.supp (applied by meson test).
     env:
       CC: gcc
       CXX: g++

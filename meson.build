@@ -178,6 +178,16 @@ if get_option('old_tb')
   endforeach
 endif
 
+# Sanitizer builds: LeakSanitizer suppressions for the two accepted kinds of reports (see the file);
+# print_suppressions=0 keeps stderr unchanged for the golden comparisons.
+if get_option('b_sanitize').contains('address')
+  add_test_setup('lsan',
+    env: {'LSAN_OPTIONS': 'suppressions=' + (meson.project_source_root() / 'tests/sanitizers/lsan.supp')
+                          + ':print_suppressions=0'},
+    is_default: true,
+  )
+endif
+
 if get_option('golden')
   subdir('tests/golden')
 endif
