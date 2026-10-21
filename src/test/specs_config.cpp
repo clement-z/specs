@@ -18,6 +18,9 @@ TEST(SPECSConfig, VerifyConfigAcceptsValidValues)
         c.verifyConfig();
         c.engine_timescale = SPECSConfig::ONE_SEC;
         c.verifyConfig();
+
+        c.default_snap_factor = 0; // disables the snap to 0 (B-021)
+        c.verifyConfig();
     }
     SPECS_TEST_FOOTER();
 }
@@ -36,6 +39,8 @@ TEST(SPECSConfigDeathTest, VerifyConfigRejectsInvalidValues)
         EXPECT_EXIT({ c.default_abstol = -1; c.verifyConfig(); }, rejected, "invalid configuration: abstol");
         EXPECT_EXIT({ c.default_abstol = nan; c.verifyConfig(); }, rejected, "invalid configuration: abstol");
         EXPECT_EXIT({ c.default_reltol = 0; c.verifyConfig(); }, rejected, "invalid configuration: reltol");
+        EXPECT_EXIT({ c.default_snap_factor = -1; c.verifyConfig(); }, rejected, "invalid configuration: snap factor");
+        EXPECT_EXIT({ c.default_snap_factor = nan; c.verifyConfig(); }, rejected, "invalid configuration: snap factor");
         EXPECT_EXIT({ c.default_resolution_multiplier = 0; c.verifyConfig(); }, rejected, "invalid configuration: resolution");
         EXPECT_EXIT({ c.engine_timescale = SPECSConfig::EngineTimescale(-16); c.verifyConfig(); }, rejected, "invalid configuration: timescale");
         EXPECT_EXIT({ c.engine_timescale = SPECSConfig::EngineTimescale(1); c.verifyConfig(); }, rejected, "invalid configuration: timescale");

@@ -50,6 +50,14 @@ public:
         }
         m_length_cm = length_cm;
     }
+
+    /** Group delay in ns at the reference wavelength (1.55 um, where the group index is m_ng) */
+    inline double groupDelay_ns() const {
+        const double c = 299792458.0;
+        // vg = c/ng
+        // => delay = L / vg = (L * ng) / c
+        return 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    }
 };
 
 
@@ -79,6 +87,8 @@ public:
      *   **Sensitivity list:** p_in
      * */
     void on_port_in_changed();
+
+    virtual void start_of_simulation();
 
     /** Constructor for Waveguide
      *
@@ -131,6 +141,8 @@ public:
      * */
     void on_p0_in_changed();
     void on_p1_in_changed();
+
+    virtual void start_of_simulation();
 
     /** Constructor for Waveguide
      *

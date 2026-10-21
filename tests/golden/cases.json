@@ -785,9 +785,10 @@
      "traces"
     ]
    },
-   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered. B-014: stderr has one delay-rounding warning per MZI-internal waveguide (arms of 43 fs round to 0, 88 fs to 100 fs at the default 100 fs); they are created by MZI init() in pointer order (B-016), hence stderr is unordered too",
    "unordered_streams": [
-    "stdout"
+    "stdout",
+    "stderr"
    ]
   },
   {
@@ -1751,7 +1752,10 @@
      "traces"
     ]
    },
-   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm"
+   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016; it changed when OpticalOutputPort gained a member, B-021); remove unordered_streams once P4 (F-01) makes iteration name-ordered",
+   "unordered_streams": [
+    "stdout"
+   ]
   },
   {
    "id": "regress/b033-crossing-two-lambda-tran",
@@ -1889,6 +1893,161 @@
     ]
    },
    "note": "B-048: probes on an undriven net in .tran: the sample taken at TRAN start is skipped silently (PROBE2, PROBE{ROOT/nc}, MLPROBE2 stay 0; no 'received unsupported signal (lambda = 1.55e-06m)' although wavelength id 0 aliases 1550 nm, B-012); the CW net next to it reads 1 mW from t = 0"
+  },
+  {
+   "id": "regress/b014-delay-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
+   ],
+   "note": "B-014: a 13 fs ring round trip rounds to 0 at 100 fs (the response collapses into delta cycles at 1 ps): reported on stderr (was silent); decided as an error, a warning until regress/b031-mzi-bidir is settled"
+  },
+  {
+   "id": "regress/b014-delay-rounding-warning",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-delay-rounding-warning.cir"
+   ],
+   "note": "B-014: a 53 fs ring round trip rounded to 100 fs (+87 %): one warning on stderr before the simulation (was silent), simulation unchanged"
+  },
+  {
+   "id": "regress/b021-snapfactor-default",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-default.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-021: with abstol=1e-2, fields below 10 * abstol are emitted as 0 (default snapfactor 10): out_a = out_b = 0, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b021-snapfactor",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-021: .options snapfactor=4 (abstol=1e-2): only fields below 0.04 sqrt(W) are emitted as 0: out_a = 0, out_b = 0.06, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b021-snapfactor-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-zero.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-021: .options snapfactor=0 disables the snap to 0: out_a = 0.03, out_b = 0.06, out_c = 0.2 sqrt(W). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "err/b021-snapfactor-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-021: .options snapfactor=-1 is rejected (must be >= 0)"
+  },
+  {
+   "id": "regress/b124-allpass-ring-default-reltol",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-124: lossless all-pass ring .op with the default reltol 1e-4: out = 0.995098 W instead of 1 W (truncation error about 49 x reltol). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b124-allpass-ring-tight-reltol",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-tight-reltol.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-124: same ring with .options reltol=1e-9: out = 1.000000 W. B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   }
  ]
 }

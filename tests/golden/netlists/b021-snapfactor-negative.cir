@@ -1,0 +1,7 @@
+* B-021: invalid .options value (snapfactor=-1) must be rejected (0 disables the snap, < 0 is meaningless)
+* Expected: "Error: .options: SNAPFACTOR must be >= 0 (got -1)", exit 1
+cwsrc1 a wl=1.55e-6 power=1e-3
+wg1 a b length=1e-4
+probe1 b
+.options snapfactor=-1
+.tran 1e-11

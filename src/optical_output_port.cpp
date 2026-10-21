@@ -2,6 +2,10 @@
 #include "optical_signal.h"
 #include "specs.h"
 
+#include <cmath>
+#include <iomanip>
+#include <sstream>
+
 string oopPortMode2str(OpticalOutputPortMode mode)
 {
     switch (mode) {
@@ -16,6 +20,79 @@ string oopPortMode2str(OpticalOutputPortMode mode)
     }
 }
 
+double roundDelay(double exact_s, double resolution_s)
+{
+    // sc_time(double, unit) truncates value/resolution + 0.5 to an integer
+    return std::floor(exact_s / resolution_s + 0.5) * resolution_s;
+}
+
+DelayRoundingVerdict classifyDelayRounding(double exact_s, double resolution_s, double max_rel_error)
+{
+    // Zero (or invalid) delays: nothing is lost
+    if (!(exact_s > 0))
+        return DELAY_ROUNDING_OK;
+    const double rounded_s = roundDelay(exact_s, resolution_s);
+    if (rounded_s == 0)
+        return DELAY_ROUNDING_ERROR;
+    if (std::abs(rounded_s - exact_s) / exact_s > max_rel_error)
+        return DELAY_ROUNDING_WARN;
+    return DELAY_ROUNDING_OK;
+}
+
+void OpticalOutputPort::checkDelayRounding(const char *device_name, double delay_s) const
+{
+    // Called once per device before the simulation (start_of_simulation()), so it reads the
+    // port configuration, not m_mode (set by applyConfig()). Delays are only honoured by
+    // event-driven ports in a time-domain analysis: .op and .dc (NO_DELAY ports), and -m fd,
+    // ignore them, so a rounding there is harmless
+    if (!m_config || m_config->m_mode != OpticalOutputPortMode::EVENT_DRIVEN
+            || specsGlobalConfig.analysis_type != SPECSConfig::TIME_DOMAIN)
+        return;
+
+    // Events are scheduled on multiples of the port time step: the engine time
+    // resolution times the resolution multiplier (snap_to_next_valid_time())
+    const double tick_s = sc_get_time_resolution().to_seconds();
+    const sc_time::value_type multiplier = m_config->m_timestep_value;
+    const double resolution_s = tick_s * multiplier;
+
+    const DelayRoundingVerdict verdict = classifyDelayRounding(delay_s, resolution_s, DELAY_ROUNDING_WARN_THRESHOLD);
+    if (verdict == DELAY_ROUNDING_OK)
+        return;
+
+    // How to fix it: the coarsest engine timescale that represents the delay well enough
+    std::ostringstream fix;
+    fix << "use a finer time resolution";
+    const int timescale = static_cast<int>(std::lround(std::log10(tick_s)));
+    bool found = false;
+    for (int ts = timescale - 1; ts >= SPECSConfig::ONE_FS && !found; --ts)
+    {
+        if (classifyDelayRounding(delay_s, std::pow(10.0, ts) * multiplier, DELAY_ROUNDING_WARN_THRESHOLD) == DELAY_ROUNDING_OK)
+        {
+            fix << ", e.g. .options timescale=" << ts;
+            found = true;
+        }
+    }
+    if (!found)
+        fix << " (.options timescale=" << SPECSConfig::ONE_FS << " is the finest)";
+    if (multiplier > 1)
+        fix << ", or a smaller .options resolution (" << multiplier << ")";
+
+    if (verdict == DELAY_ROUNDING_ERROR)
+    {
+        // TODO(B-014): decided as an error (exit 1); a warning until regress/b031-mzi-bidir,
+        // whose MZI arms (43 fs) round to 0 at 100 fs, is settled
+        std::cerr << "Warning (" << device_name << "): delay " << delay_s << " s rounds to 0 at the time resolution "
+                  << resolution_s << " s (the delayed events happen in the same time step); " << fix.str() << std::endl;
+        return;
+    }
+
+    const double rounded_s = roundDelay(delay_s, resolution_s);
+    std::ostringstream rel_error;
+    rel_error << std::showpos << std::setprecision(3) << 100 * (rounded_s - delay_s) / delay_s;
+    std::cerr << "Warning (" << device_name << "): delay " << delay_s << " s rounded to " << rounded_s << " s ("
+              << rel_error.str() << " %) at the time resolution " << resolution_s << " s; " << fix.str() << std::endl;
+}
+
 OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
     : sc_module(name)
     , m_port(p)
@@ -25,21 +102,6 @@ OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
 
     SC_THREAD(on_data_ready);
     sensitive << m_event_queue;
-}
-
-inline bool OpticalOutputPort::check_emit_by_abstol(const OpticalSignal::field_type &desired,
-                                                    const OpticalSignal::field_type &last)
-{
-    double vector_distance = abs(desired - last);
-    return vector_distance > m_abstol;
-}
-
-inline bool OpticalOutputPort::check_emit_by_reltol(const OpticalSignal::field_type &desired,
-                                                    const OpticalSignal::field_type &last)
-{
-    double vector_distance = abs(desired - last);
-    double last_size = abs(last);
-    return (vector_distance/last_size) > m_reltol;
 }
 
 void OpticalOutputPort::applyConfig() {
@@ -62,6 +124,7 @@ void OpticalOutputPort::applyConfig() {
     m_mode = m_config->m_mode;
     m_reltol = m_config->m_reltol;
     m_abstol = m_config->m_abstol;
+    m_snap_factor = m_config->m_snap_factor;
 }
 
 void OpticalOutputPort::start_of_simulation() {
@@ -128,16 +191,16 @@ void OpticalOutputPort::on_data_ready()
         else
             desired = s.m_field;
 
-        // Decide whether to emit signal or not
+        // Decide whether to emit signal or not (rule: see check_emit_by_reltol(), B-021)
         pass_abstol = check_emit_by_abstol(desired, emitted);
         pass_reltol = check_emit_by_reltol(desired, emitted);
 
         // Only emits when passes both tests
         emit_signal = pass_abstol && pass_reltol;
 
-        // Emit zeros instead of signals smaller than a 10 abstol
-        // TODO: check this !!
-        if (emit_signal && (abs(desired) < 10*m_abstol))
+        // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
+        // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
+        if (emit_signal && (abs(desired) < m_snap_factor*m_abstol))
             desired = complex<double>(0,0);
 
 
@@ -186,9 +249,9 @@ sc_time OpticalOutputPort::snap_to_next_valid_time(const sc_time &t, const unsig
 void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier)
 {
     // Calculate the simulation time at which event was requested to be emitted.
+    // (The delay was rounded to the time resolution when it was built from a double:
+    // devices check that once, before the simulation, with checkDelayRounding(), B-014)
     auto t = sc_time_stamp() + delay;
-    if (t.value() - sc_time_stamp().value() != delay.value())
-        cerr << "Event cannot be correctly described with current timestep" << endl;
 
     //
     if (true /*&& resolution_multiplier > 1*/) {

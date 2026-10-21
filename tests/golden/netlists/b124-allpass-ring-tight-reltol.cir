@@ -1,0 +1,15 @@
+* B-124: lossless all-pass ring, CW operating point, tight reltol (1e-9): the truncation error of the
+* steady state scales with the emission threshold max(abstol, reltol * |last|). Compare with
+* b124-allpass-ring-default-reltol.cir (default reltol 1e-4: out = 0.995098 W).
+* Exact: k = sqrt(0.15), t = r = sqrt(0.85) = 0.921954 (round-trip field transmission), on resonance
+* (phi = 2 pi * 1 * 775 um / 1550 nm = 1000 pi): out = 1 W (phase pi), ring_br = ring_bl = k^2 / (1 - t)^2
+* = 24.626059 W.
+* Expected: out = 1.000000 W, ring_br = ring_bl = 24.626058 W. Here abstol (1e-8 sqrt(W)) is the binding
+* threshold: abstol / |E_ring| = 1e-8 / 4.9625 = 2.0e-9 > reltol, so the output error is about
+* 49 x 2.0e-9 = 1e-7 (the .tran variant ends at 0.99999990 W), below the 6 printed digits.
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=0.3872983346207417
+wg_ring ring_br ring_bl length=775e-6 neff=1 ng=1 att=0
+probe1 out
+.options timescale=-13 reltol=1e-9
+.op

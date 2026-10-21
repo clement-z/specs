@@ -51,6 +51,17 @@ void OPTIONSDirective::create() const
             }
             specsGlobalConfig.default_reltol = v;
         }
+        else if (kw == "SNAPFACTOR")
+        {
+            // B-021: emitted values with |E| < snapfactor * abstol become 0 (0 disables it)
+            const double v = p.second.as_double();
+            if (!(v >= 0))
+            {
+                cerr << "Error: .options: " << kw << " must be >= 0 (got " << v << ")" << endl;
+                exit(1);
+            }
+            specsGlobalConfig.default_snap_factor = v;
+        }
         else if (kw == "TS" || kw == "TIMESCALE")
         {
             // as_integer() truncates toward zero: check the truncated value

@@ -33,8 +33,12 @@
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)
 * SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
-* `doc/netlist.md`: nets, positional arguments and keywords of COUPLER, CWSRC, VLSRC, EVLSRC and PCMCELL
-  (complements the cheatsheet)
+* `doc/netlist.md`: nets, positional arguments and keywords of COUPLER, CROSSING, CWSRC, VLSRC, EVLSRC, PCMCELL
+  and PDET, and how probes trace in `.tran` (complements the cheatsheet)
+* `doc/numerics.md`: tolerances (the emission rule max(abstol, reltol·|last|), the snap to 0), the error of
+  resonators versus reltol and how to choose it, time resolution and delay rounding (B-021, B-124, B-014)
+* `.options snapfactor=<x>`: emitted fields with |E| < snapfactor·abstol are emitted as 0 (default 10, as
+  before; 0 disables the snap) (B-021)
 
 ### Fixed
 
@@ -95,6 +99,10 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   (they read 0 until the net's next event, so a CW path stayed at 0 in the VCD for the whole transient). Each
   probe samples its net when it is enabled at the start of the transient, after the operating point and any
   initial conditions (B-048; `doc/netlist.md`)
+* Delays that the time resolution rounds by more than 10 % (e.g. a 53 fs ring round trip run at 100 fs: +87 %), or
+  to 0 (the loop then collapses into one time step), are reported on stderr once per waveguide in `.tran` and
+  testbenches, with the `.options timescale` to use; they were rounded silently and the check meant to catch it
+  could never fire (B-014; an error for delays that round to 0 is pending, see `backlog/B-014-*.md`)
 
 ### Removed
 

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b124-allpass-ring-default-reltol"
+}

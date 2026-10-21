@@ -107,6 +107,8 @@ public:
     // Port options
     double default_abstol = 1e-8;
     double default_reltol = 1e-4;
+    // values with |E| < default_snap_factor * default_abstol are emitted as 0 (.options snapfactor, B-021)
+    double default_snap_factor = 10;
     sc_time::value_type default_resolution_multiplier = 1;
 
     // For multi-wavelength support
@@ -151,6 +153,8 @@ public:
             invalid("abstol must be > 0", default_abstol);
         if (!(default_reltol > 0))
             invalid("reltol must be > 0", default_reltol);
+        if (!(default_snap_factor >= 0))
+            invalid("snap factor must be >= 0", default_snap_factor);
         if (!(default_resolution_multiplier >= 1))
             invalid("resolution multiplier must be >= 1", default_resolution_multiplier);
         if (!(ONE_FS <= engine_timescale && engine_timescale <= ONE_SEC))

@@ -30,6 +30,7 @@ SPECSConfig::SPECSConfig(sc_module_name name)
     // Port options
     default_abstol = 1e-8;
     default_reltol = 1e-4;
+    default_snap_factor = 10;
     default_resolution_multiplier = 1;
 
     // Trace options
@@ -260,6 +261,7 @@ void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
     oop_default_config->m_mode = simulation_mode;
     oop_default_config->m_abstol = default_abstol;
     oop_default_config->m_reltol = default_reltol;
+    oop_default_config->m_snap_factor = default_snap_factor;
     oop_default_config->m_timestep_value = default_resolution_multiplier; // relative to systemc timestep
 
     // apply default config to all optical output ports which don't have one
