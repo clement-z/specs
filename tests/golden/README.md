@@ -211,26 +211,19 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   `vcd_ignore_values`, and the testbench prints them with 3 decimals (far
   above the noise), so its stdout, self-checks included, is reproducible.
   Reproducible seeds are planned (P4, F-01).
-* **Pointer-ordered iteration.** `sc_get_all_object_by_type<T>()` and
-  `sc_get_all_module_by_type<T>()` (`src/utils/sysc_utils.h`) return
-  `std::set<T*>`, so the following are listed in memory-address order:
-  * the operating-point listing (`printOPAnalysisResult`);
-  * the `--vci` dump;
-  * the detector names printed while setting up tracing.
-
-  The order is stable for a given binary (run-to-run identical), but changes
-  between builds (B-016). Line order is checked by default (B-126); the cases
-  whose order differs between the baseline and the gcc, clang and gcc `-O0`
-  Meson builds of 2026-10-21 (SystemC 3.0.2) declare `"unordered_streams":
-  ["stdout"]`: `cir/add_drop_pyspecs`, `cir/subckt_tests`, `opt/tracefile-o`,
-  `opt/multi-file`, `opt/vci`, `regress/b031-mzi-bidir`,
-  `regress/b006-empty-output`, `regress/b004-mode-fd-tran`. These exceptions go
-  away once iteration is name-ordered (F-01). An ASan/UBSan (clang, `-O0`)
-  build also reorders `cir/add_drop`, `cir/subckt_test`, `cir-json/add_drop`,
-  `opt/mode-fd`, `opt/tol-resolution-overrides`, `regress/b150-include-in-subckt`
-  and `err/b017-json-unwritable` (element creation order, "unidir backlog");
-  use `--lenient-order` for such builds. VCD comparison does not depend on
-  declaration order.
+* **Name-ordered iteration (F-01, sprint 2026-10b P4).** Until then,
+  `sc_get_all_object_by_type<T>()` / `sc_get_all_module_by_type<T>()`
+  (`src/utils/sysc_utils.h`) returned `std::set<T*>` and the parser created
+  backlog elements from a `std::set<const ParseElement*>`, so the OP listing,
+  the `--vci` dump, `init()` calls, auto-probes and VCD declarations, and the
+  "Creating ..." lines followed heap addresses and changed between builds
+  (B-016, B-176; 14 cases had to declare `unordered_streams`). Now the
+  collections are sorted by hierarchical name (`strcmp`) and elements are
+  created in netlist order, so every case checks its line order and no case
+  declares `unordered_streams`. The one-time re-record was proven to change
+  ordering only with `backlog/repro/p4-ordering-proof.py` (same lines with IDs
+  masked, same set of (signal, waveform) pairs). `unordered_streams` and
+  `--lenient-order` stay available for new nondeterminism.
 * **Cross-build check:** the same baseline passes for
   * CMake Release (GCC, `-O3`),
   * CMake Debug (`-O0`),
