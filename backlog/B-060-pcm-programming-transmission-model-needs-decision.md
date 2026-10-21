@@ -1,5 +1,5 @@
 # B-060: PCM programming/transmission model needs a decision (energy, steps, timing, tanh normalisation)
-severity: med | category: physics | effort: M | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: physics | effort: M | fix-class: needs-human | verdict: CONFIRMED | status: validation (point 5) fixed in c22ff40 (sprint 2026-10b P2); model points 1-4 deferred to PCM v2 (scout F-10)
 location: src/devices/pcm_device.cpp:56-83,102-131,144, src/devices/pcm_device.h:50-51
 ## Problem
 1. "energy_absorbed" integrates the incident power Σ P_in·Δt (:118-122), not the absorbed power ((1−T)·P_in or an absorption coefficient).
