@@ -35,6 +35,13 @@ Fresh gcc and clang builds; `meson test`; golden `--atol 0 --strict` against the
 every changed baseline file maps to an approved item; diff scope limited to the phase's items; then
 `git merge --no-ff` into `sprint/2026-10b` and update this board.
 
+## Heartbeats (survive usage limits)
+- Coordinator: paseo heartbeat `924bc5b5` (every 5 min, expires after 96 h) runs `discover/orchestration/heartbeat.py`,
+  which resumes limit-stopped phase agents itself and reports DONE/ATTENTION lines to the coordinator.
+  Registry of watched agents: `discover/orchestration/2026-10b/agents.json` (update when launching a phase).
+- Each phase orchestrator creates its own 5-min heartbeat (rule in `COMMON.md`) and deletes it after its report.
+- Delete the coordinator heartbeat in P8 (`paseo heartbeat delete 924bc5b5`).
+
 ## Resume (after a session limit or a new session)
 1. Read this board and `backlog/DECISIONS-2026-10-21.md`.
 2. `paseo ls` → running/idle phase agent; check its branch for the done marker and `Pn-progress.md`.
@@ -48,3 +55,4 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 ## Log
 - 2026-10-21 — decisions recorded (c4597b9); plan written; sanitizer option a chosen; awaiting "go".
 - 2026-10-21 — go; P1 launched (agent 6e49bae6, ws/harness).
+- 2026-10-21 — coordinator heartbeat 924bc5b5 (5 min) + heartbeat.py; phase agents set their own heartbeats.
