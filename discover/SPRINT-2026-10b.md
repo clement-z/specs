@@ -41,9 +41,9 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 3. If the agent stopped mid-phase: `paseo send --no-wait <id> "<resume, re-launch subagents, commit progress>"`.
 4. Re-arm the watcher: `python3 discover/orchestration/watch_agents.py <repo> <agent>:<branch>:<done marker>`.
 
-## Open point
-- Sanitizer job blocking (P7): with leak detection on, it cannot become clean (leaks at `exit()` on error paths;
-  SystemC never unwinds thread stacks). Awaiting maintainer choice (suppression file vs no leak check).
+## Decided open point
+- Sanitizer job blocking (P7): **option a** — LSan suppression file limited to leaks at `exit()` on error paths and
+  allocations owned by SystemC thread stacks; leak detection stays on otherwise.
 
 ## Log
-- 2026-10-21 — decisions recorded (c4597b9); plan written; awaiting "go".
+- 2026-10-21 — decisions recorded (c4597b9); plan written; sanitizer option a chosen; awaiting "go".

@@ -36,7 +36,9 @@ printed signal IDs): **all approved**, done first.
 | F-28 `.op`/`.dc` convergence | **Approved**: iteration cap, residual report, non-convergence error. |
 
 ## CI
-- **Approved**: make the sanitizer job blocking once it is clean (see open point below).
+- **Approved**: make the sanitizer job blocking once it is clean, using a LeakSanitizer suppression file limited to
+  (1) allocations still live at `exit()` on error paths and (2) allocations owned by SystemC thread stacks (never
+  unwound by SystemC). Leak detection stays on for everything else.
 - **Pass** (stay in backlog): ccache in CI; sanitizer job tuning.
 
 ## Execution
