@@ -1,5 +1,5 @@
 # B-032: Crossing S-matrix is not passive (in-phase crosstalk, |t|²+|x|² > 1, signed xtalk)
-severity: high | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED
+severity: high | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 04c7819 (sprint 2026-10b P3)
 location: src/devices/crossing.cpp:9-18, src/devices/crossing.cpp:62-74, src/devices/crossing.h:28-33, src/parser/parse_element.cpp:593-606
 ## Problem
 `CrossingUni` and `CrossingBi` compute `t = 10^(-att/20)` and `x = 10^(+xtalk/20)` and build S = [[t, x], [x, t]]

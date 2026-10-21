@@ -1,5 +1,5 @@
 # B-159: CrossingBi is never instantiated, despite DECLARE_BIDIR_ELEMENT
-severity: med | category: bug | effort: S | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: bug | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 04c7819 (sprint 2026-10b P3)
 location: src/parser/parse_element.cpp:576-590, src/parser/parse_element.h:87
 ## Problem
 `CrossingElement::create` always calls `INSTANTIATE(pt_helper, false)`. Unlike WG/DC, it never checks whether its

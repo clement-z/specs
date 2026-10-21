@@ -9,9 +9,9 @@ Base: `ws/devices` @ 51f0ca2 (= `sprint/2026-10b` after the P2 merge). Baseline 
 ## Items
 | # | item(s) | status | commit | notes |
 |---|---|---|---|---|
-| 1 | B-032 + B-033 + B-159 crossing | in progress | | implementer worktree `/tmp/P3-wt/crossing` (branch `P3-wip/crossing`) |
+| 1 | B-032 + B-033 + B-159 crossing | **done** | 04c7819 | from `P3-wip/crossing` 496818c; golden: 4 `b147-crossing-out-*` re-recorded (a/b/d slot split only), 5 new cases, gtest; 120/120 `--atol 0`; docs `doc/netlist.md` CROSSING |
 | 2 | B-049 + B-050 event-driven PDET | in progress | | `/tmp/P3-wt/pdet` (`P3-wip/pdet`) |
-| 3 | B-048 probe sampling (IC-proof) | in progress | | `/tmp/P3-wt/probes` (`P3-wip/probes`) |
+| 3 | B-048 probe sampling (IC-proof) | implemented, to integrate after item 2 | | `P3-wip/probes` 8521e6b (implementer done; 10 regress cases change, checker OK) |
 | 4 | B-021 + B-014 + B-124 numerics | in progress | | `/tmp/P3-wt/numerics` (`P3-wip/numerics`); docs after the code |
 
 ## Resume notes
