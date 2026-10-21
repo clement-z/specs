@@ -12,7 +12,7 @@ journal publication. Merges into `dev`/`master`, tags and pushes only on an expl
 ## Phases
 | # | Phase | Items | Workspace / branch | Model | Done marker | Blocked on | State |
 |---|---|---|---|---|---|---|---|
-| A | Decided follow-ups (v0.2.0) | B-146 land; B-014 error option (b); lexer integer overflow → parse error; zero tolerances allowed (≥ 0, warning when both 0) | `ws-followups` / `ws/followups` | Opus 5.5 xhigh | `backlog/sprint-2026-10c/PA-REPORT.md` | "go" | prepared |
+| A | Decided follow-ups (v0.2.0) | B-146 land; B-014 error option (b); 64-bit integer literals (overflow → parse error); zero tolerances allowed (≥ 0, warning when both 0) | `ws-followups` / `ws/followups` | Opus 5.5 xhigh | `backlog/sprint-2026-10c/PA-REPORT.md` | "go" | prepared |
 | B | Sanitizer CI (gcc ASan/UBSan) green | reproduce locally with gcc (runtimes now installed), fix (suppression or code), keep the job blocking | coordinator | Opus 5.5 | CI run green on all jobs | "go" | prepared |
 | C | v0.2.0 release prep | CHANGELOG `[0.2.0]`, version `0.2.0` in `meson.build`, `CITATION.cff` citing the ECOC paper (no DOI per version) | coordinator (or Sonnet) | Opus 5.5 | release-prep commit; **stop before tag/merge** | A, B | prepared |
 | D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 xhigh | `PD1-REPORT.md` | C | prepared (answers recorded, Q2/Q5/Q8 provisional) |
