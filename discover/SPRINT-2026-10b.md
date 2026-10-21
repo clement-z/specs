@@ -13,8 +13,8 @@
 | P4 | F-01 reproducible runs (fixes B-016) | seeds, name-ordered iteration, manifest | `ws-repro` / `ws/repro` (agent 87116f2a) | Opus 5.5 xhigh | `backlog/sprint-2026-10b/P4-REPORT.md` | done, merged (0dee6b2); lexer fix awaits sign-off |
 | P5 | F-28 + F-12 | `.op`/`.dc` convergence; netlist pack (SPICE semantics) | `ws-netlist` / `ws/netlist` (agent e01d0c83) | Opus 5.5 xhigh orch. | `backlog/sprint-2026-10b/P5-REPORT.md` | done, merged (43a50d7) |
 | P6 | F-05 outputs/tracing | `.save`, `--no-trace`, CSV/`.npz`, trace-all fallback | `ws-outputs` / `ws/outputs` (agent 5532f8fc) | Opus 5.5 high | `backlog/sprint-2026-10b/P6-REPORT.md` | done, merged |
-| P7 | CI: sanitizer job blocking | after P4 removes the ordering noise | coordinator | Opus 5.5 | CI green with blocking sanitizer job | done (8978bea); CI result in P8 |
-| P8 | Final docs + verification + push | cheatsheet/README/CHANGELOG, full re-verification, push branch | coordinator | Opus 5.5 | pushed `origin/sprint/2026-10b` | pending |
+| P7 | CI: sanitizer job blocking | after P4 removes the ordering noise | coordinator | Opus 5.5 | CI green with blocking sanitizer job | **open**: clean with clang ASan locally, but the gcc ASan job fails in CI (run 39561554077); no gcc ASan runtime on this machine |
+| P8 | Final docs + verification + push | cheatsheet/README/CHANGELOG, full re-verification, push branch | coordinator | Opus 5.5 | pushed `origin/sprint/2026-10b` | done: pushed e12b6be; final local check gcc/clang/clang-ASan meson test 12/12, golden 190/190 |
 
 Why sequential: P2–P6 all re-record golden outputs and touch `parse_element.cpp`/`specs.cpp`; one phase at a time
 keeps every baseline change attributable and avoids manifest/merge conflicts. P1 goes first because it changes the
@@ -68,3 +68,4 @@ every changed baseline file maps to an approved item; diff scope limited to the 
 - 2026-10-21 — P5 merged (43a50d7): gate = gcc+clang meson test 12/12, golden 176/176 `--atol 0`; vs pre-P5 baseline exactly 12 predicted cases (7 `.dc` old-prefix + stop point, 3 legacy path-only, help lines added). P6 launched (agent 5532f8fc).
 - 2026-10-21 — P6 merged: gate = gcc+clang meson test 12/12, golden 190/190 `--atol 0`; vs pre-P6 baseline exactly 28 predicted cases (26 auto-PROBE removal + traceall echo, 2 help). Agent phases done; P7 started by the coordinator.
 - 2026-10-21 — P7 done (8978bea): `tests/sanitizers/lsan.supp` (2 rules) via a Meson default test setup; clang ASan meson test 12/12 with leak detection on; an injected leak in `sc_main` fails 10/12 (still detected). CI job blocking. P8 started.
+- 2026-10-21 — P8: pushed `origin/sprint/2026-10b` @ e12b6be; heartbeat 924bc5b5 deleted. CI run 39561554077: gcc ✓, clang ✓, **asan+ubsan (gcc) ✗ (Test step)** — not reproducible here (no 64-bit libasan for gcc 11/13/14); logs need GitHub auth.
