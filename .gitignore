@@ -37,5 +37,5 @@ builddir/
 /subprojects/*
 !/subprojects/*.wrap
 !/subprojects/packagefiles/
-# install.sh / CI: SystemC build and install prefix
-.deps/
+# CI: compiler cache
+.ccache/

@@ -7,7 +7,8 @@ on:
 
 env:
   MESON_VERSION: "1.11.2"
-  SYSTEMC_PREFIX: ${{ github.workspace }}/.deps/systemc
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_MAXSIZE: 500M
 
 jobs:
   build-test:
@@ -24,19 +25,21 @@ jobs:
             cc: clang
             cxx: clang++
     env:
-      # CC too: SystemC compiles C and assembly (QuickThreads) with it, using flags chosen for $CXX
-      # (clang-only -Qunused-arguments breaks a gcc `cc`).
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
+      # CC too: the SystemC subproject compiles C and assembly (QuickThreads) with it, using flags
+      # chosen for $CXX (clang-only -Qunused-arguments breaks a gcc `cc`). ccache: Meson only adds
+      # it by itself when CC/CXX are unset.
+      CC: ccache ${{ matrix.cc }}
+      CXX: ccache ${{ matrix.cxx }}
     steps:
+      # Full history: the version comes from `git describe --tags` (utils/git-version.sh)
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          fetch-depth: 0
 
       - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ninja-build flex bison doxygen graphviz
+          sudo apt-get install -y --no-install-recommends ninja-build flex bison doxygen graphviz ccache
 
       - uses: actions/setup-python@v5
         with:
@@ -45,24 +48,22 @@ jobs:
       - name: Install meson
         run: python -m pip install "meson==${MESON_VERSION}"
 
-      - name: SystemC cache key
-        id: systemc
-        run: |
-          echo "sha=$(git -C thirdparty/systemc rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "cxx=$($CXX --version | head -n 1 | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache SystemC
+      # Wrap downloads (SystemC, args, gtest), and the compiler cache (SystemC is built every run)
+      - name: Cache wrap downloads
         uses: actions/cache@v4
         with:
-          path: .deps/systemc
-          key: systemc-${{ runner.os }}-${{ steps.systemc.outputs.sha }}-${{ steps.systemc.outputs.cxx }}
+          path: subprojects/packagecache
+          key: wraps-${{ hashFiles('subprojects/*.wrap') }}
 
-      # No-op when the cache was restored (stamp file check in the script)
-      - name: Build SystemC (C++20)
-        run: utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
+          restore-keys: ccache-${{ runner.os }}-${{ matrix.compiler }}-
 
       - name: Configure
-        run: meson setup build -Dnative=false -Dspx=true -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+        run: meson setup build -Dnative=false -Dspx=true
 
       - name: Build
         run: meson compile -C build
@@ -74,7 +75,8 @@ jobs:
         if: matrix.compiler == 'gcc'
         run: ninja -C build doc
 
-      # They need libsystemc.so.3.0 at run time (shipped here; use LD_LIBRARY_PATH)
+      # They need libsystemc.so.3.0 at run time (shipped here, from the SystemC subproject; use
+      # LD_LIBRARY_PATH)
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:
@@ -82,7 +84,7 @@ jobs:
           path: |
             build/specs
             build/libspx.so
-            .deps/systemc/lib*/libsystemc.so*
+            build/subprojects/systemc-*/libsystemc.so*
 
       - name: Upload documentation
         if: matrix.compiler == 'gcc'
@@ -105,17 +107,17 @@ jobs:
     runs-on: ubuntu-24.04
     # Blocking: LeakSanitizer suppressions in tests/sanitizers/lsan.supp (applied by meson test).
     env:
-      CC: gcc
-      CXX: g++
+      CC: ccache gcc
+      CXX: ccache g++
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          fetch-depth: 0
 
       - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ninja-build flex bison
+          sudo apt-get install -y --no-install-recommends ninja-build flex bison ccache
 
       - uses: actions/setup-python@v5
         with:
@@ -124,24 +126,22 @@ jobs:
       - name: Install meson
         run: python -m pip install "meson==${MESON_VERSION}"
 
-      - name: SystemC cache key
-        id: systemc
-        run: |
-          echo "sha=$(git -C thirdparty/systemc rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          echo "cxx=$($CXX --version | head -n 1 | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache SystemC
+      - name: Cache wrap downloads
         uses: actions/cache@v4
         with:
-          path: .deps/systemc
-          key: systemc-${{ runner.os }}-${{ steps.systemc.outputs.sha }}-${{ steps.systemc.outputs.cxx }}
+          path: subprojects/packagecache
+          key: wraps-${{ hashFiles('subprojects/*.wrap') }}
 
-      - name: Build SystemC (C++20)
-        run: utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-sanitizers-${{ github.sha }}
+          restore-keys: ccache-${{ runner.os }}-sanitizers-
 
       - name: Configure
         run: >
-          meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+          meson setup build -Dnative=false
           -Dbuildtype=debug -Db_sanitize=address,undefined -Db_lundef=false
 
       - name: Build
