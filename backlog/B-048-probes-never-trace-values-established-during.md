@@ -1,5 +1,5 @@
 # B-048: Probes never trace values established during the OP, so constant (CW) nets show 0 in .tran
-severity: high | category: bug | effort: XS | fix-class: needs-design | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 65129a7 (sprint 2026-10b P3)
 location: src/devices/probe.cpp:26-31,143-148, src/specs.cpp:79-87,208-216
 ## Problem
 `runTRANAnalysis()` first runs the OP with every PROBE/MLPROBE (and every auto-probe) disabled (specs.cpp:79-87).

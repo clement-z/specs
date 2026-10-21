@@ -11,7 +11,7 @@ Base: `ws/devices` @ 51f0ca2 (= `sprint/2026-10b` after the P2 merge). Baseline 
 |---|---|---|---|---|
 | 1 | B-032 + B-033 + B-159 crossing | **done** | 04c7819 | from `P3-wip/crossing` 496818c; golden: 4 `b147-crossing-out-*` re-recorded (a/b/d slot split only), 5 new cases, gtest; 120/120 `--atol 0`; docs `doc/netlist.md` CROSSING |
 | 2 | B-049 + B-050 event-driven PDET | **done** | be96f26 | from `P3-wip/pdet` 81ccd4c + tb self-check threshold 1e-7 → 1e-12 (0.3 % flake); golden: tb/det, tb/detector re-recorded (3/3, noisy readouts in vcd_ignore_values), 3 new cases, gtest; 123/123; docs `doc/netlist.md` PDET |
-| 3 | B-048 probe sampling (IC-proof) | implemented, to integrate after item 2 | | `P3-wip/probes` 8521e6b (implementer done; 10 regress cases change, checker OK) |
+| 3 | B-048 probe sampling (IC-proof) | **done** | 65129a7 | from `P3-wip/probes` 8521e6b; `applyInitialConditions()`/`ic_orders` before the probe enables; golden: 10 regress .tran cases re-recorded (t=0 OP values only, 2 checkers), 3 new, gtest; 126/126 |
 | 4 | B-021 + B-014 + B-124 numerics | in progress | | `/tmp/P3-wt/numerics` (`P3-wip/numerics`); docs after the code |
 
 ## Resume notes
