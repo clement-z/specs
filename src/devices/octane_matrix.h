@@ -52,6 +52,8 @@ public:
     // For internal octane_cell
     double m_meltEnergy;
     int m_nStates;
+    double m_Tc; /* PCM power transmission in the crystalline state */
+    double m_Ta; /* PCM power transmission in the amorphous state */
 
     // Wires
     vector<unique_ptr<sc_signal<OpticalSignal>>> m_optical_connect_horizontal;
@@ -78,15 +80,19 @@ public:
      * @param name name of the module
      * @param meltEnergy energy needed to amorphize by one step
      * @param nStates number of internal states supported by the PCM
+     * @param Tc power transmission (W/W) of the PCM in the crystalline state (required, no default)
+     * @param Ta power transmission (W/W) of the PCM in the amorphous state (required, no default)
      * */
     OctaneMatrix(sc_module_name name, std::size_t rows, std::size_t columns,
-                    double meltEnergy = 10e-12, int nStates = 63, bool isCompact = false)
+                    double meltEnergy, int nStates, double Tc, double Ta, bool isCompact = false)
         : sc_module(name)
         , m_rows(rows)
         , m_columns(columns)
         , m_isCompact(isCompact)
         , m_meltEnergy(meltEnergy)
         , m_nStates(nStates)
+        , m_Tc(Tc)
+        , m_Ta(Ta)
     {
 
         assert(rows > 0);

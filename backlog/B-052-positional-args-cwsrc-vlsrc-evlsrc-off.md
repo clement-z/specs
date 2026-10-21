@@ -1,5 +1,5 @@
 # B-052: Positional args of CWSRC/VLSRC/EVLSRC are off by one; PCMCELL Tc/Ta is blocked by assert
-severity: high | category: parser | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: high | category: parser | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in aaa02b3 (sprint 2026-10b P2)
 location: src/parser/parse_element.cpp:637-652,714-715,867-868,1202,1215-1218
 ## Problem
 - **CWSRC**: `args[1]` → WL, `args[2]` → power, `args[3]` → phase. `args[0]` is ignored, and `args[3]` is behind `assert(args.size() <= 3)`. `cwsrc1 in 1.55e-6 1e-3` therefore emits 0 W at λ = 1 mm.

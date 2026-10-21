@@ -21,7 +21,6 @@ core_sources += files(
   'power_meter.cpp',
   'probe.cpp',
   'splitter.cpp',
-  'time_monitor.cpp',
   'value_list_source.cpp',
   'waveguide.cpp',
 )

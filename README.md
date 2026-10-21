@@ -3,6 +3,8 @@
 For the moment, refer to [the online documentation](https://demo.zrounba.fr/specs/doc/index.html
 ) to see how to download and use SPECS, or try it from the browser on our [demonstration website](https://demo.zrounba.fr/specs)
 
+Netlist element arguments (e.g. COUPLER `k`/`kp`/`t`) are documented in [`doc/netlist.md`](doc/netlist.md).
+
 ## Building
 
 Requirements: a C++20 compiler (GCC ≥ 11 or clang), [Meson](https://mesonbuild.com) ≥ 1.3, Ninja, CMake,

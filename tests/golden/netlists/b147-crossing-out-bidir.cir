@@ -1,0 +1,23 @@
+* B-147 regression (repro: backlog/repro/a4-crossing-out-bidir.cir). The crossing output c
+* is on a bidirectional net: wg1 is bidirectional because e has 2 writers (wg1 and wg2). The
+* crossing outputs used to be bound as readers, so on c the crossing wrote the same signal as
+* wg1's backward output and wg1 read the other one: e:0 = e:1 = 0. They are now bound as
+* writers: wg1 (created first, while elaborating e) writes c:0 and reads c:1; crossing1 (the
+* second writer of c) writes c:1.
+* Expected, with the CURRENT crossing model (defaults att = 0 dB, no crosstalk: out1 = in1,
+* out2 = in2; P3 (B-032/B-033) changes the crossing model and may change these values);
+* waveguides: L = 1e-4 m, neff 2.2111, att 0: lossless,
+* phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped, 2*phi = 1.9052 rad:
+*   a = b = 1 mW at 0 (sources); d = 1 mW at 0 (crossing out2 = in2)
+*   c:1 = 1 mW at 0 (crossing out1 = in1); c:0 = 0 (nothing comes back from e)
+*   e:0 = 1 mW at phi (wg1 output); e:1 = 0
+*   f:0 = 1 mW at 2*phi (wg1's output, back through wg2); f:1 = 0
+* Same e:0 as with "coupler1 a b c d k=0" in place of the crossing.
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=1e-3
+crossing1 a b c d
+wg1 c e length=1e-4
+wg2 f e length=1e-4
+probe1 d
+.tran 1e-11

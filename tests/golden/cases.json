@@ -730,10 +730,11 @@
     "-f",
     "circuits/add_drop_pyspecs.cir"
    ],
-   "unordered_streams": [
+   "ignore_streams": [
     "stdout"
    ],
-   "note": "B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+   "expect": "fail",
+   "note": "B-002: sampled-time is not implemented (delayedWriteSampledTime() dropped every write): -m sampled-time is rejected with a clean error, exit 1 (was exit 0; before B-004 the .tran directive silently overrode the mode)"
   },
   {
    "id": "opt/mode-fd",
@@ -1081,6 +1082,619 @@
    ],
    "expect": "fail",
    "note": "B-131: --nrings_crow outside 1..1024 is rejected"
+  },
+  {
+   "id": "regress/b001-fd-multilambda-stale",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-001: multi-wavelength .op; a stale partial value of one wavelength used to be emitted as the converged value (m = o = 0.25 W at 1550 nm instead of 0.5625 W)"
+  },
+  {
+   "id": "regress/b052-cwsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-cwsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: CWSRC positional `wl power phi` (cwsrc1 a 1.55e-6 1e-3 0.5 -> 1550 nm, 1 mW, 0.5 rad; was 0 W at 1 mm)"
+  },
+  {
+   "id": "regress/b052-vlsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-vlsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: VLSRC positional values file is loaded (emissions at 100/200/300 ps; was silently ignored)"
+  },
+  {
+   "id": "regress/b052-evlsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-evlsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: EVLSRC positional values file is loaded (emissions at 100/200/300 ps; was silently ignored)"
+  },
+  {
+   "id": "regress/b052-pcmcell-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-pcmcell-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: PCMCELL positional `emelt n tc ta` (out = 0.85 mW at k=0, 0.9495 mW at k=n; was an assert abort in Debug)"
+  },
+  {
+   "id": "err/b052-cwsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-cwsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: CWSRC with 4 positional args gives a clean error (was an assert abort / args shifted with NDEBUG)"
+  },
+  {
+   "id": "err/b052-vlsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-vlsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: VLSRC with 2 positional args gives a clean error (was an assert abort / loaded the first file with NDEBUG)"
+  },
+  {
+   "id": "err/b052-evlsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-evlsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: EVLSRC with 2 positional args gives a clean error (was an assert abort / loaded the first file with NDEBUG)"
+  },
+  {
+   "id": "err/b052-pcmcell-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-pcmcell-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: PCMCELL with 5 positional args gives a clean error (at most 4: emelt n tc ta)"
+  },
+  {
+   "id": "regress/b051-pcmcell-tc-zero",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-tc-zero.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-051: tc/ta are a presence check: t_c=0 ep=1 (aliases) is valid; out = tanh(1.5) mW = 0.000905 W at k=5, n=10"
+  },
+  {
+   "id": "err/b051-pcmcell-no-tc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-no-tc.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-051: PCMCELL without tc gives a clean error (was fully opaque: constructor defaults Tc = Ta = 0)"
+  },
+  {
+   "id": "err/b051-pcmcell-no-ta",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-no-ta.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-051: PCMCELL without ta (tc given positionally) gives a clean error (was T(0) = tc, ta silently 0)"
+  },
+  {
+   "id": "regress/b060-pcmcell-k-eq-n",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-eq-n.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-060: k = n is a valid initial state (n=4 k=4 tc=0.2 ta=0.8: out = 0.2+0.6*tanh(3) mW = 0.000797 W)"
+  },
+  {
+   "id": "err/b060-pcmcell-n-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-n-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with n = -1 gives a clean error (was accepted, frozen state)"
+  },
+  {
+   "id": "err/b060-pcmcell-n-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-n-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with n = 0 keeps its existing error (PCM Cell needs values for both Emelt and Nstates)"
+  },
+  {
+   "id": "err/b060-pcmcell-k-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with initial state k = -1 gives a clean error (was accepted)"
+  },
+  {
+   "id": "err/b060-pcmcell-k-gt-n",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-gt-n.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with initial state k = n + 1 gives a clean error (was accepted)"
+  },
+  {
+   "id": "regress/b004-mode-fd-tran",
+   "args": [
+    "-m",
+    "fd",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "unordered_streams": [
+    "stdout"
+   ],
+   "note": "B-004: an explicit -m overrides the .tran default (time domain): the transient runs in frequency domain (NO_DELAY ports), i.e. a CW steady state at each source event (drop ~1 W from 500 ps to 2 ns, no ring build-up). B-126: stdout order depends on heap layout (pointer-ordered OP listing / --vci dump, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b004-mode-td-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-m",
+    "td",
+    "-f",
+    "tests/golden/netlists/b004-mode-td-op.cir"
+   ],
+   "note": "B-004: an explicit -m td is kept with .op (was overridden to frequency domain); the operating point is unchanged (OP runs every port in NO_DELAY mode)"
+  },
+  {
+   "id": "regress/b004-mode-td-dc",
+   "args": [
+    "-m",
+    "td",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "B-004: an explicit -m td is kept with .dc (was overridden to frequency domain); the sweep is unchanged (DC runs every port in NO_DELAY mode), only the printed and traced simulation_mode differ from cir/add_drop"
+  },
+  {
+   "id": "regress/b144-bidir-source-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-bidir-source-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: uni source created before a bidirectional WG on an explicit '&' net; the light now reaches the WG (out:0 = 1 W at -2.1890 rad, was 0). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-uni-writer-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-uni-writer-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: uni writer created first on a bidirectional net takes slot :0 (b:0 = 1 mW at -2.1890 rad, was 0); same values as b144-uni-writer-second. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-uni-writer-second",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-uni-writer-second.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: same circuit as b144-uni-writer-first, WG created first (b:0 = 1 mW at -2.1890 rad, unchanged by the fix). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-two-sources-one-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-two-sources-one-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: two sources on one net take slots :0 and :1 (a:0 = 1 mW, a:1 = 2 mW, exit 0; was E115, exit 1). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b144-three-writers",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-three-writers.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-144 known limitation (out of scope): three writers on one optical net still stop with SystemC E115, exit 1 (bidirectional() only tests m_writers_count == 2; validation is B-164)"
+  },
+  {
+   "id": "regress/b145-upgrade-reader",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: a bidirectional WG that writes a net with a uni reader already bound no longer swaps the signals (out = 1.3409 mW at 2.4261 rad, was 0.5 mW); same as b145-upgrade-reader-ref. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-reader-ref",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-ref.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: reference for b145-upgrade-reader without '&' (out = 1.3409 mW at 2.4261 rad). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-reader-case2",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-case2.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: counter-case, a bidirectional WG that reads the upgraded net still swaps (out = 1.3409 mW at -0.5209 rad, unchanged by the fix); same as b145-upgrade-reader-case2-ref. B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-reader-case2-ref",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-case2-ref.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: reference for b145-upgrade-reader-case2 without '&' (out = 1.3409 mW at -0.5209 rad). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b145-upgrade-roles",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-roles.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: role-aware upgrade for PSHIFT, COUPLER and MZI, writing (no swap) and reading (swap) the upgraded net; out_wps = out_r* = 4.5 mW, out_wdc = 3.38 mW, out_wmzi = 2.5 mW at 1.1071 rad (were 0 / 2 mW). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-bidir",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-bidir.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Values follow the current crossing model (P3, B-032/B-033, may change them). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-wg",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-wg.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-splitter",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-splitter.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-splitter-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-splitter-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Current crossing model (P3 may change it). B-126: stdout order depends on heap layout (pointer-ordered OP listing, B-016); remove unordered_streams once P4 (F-01) makes iteration name-ordered"
   }
  ]
 }

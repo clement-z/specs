@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b147-crossing-out-explicit-splitter-first.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b147-crossing-out-explicit-splitter-first"
+}

@@ -22,7 +22,7 @@
 * CI: GitHub Actions and GitLab CI on Ubuntu 24.04 with Meson (gcc and clang, golden check);
   `install.sh` rewritten for Meson
 * The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed)
-* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 80 `specs` cases
+* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 114 `specs` cases
   (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
   * Stricter by default (sprint 2026-10b, B-126..B-129): line order is checked (except per-case
     `unordered_streams`; `--lenient-order`), NEW/MISSING cases and an unrequested gtest skip fail
@@ -33,6 +33,8 @@
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)
 * SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
+* `doc/netlist.md`: nets, positional arguments and keywords of COUPLER, CWSRC, VLSRC, EVLSRC and PCMCELL
+  (complements the cheatsheet)
 
 ### Fixed
 
@@ -56,9 +58,30 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * Docs: Doxygen config/mainpage and stale `@param`/`@sa` references (B-083, B-100, B-102); KiCad symbol
   templates (B-082); `.gitignore` no longer hides new `circuits/*.cir` (B-114); flex/bison warnings (B-109, B-177)
 * gtest fork harness: pipe deadlock above 64 KiB, escaping assertions/exceptions (B-125); angle check (B-123)
+* Multi-wavelength `.op`/`.dc` (and the OP phase of `.tran`): a stale partial value of one wavelength could be
+  emitted as the converged result when another wavelength shared the output port (B-001)
+* Bidirectional (`&`) nets: one slot convention (every writer takes the next free slot), so light no longer
+  depends on the netlist line order: a source or other unidirectional writer listed before the bidirectional
+  device no longer loses its light, two sources on one net run (was E115), a net upgraded to bidirectional keeps
+  its reader on the device's output, and crossing outputs on bidirectional nets propagate (B-144, B-145, B-147)
+* Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
+  at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
+  positional arguments is a clean error (B-052)
+* PCMCELL requires `tc` and `ta` (a cell without them was silently opaque: Tc = Ta = 0); the C++ PCM
+  constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
+  parameters (B-051)
+* PCMCELL rejects `n` <= 0 and an initial state `k` outside [0, n] (B-060; the PCM model itself is unchanged)
+* COUPLER: `k` is documented as the field cross-coupling (P_cross = k²), `kp` the power ratio and `t` the through
+  field coefficient (`doc/netlist.md`; the paper's κ = 0.15 is a power ratio, i.e. `kp`); the misleading
+  per-instance "Warning: coupling power for DC currently set to field." is gone (B-037)
+* `-m sampled-time` is rejected with an error (it was not implemented and silently dropped every optical write);
+  an explicit `-m` now takes priority over the default mode of the netlist's `.op`/`.dc`/`.tran` (it was
+  silently overridden), e.g. `-m fd` runs a `.tran` in frequency domain (B-002, B-004)
 
 ### Removed
 
+* `--mon` and the `TimeMonitor` device: it shifted simulated time, stopped after initialisation in netlist runs
+  and called `exit(1)` on its first report (B-058; progress reporting is planned separately, scout F-15)
 * Dead code (see `backlog/cleanup/REPORT.md`): `do_circuit`/`raphael_main`, the unused `Ring`,
   `PowerProbe` and `PhaseProbe` devices, dead output-port and parser code, the duplicate
   `utils/draw_graph_from_json.py`, leftover debug prints on stdout

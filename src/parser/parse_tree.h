@@ -735,11 +735,26 @@ struct ParseTreeCreationHelper {
     // return next element which is connected to "net_name" and doesnt have a corresponding module in circuit_modules
     vector<ParseElement *>::iterator next_fresh_element_bound_to(const string &net_name, const set<const ParseElement *> &excludes = {});
 
-    // upgrade a signal to bidirectional
-    void upgrade_signal(const string &name);
+    // upgrade a signal to bidirectional (called by a bidirectional device
+    // before connect_bi(); device_writes_net is the role of the device on
+    // that net in its unidirectional variant: true for an output, false for
+    // an input)
+    void upgrade_signal(const string &name, bool device_writes_net);
 
     // Create signals connected to a given element
     void create_signals(const ParseElement *elem);
+
+    // Slot convention on a bidirectional net (two signals, net:0 and net:1):
+    // - every writer takes the next free slot, in creation order: the first
+    //   port that writes the net (uni writer or bidir device) writes net:0,
+    //   the second one writes net:1; a third writer is an error;
+    // - a bidir device (connect_bi) reads the other slot, i.e. what the other
+    //   side writes;
+    // - a uni reader (connect_uni) reads net:0 while the net has 0 or 1
+    //   writers, net:1 once it has 2: with 2 writers, which one it reads
+    //   depends on the creation order;
+    // - upgrade_signal() keeps this convention when a net created as
+    //   unidirectional, with ports already bound to it, becomes bidirectional.
 
     // Connect a port to a signal using the net name
     template <typename signal_type, typename port_type>
@@ -781,10 +796,11 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
             exit(2);
         }
 
-        int i_write = pt->nets.at(net_name).m_connect_writer_count;
-        i_write = max(i_write, 1);// If there are already 2 writers, act as a reader for the second one (imitate the second writer but only as a reader)
-        int i_read = (i_write + 1) % 2;
-        int i = as_writer ? i_write : i_read;
+        // a writer takes the next free slot; a reader reads net:0 (the first
+        // writer's slot) until there are 2 writers, then net:1
+        int n_writers = pt->nets.at(net_name).m_connect_writer_count;
+        int i_read = (max(n_writers, 1) + 1) % 2;
+        int i = as_writer ? n_writers : i_read;
 
         sig_raw = circuit_signals.at(net_name)[i].get();
         sig = dynamic_cast<signal_type *>(sig_raw);
@@ -833,7 +849,8 @@ void ParseTreeCreationHelper::connect_bi(port_in_type &p_in, port_out_type &p_ou
             exit(1);
         }
 
-        // First get the signal to be written or read (in the right order)
+        // First get the signal to be written (next free slot) and the one
+        // to be read (the other slot)
         int i_write = pt->nets.at(net_name).m_connect_writer_count;
         int i_read = (i_write + 1) % 2;
 

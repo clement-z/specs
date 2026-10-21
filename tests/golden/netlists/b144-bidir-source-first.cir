@@ -1,0 +1,14 @@
+* B-144 regression (repro: backlog/repro/a2-bidir-source-first.cir): a uni source created
+* before a bidirectional device on an explicit '&' net. Uni writers used to always take slot
+* :1, which the device (the second writer) then wrote as well, so no light reached the
+* device: in:1 = 1 W, out:0 = out:1 = 0 W.
+* Next-free-slot convention: cwsrc1 (first writer of in) writes in:0; wg1 (second writer)
+* writes in:1 and reads in:0.
+* Expected (.op; wg1 has the default length 1e-4 m, neff 2.2111, att 0 dB/cm: lossless):
+*   in:0  = 1 W at 0 rad (cwsrc1); in:1 = 0 (wg1 backward output, nothing comes back)
+*   out:0 = 1 W at phi = 2*pi*neff*L/lambda = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad
+*           = -2.1890 rad wrapped (wg1 output; wg1 is the first writer of out); out:1 = 0
+cwsrc1 in wl=1.55e-6 power=1
+wg1 in& out
+probe1 out
+.op

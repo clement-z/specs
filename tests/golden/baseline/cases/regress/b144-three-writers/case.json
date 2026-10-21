@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-three-writers.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "regress/b144-three-writers"
+}

@@ -5,7 +5,6 @@
 #include <args.hxx>
 
 #include "optical_signal.h"
-#include "devices/time_monitor.h"
 #include "tb/alltestbenches.h"
 #include "utils/strutils.h"
 
@@ -174,10 +173,6 @@ int sc_main(int argc, char *argv[])
                           "list_tests",
                           "List available testbenches",
                           { 'p', "list-testbenches" });
-    args::Flag add_time_monitor(parser,
-                          "add_time_monitor",
-                          "Monitor simulation status",
-                          { "mon" });
     args::ValueFlag<string> test(
         parser,
         "test_name",
@@ -219,8 +214,9 @@ int sc_main(int argc, char *argv[])
         }
         else if (strutils::iequals(s, "sampled-time"))
         {
-            cout << "Optical ports working in sampled-time mode by default" << endl;
-            specsGlobalConfig.simulation_mode = OpticalOutputPortMode::SAMPLED_TIME;
+            // B-002: OpticalOutputPort::delayedWriteSampledTime() is a TODO that drops every write
+            cerr << "Error: sampled-time mode is not implemented" << endl;
+            return 1;
         }
         else if (strutils::iequals(s, "frequency-domain") || strutils::iequals(s, "fd"))
         {
@@ -232,6 +228,8 @@ int sc_main(int argc, char *argv[])
             cerr << "Unknown mode: '" << s << "'" << endl;
             return 1;
         }
+        // B-004: an explicit -m takes priority over the default mode of the netlist's analysis
+        specsGlobalConfig.simulation_mode_explicit = true;
     }
 
     if (set_reltol) {
@@ -296,14 +294,6 @@ int sc_main(int argc, char *argv[])
         cout << "Using trace file: " << set_tracefile.Get() << endl;
         // TODO: validate filename
         specsGlobalConfig.trace_filename = set_tracefile.Get();
-    }
-
-    shared_ptr<TimeMonitor> tm;
-    if (add_time_monitor) {
-        if (specsGlobalConfig.simulation_mode == OpticalOutputPortMode::FREQUENCY_DOMAIN)
-            tm = make_shared<TimeMonitor>("TM", 0, 0.5);
-        else
-            tm = make_shared<TimeMonitor>("TM", 1e-14, 0.5);
     }
 
     if (file) {

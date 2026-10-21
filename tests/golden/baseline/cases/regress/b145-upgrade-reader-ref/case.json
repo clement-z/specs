@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b145-upgrade-reader-ref.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 3445,
+   "kind": "vcd",
+   "sha256": "0b2b7632100ad8d0b5236ca397821d694cbcfb47b0c28ce899534b0ce73c679a",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b145-upgrade-reader-ref"
+}

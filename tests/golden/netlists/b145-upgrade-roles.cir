@@ -1,0 +1,55 @@
+* B-145 regression: upgrade_signal() on a net with a uni reader already bound, for the other
+* bidirectional devices (PSHIFT, COUPLER, MZI; WG is covered by b145-upgrade-reader*).
+* The swap depends on the role of the device on the upgraded net c_*, as in its uni variant:
+* W sub-circuits: the device WRITES c_w* (an output): no swap; R sub-circuits: the device
+* READS c_r* (an input): swap, so the reader reads the net's next writer (cwsrc_r*_c).
+* In each sub-circuit, merger_* reads a_*& (explicit bidir), so it is created first, while
+* elaborating a_*, and binds c_* as a reader before the device (bidirectional because of
+* e_*& or n_rmzi&) upgrades c_*. cwsrc_*_a is the first writer of a_* (slot a_*:0).
+* Before the fix: W out = 0 (B-144: cwsrc_w*_a wrote a_w*:1, merger read a_w*:0; B-145:
+* merger left on the half of c_w* nobody writes); R out = 2 mW (c read, a lost by B-144).
+* Expected (fields in sqrt(mW); merger: out = (in1 + in2)/sqrt2; inputs: a_* = 1 mW at 0,
+* e_w* and c_r* = 4 mW at 0, i.e. fields 1 and 2):
+*   PSHIFT (sensitivity 1 rad/V, v unconnected: 0 V, att 0): transmission 1
+*     c_wps = 4 mW at 0 -> out_wps = |2 + 1|^2/2 = 4.5 mW at 0
+*     e_rps:0 = 4 mW at 0
+*   COUPLER k=0.6 (field cross coupling): through t = sqrt(1 - 0.36) = 0.8 at 0 rad,
+*     cross 0.6 at pi/2
+*     c_wdc = |0.8*2|^2 = 2.56 mW at 0, d_wdc:0 = |0.6*2|^2 = 1.44 mW at 1.5708 rad
+*       -> out_wdc = |1.6 + 1|^2/2 = 3.38 mW at 0
+*     e_rdc:0 = 2.56 mW at 0, d_rdc:0 = 1.44 mW at 1.5708 rad
+*   MZI (defaults: 50/50 couplers, zero-length arms, 0 V: both arms in phase), input E on in1:
+*     out1 = E (t^2 - k^2) = 0, out2 = E (2 j t k) = j E
+*     c_wmzi (out2) = 4 mW at pi/2 = 1.5708 rad, d_wmzi (out1) = 0
+*       -> out_wmzi = |2j + 1|^2/2 = 2.5 mW at atan(2) = 1.1071 rad
+*     e_rmzi:0 (out2) = 4 mW at 1.5708 rad, d_rmzi = 0 (the MZI is bidirectional only through
+*     its input nets, B-038, hence n_rmzi&)
+*   R sub-circuits: c_r* = 4 mW at 0 (cwsrc_r*_c) -> out_r* = |2 + 1|^2/2 = 4.5 mW at 0;
+*     c_r*:1 = 0 (the device's backward output)
+* W: the device writes c_w*
+cwsrc_wps_a a_wps wl=1.55e-6 power=1e-3
+merger_wps c_wps a_wps& out_wps
+cwsrc_wps_e e_wps wl=1.55e-6 power=4e-3
+pshift_wps e_wps& c_wps v_wps
+cwsrc_wdc_a a_wdc wl=1.55e-6 power=1e-3
+merger_wdc c_wdc a_wdc& out_wdc
+cwsrc_wdc_e e_wdc wl=1.55e-6 power=4e-3
+coupler_wdc e_wdc& n_wdc c_wdc d_wdc k=0.6
+cwsrc_wmzi_a a_wmzi wl=1.55e-6 power=1e-3
+merger_wmzi c_wmzi a_wmzi& out_wmzi
+cwsrc_wmzi_e e_wmzi wl=1.55e-6 power=4e-3
+mzi_wmzi e_wmzi& n_wmzi d_wmzi c_wmzi v_wmzi
+* R: the device reads c_r*, listed before the net's uni writer cwsrc_r*_c
+cwsrc_rps_a a_rps wl=1.55e-6 power=1e-3
+merger_rps c_rps a_rps& out_rps
+pshift_rps c_rps e_rps& v_rps
+cwsrc_rps_c c_rps wl=1.55e-6 power=4e-3
+cwsrc_rdc_a a_rdc wl=1.55e-6 power=1e-3
+merger_rdc c_rdc a_rdc& out_rdc
+coupler_rdc c_rdc n_rdc e_rdc& d_rdc k=0.6
+cwsrc_rdc_c c_rdc wl=1.55e-6 power=4e-3
+cwsrc_rmzi_a a_rmzi wl=1.55e-6 power=1e-3
+merger_rmzi c_rmzi a_rmzi& out_rmzi
+mzi_rmzi c_rmzi n_rmzi& d_rmzi e_rmzi v_rmzi
+cwsrc_rmzi_c c_rmzi wl=1.55e-6 power=4e-3
+.op

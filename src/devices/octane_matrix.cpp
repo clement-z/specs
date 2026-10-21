@@ -135,7 +135,7 @@ void OctaneMatrix::init()
                     __outname("SEG_", i, j),
                     term_row, term_col,
                     coupling_through_row, coupling_through_col,
-                    m_meltEnergy, m_nStates, m_isCompact
+                    m_meltEnergy, m_nStates, m_Tc, m_Ta, m_isCompact
                     );
             temp_segment->init(); // mandatory initialization
             m_segment.push_back(std::move(temp_segment));

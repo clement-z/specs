@@ -50,6 +50,13 @@ void OpticalOutputPort::applyConfig() {
         cerr << "Did you forget to run prepareSimulation() ?" << endl;
         exit(1);
     }
+    if (m_config->m_mode == OpticalOutputPortMode::SAMPLED_TIME)
+    {
+        // B-002: delayedWriteSampledTime() is a TODO that drops every write. Rejected
+        // here, at configuration time, rather than in delayedWrite() (per event)
+        cerr << "Error: " << name() << ": sampled-time mode is not implemented" << endl;
+        exit(1);
+    }
 
     m_temporal_resolution = sc_time::from_value(m_config->m_timestep_value);
     m_mode = m_config->m_mode;
@@ -215,7 +222,7 @@ void OpticalOutputPort::delayedWriteSampledTime(const OpticalSignal &value, cons
     (void)value;
     (void)delay;
     (void)resolution_multiplier;
-    // TODO
+    // TODO (until then, SAMPLED_TIME is rejected by SPECSConfig::verifyConfig() and applyConfig(), B-002)
     // Goal here will be to manage, maybe, some averaging
     // i.e. when we output sampled-time, if we receive event-driven signals, we convert them
     // to sampled-time by averaging over the timestep and emitting the average
@@ -227,27 +234,24 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
     //    return;
 
     const sc_time &now = sc_time_stamp();
-    if (m_queue.empty() || m_queue.cbegin()->first != now) {
-        // if the queue is empty, or contains no event for current time,
-        // push the signal directly
+
+    // find a scheduled signal with this timestamp and this lambda anywhere in
+    // the queue, not only at its top: another wavelength can be on top (B-001)
+    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&now](const auto &x) {
+            return now == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
+            });
+
+    if (it == m_queue.end()) {
+        // if not, schedule the signal for the current time
         m_queue.push(make_pair(now, value));
         m_event_queue.notify(SC_ZERO_TIME);
     }
     else {
-        // if the queue is contains an event for current time
-        if (m_queue.cbegin()->second.m_wavelength_id == value.m_wavelength_id) {
-            // if wavelengths are equal, just replace or sum with the old one
-            if (m_use_deltas)
-                m_queue.begin()->second += value;
-            else
-                m_queue.begin()->second = value;
-            //m_event_queue_fd.cancel_all();
-            //m_event_queue_fd.notify(SC_ZERO_TIME);
-        } else {
-            // otherwise just schedule event separately
-            m_queue.push(make_pair(now, value));
-            m_event_queue.notify(SC_ZERO_TIME);
-        }
+        // if yes, just replace or sum with the old one
+        if (m_use_deltas)
+            it->second += value;
+        else
+            it->second = value;
     }
 }
 

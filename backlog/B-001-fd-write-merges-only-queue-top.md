@@ -1,5 +1,5 @@
 # B-001: FD write merges only with the queue top: stale per-λ value wins in multi-λ OP/DC
-severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in b2bd836 (sprint 2026-10b P2)
 location: src/optical_output_port.cpp:371-405, src/utils/pqueue.h:12, src/optical_signal.h:120-123
 ## Problem
 In NO_DELAY mode (every `.op`/`.dc`, and the OP phase of `.tran`), `immediateWriteFrequencyDomain` checks only

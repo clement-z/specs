@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b052-cwsrc-args.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b052-cwsrc-args"
+}

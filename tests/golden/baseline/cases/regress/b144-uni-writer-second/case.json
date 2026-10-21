@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-uni-writer-second.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1959,
+   "kind": "vcd",
+   "sha256": "d5aeef5865dfc112c6d244a95bc7f698611691ef29d53eaa9453c149865950ae",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b144-uni-writer-second"
+}

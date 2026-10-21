@@ -30,6 +30,16 @@
   "err/b034-coupler-k-gt-1",
   "err/b034-coupler-kp-negative",
   "err/b034-splitter-ratio-gt-1",
+  "err/b051-pcmcell-no-ta",
+  "err/b051-pcmcell-no-tc",
+  "err/b052-cwsrc-args",
+  "err/b052-evlsrc-args",
+  "err/b052-pcmcell-args",
+  "err/b052-vlsrc-args",
+  "err/b060-pcmcell-k-gt-n",
+  "err/b060-pcmcell-k-negative",
+  "err/b060-pcmcell-n-negative",
+  "err/b060-pcmcell-n-zero",
   "err/b064-evlsrc-missing-file",
   "err/b131-nrings-crow-zero",
   "err/b148-crossing-args",
@@ -59,10 +69,34 @@
   "opt/tol-resolution-overrides",
   "opt/tracefile-o",
   "opt/vci",
+  "regress/b001-fd-multilambda-stale",
+  "regress/b004-mode-fd-tran",
+  "regress/b004-mode-td-dc",
+  "regress/b004-mode-td-op",
   "regress/b006-empty-output",
   "regress/b031-mzi-bidir",
   "regress/b036-vci-crow",
+  "regress/b051-pcmcell-tc-zero",
+  "regress/b052-cwsrc-positional",
+  "regress/b052-evlsrc-positional",
+  "regress/b052-pcmcell-positional",
+  "regress/b052-vlsrc-positional",
+  "regress/b060-pcmcell-k-eq-n",
   "regress/b131-nrings-crow",
+  "regress/b144-bidir-source-first",
+  "regress/b144-three-writers",
+  "regress/b144-two-sources-one-net",
+  "regress/b144-uni-writer-first",
+  "regress/b144-uni-writer-second",
+  "regress/b145-upgrade-reader",
+  "regress/b145-upgrade-reader-case2",
+  "regress/b145-upgrade-reader-case2-ref",
+  "regress/b145-upgrade-reader-ref",
+  "regress/b145-upgrade-roles",
+  "regress/b147-crossing-out-bidir",
+  "regress/b147-crossing-out-explicit-splitter",
+  "regress/b147-crossing-out-explicit-splitter-first",
+  "regress/b147-crossing-out-explicit-wg",
   "regress/b150-include-in-subckt",
   "regress/b156-many-includes",
   "tb/ac_add_drop",
@@ -280,6 +314,72 @@
    "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|opt/mode-fd|opt/mode-sampled-time|opt/multi-file|opt/tol-resolution-overrides|opt/tracefile-o|opt/vci|regress/b006-empty-output|regress/b031-mzi-bidir|regress/b150-include-in-subckt|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg)$",
    "gtest": false,
    "note": "B-129: printed OpticalSignal IDs replaced by first-appearance ranks [#k] (canonical_ids); stored files rewritten in place, not re-run: line order and values unchanged"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T01:58:51Z",
+   "only": "^regress/b001-fd-multilambda-stale$",
+   "gtest": false,
+   "note": "B-001: new case, multi-wavelength .op FD queue merge (m = o = 0.5625 W at 1550 nm)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T01:59:10Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "B-001: new gtest OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:25:14Z",
+   "only": "^(regress|err)/b052-",
+   "gtest": false,
+   "note": "B-052: new cases, positional args of CWSRC/VLSRC/EVLSRC/PCMCELL and too-many-args errors"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:26:47Z",
+   "only": "^(regress|err)/b051-",
+   "gtest": false,
+   "note": "B-051: new cases, PCMCELL requires tc/ta (tc=0 valid)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:27:57Z",
+   "only": "^(regress|err)/b060-",
+   "gtest": false,
+   "note": "B-060: new cases, PCMCELL n > 0 and 0 <= k <= n"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:27:57Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "B-060: new gtests PCMElementDeathTest.*"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:30:10Z",
+   "only": "^(opt/mode-sampled-time|regress/b004-mode-(fd-tran|td-op|td-dc))$",
+   "gtest": false,
+   "note": "B-002/B-004: -m sampled-time is a clean error (exit 1); new cases: explicit -m overrides the analysis default mode (-m fd .tran, -m td .op/.dc)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:30:10Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "B-002: new gtest OpticalOutputPortDeathTest.ApplyConfigRejectsSampledTime"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:31:34Z",
+   "only": "^cli/(help|no-args)$",
+   "gtest": false,
+   "note": "B-058: --mon removed from the help text (TimeMonitor removed)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:35:03Z",
+   "only": "^regress/b14[457]-",
+   "gtest": false,
+   "note": "B-144/B-145/B-147: new cases, next-free-slot convention on bidirectional nets (hand-checked values in the netlist headers)"
+  },
+  {
+   "recorded_at_utc": "2026-10-21T02:37:13Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/paul_3ring_puf|cir/subckt_tests|regress/b150-include-in-subckt|cir-json/add_drop|cir-json/add_drop_pyspecs|cir-json/subckt_tests|opt/tracefile-o|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|opt/vci|regress/b006-empty-output|err/b017-json-unwritable|regress/b004-mode-fd-tran|regress/b004-mode-td-op|regress/b004-mode-td-dc|regress/b145-upgrade-roles|err/b034-coupler-k-gt-1|err/b034-coupler-kp-negative)$",
+   "gtest": false,
+   "note": "B-037: the per-instance 'Warning: coupling power for DC currently set to field.' line is removed from stdout (verified: the only difference)"
   }
  ]
 }

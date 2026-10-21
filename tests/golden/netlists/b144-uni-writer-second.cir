@@ -1,0 +1,13 @@
+* B-144 regression (repro: backlog/repro/a4-uni-writer-second.cir): same circuit as
+* b144-uni-writer-first with the waveguide listed, and created, first. This order worked
+* before the fix and must not change.
+* Next-free-slot convention: wg1 (first writer of a) writes a:0 and reads a:1; cwsrc1
+* (second writer) writes a:1.
+* Expected (wg1: L = 1e-4 m, default neff 2.2111, att 0 dB/cm: lossless):
+*   a:1 = 1 mW at 0 rad (cwsrc1); a:0 = 0 (wg1 forward output, nothing enters b)
+*   b:0 = 1 mW at phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped; b:1 = 0
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+wg1 b a length=1e-4
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 b
+.tran 1e-11

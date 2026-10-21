@@ -1,0 +1,6 @@
+* B-052: CWSRC positional arguments are `wl power phi` (indexed from the first
+* argument; they used to be read from the second one, so this line emitted 0 W at
+* lambda = 1 mm). Phase in rad (CWSource::setPhase, std::polar).
+* Expected: ROOT/a = 1550 nm, 0.031623 sqrt(W) = sqrt(1e-3), 0.001000 W, 0.5000 rad.
+cwsrc1 a 1.55e-6 1e-3 0.5
+.op

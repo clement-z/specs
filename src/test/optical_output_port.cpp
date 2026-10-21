@@ -84,3 +84,54 @@ TEST(OpticalOutputPort, KeepsValueQueuedBeforeThreadStart)
     }
     SPECS_TEST_FOOTER();
 }
+
+// A frequency-domain write must merge with the queued value of the same
+// (time, wavelength) even when another wavelength is on top of the queue
+// (was: a second entry was pushed and the stale one could pop last, B-001).
+TEST(OpticalOutputPort, FrequencyDomainWriteMergesBehindQueueTop)
+{
+    SPECS_TEST_HEADER()
+    {
+        OOPHarness h("h");
+        auto &oop = h.m_out_writer;
+
+        const OpticalSignal a_old(OpticalSignal::field_type(0.1, 0), 1.55e-6);
+        const OpticalSignal b(OpticalSignal::field_type(2, 0), 1.56e-6);
+        const OpticalSignal a_new(OpticalSignal::field_type(0.5, 0), 1.55e-6);
+
+        oop.immediateWriteFrequencyDomain(a_old);
+        oop.immediateWriteFrequencyDomain(b);
+        // equal-time entries pop larger |E| first: b is now on top
+        ASSERT_EQ(oop.m_queue.top().second.m_wavelength_id, b.m_wavelength_id);
+        oop.immediateWriteFrequencyDomain(a_new);
+
+        ASSERT_EQ(oop.m_queue.size(), 2u);
+        int n_a = 0;
+        for (auto it = oop.m_queue.begin(); it != oop.m_queue.end(); ++it)
+        {
+            if (it->second.m_wavelength_id != a_new.m_wavelength_id)
+                continue;
+            ++n_a;
+            EXPECT_EQ(it->second.m_field, a_new.m_field);
+        }
+        EXPECT_EQ(n_a, 1);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// Sampled-time mode is not implemented (delayedWriteSampledTime() drops every
+// write): a port configured with it must be rejected when the configuration is
+// applied, with a clean error and exit 1, not per event (B-002).
+TEST(OpticalOutputPortDeathTest, ApplyConfigRejectsSampledTime)
+{
+    SPECS_TEST_HEADER()
+    {
+        OOPHarness h("h");
+        auto config = make_shared<OpticalOutputPortConfig>();
+        config->m_mode = OpticalOutputPortMode::SAMPLED_TIME;
+        h.m_out_writer.setConfig(config);
+
+        EXPECT_EXIT(h.m_out_writer.applyConfig(), testing::ExitedWithCode(1), "sampled-time mode is not implemented");
+    }
+    SPECS_TEST_FOOTER();
+}

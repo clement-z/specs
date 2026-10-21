@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-two-sources-one-net.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1463,
+   "kind": "vcd",
+   "sha256": "956fd19b7d5b6ea25a574c8255a3423a5e426b0d59a7246b03215d6fab9948af",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b144-two-sources-one-net"
+}

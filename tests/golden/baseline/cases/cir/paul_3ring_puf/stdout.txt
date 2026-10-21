@@ -103,7 +103,6 @@ Done (flattening)
 Done with bidirectional nets
 Elaborating network of ROOT/XAD_BOT_1/ring_bl...
 Creating ROOT/XAD_BOT_1/COUPLER1 (reason: connection to unidir net)
-Warning: coupling power for DC currently set to field.
 Done creating ROOT/XAD_BOT_1/COUPLER1
 Creating ROOT/XAD_BOT_1/WG_RING_L (reason: unidir backlog)
 Done creating ROOT/XAD_BOT_1/WG_RING_L

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-bidir-source-first.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b144-bidir-source-first"
+}

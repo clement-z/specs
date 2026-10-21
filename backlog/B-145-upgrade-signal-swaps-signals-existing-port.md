@@ -1,5 +1,5 @@
 # B-145: upgrade_signal swaps signals when the existing port is a reader, so it loses the light
-severity: high | category: bug | effort: XS | fix-class: needs-design | verdict: CONFIRMED
+severity: high | category: bug | effort: XS | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 6d6bf9c (sprint 2026-10b P2): next-free-slot convention
 location: src/parser/parse_tree.cpp:230-237
 ## Problem
 `upgrade_signal()` adds a second signal when a bidirectional device joins a net that was created unidirectional and

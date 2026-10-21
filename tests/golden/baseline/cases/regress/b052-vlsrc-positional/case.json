@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b052-vlsrc-positional.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 1494,
+   "kind": "vcd",
+   "sha256": "523a8c93d66dbd7d72e1c3908a701f8225fffed4d9fd6e4d70c844e34fe9d6a6",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b052-vlsrc-positional"
+}

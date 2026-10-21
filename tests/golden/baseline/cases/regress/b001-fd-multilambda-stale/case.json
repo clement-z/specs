@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b001-fd-multilambda-stale"
+}

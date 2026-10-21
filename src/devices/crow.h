@@ -27,7 +27,7 @@ public:
     double m_neff = 2.2;
     double m_ng = 4.3;
     double m_loss_db_cm = 2;
-    double m_coupling_through = 0.85;
+    double m_coupling_through = 0.85; // power ratio to the through port of each coupler (P_cross = 0.15 = kappa in the paper)
 
     // Wires
     vector<shared_ptr<sc_signal<OpticalSignal>>> S_TL;

@@ -1,0 +1,11 @@
+{
+ "args": [
+  "-m",
+  "td",
+  "-f",
+  "tests/golden/netlists/b004-mode-td-op.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b004-mode-td-op"
+}

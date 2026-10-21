@@ -1,0 +1,18 @@
+{
+ "args": [
+  "-m",
+  "fd",
+  "-f",
+  "circuits/add_drop_pyspecs.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.vcd": {
+   "bytes": 4530,
+   "kind": "vcd",
+   "sha256": "477f78c5efc12818d87fa36cc00985c4578cc6c4e2c788295f1a88353f887583",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b004-mode-fd-tran"
+}

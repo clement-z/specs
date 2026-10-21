@@ -73,5 +73,5 @@ private:
     }
 
     double m_insertion_loss;
-    double m_k_power; // power coupling factor (1-k = transmission factor)
+    double m_k_power; // cross-coupling POWER ratio (P_cross = k_power, P_through = 1 - k_power)
 };

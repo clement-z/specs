@@ -30,7 +30,6 @@
 /**              Utilities                      **/
 /** ******************************************* **/
 #include "devices/probe.h"
-#include "devices/time_monitor.h"
 #include "devices/power_meter.h"
 #include "devices/subcircuit_instance.h"
 

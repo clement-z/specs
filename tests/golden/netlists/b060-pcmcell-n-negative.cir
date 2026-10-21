@@ -1,0 +1,5 @@
+* B-060: PCMCELL rejects n <= 0 (T(k) divides by n; a negative n froze the state).
+* Expected: Error (ROOT/PCMCELL1): the number of states n must be > 0 (got -1)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=-1 tc=0.85 ta=0.95
+.op

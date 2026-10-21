@@ -7,6 +7,27 @@
 
 using namespace std;
 
+void PCMElement::check_parameters() const
+{
+    // The model divides by n and only steps the state up to n (B-060)
+    if (m_nStates <= 0)
+    {
+        cerr << "Error (" << name() << "): the number of states n must be > 0 (got " << m_nStates << ")" << endl;
+        exit(1);
+    }
+    if (m_stateCurrent < 0 || m_stateCurrent > m_nStates)
+    {
+        cerr << "Error (" << name() << "): the initial state k must be in [0, n] = [0, " << m_nStates
+             << "] (got " << m_stateCurrent << ")" << endl;
+        exit(1);
+    }
+}
+
+void PCMElement::start_of_simulation()
+{
+    check_parameters();
+}
+
 void PCMElement::on_input_changed()
 {
     // setting the transmission for the initial state

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b051-pcmcell-tc-zero.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b051-pcmcell-tc-zero"
+}

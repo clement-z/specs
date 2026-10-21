@@ -1,0 +1,10 @@
+* B-052: VLSRC positional argument is the values file (it was silently ignored,
+* only the initial 0 was emitted). File format (VLSource::setValues): one
+* `time,power,wavelength` row per line, SI units (s, W, m). The first line of the
+* file is always discarded (B-053), hence the header line in the file.
+* Expected emissions: @0 s 0 W (initial 0 at enable, first row is at t > 0),
+* @100 ps 1 mW (0.031623 sqrt(W)), @200 ps 2 mW (0.044721 sqrt(W)), @300 ps 0 W,
+* all at 1550 nm; the PROBE trace of ROOT/a follows the same steps.
+vlsrc1 a "tests/golden/netlists/b052-vlsrc-values.csv"
+probe1 a
+.tran 1e-9

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b060-pcmcell-k-eq-n.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/b060-pcmcell-k-eq-n"
+}
