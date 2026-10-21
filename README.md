@@ -45,5 +45,7 @@ If you use SPECS in your work, please cite:
 > "Introducing SPECS: Scalable Photonic Event-driven Circuit Simulator", *49th European Conference on Optical Communications (ECOC)*, Glasgow, UK, Oct. 2023.
 > [hal-04302200](https://hal.science/hal-04302200) — a copy is available in [`doc/papers/zrounba2023-specs-ecoc.pdf`](doc/papers/zrounba2023-specs-ecoc.pdf).
 
+The same reference, with the software version, is in [`CITATION.cff`](CITATION.cff) (GitHub's "Cite this repository").
+
 ---
 Copyright ©️ Institut des Nanotechnologies de Lyon (INL)

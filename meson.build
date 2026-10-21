@@ -1,5 +1,5 @@
 project('specs', 'cpp',
-  version: '0.2.0-dev',
+  version: '0.2.0',
   license: 'LGPL-3.0-or-later',
   meson_version: '>=1.3.0',
   # The thirdparty/ git submodules (systemc, args) double as subprojects, next to the gtest wrap.

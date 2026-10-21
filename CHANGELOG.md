@@ -2,27 +2,14 @@
 
 ## [unreleased]
 
+## [0.2.0] - 2026-10-21
+
 ### New
 
-* Switched to the **Meson** build system; it replaces both CMake and the `Makefile`
-  * `meson setup build && meson compile -C build` (release build by default; CMake built without
-    optimisation unless a build type was given). Options: `native`, `old_tb`, `spx`, `tests`, `golden`, `docs`
-  * SystemC is found via pkg-config, its CMake package (`-Dcmake_prefix_path=...`), or built from the
-    `thirdparty/systemc` submodule; googletest comes from a WrapDB wrap (no more configure-time git clone)
-  * `meson test` runs the unit tests, the testbench smoke tests (former `make test`) and the golden-output
-    regression check
-  * `make lib` → `meson compile -C build spx` (`libspx.so`, as built by CMake; the Makefile's `libspecs.so`
-    is gone); `make doc` → `ninja -C build doc` (output in `build/doc/html`); `make compiledb` → automatic
-    `build/compile_commands.json`; `make waves/newwaves/cleantraces/cleanoldtraces/todos` → run targets
-    of the same names; coverage → `-Db_coverage=true` and `ninja coverage-html`
-  * Removed: `make format` (most files don't follow `.clang-format`; don't run `ninja clang-format`
-    either), `make rc` (its netlist didn't exist), `config.mk`, `.config.gitlab-ci.mk`
-  * `meson install` installs `specs` (and `libspx.so` with `-Dspx=true`)
-  * Asserts stay enabled by default (`b_ndebug=false`); `-Db_ndebug=true` matches the old CMake Release
 * CI: GitHub Actions and GitLab CI on Ubuntu 24.04 with Meson (gcc and clang, golden check);
   `install.sh` rewritten for Meson
 * The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed)
-* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 114 `specs` cases
+* Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 211 `specs` cases
   (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
   * Stricter by default (sprint 2026-10b, B-126..B-129): line order is checked (except per-case
     `unordered_streams`; `--lenient-order`), NEW/MISSING cases and an unrequested gtest skip fail
@@ -34,7 +21,6 @@
   parse-error exits and SystemC thread stacks, and are applied by `meson test` in sanitizer builds
 * `specs --version` prints the version from the git tags (upstream 0865a47, ported from CMake to
   Meson: `utils/git-version.sh`, `src/utils/meson.build`)
-* SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
 * `doc/netlist.md`: nets, positional arguments and keywords of COUPLER, CROSSING, CWSRC, VLSRC, EVLSRC, PCMCELL
   and PDET, and how probes trace in `.tran` (complements the cheatsheet)
 * `doc/numerics.md`: tolerances (the emission rule max(abstol, reltol·|last|), the snap to 0), the error of
@@ -46,7 +32,8 @@
   one warning says that feedback circuits may not quiesce and `.op`/`.dc` may stop at `maxiter`
   (`doc/numerics.md`) (B-018, B-153)
 * Reproducible runs (F-01, `doc/reproducibility.md`):
-  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (an integer literal 0 to 2^63 − 1, exponent form 0 to 2^53, B-180; `--seed` wins):
+  * `--seed N` (0 to 2^64 − 1, also for `-t` testbenches) and `.options seed=N` (an integer literal 0 to
+    2^63 − 1, exponent form 0 to 2^53, B-180; `--seed` wins):
     one master seed for every random draw, **default 0**, so runs are reproducible by default. Each device
     draws from its own stream, derived from the seed and its hierarchical name (adding or reordering other
     devices does not change it); the streams are the same with every standard library (`std::mt19937_64`,
@@ -69,9 +56,6 @@
   * `.ends NAME`, checked against the `.subckt` name (case-insensitive) (B-169)
   * `.dc WL(cwsrc1) start stop step` (also `P(...)`, `F(...)` and the long forms), the same sweep as
     `.dc /cwsrc1/WL ...`, as written in the paper and the cheatsheet
-  * **Changed results:** `.dc` includes the stop value when (stop - start)/step is an integer (SPICE):
-    `circuits/add_drop.cir` sweeps 31 points, 1535 to 1565 nm, instead of 30; the other points keep their
-    values (still accumulated, B-009), and the announced point count is the swept one
   * `--param name=value` (repeatable) overrides the netlist's `.param`/`.assign` of that name; the value is
     parsed like a `.param` value
   * `.include` resolves a relative path against the directory of the including file first (for a `.subckt`
@@ -80,10 +64,6 @@
   * The pre-release netlists `double_ring.cir`, `triple_ring.cir`, `paul_simple_ring.cir` moved to
     `circuits/legacy/` (they do not parse; kept for reference) (B-133)
 * Outputs and tracing (F-05, `doc/netlist.md`):
-  * **Changed outputs:** a netlist with probes (PROBE, MLPROBE, also inside a subcircuit) traces only them: the
-    automatic `PROBE{<net>}` probes of every optical net are added only when the netlist has no probe, or with
-    an explicit `.options traceall=1` (`.options traceall=0` still disables them). Simulation results and the
-    probed signals are unchanged; the VCD loses the automatic probes and `- trace all optical nets:` prints 0
   * `.save net QTY(net) ...` traces the listed optical nets (the paper's `.save P(out) P(drop)` now parses): a net
     alone traces power, modulus, phase and wavelength, `P(...)`, `E(...)`, `PHI(...)`, `WL(...)` one quantity
     each; the probes are named `PROBE{<net>}` like the automatic ones. A netlist with `.save` traces only its
@@ -95,6 +75,42 @@
     `doc/netlist.md` ("Tracing and output files"). The golden harness decodes `.npz` outputs to text
   * An MLPROBE without a VCD (`-o ""`, `--no-trace`, `--format csv`) no longer reports every sample of its listed
     wavelengths as an unsupported signal
+
+### Changed
+
+Changes that may need edits to build scripts, netlists or post-processing. Bug fixes that change results are
+under Fixed, and `--mon` under Removed.
+
+* Switched to the **Meson** build system; it replaces both CMake and the `Makefile`
+  * `meson setup build && meson compile -C build` (release build by default; CMake built without
+    optimisation unless a build type was given). Options: `native`, `old_tb`, `spx`, `tests`, `golden`, `docs`
+  * SystemC is found via pkg-config, its CMake package (`-Dcmake_prefix_path=...`), or built from the
+    `thirdparty/systemc` submodule; googletest comes from a WrapDB wrap (no more configure-time git clone)
+  * `meson test` runs the unit tests, the testbench smoke tests (former `make test`) and the golden-output
+    regression check
+  * `make lib` → `meson compile -C build spx` (`libspx.so`, as built by CMake; the Makefile's `libspecs.so`
+    is gone); `make doc` → `ninja -C build doc` (output in `build/doc/html`); `make compiledb` → automatic
+    `build/compile_commands.json`; `make waves/newwaves/cleantraces/cleanoldtraces/todos` → run targets
+    of the same names; coverage → `-Db_coverage=true` and `ninja coverage-html`
+  * Removed: `make format` (most files don't follow `.clang-format`; don't run `ninja clang-format`
+    either), `make rc` (its netlist didn't exist), `config.mk`, `.config.gitlab-ci.mk`
+  * `meson install` installs `specs` (and `libspx.so` with `-Dspx=true`)
+  * Asserts stay enabled by default (`b_ndebug=false`); `-Db_ndebug=true` matches the old CMake Release
+* SystemC 3.0.2 (built without the copyright banner) and taywee/args 6.4.7
+* `.dc` includes the stop value when (stop - start)/step is an integer (SPICE):
+  `circuits/add_drop.cir` sweeps 31 points, 1535 to 1565 nm, instead of 30; the other points keep their
+  values (still accumulated, B-009), and the announced point count is the swept one (F-12)
+* A netlist with probes (PROBE, MLPROBE, also inside a subcircuit) traces only them: the automatic `PROBE{<net>}`
+  probes of every optical net are added only when the netlist has no probe, or with an explicit
+  `.options traceall=1` (`.options traceall=0` still disables them). Simulation results and the probed signals are
+  unchanged; the VCD loses the automatic probes and `- trace all optical nets:` prints 0 (F-05)
+* The optical field is labelled √W, not V/m, in the signals printed on stdout (B-023)
+* PCMCELL requires `tc` and `ta` (a cell without them was silently opaque: Tc = Ta = 0); the C++ PCM
+  constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
+  parameters (B-051)
+* Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
+  at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
+  positional arguments is a clean error (B-052)
 
 ### Fixed
 
@@ -115,7 +131,6 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * `--nrings_crow` sets the number of CROW rings (B-131); CROW children are prefixed with the instance name (B-072)
 * Detector readouts start at 0 instead of uninitialised memory (B-054); BitstreamSource saturation message (B-044)
 * JSON export writes the writers count, not the readers count (B-154)
-* The optical field is labelled √W, not V/m (B-023)
 * `circuits/subckt_test.cir` parses again (B-132)
 * pyspecs: works with pandas 3 and detects `.dc` sweeps (B-076, B-077); default output name, directory joins,
   error reporting, dependency manifest, notebook binary path, value shortening, bitstream helpers
@@ -131,12 +146,6 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
   its reader on the device's output, and crossing outputs on bidirectional nets propagate (B-144, B-145, B-147)
 * Subcircuit instances that share a port net now behave like the flat netlist (was E115 or last write wins, and
   no net type check) (B-146)
-* Positional element arguments: CWSRC `wl power phi` (were shifted by one: `cwsrc1 a 1.55e-6 1e-3` gave 0 W
-  at 1 mm), VLSRC/EVLSRC `file` (was ignored), PCMCELL `emelt n tc ta` (Debug builds aborted); too many
-  positional arguments is a clean error (B-052)
-* PCMCELL requires `tc` and `ta` (a cell without them was silently opaque: Tc = Ta = 0); the C++ PCM
-  constructor defaults match the header (Tc = 0, Ta = 1) and the OCTANE classes take Tc/Ta as required
-  parameters (B-051)
 * PCMCELL rejects `n` <= 0 and an initial state `k` outside [0, n] (B-060; the PCM model itself is unchanged)
 * COUPLER: `k` is documented as the field cross-coupling (P_cross = k²), `kp` the power ratio and `t` the through
   field coefficient (`doc/netlist.md`; the paper's κ = 0.15 is a power ratio, i.e. `kp`); the misleading
@@ -169,7 +178,6 @@ Details and repros in `backlog/` (one commit per item, see `backlog/FIXES-REPORT
 * A waveguide written in the netlist (also inside a `.subckt`) whose non-zero delay rounds to 0 at the time
   resolution is an error (exit 1, before the simulation, with the `.options timescale` to use); waveguides that
   devices create internally (MZI arms, ...) keep the warning (B-014)
-
 * Output order no longer depends on heap addresses: the operating-point listing, the `--vci` dump, the
   automatic probes and VCD declarations, `init()` calls and the enable order of the analyses follow
   hierarchical names (they changed with the compiler, build type or a sanitizer), and elements are created in
