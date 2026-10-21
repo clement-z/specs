@@ -110,6 +110,13 @@ public:
     uint64_t seed = DEFAULT_SEED;
     // Set when the seed was chosen explicitly (specs --seed): .options seed is then ignored
     bool seed_explicit = false;
+    // .op/.dc fixed point (F-28): delta cycles allowed per solve (the operating point, each .dc
+    // point); beyond that the analysis stops with a non-convergence error. 0: no limit
+    // (.options maxiter, specs --maxiter)
+    static constexpr uint64_t DEFAULT_MAX_ITERATIONS = 1000000;
+    uint64_t max_iterations = DEFAULT_MAX_ITERATIONS;
+    // Set when it was chosen explicitly (specs --maxiter): .options maxiter is then ignored
+    bool max_iterations_explicit = false;
 
     // Port options
     double default_abstol = 1e-8;
@@ -146,6 +153,8 @@ public:
     void runDCAnalysis();
     void runTRANAnalysis();
     void applyInitialConditions();
+    bool runFixedPoint();
+    void reportNonConvergence(const string &what, sc_dt::uint64 start_delta) const;
 
     void applyEngineResolution() {
         // set engine time resolution

@@ -1,5 +1,5 @@
 # B-080: Cheatsheet shows syntax that SPECS rejects or contradicts, and omits most elements
-severity: med | category: docs | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: docs | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed (sprint 2026-10b P5, F-12): `.dc WL(cwsrc1)` is accepted (b00b8ae), netlist syntax reference in `doc/netlist.md`; the PDF itself is unchanged
 location: doc/resources/cheatsheet.pdf (single page, Inkscape export of 2023-06-13; no source in the repo)
 ## Problem
 The only syntax reference in the repo is wrong in the places below and incomplete. The external manual (https://demo.zrounba.fr/specs/doc/index.html, reachable today, 2.5 MB single page "(c) Raphael Cardoso & Clement Zrounba, 2023", repeats the phi/pshift/merger errors and already uses the correct `.dc /cwsrc1/WL` form and has "PDET: TODO"); its source is not in the repository, so it cannot be fixed or reviewed here. Each row was checked with the prebuilt binary (`backlog/repro/a6-cheatsheet-examples.sh`).

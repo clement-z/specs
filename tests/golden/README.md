@@ -66,8 +66,8 @@ reported as NEW, everything else must pass), then `record --only '^<id>$'`.
 
 `cases.json` lists the cases. Each one runs `specs <args>` (argv[0] is always
 `specs`) in a **fresh temporary working directory**. Before the run, `circuits/`
-is copied in (netlists use `.include circuits/...`, which resolves relative to
-the cwd) and an empty `traces/` is created. Testbenches and the default trace
+is copied in (netlists use `.include circuits/...`: not found next to the including
+file, it resolves relative to the cwd, F-12) and an empty `traces/` is created. Testbenches and the default trace
 file write to `traces/<name>.vcd` relative to the cwd, with the run manifest
 (F-01: version, seed, command line, netlist file hashes) next to it as
 `traces/<name>.manifest.json`. If `traces/` is missing, specs fails (exit 1) with
@@ -146,24 +146,25 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (152 `specs` cases + 1 gtest case)
+## Case list (175 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
-| `cir/*` (9) | every `circuits/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
+| `cir/*` (9) | every `circuits/*.cir` and `circuits/legacy/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
 | `cir-json/*` (4) | `-n --json flat.json -f` on the 4 netlists that parse | flattened-netlist JSON export, dry run |
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*`, `err/f01-*` (49) | bad inputs from the 2026-10 and 2026-10b fix phases (`tests/golden/netlists/` or CLI options) | each must be rejected with a clean message and exit 1 (was a crash, abort or silent acceptance); the backlog ID is in the name |
-| `regress/bNNN-*`, `regress/f01-*` (58) | regression cases of the 2026-10 and 2026-10b fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, ...); hand-computed expected values are in the netlist headers |
+| `err/bNNN-*`, `err/fNN-*` (60) | bad inputs from the 2026-10 and 2026-10b fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
+| `regress/bNNN-*`, `regress/fNN-*` (70) | regression cases of the 2026-10 and 2026-10b fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
 is visible; re-record when it is fixed on purpose.
 
 * `cir/double_ring`, `cir/triple_ring`, `cir/paul_simple_ring`: parse error
-  (legacy netlist syntax, `one 0` at line 4), exit 1.
+  (pre-release netlist syntax, `one 0` at line 4), exit 1. The netlists are kept for reference in
+  `circuits/legacy/` (moved there by F-12; the `cir/*` case ids are unchanged).
 * `cir/paul_3ring_puf`: the VLSRC values file
   `paul_puf_bitstream_158b_3wl.csv` is not in the repo, exit 1.
 * `cli/unknown-testbench`, `cli/missing-netlist`, `cli/bad-mode`: exit 1 by design.

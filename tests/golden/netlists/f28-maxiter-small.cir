@@ -1,0 +1,10 @@
+* F-28: .options maxiter below what a converging circuit needs. The lossless all-pass ring of
+* b124-allpass-ring-default-reltol.cir needs 869 delta cycles; maxiter=100 stops it.
+* Expected: exit 1 ("did not converge within 100 iterations"), unless specs --maxiter overrides
+* the netlist (case regress/f28-maxiter-cli-priority: the same OP as regress/b124-allpass-ring-default-reltol).
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=0.3872983346207417
+wg_ring ring_br ring_bl length=775e-6 neff=1 ng=1 att=0
+probe1 out
+.options timescale=-13 maxiter=100
+.op

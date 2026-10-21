@@ -1,5 +1,5 @@
 # B-133: three legacy-syntax example netlists cannot be parsed by the current grammar
-severity: low | category: docs | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: docs | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 829894f (sprint 2026-10b P5, F-12): option (b), moved to `circuits/legacy/` with a README; golden cases kept
 location: circuits/double_ring.cir, circuits/triple_ring.cir, circuits/paul_simple_ring.cir (all fail at line 4), tests/golden/cases.json:41-49,60-68,85-93
 ## Problem
 They use the old SPECS v1 netlist language: `one 0`, `clk 1 100p`, `bsrc 0 1 2 {0, 252, 15, 0} 1550.0e-9`, 4-node `dc 2 3 4 5`, `wg 10 3 350.85u`, 3-node `pdet 2 35 24`, `*tracenet`. The current grammar has no `one`, `clk`, `bsrc`, no bare `dc`/`wg` names and a different `pdet` signature. `specs -f` exits 1 with "Parsing error (circuits/double_ring.cir:4): syntax error". triple_ring.cir also carries a stale comment block copied from double_ring. They are the only examples of 2- and 3-ring cascades.

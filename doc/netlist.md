@@ -1,3 +1,226 @@
+# Netlist syntax
+
+This file has two parts: the syntax of a netlist file (this section) and the nets, positional arguments and
+keywords of each element ([Netlist element arguments](#netlist-element-arguments)).
+
+Example, an all-pass ring resonator and a wavelength sweep (`specs -f ring.cir -o traces/ring`; the directory
+`traces/` must exist). The sweep has 31 points, from 1535 nm to 1565 nm:
+
+    * All-pass ring resonator, wavelength sweep around 1.55 um
+    .param lambda0 = 1.55u
+    .param neff    = 2.3
+    .param ng      = 4.3
+    .param k       = 0.3873              ; field coupling, k^2 = 0.15
+    .param ring_len = 101*{lambda0}/{neff}
+
+    cwsrc1 in wl={lambda0} power=1m
+    coupler1 in ring_a out ring_b k={k}
+    wg_ring ring_b ring_a length={ring_len} neff={neff} ng={ng}
+    + att=2                              ; dB/cm
+
+    .options abstol=1e-12 reltol=1e-6
+    .dc WL(cwsrc1) 1.535u 1.565u 1n
+
+More examples: `circuits/*.cir` (run them from the repository root) and `tests/golden/netlists/`.
+
+## Lines
+
+- One element, directive or analysis per line. It starts in column 1: a leading space or tab is a syntax error.
+- `*` in column 1 starts a comment line. `;` starts a comment that runs to the end of the line. Blank lines are
+  ignored.
+- `+` in column 1 continues the previous line (the previous line may end with a `;` comment).
+- Element prefixes, directive names, keywords, SI suffixes and `.dc` attributes are case-insensitive.
+  Element names are upper-cased: `wg1` becomes `ROOT/WG1` (`ROOT/X1/WG1` inside instance `X1`), and two
+  elements with the same name are an error. Net names and parameter names are case-sensitive.
+- A syntax error prints `Parsing error (file:line): ...`, the offending token and the line on stderr, and
+  exits with status 1 (3 for an unexpected character such as `$`).
+
+## Elements and nets
+
+    <PREFIX><name> net1 net2 ... [positional arguments] [key=value ...]
+
+Nets come first, in the order of the table, then the positional arguments, then the keywords.
+
+| Prefix | Nets, in order | Arguments |
+| --- | --- | --- |
+| `WG` | in, out | cheatsheet: `length` (m), `att` (dB/cm), `neff`, `ng`, `d` |
+| `MERGER` | in1, in2, out | cheatsheet |
+| `SPLITTER` | in, out1, out2 | cheatsheet |
+| `COUPLER` | in1, in2, out1, out2 | [COUPLER](#coupler) |
+| `CROSSING` | in1, in2, out1, out2 | [CROSSING](#crossing) |
+| `PSHIFT` | in, out, electrical in | cheatsheet |
+| `MZI` | in1, in2, out1, out2, electrical in | not documented yet |
+| `CWSRC` | out | [CWSRC](#cwsrc) |
+| `VLSRC` | out | [VLSRC](#vlsrc) |
+| `EVLSRC` | electrical out | [EVLSRC](#evlsrc) |
+| `PCMCELL` | in, out | [PCMCELL](#pcmcell) |
+| `PDET` | in, electrical out | [PDET](#pdet) |
+| `PROBE`, `MLPROBE` | net | [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
+| `PWR` | in (power meter) | no arguments |
+| `X` | one net per subcircuit port, then the subcircuit name | [Subcircuits](#subcircuits) |
+
+"cheatsheet" is `doc/resources/cheatsheet.pdf`. A prefix needs a name after it (`wg1`, `wg_ring`; `wg` alone is
+a syntax error).
+
+- Net names start with a letter or `_`, then letters, digits and `_`. An integer is a net name too: `1` is net
+  `N00001`. `_` alone is an anonymous net, a new one at each use. Optical and electrical nets are different
+  types; using one name for both is an error.
+- An optical net normally has one writer (an output) and readers (inputs). A net with two writers is
+  bidirectional: light travels both ways. `net&` marks a net bidirectional explicitly. A third writer is an
+  error.
+
+## Numbers
+
+Integers (`100`), decimals (`0.5`, `.5`) and exponents (`1.55e-6`). `5.` is not a number. An integer literal of
+2147483647 or more is silently read as 2147483647: write `3e9` or `3g`.
+
+SI scale suffixes go directly after the number, in any case, as in SPICE:
+
+| Suffix | `f` | `p` | `n` | `u` | `m` | `k` | `meg` | `g` | `t` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Factor | 1e-15 | 1e-12 | 1e-9 | 1e-6 | 1e-3 | 1e3 | 1e6 | 1e9 | 1e12 |
+
+`M` and `m` are both milli, `MEG` is mega. `1.55u` is exactly the same double as `1.55e-6`. A number with a
+suffix is a floating-point value (`1k` is 1000.0). Unit letters after the suffix are not accepted: `1.55um` and
+`10mW` are syntax errors (offending token `m`, `W`); write `1.55u` and `10m`.
+
+Units are SI: m, W, s, Hz, rad, V, A. Waveguide lengths are in m, losses in dB, waveguide attenuation `att` in
+dB/cm. Optical fields are in sqrt(W).
+
+## Values and expressions
+
+| Where | Accepted |
+| --- | --- |
+| `key=value`, `.param` | a free expression: numbers, `{name}`, `+ - * / ^`, parentheses, unary minus |
+| positional argument (elements, `.tran`) | one number, `{name}`, `"string"`, `[list]`, or a braced expression `{...}` |
+| `.dc` start, stop, step | a number or `{name}`; no expression |
+
+    wg1 a b length=2*500n neff={neff}      ; free expression in a keyword
+    cwsrc1 in {2*775n} 1m                  ; braced expression in a positional argument
+    cwsrc2 in2 {{lambda0}*2} 1m            ; a parameter inside braces is {name} too
+    vlsrc1 in3 "pulses.csv"                ; string
+    mlprobe1 b wl=[1.55u, 1.56u]           ; list
+
+- A parameter is `{name}`, a bare `name` is not a value. A keyword value does not take a braced expression:
+  `length={ {x}*2 }` is a syntax error, write `length={x}*2`. A positional argument does not take a free
+  expression: `wg1 a b 2*3` and `cwsrc1 in 1.55u -3` are syntax errors, write `{2*3}` and `{-3}`.
+- `^` binds tighter than `*` and `/`, which bind tighter than `+` and `-`. `^` groups left to right (`2^3^2` is
+  64). `/` is a floating-point division (`1/2` is 0.5). `2*-3` is a syntax error. There are no functions.
+- Constants: `{pi}` and `{c}` (299792458 m/s).
+- Strings are in double quotes and cannot contain a double quote. Lists are `[a, b, c]` and can be nested
+  (`[[t0, p0], [t1, p1]]`).
+
+## Parameters
+
+    .param name=value [name2=value2 ...]
+
+`.assign` is the same directive. The value is evaluated where the parameter is used, so a parameter must be
+defined on an earlier line (`Variable not found: L` otherwise). A later `.param` of the same name replaces the
+value for the lines after it. The value is an expression and can use earlier parameters.
+
+`specs --param name=value` (repeatable) sets a top-level parameter from the command line. It overrides every
+`.param`/`.assign` of that name in the netlist, wherever it is. The value is parsed like a `.param` value
+(suffixes, expressions, strings): `--param L=2*3u`. A name the netlist never assigns is still defined and gives
+`Warning: --param <name>: the netlist has no .param <name>`. A malformed argument gives
+`Invalid --param value: '<arg>' (expected name=value)` and exit status 1. Subcircuit parameters are not affected.
+
+## Subcircuits
+
+    .subckt NAME port1 port2 ... [param=default ...]
+    ...body...
+    .ends [NAME]
+
+    X<name> net1 net2 ... NAME [param=value ...]
+
+The nets of the instance are connected to the ports in order; their number must match. The name on `.ends` is
+optional; if given, it must match the `.subckt` name (case-insensitive), else
+`Parsing error (...): .ends xyz does not match the name of the subcircuit (.subckt ABC)` and exit status 1.
+Definitions can be nested. An analysis in a body is ignored.
+
+The body is read again for each instance, with its own parameters: the defaults of the `.subckt` line,
+overridden by the instance (`x2 b c abc len=30u`). **Top-level parameters are not visible in the body**
+(`Variable not found`), nor are `--param` values; `{pi}` and `{c}` are. A body can define derived parameters
+with `.param`.
+
+    .subckt abc p q len=10u
+    .param l2 = 2*{len}
+    wg1 p q length={l2}
+    .ends abc
+    x1 a b abc
+    x2 b c abc len=30u
+
+## `.include`
+
+    .include path
+
+`path` is the rest of the line up to a space, tab or `;`. Quotes are not supported (they become part of the name).
+An absolute path is used as is. A relative path is looked up first relative to the directory of the file that
+contains the `.include` line (for an `.include` in a `.subckt` body, the file that defines the subcircuit), then
+relative to the working directory. If both exist and are different files with different contents, the
+file-relative one is used and stderr shows `Warning: .include P: using <dir>/P (relative to the including file);
+P relative to the working directory is a different file`. If neither exists: `Error: included file not found
+"P"`, exit status 1. Includes can be nested. An `.include` in a body is read for each instance. Stdout shows
+`Including file: <path>` with the path opened.
+
+## Analyses
+
+One analysis per netlist. A second one stops the run with `Attempted to register a new analysis (TRAN)` /
+`But another one was already specified (OP)` and exit status 1. Without an analysis line the run is a `.tran`
+without duration. `-n` skips the analysis.
+
+- `.op`: operating point (frequency domain). The listing of every optical net is on stdout.
+- `.dc`: sweep of an attribute of a `CWSRC`, then an operating point at each value:
+
+      .dc /cwsrc1/WL start stop step
+      .dc WL(cwsrc1) start stop step
+
+  | Attribute | Sets |
+  | --- | --- |
+  | `WL`, `WAVELENGTH`, `LAMBDA` | wavelength, m |
+  | `P`, `POW`, `POWER` | power, W |
+  | `F`, `FREQ`, `FREQUENCY` | optical frequency, Hz |
+
+  The points are start, start+step, start+2*step, ... up to and including stop when (stop-start)/step is an
+  integer: `.dc WL(cwsrc1) 1.535u 1.565u 1n` has 31 points (30 before sprint 2026-10b, the stop was excluded).
+  The values are accumulated, so the last digits can differ from start + i*step (the last point above is
+  1.5650000000000022e-06, backlog B-009). Needs start < stop, step > 0 and at least 2 points
+  (`Invalid range parameters`, `Sweep order must contain at least 2 point.`). One sweep per `.dc`.
+- `.tran [duration]`: transient (time domain), after an operating point. The duration is in s (number, `{name}`
+  or `{expression}`; `.tran 2*5n` is a syntax error). Without it the run goes on until no event is left.
+
+Convergence: `.op`, every `.dc` point and the operating point before `.tran` stop after `maxiter` iterations
+(delta cycles; default 1000000, `.options maxiter=N`, `--maxiter N`, 0 for no limit) with an error, a residual
+report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](numerics.md).
+
+## Directives
+
+- `.options key=value ...` (keys case-insensitive): `abstol`, `reltol`, `snapfactor`, `timescale` (alias `ts`),
+  `resolution`, `seed`, `maxiter`: see [numerics.md](numerics.md). `traceall` (0 or 1, default 1): trace every
+  optical net. An unknown key stops with `Unknown keyword: foo (value: 1 (INTEGER))`.
+- `.nodeset`: disabled, stops with `NODESET is disabled pending bugfixes` (exit status 1).
+- `.ic`: rejected, `the .ic directive is not supported`.
+- `.save`: not supported yet, a syntax error (offending token `.save`).
+- `.title text` and `.end`: ignored (KiCad netlists). `.end` does not stop the parsing.
+
+## Command line
+
+| Option | Meaning |
+| --- | --- |
+| `-f file`, `--file=file` | netlist; repeat the option for several files, read in order as one netlist |
+| `-n`, `--dryrun` | parse and elaborate, do not simulate |
+| `--json file` | write the flattened circuit as JSON |
+| `-o name`, `--output=name` | trace file base name (`<name>.vcd`, `<name>.manifest.json`); its directory must exist; default `traces/delete_me` |
+| `--param name=value` | set a top-level parameter (see Parameters) |
+| `--maxiter N` | `.options maxiter`, overrides the netlist |
+| `--abstol x`, `--reltol x`, `-R n` | tolerances and timescale, see [numerics.md](numerics.md) |
+| `--seed N` | master seed, see [reproducibility.md](reproducibility.md) |
+
+`specs -h` lists all options. `-t name` runs a legacy C++ testbench instead of a netlist (`-p` lists them).
+
+## Legacy netlists
+
+`circuits/legacy/` holds three pre-release netlists that do not parse with this syntax; see its `README.md`.
+
 # Netlist element arguments
 
 Nets, positional arguments and keywords of the netlist elements listed below.

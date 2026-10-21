@@ -26,6 +26,7 @@
 #include "parser/parse_element.h"
 #include "parser/parse_analysis.h"
 #include "parser/parse_directive.h"
+#include "parser/parser_state.h"
 
 #include "parser.h"
 #include "scanner.h"
@@ -204,6 +205,8 @@ subcircuit.with_ports: T_DIRECTIVE_SUBCKT T_STR
                     {
                         // Register a new subcircuit in current parse tree
                         $$ = cur_pt->register_subcircuit(*$2);
+                        // directory of the file being scanned, for .include in the body (B-143)
+                        cur_pt->subcircuits[$$]->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                         delete $2;
                     }
                 | subcircuit.with_ports port_name
@@ -230,6 +233,20 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
                 // cout << "Parsed subcircuit " << cur_pt->subcircuits[$1]->name << endl;
                 cur_pt->subcircuits[$1]->netlist = *$2;
                 delete $2;
+            }
+          | subcircuit.with_assignments T_DIRECTIVE_ENDS T_STR
+            {
+                // .ends NAME: the name must be the one of the .subckt (case-insensitive)
+                const string &subckt_name = cur_pt->subcircuits[$1]->name;
+                if (!strutils::iequals(*$3, subckt_name))
+                {
+                    stringstream ss;
+                    ss << ".ends " << *$3 << " does not match the name of the subcircuit (.subckt " << subckt_name << ")";
+                    yyerror(scanner, pt, ss.str().c_str());
+                }
+                cur_pt->subcircuits[$1]->netlist = *$2;
+                delete $2;
+                delete $3;
             }
 ;
 
@@ -709,6 +726,13 @@ element_attribute: '/' T_STR '/' T_STR
                     $$ = new pair<string, string>(*$2,*$4);
                     delete $2;
                     delete $4;
+                }
+                 | T_STR '(' T_STR ')'
+                {
+                    // ATTR(elem), same as /elem/ATTR (e.g. .dc WL(cwsrc1) ...)
+                    $$ = new pair<string, string>(*$3,*$1);
+                    delete $1;
+                    delete $3;
                 }
 ;
 

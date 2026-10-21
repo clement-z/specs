@@ -3,6 +3,7 @@
 #include "parser/parse_tree.h"
 #include "specs.h"
 #include "utils/strutils.h"
+#include "utils/general_utils.h"
 
 #include <initializer_list>
 #include <utility>
@@ -56,10 +57,9 @@ struct DCAnalysis : public ParseAnalysis {
             cerr << " was already recoreded." << endl;
             exit(1);
         }
-        auto n = (range[1] - range[0]) / range[2];
-        n = max(0.0, n);
-        n = floor(n);
-        if (n <= 1.5)
+        // same count as the values swept by create() (stop included)
+        size_t n = sweep_count(range[0], range[1], range[2]);
+        if (n < 2)
         {
             cerr << "Sweep order must contain at least 2 point." << endl;
             exit(1);

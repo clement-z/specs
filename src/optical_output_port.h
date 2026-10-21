@@ -81,6 +81,13 @@ public:
     bool m_use_deltas = false;
     bool m_skip_next_convergence_check = false;
 
+    // Last emission, for the non-convergence report of the .op/.dc fixed point (F-28)
+    bool m_has_emitted = false;
+    sc_dt::uint64 m_last_emission_delta = 0; // sc_delta_count() when it was emitted
+    uint32_t m_last_emission_wlid = 0;
+    double m_last_emission_change = 0; // |E - E_last|
+    double m_last_emission_threshold = 0; // max(abstol, reltol * |E_last|)
+
     std::shared_ptr<const OpticalOutputPortConfig> m_config;
 
     void on_data_ready();

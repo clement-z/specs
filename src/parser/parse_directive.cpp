@@ -109,6 +109,20 @@ void OPTIONSDirective::create() const
             if (!specsGlobalConfig.seed_explicit)
                 specsGlobalConfig.seed = static_cast<uint64_t>(v);
         }
+        else if (kw == "MAXITER")
+        {
+            // F-28: delta cycles allowed per .op/.dc fixed point (0: no limit). Netlist numbers
+            // are doubles: only the integers up to 2^53 are exact
+            const double v = p.second.as_double();
+            if (!(v >= 0 && v <= 9007199254740992.0 && v == std::trunc(v)))
+            {
+                cerr << "Error: .options: " << kw << " must be an integer between 0 and 2^53 (got " << v << ")" << endl;
+                exit(1);
+            }
+            // specs --maxiter takes priority over the netlist
+            if (!specsGlobalConfig.max_iterations_explicit)
+                specsGlobalConfig.max_iterations = static_cast<uint64_t>(v);
+        }
         else if (kw == "TEST_VARIABLE")
             cout << kw << "(" << p.second.kind() << "): " << p.second.get_str() << endl;
         else {

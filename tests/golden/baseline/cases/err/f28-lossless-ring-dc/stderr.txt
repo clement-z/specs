@@ -1,0 +1,6 @@
+Error: .dc: sweep point 1 of 3 (WL(ROOT/CWSRC1) = 1.55e-06) did not converge within 100000 iterations (delta cycles, .options maxiter)
+Residual: 2 optical output port(s) changed in the last 10000 delta cycles. Last change |dE| and emission threshold max(abstol, reltol*|E_last|), in sqrt(W):
+  ROOT/ring_br (ROOT/COUPLER1) @ 1550 nm: |dE| = 0.0001 > 1.48554e-08 (6731.54 x)
+  ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 0.0001 > 1.48554e-08 (6731.54 x)
+A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss
+

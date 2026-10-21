@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-si-op.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 415,
+   "kind": "json",
+   "sha256": "aa18b93ed14768dae129cab473b0b64a6d4eaae2df8238a2fb6e592411a0fa97",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f12-si-op"
+}

@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f28-maxiter-small.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 431,
+   "kind": "json",
+   "sha256": "e0a9a4d0ec07b752651f40586a6fab4100ba5e8448d16dc759bd2b05e7717431",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "err/f28-maxiter-small"
+}

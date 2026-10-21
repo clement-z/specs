@@ -1,5 +1,5 @@
 # B-143: `.include` paths are resolved relative to the CWD, not to the including file
-severity: low | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 062399c (sprint 2026-10b P5, F-12): relative to the including file, then the cwd; warning if both exist and differ (quoted names still not handled)
 location: src/parser/parser.l:248
 ## Problem
 `fopen(yytext)` uses the CWD. Netlists only work from one directory (`circuits/subckt_tests.cir` includes

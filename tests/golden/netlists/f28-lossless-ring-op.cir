@@ -1,0 +1,11 @@
+* F-28: weakly coupled lossless all-pass ring, off resonance (round-trip phase 2 pi * 500.19).
+* k = 1e-4 (field): the ring field changes by about k * |E_in| = 1e-4 sqrt(W) per round trip
+* and that change decays as t^n, t = sqrt(1 - k^2) = 1 - 5e-9, so the .op fixed point needs about
+* 2e9 round trips to get below the tolerances: it ran for hours before F-28.
+* Expected: exit 1 after the default 1000000 iterations (delta cycles), with the residual:
+* ROOT/ring_bl and ROOT/ring_br still change by about 1e-4 sqrt(W), 7e3 x their threshold.
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=1e-4
+wg_ring ring_br ring_bl length=775.3e-6 neff=1 ng=1 att=0
+probe1 out
+.op

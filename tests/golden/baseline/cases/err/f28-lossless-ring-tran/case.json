@@ -1,0 +1,18 @@
+{
+ "args": [
+  "--maxiter",
+  "20000",
+  "-f",
+  "tests/golden/netlists/f28-lossless-ring-tran.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 463,
+   "kind": "json",
+   "sha256": "c219d7725a888c2e0634eac82f460a1efb24f5a7c6cc6fce276375f2e0ecafe7",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "err/f28-lossless-ring-tran"
+}

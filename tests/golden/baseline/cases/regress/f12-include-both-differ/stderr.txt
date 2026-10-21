@@ -1,0 +1,2 @@
+Warning: .include circuits/add_drop_sub.cir: using tests/golden/netlists/f12-include/circuits/add_drop_sub.cir (relative to the including file); circuits/add_drop_sub.cir relative to the working directory is a different file
+

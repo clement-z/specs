@@ -1,0 +1,20 @@
+* F-12: --param name=value overrides the root-level .param/.assign of the same name, whatever the
+* order. Run with --param pin=4e-3/2 --param att=0 (values parsed as in .param):
+* - pin = 0.002 for CWSRC1 (before the second .param pin) and CWSRC2 (after it): ROOT/a = ROOT/d =
+*   0.002 W (without --param: 1e-3 W and 3e-3 W, the .param lines apply in netlist order);
+* - att = 0 (INTEGER): no loss in WG1, ROOT/b = 0.002 W (without: 1 dB over 1 cm);
+* - the parameter pin of subcircuit SRC (default 5e-3) is not affected: ROOT/c = 0.005 W.
+.param pin=1e-3
+.assign att=1
+cwsrc1 a wl=1.55e-6 power={pin}
+wg1 a b length=1e-2 att={att} neff=2.35 ng=4.3
+.param pin=3e-3
+cwsrc2 d wl=1.55e-6 power={pin}
+.subckt src p pin=5e-3
+cwsrc1 p wl=1.55e-6 power={pin}
+.ends
+x1 c src
+probe1 b
+probe2 c
+probe3 d
+.op

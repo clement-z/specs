@@ -355,6 +355,9 @@ struct ParseSubcircuit {
     vector<string> ports; // name of ports
     map<string, Variable> kwargs; // list of kw arguments found on netlist
     const ParseTree *parent;
+    // directory of the file that defines the subcircuit: .include in the body is relative to it
+    // first (B-143); "" if none
+    string include_dir;
 
     ParseSubcircuit(const string &name, ParseTree *parent = nullptr)
     : name(name)
@@ -567,6 +570,9 @@ struct ParseTree {
     // manifest (F-01). Only the root tree's list is filled: the subcircuit trees, parsed during
     // flatten(), record their .include files into it (root_input_files()).
     mutable vector<string> input_files;
+    // --param overrides (F-12), root tree only: name -> whether the netlist also assigns it.
+    // Set before the netlist is parsed; a .param/.assign of the same name does not replace them.
+    map<string, bool> param_overrides;
 
     ParseTree(const string &name = "ROOT")
     : name(name)
@@ -662,8 +668,21 @@ struct ParseTree {
     template <typename T>
     void set_local_variable(string &name, T val)
     {
+        // a --param override wins over the netlist's assignment
+        auto it = param_overrides.find(name);
+        if (it != param_overrides.end())
+        {
+            it->second = true;
+            return;
+        }
         // will throw a compile error if type T is not supported by Variable
         local_assignments[name] = val;
+    }
+
+    void set_param_override(const string &name, const Variable &val)
+    {
+        local_assignments[name] = val;
+        param_overrides.emplace(name, false);
     }
 
     Variable get_variable(string &name)

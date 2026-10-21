@@ -1,7 +1,7 @@
 {
  "args": [
   "-f",
-  "circuits/double_ring.cir"
+  "circuits/legacy/double_ring.cir"
  ],
  "exit": 1,
  "files": {},

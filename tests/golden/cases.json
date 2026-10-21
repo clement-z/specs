@@ -42,10 +42,10 @@
    "id": "cir/double_ring",
    "args": [
     "-f",
-    "circuits/double_ring.cir"
+    "circuits/legacy/double_ring.cir"
    ],
    "expect": "fail",
-   "note": "parse error: legacy netlist syntax ('one 0' at line 4) not supported by the current grammar"
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
   },
   {
    "id": "cir/paul_3ring_puf",
@@ -60,10 +60,10 @@
    "id": "cir/paul_simple_ring",
    "args": [
     "-f",
-    "circuits/paul_simple_ring.cir"
+    "circuits/legacy/paul_simple_ring.cir"
    ],
    "expect": "fail",
-   "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
   },
   {
    "id": "cir/subckt_test",
@@ -83,10 +83,10 @@
    "id": "cir/triple_ring",
    "args": [
     "-f",
-    "circuits/triple_ring.cir"
+    "circuits/legacy/triple_ring.cir"
    ],
    "expect": "fail",
-   "note": "parse error: legacy netlist syntax ('one 0' at line 4)"
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
   },
   {
    "id": "err/b149-x-noargs",
@@ -2328,6 +2328,445 @@
     "tests/golden/netlists/f01-manifest.cir"
    ],
    "note": "F-01: --print-manifest in a dry run prints the run manifest on stdout after building the circuit, with \"trace_file\": null; no file is written"
+  },
+  {
+   "id": "err/f28-lossless-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-op.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: weakly coupled lossless ring (k = 1e-4, off resonance): the .op fixed point stops after the default 1000000 iterations (delta cycles) with the residual of the two ring nets and exit 1 (it ran for hours before)"
+  },
+  {
+   "id": "err/f28-lossless-ring-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-dc.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: the same ring in a .dc sweep with .options maxiter=100000: sweep point 1 of 3 does not converge, residual, exit 1"
+  },
+  {
+   "id": "err/f28-lossless-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "20000",
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-tran.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: the same ring in a .tran with specs --maxiter 20000: the operating point before the transient does not converge, residual, exit 1"
+  },
+  {
+   "id": "err/f28-maxiter-small",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-maxiter-small.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=100 stops the converging all-pass ring of b124 (869 delta cycles): exit 1, residual lists the 4 ports that changed"
+  },
+  {
+   "id": "regress/f28-maxiter-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "1000000",
+    "-f",
+    "tests/golden/netlists/f28-maxiter-small.cir"
+   ],
+   "note": "F-28: specs --maxiter overrides .options maxiter=100 of the netlist: converges to the operating point of regress/b124-allpass-ring-default-reltol (out = 0.995098 W)"
+  },
+  {
+   "id": "regress/f28-maxiter-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "0",
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "note": "F-28: --maxiter 0 is no limit: same operating point and outputs as regress/b124-allpass-ring-default-reltol"
+  },
+  {
+   "id": "err/f28-options-maxiter-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-options-maxiter-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=-1 is rejected (integer between 0 and 2^53), exit 1"
+  },
+  {
+   "id": "err/f28-options-maxiter-fraction",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-options-maxiter-fraction.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=1.5 is rejected (integer between 0 and 2^53), exit 1"
+  },
+  {
+   "id": "err/f28-maxiter-cli-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "abc",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-28: specs --maxiter abc is rejected before parsing (decimal integer), exit 1"
+  },
+  {
+   "id": "regress/f12-si-suffixes",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "tests/golden/netlists/f12-si-suffixes.cir"
+   ],
+   "note": "F-12 (B-160): scale suffixes f p n u m k meg g t on numbers (SPICE, caseless: M is milli, MEG mega), dry run with JSON export: each pair of elements/.params gives equal values with the suffix and the exponent form (1.55u = 1.55e-6, 1k = 1000 as a DOUBLE, 1M = 1e-3, 1.5e3k = 1.5e6, {2*775n} in a positional expression, a .param with a suffix); the rel_* .params check that the suffixed value is the correctly rounded double of the exponent form (exactly 0)"
+  },
+  {
+   "id": "regress/f12-si-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-si-op.cir"
+   ],
+   "note": "F-12 (B-160): .op with scale suffixes in element kwargs (wl=1.55u power=1m length=500u), positional arguments (1.31u 2m) and .options (abstol=1p reltol=10u); expected values in the netlist header"
+  },
+  {
+   "id": "err/f12-si-unit-letters",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-si-unit-letters.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12 (B-160): unit letters after the scale suffix are not accepted: wl=1.55um lexes as 1.55u followed by the identifier m, a syntax error (offending token \"m\"), exit 1"
+  },
+  {
+   "id": "regress/f12-ends-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-ends-name.cir"
+   ],
+   "note": "F-12 (B-169): .ends NAME accepted, name compared case-insensitively with the .subckt name (.ends DELAY, nested .ends Delay_Line inside ring_path checked when the body is parsed per instance, plus a bare .ends); .op output identical to the same netlist with bare .ends lines"
+  },
+  {
+   "id": "err/f12-ends-name-mismatch",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-ends-name-mismatch.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12 (B-169): .ends rong closing .subckt ring is rejected with a parsing error naming both names, exit 1"
+  },
+  {
+   "id": "regress/f12-dc-wl-alias",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-wl-alias.cir"
+   ],
+   "note": "F-12: .dc WL(cwsrc1) start stop step (ATTR(elem), the paper/cheatsheet syntax) on an unbalanced MZI; stdout and VCD must be identical to regress/f12-dc-wl-slash (.dc /cwsrc1/WL), only the run manifest differs (netlist path and hash)"
+  },
+  {
+   "id": "regress/f12-dc-wl-slash",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-wl-slash.cir"
+   ],
+   "note": "F-12: reference for regress/f12-dc-wl-alias: the same circuit and sweep with .dc /cwsrc1/WL"
+  },
+  {
+   "id": "regress/f12-dc-p-alias",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-p-alias.cir"
+   ],
+   "note": "F-12: .dc P(cwsrc1) start stop step (power sweep through the ATTR(elem) alias) on the circuit of regress/f12-dc-wl-alias at 1550 nm: output power proportional to the source power"
+  },
+  {
+   "id": "err/f12-dc-alias-unknown-attr",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-alias-unknown-attr.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12: .dc Q(cwsrc1) is rejected with the existing message of the /elem/ATTR form (Unknown attribute for CWSRC1: Q), exit 1"
+  },
+  {
+   "id": "regress/f12-param-override",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "pin=4e-3/2",
+    "--param",
+    "att=0",
+    "-f",
+    "tests/golden/netlists/f12-param-override.cir"
+   ],
+   "note": "F-12: --param overrides the root-level .param/.assign of the same name whatever the order (uses before and after the netlist's second .param pin both see 0.002 W), the value is parsed as in .param (4e-3/2, att=0 INTEGER); the subcircuit parameter pin keeps its default (0.005 W)"
+  },
+  {
+   "id": "regress/f12-param-undefined",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "pin=2e-3",
+    "-f",
+    "tests/golden/netlists/f12-param-undefined.cir"
+   ],
+   "note": "F-12: --param of a name the netlist never assigns at root level is defined anyway ({pin} = 0.002 W), with the warning 'Warning: --param pin: the netlist has no .param pin' on stderr"
+  },
+  {
+   "id": "err/f12-param-malformed",
+   "args": [
+    "--param",
+    "lambda-min=1.54e-6",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-12: --param needs name=value with an identifier name ('-' is not allowed): Invalid --param value, exit 1"
+  },
+  {
+   "id": "regress/f12-include-relative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-include/main.cir"
+   ],
+   "note": "F-12 (B-143): .include relative to the including file first: main.cir -> mid.cir (same dir) -> sub/leaf.cir then sub/probes.cir (relative to mid.cir, after sub/leaf.cir has ended); the body of subcircuit SRC, defined in sub/leaf.cir, includes src_body.cir next to sub/leaf.cir when X1 is flattened. 'Including file:' and the run manifest give the paths opened"
+  },
+  {
+   "id": "regress/f12-include-both-differ",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-include/both.cir"
+   ],
+   "note": "F-12 (B-143): .include circuits/add_drop_sub.cir exists next to both.cir and in the working directory, with different contents: the file-relative one is used (sets .param included_from, no subcircuit), with a warning on stderr"
   }
  ]
 }

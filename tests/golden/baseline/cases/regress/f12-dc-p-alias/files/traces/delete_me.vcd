@@ -1,0 +1,149 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaabc  abstol       $end
+$var real    1  aaabd  reltol       $end
+$var wire   32  aaabe  resolution_multiplier [31:0]  $end
+$var wire   32  aaabf  engine_timescale [31:0]  $end
+$var wire   32  aaabg  simulation_mode [31:0]  $end
+$var wire   32  aaabh  analysis_type [31:0]  $end
+$var wire    1  aaabi  trace_all_optical_nets       $end
+$var wire    1  aaabj  verbose_component_initialization       $end
+$scope module PROBE{ROOT/a} $end
+$var real    1  aaaae  power       $end
+$var real    1  aaaaf  abs       $end
+$var real    1  aaaag  phase       $end
+$var real    1  aaaah  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/b} $end
+$var real    1  aaaai  power       $end
+$var real    1  aaaaj  abs       $end
+$var real    1  aaaak  phase       $end
+$var real    1  aaaal  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/c} $end
+$var real    1  aaaam  power       $end
+$var real    1  aaaan  abs       $end
+$var real    1  aaaao  phase       $end
+$var real    1  aaaap  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/d} $end
+$var real    1  aaaaq  power       $end
+$var real    1  aaaar  abs       $end
+$var real    1  aaaas  phase       $end
+$var real    1  aaaat  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/in} $end
+$var real    1  aaaau  power       $end
+$var real    1  aaaav  abs       $end
+$var real    1  aaaaw  phase       $end
+$var real    1  aaaax  wavelength       $end
+$upscope $end
+$scope module PROBE{ROOT/out} $end
+$var real    1  aaaay  power       $end
+$var real    1  aaaaz  abs       $end
+$var real    1  aaaba  phase       $end
+$var real    1  aaabb  wavelength       $end
+$upscope $end
+$scope module ROOT/PROBE1 $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.0007644820051635388 aaaaa
+r0.02764926771477933 aaaab
+r-1.925492271554873 aaaac
+r1.55e-06 aaaad
+r0.0005 aaaae
+r0.0223606797749979 aaaaf
+r0 aaaag
+r1.55e-06 aaaah
+r0.0005 aaaai
+r0.0223606797749979 aaaaj
+r0 aaaak
+r1.55e-06 aaaal
+r0.0005 aaaam
+r0.0223606797749979 aaaan
+r-2.432200764069288 aaaao
+r1.55e-06 aaaap
+r0.0005000000000000001 aaaaq
+r0.0223606797749979 aaaar
+r-1.418783779040458 aaaas
+r1.55e-06 aaaat
+r0.0009999999999999998 aaaau
+r0.03162277660168379 aaaav
+r0 aaaaw
+r1.55e-06 aaaax
+r0.0007644820051635388 aaaay
+r0.02764926771477933 aaaaz
+r-1.925492271554873 aaaba
+r1.55e-06 aaabb
+r1e-08 aaabc
+r0.0001 aaabd
+b1 aaabe
+b11111111111111111111111111110011 aaabf
+b11 aaabg
+b1 aaabh
+1aaabi
+0aaabj
+$end
+
+#1
+r0.001528964010327078 aaaaa
+r0.03910196939192549 aaaab
+r0.001 aaaae
+r0.0316227766016838 aaaaf
+r0.001 aaaai
+r0.0316227766016838 aaaaj
+r0.001 aaaam
+r0.0316227766016838 aaaan
+r0.001 aaaaq
+r0.0316227766016838 aaaar
+r0.002 aaaau
+r0.04472135954999579 aaaav
+r0.001528964010327078 aaaay
+r0.03910196939192549 aaaaz
+
+#2
+r0.002293446015490617 aaaaa
+r0.04788993647407164 aaaab
+r0.0015 aaaae
+r0.03872983346207418 aaaaf
+r0.0015 aaaai
+r0.03872983346207418 aaaaj
+r0.0015 aaaam
+r0.03872983346207418 aaaan
+r0.0015 aaaaq
+r0.03872983346207418 aaaar
+r0.003 aaaau
+r0.05477225575051661 aaaav
+r0.002293446015490617 aaaay
+r0.04788993647407164 aaaaz
+
+#3
+r0.003057928020654155 aaaaa
+r0.05529853542955867 aaaab
+r0.002 aaaae
+r0.04472135954999579 aaaaf
+r0.002 aaaai
+r0.04472135954999579 aaaaj
+r0.002 aaaam
+r0.04472135954999579 aaaan
+r0.002 aaaaq
+r0.0447213595499958 aaaar
+r0.003999999999999999 aaaau
+r0.06324555320336758 aaaav
+r0.003057928020654155 aaaay
+r0.05529853542955867 aaaaz
+

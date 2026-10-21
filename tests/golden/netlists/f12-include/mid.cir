@@ -1,0 +1,4 @@
+* F-12: included by main.cir (same directory); includes files relative to this file
+.include sub/leaf.cir
+.include sub/probes.cir
+cwsrc1 a wl=1.55e-6 power=1e-3

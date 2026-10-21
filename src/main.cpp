@@ -58,6 +58,43 @@ int do_test(const string &testname)
     return 0;
 }
 
+// --param name (F-12): a letter or '_', then letters, digits or '_' (as a .param name)
+bool is_param_name(const string &name)
+{
+    auto is_alpha_plus = [](char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; };
+    if (name.empty() || !is_alpha_plus(name[0]))
+        return false;
+    for (char c : name)
+        if (!is_alpha_plus(c) && !(c >= '0' && c <= '9'))
+            return false;
+    return true;
+}
+
+// Value of a --param override (F-12): the line ".param name=value" parsed with the netlist grammar
+// into a scratch tree, before the netlist (its parameters are not visible)
+Variable parse_param_value(const string &name, const string &value)
+{
+    ParseTree scratch;
+    ParserState parser_state;
+    parser_state.current_filename = "--param " + name;
+    yyscan_t scanner;
+    yylex_init_extra(&parser_state, &scanner);
+    string line = ".param " + name + "=" + value + "\n";
+    YY_BUFFER_STATE buf = yy_scan_string(line.c_str(), scanner);
+    yy_switch_to_buffer(buf, scanner);
+    yyset_lineno(1, scanner);
+    int parsing_result = yyparse(scanner, &scratch);
+    yylex_destroy(scanner);
+
+    // exactly one assignment (e.g. not "x=1 y=2")
+    if (parsing_result != 0 || scratch.local_assignments.size() != 1 || scratch.local_assignments.count(name) == 0)
+    {
+        cerr << "Invalid --param value: '" << name << "=" << value << "' (expected name=value)" << endl;
+        exit(1);
+    }
+    return scratch.local_assignments.at(name);
+}
+
 int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer="")
 {
     yyscan_t scanner;
@@ -93,6 +130,12 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
     // Return if unsuccessful
     if (parsing_result != 0) {
         return parsing_result;
+    }
+
+    for (const auto &p : pt.param_overrides)
+    {
+        if (!p.second)
+            cerr << "Warning: --param " << p.first << ": the netlist has no .param " << p.first << endl;
     }
 
     pt.print();
@@ -173,6 +216,18 @@ int sc_main(int argc, char *argv[])
                           "Set the master seed of the random streams (decimal integer, 0 to 2^64-1, "
                           "default 0); overrides .options seed",
                           { "seed" });
+    args::ValueFlagList<string> set_params(parser,
+                          "name=value",
+                          "Set the netlist parameter <name>, parsed as in .param name=value; "
+                          "overrides the netlist's .param/.assign of the same name (repeatable)",
+                          { "param" });
+
+    args::ValueFlag<string> set_maxiter(parser,
+                          "set_maxiter",
+                          "Set the maximum number of iterations (delta cycles) of the .op/.dc fixed point, "
+                          "per operating point or sweep point (decimal integer, default 1000000, 0: no "
+                          "limit); overrides .options maxiter",
+                          { "maxiter" });
 
     args::ValueFlag<size_t> set_nrings_crow(parser,
                           "set_nrings_crow",
@@ -288,6 +343,31 @@ int sc_main(int argc, char *argv[])
         // takes priority over the netlist's .options seed
         specsGlobalConfig.seed_explicit = true;
     }
+    if (set_maxiter) {
+        // F-28: set directly, like --seed (full 64-bit range); takes priority over .options maxiter
+        const string &s = set_maxiter.Get();
+        uint64_t maxiter_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), maxiter_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid maxiter value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.max_iterations = maxiter_val;
+        specsGlobalConfig.max_iterations_explicit = true;
+    }
+    // F-12: validated here, applied to the netlist parse tree (ignored with -t, like --reltol)
+    vector<pair<string, string>> param_overrides;
+    for (const auto &s : set_params.Get()) {
+        const size_t i_eq = s.find('=');
+        const string name = s.substr(0, i_eq);
+        const string value = i_eq == string::npos ? "" : s.substr(i_eq + 1);
+        if (i_eq == string::npos || !is_param_name(name) || value.empty()
+            || value.find_first_of("\r\n") != string::npos) {
+            cerr << "Invalid --param value: '" << s << "' (expected name=value)" << endl;
+            return 1;
+        }
+        param_overrides.emplace_back(name, value);
+    }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();
     }
@@ -338,6 +418,9 @@ int sc_main(int argc, char *argv[])
         footer << endl;
         //cout << footer.str() << endl;
         ParseTree pt;
+        // the last one wins if a name is given twice
+        for (const auto &p : param_overrides)
+            pt.set_param_override(p.first, parse_param_value(p.first, p.second));
         int parse_result = build_circuit(pt, file.Get(), footer.str());
         if (parse_result)
         {

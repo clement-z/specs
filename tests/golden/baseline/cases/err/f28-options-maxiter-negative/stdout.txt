@@ -1,0 +1,38 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+2 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/PROBE1 (PROBE) ROOT/in {} {}
+-----------
+1 named nets
+ - ROOT/in: OANALOG<1>u (1|1)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {maxiter (DOUBLE) = -1, }
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[OP] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/in...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/PROBE1 (reason: unidir backlog)
+Done creating ROOT/PROBE1
+Done (elaborating network of ROOT/in)
+
