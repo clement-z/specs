@@ -1,0 +1,12 @@
+# SystemC 3.0.2 (tag 3.0.2 of accellera-official/systemc), built with its own CMake build through
+# Meson's cmake module (options in the top-level meson.build). The tarball is the tag's tree minus
+# the dotfiles excluded by SystemC's .gitattributes (.github/, .mailmap, a test marker).
+[wrap-file]
+directory = systemc-3.0.2
+source_url = https://github.com/accellera-official/systemc/archive/refs/tags/3.0.2.tar.gz
+source_filename = systemc-3.0.2.tar.gz
+source_hash = 9b3693ed286aab958b9e5d79bb0ad3bc523bbc46931100553275352038f4a0c4
+method = cmake
+
+[provide]
+systemc = systemc_dep

@@ -1,5 +1,6 @@
-# Same steps as .github/workflows/ci.yml. SystemC is built from the thirdparty/systemc submodule
-# as C++20 (distro packages may use another standard, which fails at link time) and cached.
+# Same steps as .github/workflows/ci.yml. SystemC is built as C++20 from subprojects/systemc.wrap
+# by `meson setup` (distro packages may use another standard, which fails at link time); the wrap
+# downloads and ccache are cached.
 image: ubuntu:24.04
 
 stages:
@@ -8,40 +9,46 @@ stages:
     - deploy
 
 variables:
-    # Recursive submodule update
-    GIT_SUBMODULE_STRATEGY: recursive
+    # Full clone: the version comes from `git describe --tags` (utils/git-version.sh)
+    GIT_DEPTH: "0"
     DEBIAN_FRONTEND: noninteractive
     MESON_VERSION: "1.11.2"
-    SYSTEMC_PREFIX: $CI_PROJECT_DIR/.deps/systemc
+    # CC too: the SystemC subproject compiles C and assembly (QuickThreads) with it. ccache: Meson
+    # only adds it by itself when CC/CXX are unset.
+    CC: ccache gcc
+    CXX: ccache g++
+    CCACHE_DIR: $CI_PROJECT_DIR/.ccache
+    CCACHE_MAXSIZE: 500M
 
 default:
     before_script:
         - apt-get update
         - apt-get install -y --no-install-recommends
-          ca-certificates git g++ cmake ninja-build flex bison
+          ca-certificates git g++ cmake ninja-build flex bison ccache
           python3 python3-venv doxygen graphviz
         - python3 -m venv /opt/meson
         - /opt/meson/bin/pip install "meson==${MESON_VERSION}"
         - export PATH="/opt/meson/bin:$PATH"
-        # No-op when the cache already holds this SystemC commit built by this compiler
-        - utils/build-systemc.sh "$SYSTEMC_PREFIX" .deps/systemc-build
+    # Meson checks the wrap hashes, so a changed wrap just downloads its new tarball
     cache:
-        key: systemc-ubuntu24.04-gcc
+        key: wraps-ccache-ubuntu24.04-gcc
         paths:
-            - .deps/systemc
+            - subprojects/packagecache/
+            - .ccache/
 
 # specs and libspx.so need libsystemc.so.3.0 at run time: it is shipped in the artefacts
-# (.deps/systemc/lib*/), use LD_LIBRARY_PATH to run them elsewhere.
+# (build/subprojects/systemc-*/; the pattern skips the libsystemc.so.<version>.p/ object
+# directory), use LD_LIBRARY_PATH to run them elsewhere.
 build:
     stage: build
     script:
-        - meson setup build -Dnative=false -Dspx=true -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+        - meson setup build -Dnative=false -Dspx=true
         - meson compile -C build
     artifacts:
         paths:
             - build/specs
             - build/libspx.so
-            - .deps/systemc/lib*/libsystemc.so*
+            - build/subprojects/systemc-*/libsystemc.so.[0-9]*[0-9]
         expire_in: 1 week
 
 # A build dir does not survive being passed as an artefact (fresh checkout timestamps, absolute
@@ -50,7 +57,7 @@ test:
     stage: test
     needs: [build]
     script:
-        - meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX"
+        - meson setup build -Dnative=false
         - meson test -C build --print-errorlogs
     artifacts:
         when: always
@@ -61,7 +68,7 @@ test:
 doc:
     stage: build
     script:
-        - meson setup build -Dnative=false -Dcmake_prefix_path="$SYSTEMC_PREFIX" -Dtests=disabled
+        - meson setup build -Dnative=false -Dtests=disabled
         - ninja -C build doc
     artifacts:
         paths:

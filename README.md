@@ -16,24 +16,38 @@ Requirements: a C++20 compiler (GCC ≥ 11 or clang), [Meson](https://mesonbuild
 flex, bison ≥ 3 and Python 3.
 
 ```sh
-git clone --recursive https://github.com/clement-z/specs && cd specs
-./install.sh                       # SystemC -> .deps/systemc, then builds and tests build/specs
+git clone https://github.com/clement-z/specs && cd specs
+./install.sh                       # builds and tests build/specs (same as the commands below)
 ```
 
-or by hand, with a SystemC 3.0.2 built as **C++20** (a C++17 build fails to link):
+or by hand:
 
 ```sh
-meson setup build -Dcmake_prefix_path=/path/to/systemc/prefix   # release build by default
-meson compile -C build
+meson setup build                  # release build by default; downloads SystemC, args and googletest
+meson compile -C build             # builds SystemC 3.0.2 as C++20, then specs
 meson test -C build                # unit tests, testbench smoke tests, golden-output regression
 build/specs -f circuits/add_drop.cir -o traces/out               # needs a traces/ directory
 build/specs -f circuits/add_drop.cir -o traces/out --format csv  # traces/out.csv instead of traces/out.vcd
 ```
 
-Without `-Dcmake_prefix_path` (and no `systemc` pkg-config package), Meson builds SystemC from the
-`thirdparty/systemc` submodule. Useful options: `-Dnative=false` (portable binaries, no `-march=native`),
+SystemC 3.0.2 and [taywee/args](https://github.com/Taywee/args) 6.4.7 come from `subprojects/*.wrap`
+(release tarballs checked by sha256), like googletest. To build without network access, run
+`meson subprojects download` beforehand, then `meson setup build --wrap-mode=nodownload`.
+
+To use an installed SystemC instead (it must be built as **C++20**: a C++17 build fails to link and is
+ignored with a warning), ask for it explicitly:
+
+```sh
+meson setup build -Dforce_fallback_for= -Dcmake_prefix_path=/path/to/systemc/prefix  # else the wrap
+meson setup build --wrap-mode=nofallback -Dcmake_prefix_path=/path/to/systemc/prefix # else an error
+```
+
+SystemC is then looked up with pkg-config, then as a CMake package (`-Dcmake_prefix_path`); args as a CMake
+package (with `nofallback`, the unit tests also need an installed googletest). Useful options: `-Dnative=false` (portable binaries, no `-march=native`),
 `-Dold_tb=false` (no built-in testbenches), `-Dtests=disabled` (no googletest download). The shared library
 is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs it), and the Doxygen docs with `ninja -C build doc`.
+`meson install` installs `specs` and, when SystemC is built from its wrap, `libsystemc.so` into `<prefix>/<libdir>`
+(the installed `specs` finds it through its rpath).
 
 If you want to contribute with the project, check the `todo.txt` file for some inspiration on points to work on. We are also open for new ideas, so feel free to open an issue and discuss.
 

@@ -5,7 +5,7 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
 
 ## Layout and project settings
 
-1. **`subproject_dir: 'thirdparty'`.** The existing submodules (`thirdparty/systemc`, `thirdparty/args`)
+1. *(Superseded by 34: `subprojects/`, wraps.)* **`subproject_dir: 'thirdparty'`.** The existing submodules (`thirdparty/systemc`, `thirdparty/args`)
    double as subprojects, so there is one place for third-party code. The gtest wrap lives at
    `thirdparty/gtest.wrap`; its downloads (`thirdparty/googletest-*/`, `thirdparty/packagecache/`,
    `thirdparty/.wraplock`) are git-ignored. The cost is that wrap downloads sit next to tracked submodules,
@@ -66,7 +66,7 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
 
 ## Dependencies
 
-16. **SystemC lookup order:** pkg-config `systemc` → CMake package `SystemCLanguage` (`SystemC::systemc`,
+16. *(Superseded by 35: the wrap by default, an installed SystemC on request.)* **SystemC lookup order:** pkg-config `systemc` → CMake package `SystemCLanguage` (`SystemC::systemc`,
     honours `-Dcmake_prefix_path`) → CMake subproject `thirdparty/systemc`. For the first two, a `cxx.links()`
     probe checks that SystemC was built with the same C++ standard (the `sc_api_version_*_cxx<std>`
     symbol). On a mismatch, Meson prints a warning and moves to the next candidate, instead of failing late
@@ -75,7 +75,7 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
     tree into `~/.cmake/packages`. Lookups pass `-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF` (and the pre-3.16
     variable), so a stale scratch build is never picked instead of the fallback. `utils/build-systemc.sh`
     and the subproject also don't register their build trees.
-17. **CMake-subproject fallback** (`thirdparty/systemc` via Meson's `cmake` module). Options:
+17. *(Now the default build, from `subprojects/systemc.wrap`; options unchanged, see 35.)* **CMake-subproject fallback** (`thirdparty/systemc` via Meson's `cmake` module). Options:
     `CMAKE_CXX_STANDARD=20`, `ENABLE_EXAMPLES=OFF`, `ENABLE_REGRESSION=OFF`,
     `CMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON`, `warning_level=0`. Three non-obvious points:
     - **Shared** (`BUILD_SHARED_LIBS=ON`) and **installed** (`set_install(true)`, library only).
@@ -95,7 +95,7 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
       `/usr/local/lib64`). There it can shadow, or be shadowed by, another SystemC, possibly one built
       with another C++ standard. Meson's `cmake` module cannot redirect the install dir. Installs that
       matter should use a separately installed SystemC (`install.sh` does).
-18. **args:** CMake package `taywee::args`, else `-isystem thirdparty/args` (header-only).
+18. *(Superseded by 36.)* **args:** CMake package `taywee::args`, else `-isystem thirdparty/args` (header-only).
 19. **gtest: WrapDB `gtest 1.17.0-4`** (CMake used FetchContent 1.12.0). 1.17.0 is the newest release line
     with several WrapDB revisions (1.18.0 had just one), it supports C++17/20 and it builds cleanly with
     GCC 11 and clang 19. The gtest results (`A.B` PASS, `Waveguide.Instantiation` PASS,
@@ -151,7 +151,7 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
 
 ## CI and install
 
-30. **CI image/runner: Ubuntu 24.04** for both GitHub Actions (`ubuntu-24.04`, pinned) and GitLab
+30. *(SystemC part superseded by 37.)* **CI image/runner: Ubuntu 24.04** for both GitHub Actions (`ubuntu-24.04`, pinned) and GitLab
     (`ubuntu:24.04`, replacing Alpine, whose `systemc-dev` standard is unknown). SystemC is built from the
     submodule as C++20 by `utils/build-systemc.sh` (shared by both CIs and `install.sh`). The script
     is idempotent: a stamp file holds the SystemC commit plus the compiler's `--version` line without
@@ -169,6 +169,53 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
     this explicitly. `doc` + `pages` run on master, as before; the doc job configures with `-Dtests=disabled`.
     GitHub also ships `libsystemc.so*` with its binary artefacts. Downloaded binaries need
     `LD_LIBRARY_PATH`, because their rpath points into the runner workspace.
-33. **`install.sh`:** submodules → `utils/build-systemc.sh .deps/systemc` → `meson setup build
+33. *(Superseded by 37.)* **`install.sh`:** submodules → `utils/build-systemc.sh .deps/systemc` → `meson setup build
     -Dcmake_prefix_path=.deps/systemc` → `meson compile` → `meson test`. SystemC is no longer built inside
     the submodule work tree (`thirdparty/systemc/build`), which used to leave the submodule dirty.
+
+## Dependencies from wraps (2026-10-21, third round, before v0.2.0)
+
+Maintainer decision in `backlog/DECISIONS-2026-10-21.md` ("third round"); implemented in phase PC2.
+
+34. **`subprojects/` (Meson's default), no submodules.** `thirdparty/` is renamed and `subproject_dir` dropped.
+    SystemC 3.0.2 and taywee/args 6.4.7 come from `[wrap-file]` wraps (GitHub tag tarballs, sha256), like
+    gtest. Both tarballs were compared with `diff -r` to the former submodule commits (which are the tags):
+    args is identical; SystemC lacks only the dotfiles its `.gitattributes` marks `export-ignore`
+    (`.github/`, `.mailmap`, `.gitmodules`, `.gitattributes`, a regression-test marker), none used by its
+    CMake build. `.gitignore` ignores `subprojects/*` except `*.wrap` and `packagefiles/`. Offline:
+    `meson subprojects download`, then `--wrap-mode=nodownload`.
+35. **SystemC from the wrap by default; an installed one only on explicit request.** `default_options`
+    has `force_fallback_for=systemc,args`. `meson.build` reads `wrap_mode` and `force_fallback_for`:
+    - default: `cmake.subproject('systemc')` with the options of 17, no lookup of an installed SystemC
+      (a `-Dcmake_prefix_path` alone does not change that);
+    - `-Dforce_fallback_for=` (without `systemc`): pkg-config, then the CMake package, each with the ABI
+      check of 16; if none is usable, the wrap (Meson's usual fallback);
+    - `--wrap-mode=nofallback`: the same lookup, and an error if none is usable. **nofallback wins over
+      the project's default `force_fallback_for`**: Meson's own `dependency()` gives `force_fallback_for`
+      precedence, but it cannot tell a project default from a user value, and a user who asks for no
+      fallback means it. **[review]**
+    - `--wrap-mode=forcefallback`: always the wrap.
+    `dependency()`'s automatic fallback is not used because the CMake subproject needs options
+    (`cmake.subproject_options()`) that `dependency()` cannot pass; the wraps still have `method = cmake`
+    (Meson ≥ 1.3) and a `[provide]` section, so `meson subprojects` commands and a plain `subproject()`
+    treat them correctly. Checked with Meson 1.3.0 and 1.11.2. The rpath handling of 15 is unchanged
+    (prefix libdir for an installed SystemC, `<prefix>/<libdir>` for the subproject).
+36. **args through its CMake build, not its `meson.build`.** args 6.4.7 ships a `meson.build` (providing
+    `args_dep`), but it calls `install_headers('args.hxx')` unconditionally, so `meson install` would
+    install `<prefix>/include/args.hxx`. Its CMake build is used instead (`cmake.subproject('args')`,
+    `ARGS_BUILD_EXAMPLE/UNITTESTS=OFF`, `set_install(false)`): an INTERFACE target, nothing built or
+    installed. An installed args (CMake package `taywee::args`) follows the same rule as SystemC (35).
+37. **CI and `install.sh` build SystemC as a subproject.** No `utils/build-systemc.sh` (removed), no prefix
+    or prefix cache, no submodules. CI keeps `CC`/`CXX` per matrix entry, prefixed with `ccache` (Meson only
+    adds ccache itself when they are unset), caches `subprojects/packagecache` (GitHub: keyed on the
+    `.wrap` files; GitLab: a fixed key, Meson checks the hashes) and `.ccache`, and clones the full
+    history for `git describe`. The binaries artefact ships `build/subprojects/systemc-*/libsystemc.so.[0-9]*[0-9]`
+    (`libsystemc.so*` would also match the `libsystemc.so.<version>.p/` object directory).
+    `install.sh` is plain setup/compile/test.
+38. **The SystemC subproject is never sanitized** (`set_override_option('b_sanitize', 'none')`). Sanitizer builds
+    used to link an unsanitized, installed SystemC. Built from the wrap, SystemC inherited
+    `-fsanitize=address,undefined`, and UBSan's vptr check fires in SystemC's own process dispatch
+    (`sc_process.h:633`, a member-function pointer called on `sc_process_host`) for every process: with
+    `meson test`'s `halt_on_error`, 11/12 tests and 123/212 golden cases failed (gcc). With the override, the
+    SPECS objects are sanitized as before and SystemC's are not (checked in `compile_commands.json`, Meson
+    1.3.0 and 1.11.2).

@@ -1,0 +1,11 @@
+# taywee/args 6.4.7 (header-only). Used through its CMake build (target taywee::args), not its
+# meson.build, which installs args.hxx unconditionally: SPECS does not install it.
+[wrap-file]
+directory = args-6.4.7
+source_url = https://github.com/Taywee/args/archive/refs/tags/6.4.7.tar.gz
+source_filename = args-6.4.7.tar.gz
+source_hash = ae53d120609ecf44ff079b6992b4b54d6c25e9d647d06f46d9f68fe1476c0454
+method = cmake
+
+[provide]
+args = args_dep

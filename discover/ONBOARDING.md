@@ -17,11 +17,11 @@ SystemC device modules exchanging per-wavelength complex optical fields, and run
 | Layer | Technology | Version / notes |
 |---|---|---|
 | Language | C++ | C++20 (`gnu++20`) |
-| Kernel | SystemC | 3.0.2 (submodule `thirdparty/systemc`, built as C++20) |
-| CLI | taywee/args | submodule `thirdparty/args`, header-only |
+| Kernel | SystemC | 3.0.2 (wrap `subprojects/systemc.wrap`, built as C++20 by `meson setup`) |
+| CLI | taywee/args | 6.4.7, wrap `subprojects/args.wrap`, header-only |
 | Parser | flex + bison | reentrant scanner, caseless; generated into the build dir |
 | Build | **Meson** ≥1.3 (+ Ninja) | replaced CMake and the Makefile in sprint 2026-10 (`discover/meson/`) |
-| Tests | GoogleTest (WrapDB wrap `thirdparty/gtest.wrap`) with fork-per-test macros; legacy `specs -t <tb>` testbenches with no assertions; **golden-output harness** `tests/golden/` (new) | |
+| Tests | GoogleTest (WrapDB wrap `subprojects/gtest.wrap`) with fork-per-test macros; legacy `specs -t <tb>` testbenches with no assertions; **golden-output harness** `tests/golden/` (new) | |
 | Python | `pyspecs/` subprocess wrapper + VCD→pandas | not packaged, undeclared deps |
 | CI | `.github/workflows/ci.yml` and `.gitlab-ci.yml` (Ubuntu 24.04, Meson) | not yet run on a remote |
 | Licence | LGPL-3.0 | no per-file headers |
@@ -64,7 +64,7 @@ specs -f circuit.cir [-o trace] [-T ts] [--abstol/--reltol] [-t tb]
 | `pyspecs/`, `utils/` | Python wrapper, VCD analysis, graph drawing, GTKWave launcher, KiCad symbol lib |
 | `doc/` | Doxygen config, stub mainpage, cheatsheet (stale), poster, **paper** (`doc/papers/`) |
 | `tests/golden/` | golden-output regression harness (sprint 2026-10) |
-| `thirdparty/` | submodules: systemc, args |
+| `subprojects/` | wraps: systemc, args, gtest (downloads are git-ignored) |
 
 ## Simulation lifecycle
 CLI parse → `.options` footer synthesised from flags → `yyparse` → `ParseTree::flatten` (re-parses subckt
@@ -82,9 +82,10 @@ Full trace with file:line in report 01 §3.
 - Git: work on `dev`, `--no-ff` merges to `master`; lowercase imperative commit subjects; one tag `v0.1`.
 
 ## Common tasks (Meson; decisions in `discover/meson/DECISIONS.md`)
-- Deps: SystemC + args installed in `~/.local/opt/specs-deps` (shared by all sprint worktrees). Elsewhere
-  `./install.sh` builds SystemC from the submodule, or Meson falls back to building it as a CMake subproject.
-- Build: `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps && meson compile -C build`
+- Deps: SystemC, args and googletest come from `subprojects/*.wrap`; `meson setup` downloads them and builds
+  SystemC as a CMake subproject. An installed SystemC only on request (`-Dforce_fallback_for=`
+  `-Dcmake_prefix_path=<prefix>`, or `--wrap-mode=nofallback`).
+- Build: `meson setup build && meson compile -C build`
   (release by default; options in `meson.options`: `native`, `old_tb`, `spx`, `tests`, `golden`, `docs`)
 - Tests: `meson test -C build` (suites `unit`, `tb`, `golden`; `--suite golden` for the gate only)
 - Run a netlist: `build/specs -f circuits/add_drop.cir -o /tmp/trace`
