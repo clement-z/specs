@@ -7,7 +7,7 @@
 ### New
 
 * CI: GitHub Actions and GitLab CI on Ubuntu 24.04 with Meson (gcc and clang, golden check);
-  `install.sh` rewritten for Meson
+  `install.sh` rewritten for Meson (plain setup, compile, test)
 * The unit tests compile again (`src/test/utils.h` placeholder `static_assert` removed)
 * Golden-output regression harness (`tests/golden/`, `meson test --suite golden`): 211 `specs` cases
   (example netlists, CLI options, every testbench, bad-input errors, regressions) plus the gtest suite
@@ -84,8 +84,13 @@ under Fixed, and `--mon` under Removed.
 * Switched to the **Meson** build system; it replaces both CMake and the `Makefile`
   * `meson setup build && meson compile -C build` (release build by default; CMake built without
     optimisation unless a build type was given). Options: `native`, `old_tb`, `spx`, `tests`, `golden`, `docs`
-  * SystemC is found via pkg-config, its CMake package (`-Dcmake_prefix_path=...`), or built from the
-    `thirdparty/systemc` submodule; googletest comes from a WrapDB wrap (no more configure-time git clone)
+  * SystemC 3.0.2, taywee/args 6.4.7 and googletest come from wraps in `subprojects/` (release tarballs
+    with sha256; the git submodules and `thirdparty/` are gone, so no `--recursive` clone): `meson setup`
+    downloads them and builds SystemC as C++20 with its CMake build (offline: `meson subprojects download`
+    first). An installed SystemC is used only on request: `-Dforce_fallback_for=` (falls back to the wrap)
+    or `--wrap-mode=nofallback` (errors), found via pkg-config or its CMake package (`-Dcmake_prefix_path`),
+    and ignored with a warning if built with another C++ standard. `meson install` also installs the
+    subproject's `libsystemc.so` into `<prefix>/<libdir>`, where the installed `specs` finds it (rpath)
   * `meson test` runs the unit tests, the testbench smoke tests (former `make test`) and the golden-output
     regression check
   * `make lib` → `meson compile -C build spx` (`libspx.so`, as built by CMake; the Makefile's `libspecs.so`

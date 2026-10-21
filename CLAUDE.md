@@ -5,15 +5,14 @@ parser, and a Python wrapper (`pyspecs/`). Paper: `doc/papers/zrounba2023-specs-
 Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known issues in `backlog.md`.
 
 ## Build & run
-- Deps: SystemC 3.0.2 **built as C++20** and taywee/args. On this machine they are prebuilt in
-  `~/.local/opt/specs-deps-next` (`~/.local/opt/specs-deps` is the older SystemC 3.0.1, don't use it);
-  otherwise use the submodules (`git submodule update --init --recursive`).
-- Build (Meson, release by default):
-  `meson setup build -Dcmake_prefix_path=$HOME/.local/opt/specs-deps-next && meson compile -C build`
+- Deps: SystemC 3.0.2 (**built as C++20**), taywee/args 6.4.7 and googletest come from `subprojects/*.wrap`:
+  `meson setup` downloads them (offline: `meson subprojects download` first) and builds SystemC with its CMake
+  build. An installed SystemC/args only on request: `-Dforce_fallback_for= -Dcmake_prefix_path=<prefix>`
+  (or `--wrap-mode=nofallback`, which errors if none is usable).
+- Build (Meson, release by default): `meson setup build && meson compile -C build`
   - Options (`meson.options`): `native` (`-march=native`, default on), `old_tb`, `spx`, `tests`, `golden`, `docs`.
     `libspx.so`: `meson compile -C build spx`. Docs: `ninja -C build doc`. Decisions: `discover/meson/DECISIONS.md`.
   - Asserts are on by default (`b_ndebug=false`). The golden baseline was recorded with `-DNDEBUG`; both pass.
-  - Without the prebuilt deps: `./install.sh`, or plain `meson setup build` (builds SystemC from the submodule).
   - **Don't run `ninja clang-format`** (Meson's automatic target): it reformats every file.
 - Run: `build/specs -f circuits/add_drop.cir -o traces/out` (needs a `traces/` dir in the cwd;
   `.include` paths resolve relative to the including file, then the cwd). Legacy testbenches: `build/specs -t wg` (list them with `specs -p`).
