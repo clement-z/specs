@@ -1,1 +1,5 @@
-{"agents": []}
+{
+ "agents": [
+  {"id": "f8d8912f-7d3e-499d-b5c9-c7cdcad6118b", "phase": "PA", "branch": "ws/followups", "done": "backlog/sprint-2026-10c/PA-REPORT.md"}
+ ]
+}
