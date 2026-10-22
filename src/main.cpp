@@ -266,12 +266,6 @@ int sc_main(int argc, char *argv[])
                           "<seconds> of wall-clock time (default 1); it never changes the simulation; "
                           "netlists only",
                           { "progress" }, string("1"), string());
-    args::Flag set_no_coalescing(parser,
-                          "no_coalescing",
-                          "Expert option (ablation): keep every write of an optical output port as its own "
-                          "pending entry, instead of merging the writes for the same time and wavelength; "
-                          "equal times are processed in write order; overrides .options coalesce",
-                          { "no-coalescing" });
     args::ValueFlag<string> set_max_events(parser,
                           "set_max_events",
                           "Expert option: stop the run once the optical output ports have processed this "
@@ -434,11 +428,6 @@ int sc_main(int argc, char *argv[])
             return 1;
         }
         specsGlobalConfig.progress_period_s = period_s;
-    }
-    if (set_no_coalescing) {
-        // F-15 expert option; takes priority over .options coalesce
-        specsGlobalConfig.coalesce = false;
-        specsGlobalConfig.coalesce_explicit = true;
     }
     if (set_max_events) {
         // F-15 expert option, set directly like --maxiter; takes priority over .options maxevents

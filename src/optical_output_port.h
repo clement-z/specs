@@ -66,10 +66,6 @@ public:
     // Emitted values with |E| < m_snap_factor * m_abstol are replaced by 0; 0 disables it (B-021)
     double m_snap_factor = 10;
     sc_time::value_type m_timestep_value = 1; // relative to systemc timestep
-    // F-15 expert option (.options coalesce, specs --no-coalescing): a write for a (time, wavelength)
-    // already pending replaces (or adds to) that entry. Off: every write is a new entry, and entries
-    // of equal time are taken in write order (FIFO)
-    bool m_coalesce = true;
     // F-15 --stats: count the activity of the port (OpticalOutputPortStats)
     bool m_collect_stats = false;
     // F-15 event cap; nullptr: no cap
@@ -105,15 +101,12 @@ public:
 	typedef sc_port<sc_signal_out_if<OpticalSignal>> port_type;
 	typedef pair<sc_time, OpticalSignal> pair_type;
     typedef PQueue<pair_type> queue_type;
-    // Pending entries without coalescing (F-15): equal times in insertion order
-    typedef std::multimap<sc_time, OpticalSignal> fifo_queue_type;
 
 
 // private:
 public:
     port_type &m_port;
     queue_type m_queue;
-    fifo_queue_type m_fifo_queue; // used instead of m_queue when m_coalesce is off
 
     // F-15: the notifications of the pending entries, as the sc_event_queue used here before
     // made them, without its allocation per notification: m_pending_event fires once per entry,
@@ -133,7 +126,6 @@ public:
     double m_snap_factor;
     bool m_use_deltas = false;
     bool m_skip_next_convergence_check = false;
-    bool m_coalesce = true;
     bool m_collect_stats = false;
     OpticalOutputPortEventCap *m_event_cap = nullptr; // owned by m_config
 
@@ -212,7 +204,6 @@ public:
         m_pending_times = decltype(m_pending_times)();
         m_pending_event.cancel();
         m_queue = queue_type();
-        m_fifo_queue.clear();
     }
 
     void reset()
@@ -224,13 +215,13 @@ public:
 
     inline bool isempty() const
     {
-        return m_queue.empty() && m_fifo_queue.empty();
+        return m_queue.empty();
     }
 
-    // Pending entries (of the queue in use)
+    // Pending entries
     inline size_t pending() const
     {
-        return m_coalesce ? m_queue.size() : m_fifo_queue.size();
+        return m_queue.size();
     }
 
     const OpticalOutputPortStats &getStats() const

@@ -127,51 +127,6 @@ TEST(RunStats, NoCountersWhenOff)
     SPECS_TEST_FOOTER();
 }
 
-// No coalescing (F-15 expert option): every write is its own entry, entries of the same time
-// are taken in write order (FIFO), so the last write of a time step is the one left on the net
-TEST(RunStats, NoCoalescingKeepsEveryWriteInOrder)
-{
-    SPECS_TEST_HEADER()
-    {
-        StatsHarness h("h");
-        h.config->m_coalesce = false;
-        auto &oop = h.m_out_writer;
-        const OpticalOutputPortStats &s = oop.getStats();
-        sc_start(SC_ZERO_TIME);
-
-        // |E| decreasing then increasing: the coalescing queue orders equal times by |E|, this one by write order
-        oop.delayedWrite(OpticalSignal(F(1, 0), 1.55e-6), sc_time(1, SC_NS));
-        oop.delayedWrite(OpticalSignal(F(3, 0), 1.55e-6), sc_time(1, SC_NS));
-        oop.delayedWrite(OpticalSignal(F(2, 0), 1.55e-6), sc_time(1, SC_NS));
-        EXPECT_EQ(oop.pending(), 3u);
-        EXPECT_TRUE(oop.m_queue.empty());
-
-        sc_start(2, SC_NS);
-        EXPECT_EQ(h.seen, (std::vector<F>{1, 3, 2}));
-        EXPECT_EQ(s.scheduled, 3u);
-        EXPECT_EQ(s.coalesced, 0u);
-        EXPECT_EQ(s.processed, 3u);
-        EXPECT_EQ(s.emitted, 3u);
-        EXPECT_EQ(s.pending_max, 3u);
-        EXPECT_TRUE(oop.isempty());
-
-        // frequency-domain writes too
-        oop.immediateWriteFrequencyDomain(OpticalSignal(F(4, 0), 1.55e-6));
-        oop.immediateWriteFrequencyDomain(OpticalSignal(F(5, 0), 1.55e-6));
-        EXPECT_EQ(oop.pending(), 2u);
-        sc_start(1, SC_NS);
-        EXPECT_EQ(h.seen, (std::vector<F>{1, 3, 2, 4, 5}));
-        EXPECT_EQ(s.processed, 5u);
-
-        // drop_queue() empties it
-        oop.delayedWrite(OpticalSignal(F(1, 0), 1.55e-6), sc_time(1, SC_NS));
-        EXPECT_FALSE(oop.isempty());
-        oop.drop_queue();
-        EXPECT_TRUE(oop.isempty());
-    }
-    SPECS_TEST_FOOTER();
-}
-
 // Event cap (F-15 expert option): the simulation stops at the end of the delta cycle in which
 // the ports sharing the cap have processed max_events entries in total
 TEST(RunStats, EventCapStopsTheSimulation)
@@ -246,7 +201,7 @@ TEST(RunStats, CollectAndJson)
             "  \"format_version\": 1,\n"
             "  \"analysis\": \"TRAN\",\n"
             "  \"sections\": [\"summary\", \"ports\", \"devices\"],\n"
-            "  \"options\": {\"abstol\": 1e-08, \"reltol\": 1e-04, \"snapfactor\": 10, \"coalesce\": true, \"maxevents\": 0},\n"
+            "  \"options\": {\"abstol\": 1e-08, \"reltol\": 1e-04, \"snapfactor\": 10, \"maxevents\": 0},\n"
             "  \"event_cap_reached\": false,\n"
             "  \"end_time_s\": 3e-09,\n"
             "  \"wall_time_s\": 0.25,\n"

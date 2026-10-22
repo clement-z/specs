@@ -132,15 +132,6 @@ void OPTIONSDirective::create() const
             if (!specsGlobalConfig.max_iterations_explicit)
                 specsGlobalConfig.max_iterations = max_iterations;
         }
-        else if (kw == "COALESCE")
-        {
-            // F-15 expert option (ablation): 0 keeps every write of a port as its own pending
-            // entry, equal times in write order (doc/numerics.md)
-            const bool coalesce = p.second.as_boolean();
-            // specs --no-coalescing takes priority over the netlist
-            if (!specsGlobalConfig.coalesce_explicit)
-                specsGlobalConfig.coalesce = coalesce;
-        }
         else if (kw == "MAXEVENTS")
         {
             // F-15 expert option: the run stops after this many processed pending entries (0: no cap)

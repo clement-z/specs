@@ -15,9 +15,9 @@
    "stored": "files/traces/crow_tb.manifest.json"
   },
   "traces/crow_tb.stats.json": {
-   "bytes": 3895,
+   "bytes": 3877,
    "kind": "json",
-   "sha256": "7e589281e13f8834844c80f897008d5d34d0a2c8d9ecefd1dfef83a436661c25",
+   "sha256": "b3c9e8080153b75567ea6daf8813618e62e8d719d0c1ba8b2f6c699e23d32fe2",
    "stored": "files/traces/crow_tb.stats.json"
   },
   "traces/crow_tb.vcd": {

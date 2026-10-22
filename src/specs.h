@@ -121,11 +121,7 @@ public:
     uint64_t max_iterations = DEFAULT_MAX_ITERATIONS;
     // Set when it was chosen explicitly (specs --maxiter): .options maxiter is then ignored
     bool max_iterations_explicit = false;
-    // Expert options for ablation studies (F-15, doc/numerics.md). Coalescing of the writes of a
-    // port for the same (time, wavelength) (.options coalesce, specs --no-coalescing)
-    bool coalesce = true;
-    bool coalesce_explicit = false; // set by specs --no-coalescing: .options coalesce is then ignored
-    // Event cap: the run stops once the output ports have processed max_events pending entries
+    // Expert option (F-15, doc/numerics.md). Event cap: the run stops once the output ports have processed max_events pending entries
     // (.options maxevents, specs --max-events); 0: no cap
     uint64_t max_events = 0;
     bool max_events_explicit = false; // set by specs --max-events: .options maxevents is then ignored

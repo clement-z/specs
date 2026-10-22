@@ -64,7 +64,7 @@ Info: /OSCI/SystemC: Simulation stopped by user.
   "format_version": 1,
   "analysis": "OP",
   "sections": ["summary"],
-  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "coalesce": true, "maxevents": 10},
+  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "maxevents": 10},
   "event_cap_reached": true,
   "end_time_s": 0,
   "wall_time_s": "<WALL_TIME>",

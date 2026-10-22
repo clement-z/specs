@@ -135,7 +135,6 @@ void OpticalOutputPort::applyConfig() {
     m_reltol = m_config->m_reltol;
     m_abstol = m_config->m_abstol;
     m_snap_factor = m_config->m_snap_factor;
-    m_coalesce = m_config->m_coalesce;
     m_collect_stats = m_config->m_collect_stats;
     m_event_cap = m_config->m_event_cap.get();
 }
@@ -153,7 +152,7 @@ void OpticalOutputPort::on_data_ready()
         wait();
 
         // Check if output queue is empty (would be a bug)
-        if (m_coalesce ? m_queue.size() == 0 : m_fifo_queue.empty()) {
+        if (m_queue.size() == 0) {
             cerr << "error: write cancelled, because no values are present" << endl;
             sc_stop();
             continue;
@@ -162,13 +161,9 @@ void OpticalOutputPort::on_data_ready()
         // Get current time
         sc_time now = sc_time_stamp();
 
-        // Get the next queue item and pop it from the queue (without coalescing: the
-        // first one written for the earliest time, F-15)
-        auto tuple = m_coalesce ? m_queue.top() : pair_type(*m_fifo_queue.begin());
-        if (m_coalesce)
-            m_queue.pop();
-        else
-            m_fifo_queue.erase(m_fifo_queue.begin());
+        // Get the next queue item and pop it from the queue
+        auto tuple = m_queue.top();
+        m_queue.pop();
 
         // Assign to more readable names
         const auto &t = tuple.first; //time
@@ -336,16 +331,6 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         t = snap_to_next_valid_time(t, resolution_multiplier);
     }
 
-
-    // without coalescing (F-15): always a new entry, after those of the same time
-    if (!m_coalesce) {
-        m_fifo_queue.emplace(t, value);
-        notify_pending(t - sc_time_stamp());
-        if (m_collect_stats)
-            count_scheduled(false);
-        return;
-    }
-
     // find first scheduled signal with this timestamp and this lambda
     auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&t](const auto &x) {
             return t == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
@@ -397,15 +382,6 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
     //    return;
 
     const sc_time &now = sc_time_stamp();
-
-    // without coalescing (F-15): always a new entry, after those of the same time
-    if (!m_coalesce) {
-        m_fifo_queue.emplace(now, value);
-        notify_pending(SC_ZERO_TIME);
-        if (m_collect_stats)
-            count_scheduled(false);
-        return;
-    }
 
     // find a scheduled signal with this timestamp and this lambda anywhere in
     // the queue, not only at its top: another wavelength can be on top (B-001)

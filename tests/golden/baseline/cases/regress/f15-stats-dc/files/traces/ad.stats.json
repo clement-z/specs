@@ -3,7 +3,7 @@
   "format_version": 1,
   "analysis": "DC",
   "sections": ["summary"],
-  "options": {"abstol": 1e-12, "reltol": 1e-06, "snapfactor": 10, "coalesce": true, "maxevents": 0},
+  "options": {"abstol": 1e-12, "reltol": 1e-06, "snapfactor": 10, "maxevents": 0},
   "event_cap_reached": false,
   "end_time_s": 3.1e-14,
   "wall_time_s": "<WALL_TIME>",
