@@ -116,7 +116,6 @@ public:
     sc_event m_pending_event;
     std::priority_queue<sc_time, std::vector<sc_time>, std::greater<sc_time>> m_pending_times;
 
-    std::map<uint32_t,OpticalSignal::field_type> m_desired_fields;
     std::map<uint32_t,OpticalSignal::field_type> m_emitted_fields;
 
     sc_time m_temporal_resolution;
@@ -124,7 +123,6 @@ public:
     double m_reltol;
     double m_abstol;
     double m_snap_factor;
-    bool m_use_deltas = false;
     bool m_skip_next_convergence_check = false;
     bool m_collect_stats = false;
     OpticalOutputPortEventCap *m_event_cap = nullptr; // owned by m_config
@@ -209,7 +207,6 @@ public:
     void reset()
     {
         drop_queue();
-        m_desired_fields.clear();
         m_emitted_fields.clear();
     }
 

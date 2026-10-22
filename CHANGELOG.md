@@ -32,6 +32,12 @@
   delays computed once per wavelength, the output ports' event notifications without an allocation per event.
   CROW benchmark (30 rings, no tracing): about 1.5x less CPU time than v0.2.0
 
+### Removed
+
+* Unused code (decision 2026-10-23): the delta-write mode of the optical output ports and the single-wavelength
+  generic transmission devices (`GenericTransmissionDevice`, `Generic2x2Coupler`, `GenericWaveguide`), which no
+  netlist or testbench could reach. A generic N-port device stays planned (scout F-03), written from scratch
+
 ## [0.2.0] - 2026-10-21
 
 ### New

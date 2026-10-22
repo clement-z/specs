@@ -12,7 +12,6 @@
 #include "devices/probe.h"
 #include "devices/detector.h"
 #include "devices/power_meter.h"
-#include "devices/generic_transmission_device.h"
 #include "run_manifest.h"
 #include "run_progress.h"
 #include "run_stats.h"

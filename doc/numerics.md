@@ -281,7 +281,7 @@ Counters (per port, summed in `totals` and per device type):
 | Key | Counts |
 | --- | --- |
 | `scheduled` | values written to the port by its device (`delayedWrite()`), at a time and wavelength |
-| `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one, or is added to it for devices that write deltas) |
+| `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one) |
 | `processed` | pending entries taken at their time |
 | `emitted` | of which written to the net with a new value (the gate passed) |
 | `suppressed.abstol` | not written: \|E - E_last\| <= abstol |

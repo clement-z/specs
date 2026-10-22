@@ -187,17 +187,10 @@ void OpticalOutputPort::on_data_ready()
 
         uint32_t wlid = s.m_wavelength_id;
 
-        //auto &desired = m_desired_fields[wlid];
         auto &emitted = m_emitted_fields[wlid];
 
         // Store the desired output value which we know is valid
-        if (m_use_deltas)
-        {
-            desired = m_desired_fields[wlid] + s.m_field;
-            m_desired_fields[wlid] = desired;
-        }
-        else
-            desired = s.m_field;
+        desired = s.m_field;
 
         // Decide whether to emit signal or not (rule: see check_emit_by_reltol(), B-021)
         pass_abstol = check_emit_by_abstol(desired, emitted);
@@ -251,7 +244,7 @@ void OpticalOutputPort::on_data_ready()
         if (emit_signal || m_skip_next_convergence_check)
         {
             // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
-            // cout << " emitting " << m_desired_fields[wlid] << endl;
+            // cout << " emitting " << desired << endl;
             m_skip_next_convergence_check = false;
 
             // Remember the change, for the .op/.dc non-convergence report (F-28)
@@ -344,11 +337,8 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         notify_pending(t - sc_time_stamp());
     }
     else {
-        // if yes, just replace or sum with the old one
-        if (m_use_deltas)
-            it->second += value;
-        else
-            it->second = value;
+        // if yes, just replace the old one
+        it->second = value;
     }
     if (m_collect_stats)
         count_scheduled(coalesced);
@@ -396,11 +386,8 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
         notify_pending(SC_ZERO_TIME);
     }
     else {
-        // if yes, just replace or sum with the old one
-        if (m_use_deltas)
-            it->second += value;
-        else
-            it->second = value;
+        // if yes, just replace the old one
+        it->second = value;
     }
     if (m_collect_stats)
         count_scheduled(coalesced);
