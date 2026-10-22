@@ -213,7 +213,7 @@ void OpticalOutputPort::on_data_ready()
         // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
         // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
         bool snapped = false;
-        if (emit_signal && (abs(desired) < m_snap_factor*m_abstol))
+        if (emit_signal && check_snap_to_zero(desired))
         {
             desired = complex<double>(0,0);
             snapped = true;
@@ -259,11 +259,12 @@ void OpticalOutputPort::on_data_ready()
             m_skip_next_convergence_check = false;
 
             // Remember the change, for the .op/.dc non-convergence report (F-28)
+            // (the magnitudes are computed when the report asks for them)
             m_has_emitted = true;
             m_last_emission_delta = sc_delta_count();
             m_last_emission_wlid = wlid;
-            m_last_emission_change = abs(desired - emitted);
-            m_last_emission_threshold = std::max(m_abstol, m_reltol * abs(emitted));
+            m_last_emission_desired = desired;
+            m_last_emission_last = emitted;
 
             // Replace the stored emitted output value at that wavelength
             emitted = desired;

@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 #include <systemc.h>
+#include <cmath>
+#include <limits>
+#include <vector>
 
 #include "optical_output_port.h"
 #include "specs.h"
@@ -208,7 +211,7 @@ TEST(OpticalOutputPort, EmissionGateWithZeroTolerances)
         EXPECT_EQ(write(F(1e-9, 0)), F(1e-9, 0)) << "below the default abstol and snap (1e-7): emitted as is";
         EXPECT_EQ(write(F(1e-9, 1e-25)), F(1e-9, 1e-25)) << "relative change 1e-16: emitted";
         EXPECT_EQ(write(F(5e-324, 0)), F(5e-324, 0)) << "smallest subnormal: emitted, not snapped";
-        EXPECT_EQ(oop.m_last_emission_threshold, 0);
+        EXPECT_EQ(oop.lastEmissionThreshold(), 0);
         const sc_dt::uint64 last_emission = oop.m_last_emission_delta;
         EXPECT_EQ(write(F(5e-324, 0)), F(5e-324, 0));
         EXPECT_EQ(oop.m_last_emission_delta, last_emission) << "identical value: not emitted";
@@ -361,6 +364,149 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
         EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
         specsGlobalConfig.analysis_type = SPECSConfig::DC;
         EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// F-15: the gate decides on squared norms (std::norm) when the roundings cannot change the
+// result, on the magnitudes (std::abs) otherwise. It must take the same decisions as the
+// former gate, below, for every input: zero, NaN, infinities, subnormals, huge values and
+// values one ulp around each threshold
+namespace {
+typedef OpticalSignal::field_type GateField;
+
+bool formerAbstolGate(double abstol, const GateField &desired, const GateField &last)
+{
+    return abs(desired - last) > abstol;
+}
+
+bool formerReltolGate(double reltol, const GateField &desired, const GateField &last)
+{
+    double vector_distance = abs(desired - last);
+    double last_size = abs(last);
+    if (last_size == 0)
+        return vector_distance > 0;
+    if (reltol == 0)
+        return vector_distance > 0;
+    return (vector_distance/last_size) > reltol;
+}
+
+bool formerSnap(double snap_factor, double abstol, const GateField &desired)
+{
+    return abs(desired) < snap_factor*abstol;
+}
+
+// Magnitudes around the thresholds of the default and zero tolerances, and edge values
+std::vector<double> gateTestMagnitudes()
+{
+    const double inf = std::numeric_limits<double>::infinity();
+    const double nan = std::numeric_limits<double>::quiet_NaN();
+    std::vector<double> v = {0.0, -0.0, 5e-324, 1e-320, 2.2250738585072014e-308, 1e-300, 1e-200, 1e-160,
+                             1e-150, 1e-20, 1e-12, 1e-4, 0.5, 1, 1.5, 1e100, 1e150, 1e160, 1e300,
+                             1.7976931348623157e308, inf, -inf, nan};
+    for (double t : {1e-8, 1e-7, 1e-4, 1e-12, 1e-16})
+    {
+        double x = t;
+        for (int i = 0; i < 3; ++i)
+            x = std::nextafter(x, 0.0);
+        for (int i = 0; i < 7; ++i, x = std::nextafter(x, 1.0))
+        {
+            v.push_back(x);
+            v.push_back(-x);
+            v.push_back(x * 1e-4); // reltol: |dE| = 1e-4 * |E_last|
+            v.push_back(1 + x);
+        }
+    }
+    return v;
+}
+} // namespace
+
+TEST(OpticalOutputPort, SquaredNormGateMatchesFormerGate)
+{
+    SPECS_TEST_HEADER()
+    {
+        OOPHarness h("h");
+        auto &oop = h.m_out_writer;
+        const std::vector<double> mags = gateTestMagnitudes();
+        // a few complex values from those magnitudes (pure real, pure imaginary, mixed)
+        std::vector<GateField> fields;
+        for (double m : mags)
+        {
+            fields.emplace_back(m, 0);
+            fields.emplace_back(0, m);
+            fields.emplace_back(m * 0.6, m * 0.8);
+        }
+        // relative changes around reltol = 1e-4 of a few last values
+        std::vector<GateField> lasts = {GateField(0, 0), GateField(1, 0), GateField(0.6, -0.8),
+                                        GateField(1e-3, 2e-3), GateField(1e-8, 0), GateField(1e-300, 0),
+                                        GateField(std::numeric_limits<double>::infinity(), 0),
+                                        GateField(std::numeric_limits<double>::quiet_NaN(), 0)};
+
+        size_t checked = 0;
+        for (double abstol : {1e-8, 0.0, 1e-12})
+        {
+            for (double reltol : {1e-4, 0.0, 1e-9})
+            {
+                for (double snap_factor : {10.0, 0.0, 1.0})
+                {
+                    auto config = make_shared<OpticalOutputPortConfig>();
+                    config->m_abstol = abstol;
+                    config->m_reltol = reltol;
+                    config->m_snap_factor = snap_factor;
+                    oop.setConfig(config);
+                    oop.applyConfig();
+                    for (const GateField &last : lasts)
+                    {
+                        auto check = [&](const GateField &desired) {
+                            ASSERT_EQ(oop.check_emit_by_abstol(desired, last), formerAbstolGate(abstol, desired, last))
+                                << "abstol " << abstol << ", desired " << desired << ", last " << last;
+                            ASSERT_EQ(oop.check_emit_by_reltol(desired, last), formerReltolGate(reltol, desired, last))
+                                << "reltol " << reltol << ", desired " << desired << ", last " << last;
+                            ASSERT_EQ(oop.check_snap_to_zero(desired), formerSnap(snap_factor, abstol, desired))
+                                << "snap " << snap_factor << " x abstol " << abstol << ", desired " << desired;
+                            ++checked;
+                        };
+                        for (const GateField &f : fields)
+                        {
+                            check(f);
+                            check(last + f); // changes relative to last
+                            check(last * (1 + f.real())); // relative changes along last
+                        }
+                        // exactly at and one ulp around the reltol threshold, along last
+                        for (double r : {reltol, 1e-4, 1e-9})
+                        {
+                            double x = r;
+                            for (int i = 0; i < 3; ++i)
+                                x = std::nextafter(x, 0.0);
+                            for (int i = 0; i < 7; ++i, x = std::nextafter(x, 1.0))
+                                check(last * (1 + x));
+                        }
+                    }
+                }
+            }
+        }
+        EXPECT_GT(checked, 100000u);
+
+        // the edge cases named by F-15, explicitly (default tolerances)
+        auto default_config = make_shared<OpticalOutputPortConfig>();
+        oop.setConfig(default_config);
+        oop.applyConfig();
+        const double inf = std::numeric_limits<double>::infinity();
+        const double nan = std::numeric_limits<double>::quiet_NaN();
+        // |last| = 0
+        EXPECT_TRUE(oop.check_emit_by_reltol(GateField(1e-300, 0), GateField(0, 0)));
+        EXPECT_TRUE(oop.check_emit_by_reltol(GateField(0, 5e-324), GateField(0, -0.0)));
+        EXPECT_FALSE(oop.check_emit_by_abstol(GateField(0, 5e-324), GateField(0, 0)));
+        // NaN: never emitted (comparisons with NaN are false)
+        EXPECT_FALSE(oop.check_emit_by_abstol(GateField(nan, 0), GateField(1, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(GateField(nan, 0), GateField(1, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(GateField(1, 0), GateField(nan, 0)));
+        EXPECT_FALSE(oop.check_snap_to_zero(GateField(nan, 0)));
+        // infinities: hypot(inf, NaN) = inf, so inf - inf = NaN in one part still passes abstol
+        EXPECT_TRUE(oop.check_emit_by_abstol(GateField(inf, 0), GateField(1, 0)));
+        EXPECT_TRUE(oop.check_emit_by_abstol(GateField(inf, inf), GateField(inf, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(GateField(1, 0), GateField(inf, 0)));
+        EXPECT_FALSE(oop.check_snap_to_zero(GateField(inf, 0)));
     }
     SPECS_TEST_FOOTER();
 }

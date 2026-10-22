@@ -252,6 +252,12 @@
    "only": "^(cli/help|cli/no-args|regress/f15-stats-testbench|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-15 (PD1): --stats also for the -t testbenches (help text of --stats loses 'netlists only'); new case regress/f15-stats-testbench; gtest RunStats.PortOfADestroyedSignalHasNoNet"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:13:53Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-15 (PD2 item 1): new unit test OpticalOutputPort.SquaredNormGateMatchesFormerGate"
   }
  ]
 }

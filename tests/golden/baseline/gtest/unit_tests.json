@@ -52,6 +52,7 @@
   "OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop": "PASS",
   "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
   "OpticalOutputPort.SnapFactorFromConfig": "PASS",
+  "OpticalOutputPort.SquaredNormGateMatchesFormerGate": "PASS",
   "OpticalOutputPortDeathTest.ApplyConfigRejectsSampledTime": "PASS",
   "PCMElementDeathTest.CheckParametersRejectsInvalidStates": "PASS",
   "PCMElementDeathTest.StartOfSimulationChecksParameters": "PASS",

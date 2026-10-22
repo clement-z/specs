@@ -137,8 +137,19 @@ public:
     bool m_has_emitted = false;
     sc_dt::uint64 m_last_emission_delta = 0; // sc_delta_count() when it was emitted
     uint32_t m_last_emission_wlid = 0;
-    double m_last_emission_change = 0; // |E - E_last|
-    double m_last_emission_threshold = 0; // max(abstol, reltol * |E_last|)
+    OpticalSignal::field_type m_last_emission_desired = 0; // E
+    OpticalSignal::field_type m_last_emission_last = 0; // E_last
+
+    // |E - E_last| of the last emission
+    double lastEmissionChange() const
+    {
+        return abs(m_last_emission_desired - m_last_emission_last);
+    }
+    // max(abstol, reltol * |E_last|) of the last emission
+    double lastEmissionThreshold() const
+    {
+        return std::max(m_abstol, m_reltol * abs(m_last_emission_last));
+    }
 
     std::shared_ptr<const OpticalOutputPortConfig> m_config;
 
@@ -146,6 +157,7 @@ public:
     void count_scheduled(bool coalesced);
     bool check_emit_by_abstol(const OpticalSignal::field_type &desired, const OpticalSignal::field_type &last);
     bool check_emit_by_reltol(const OpticalSignal::field_type &desired, const OpticalSignal::field_type &last);
+    bool check_snap_to_zero(const OpticalSignal::field_type &desired) const;
 
     void applyConfig();
     virtual void start_of_simulation();
@@ -219,6 +231,25 @@ public:
     void delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
 };
 
+// F-15: compares two squared magnitudes (norms) computed with a few roundings each, when those
+// roundings cannot change the result of comparing the magnitudes themselves (as std::abs()
+// and a division compute them): +1 if x2 > y2, -1 if x2 < y2, 0 if they are within a relative
+// 1e-13 (the roundings are below 1e-14) or either is outside [1e-280, 1e280] (zero, subnormal
+// components, overflow, inf, NaN), where the caller decides on the magnitudes instead
+inline int compareSquaredMagnitudes(double x2, double y2)
+{
+    constexpr double lo = 1e-280;
+    constexpr double hi = 1e280;
+    constexpr double margin = 1e-13;
+    if (!(x2 >= lo && x2 <= hi && y2 >= lo && y2 <= hi))
+        return 0;
+    if (x2 > y2 * (1 + margin))
+        return 1;
+    if (x2 < y2 * (1 - margin))
+        return -1;
+    return 0;
+}
+
 // Emission gate (B-021). A new value is emitted only if it differs from the last emitted
 // value (same wavelength) by more than abstol AND by more than reltol relative to it:
 //   |desired - last| > max(abstol, reltol * |last|)
@@ -226,25 +257,56 @@ public:
 // which a change need not be propagated, not solver tolerances. Both may be 0 (B-153):
 // with abstol = reltol = 0 every change is emitted. Defined here (inline) so
 // that the unit tests can call them.
+// F-15: decided on squared norms (no hypot()) when compareSquaredMagnitudes() is sure, else
+// on the magnitudes as before: the same decision for every input, bit for bit
 inline bool OpticalOutputPort::check_emit_by_abstol(const OpticalSignal::field_type &desired,
                                                     const OpticalSignal::field_type &last)
 {
-    double vector_distance = abs(desired - last);
+    const OpticalSignal::field_type diff = desired - last;
+    // No change: |diff| = 0 is never above abstol (>= 0)
+    if (diff.real() == 0 && diff.imag() == 0)
+        return false;
+    const int order = compareSquaredMagnitudes(norm(diff), m_abstol * m_abstol);
+    if (order != 0)
+        return order > 0;
+    double vector_distance = abs(diff);
     return vector_distance > m_abstol;
 }
 
 inline bool OpticalOutputPort::check_emit_by_reltol(const OpticalSignal::field_type &desired,
                                                     const OpticalSignal::field_type &last)
 {
-    double vector_distance = abs(desired - last);
-    double last_size = abs(last);
+    const OpticalSignal::field_type diff = desired - last;
+    // No change: 0 > reltol * |last| never holds (also for |last| = 0, below)
+    if (diff.real() == 0 && diff.imag() == 0)
+        return false;
     // Nothing (or 0) emitted yet: any change passes, no change doesn't. Same result as
     // the division below gave (x/0 = inf > reltol, 0/0 = NaN > reltol is false)
-    if (last_size == 0)
-        return vector_distance > 0;
+    // (|last| = 0 exactly when both parts are 0)
+    if (last.real() == 0 && last.imag() == 0)
+        return abs(diff) > 0;
     // reltol = 0 (B-153): any change passes, also one so small next to |last| that the
     // division below underflows to 0
     if (m_reltol == 0)
-        return vector_distance > 0;
+        return abs(diff) > 0;
+    const int order = compareSquaredMagnitudes(norm(diff), m_reltol * m_reltol * norm(last));
+    if (order != 0)
+        return order > 0;
+    double vector_distance = abs(diff);
+    double last_size = abs(last);
     return (vector_distance/last_size) > m_reltol;
+}
+
+// Snap (B-021): an emitted value with |E| < snap_factor * abstol is replaced by 0 (snap_factor
+// = 0 or abstol = 0: never). F-15: on squared norms like the gate above
+inline bool OpticalOutputPort::check_snap_to_zero(const OpticalSignal::field_type &desired) const
+{
+    const double threshold = m_snap_factor * m_abstol;
+    // |E| < 0 never holds (nor for NaN)
+    if (threshold == 0)
+        return false;
+    const int order = compareSquaredMagnitudes(norm(desired), threshold * threshold);
+    if (order != 0)
+        return order < 0;
+    return abs(desired) < threshold;
 }
