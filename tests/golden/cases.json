@@ -3467,6 +3467,246 @@
    ],
    "expect": "fail",
    "note": "F-05: the CSV cannot be created (no such directory): 'Error: cannot open trace file \"no_such_dir/t.csv\"', exit 1"
+  },
+  {
+   "id": "regress/f15-stats-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=ports,devices",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+   ],
+   "note": "F-15: --stats=ports,devices on a two-wavelength .tran: traces/x.stats.json next to the VCD (run totals, one row per output port, per device type; wall_time_s masked), 'Run statistics written to traces/x.stats.json' on stdout"
+  },
+  {
+   "id": "regress/f15-stats-op-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "--stats",
+    "-f",
+    "tests/golden/netlists/b021-snapfactor.cir"
+   ],
+   "note": "F-15: --stats without a trace file: the JSON (summary) is printed to stdout; out_a passes the gate from 0 but is snapped to 0 again (suppressed.snap = 1)"
+  },
+  {
+   "id": "regress/f15-stats-file-print",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=devices",
+    "--stats-file",
+    "traces/custom.stats.json",
+    "--print-stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+   ],
+   "note": "F-15: --stats-file writes the run statistics there (not next to the trace), --print-stats also prints them; multi-wavelength .op, devices section"
+  },
+  {
+   "id": "regress/f15-stats-dc",
+   "args": [
+    "--stats",
+    "-o",
+    "traces/ad",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "F-15: --stats on a .dc wavelength sweep: counters kept over every sweep point (reset() keeps them)"
+  },
+  {
+   "id": "err/f15-stats-bad-section",
+   "args": [
+    "--stats=port",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: unknown --stats section: 'Invalid --stats value', exit 1"
+  },
+  {
+   "id": "regress/f15-coalesce-options",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "--stats",
+    "-f",
+    "tests/golden/netlists/f15-coalesce-off.cir"
+   ],
+   "note": "F-15 expert option .options coalesce=0 on the circuit of regress/b001-fd-multilambda-stale: same values per wavelength; the OP listing shows v @ 1550 nm (last write; 1560 nm with coalescing, equal times by |E|); stats: coalesced 0, scheduled = processed = 16 (14/12 with coalescing)"
+  },
+  {
+   "id": "regress/f15-no-coalescing-cli",
+   "args": [
+    "--no-coalescing",
+    "--stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "F-15 expert option --no-coalescing on a .tran (ring): same VCD as cir/add_drop_pyspecs; stats: coalesced 0, more processed entries (scheduled 4649, processed 4648 vs 3755/3752 with coalescing) and pending_max 2"
+  },
+  {
+   "id": "regress/f15-maxevents-options-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/f15-maxevents-tran.cir"
+   ],
+   "note": "F-15 expert option .options maxevents=20: the .tran stops at 30 ps with a warning (21 entries processed: the rest of the delta cycle), exit 0; stats: event_cap_reached true"
+  },
+  {
+   "id": "regress/f15-max-events-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--max-events",
+    "0",
+    "--stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/f15-maxevents-tran.cir"
+   ],
+   "note": "F-15: --max-events 0 overrides .options maxevents=20 (no cap): the ring runs until its activity stops (51 ps)"
+  },
+  {
+   "id": "err/f15-max-events-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--max-events",
+    "10",
+    "--no-trace",
+    "--stats",
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: the event cap reached in an .op: 'Error: .op: the operating point stopped at the event cap: 10 pending entries processed (.options maxevents=10)', the stats on stdout (event_cap_reached true), exit 1"
+  },
+  {
+   "id": "err/f15-max-events-invalid",
+   "args": [
+    "--max-events",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: 'Invalid max-events value', exit 1"
+  },
+  {
+   "id": "err/f15-options-maxevents-fraction",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/f15-options-maxevents-fraction.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: .options maxevents=2.5: 'Error: .options: MAXEVENTS must be an integer between 0 and 2^53 (got 2.5)', exit 1"
+  },
+  {
+   "id": "regress/f15-progress-quiet",
+   "args": [
+    "--progress=3600",
+    "-o",
+    "traces/x",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "F-15: --progress with a period longer than the run prints nothing (the line itself is wall-clock dependent; gtest RunProgress.*); outputs as cir/add_drop_pyspecs"
+  },
+  {
+   "id": "err/f15-progress-invalid",
+   "args": [
+    "--progress=0",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: --progress needs a period > 0: 'Invalid --progress value', exit 1"
+  },
+  {
+   "id": "regress/f15-stats-testbench",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "2",
+    "--stats=ports"
+   ],
+   "note": "F-15: --stats with a -t testbench: traces/crow_tb.stats.json next to its VCD; the two CROW ports bound to signals of the testbench function, destroyed when it returns, have \"net\": null (was a SIGSEGV while resolving them, found by stats-record)"
   }
  ]
 }

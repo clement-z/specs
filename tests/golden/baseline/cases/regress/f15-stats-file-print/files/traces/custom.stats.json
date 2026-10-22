@@ -1,0 +1,16 @@
+{
+  "format": "specs-run-stats",
+  "format_version": 1,
+  "analysis": "OP",
+  "sections": ["summary", "devices"],
+  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "coalesce": true, "maxevents": 0},
+  "event_cap_reached": false,
+  "end_time_s": 0,
+  "wall_time_s": "<WALL_TIME>",
+  "totals": {"output_ports": 8, "scheduled": 14, "coalesced": 2, "processed": 12, "emitted": 12, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 2, "pending_mean": 1.4285714285714286, "pending_end": 0, "last_emission_s": 0},
+  "devices": [
+    {"type": "CWSource", "instances": 4, "output_ports": 4, "scheduled": 4, "coalesced": 0, "processed": 4, "emitted": 4, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 0},
+    {"type": "Merger", "instances": 3, "output_ports": 3, "scheduled": 8, "coalesced": 2, "processed": 6, "emitted": 6, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 2, "pending_mean": 1.625, "pending_end": 0, "last_emission_s": 0},
+    {"type": "WaveguideUni", "instances": 1, "output_ports": 1, "scheduled": 2, "coalesced": 0, "processed": 2, "emitted": 2, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 2, "pending_mean": 1.5, "pending_end": 0, "last_emission_s": 0}
+  ]
+}

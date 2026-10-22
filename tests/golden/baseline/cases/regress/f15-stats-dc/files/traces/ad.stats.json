@@ -1,0 +1,11 @@
+{
+  "format": "specs-run-stats",
+  "format_version": 1,
+  "analysis": "DC",
+  "sections": ["summary"],
+  "options": {"abstol": 1e-12, "reltol": 1e-06, "snapfactor": 10, "coalesce": true, "maxevents": 0},
+  "event_cap_reached": false,
+  "end_time_s": 3.1e-14,
+  "wall_time_s": "<WALL_TIME>",
+  "totals": {"output_ports": 9, "scheduled": 2201, "coalesced": 0, "processed": 2201, "emitted": 2170, "suppressed": {"abstol": 0, "reltol": 31, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 3.0000000000000005e-14}
+}

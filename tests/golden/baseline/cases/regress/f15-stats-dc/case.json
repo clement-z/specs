@@ -1,0 +1,31 @@
+{
+ "args": [
+  "--stats",
+  "-o",
+  "traces/ad",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/ad.manifest.json": {
+   "bytes": 410,
+   "kind": "json",
+   "sha256": "bd44f66c2ef3ab0ba753a12b5ede2d9a26004a34f1788e1ac84e82116b44b47b",
+   "stored": "files/traces/ad.manifest.json"
+  },
+  "traces/ad.stats.json": {
+   "bytes": 548,
+   "kind": "json",
+   "sha256": "72ad915a27e79e417e166c2483c991d92f279dd2110a167846f2601b22f9587a",
+   "stored": "files/traces/ad.stats.json"
+  },
+  "traces/ad.vcd": {
+   "bytes": 27050,
+   "kind": "vcd",
+   "sha256": "0ea8886ba1cc537b9a04ecd4bf46a35c6983b1985447a5e4c2de0f8f830a905d",
+   "stored": "files/traces/ad.vcd"
+  }
+ },
+ "id": "regress/f15-stats-dc"
+}

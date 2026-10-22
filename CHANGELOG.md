@@ -8,6 +8,19 @@
   `build`, `test` and `golden` tasks in `build-pixi/<toolchain>` (also ASan+UBSan), a `py` and a `docs`
   environment. CI: pixi job on Ubuntu (blocking) and macOS (non-blocking), next to the apt jobs
 * Agent instructions moved from `CLAUDE.md` to `AGENTS.md` (read by all coding agents); `CLAUDE.md` imports it
+* Run statistics (F-15): `specs --stats` writes `<trace>.stats.json` with the counters of the optical output
+  ports (values scheduled, coalesced, processed, emitted, suppressed by abstol/reltol/snap, pending entries,
+  last emission) and the wall time; `--stats=ports,devices` adds one row per output port and per device type,
+  `--stats-file` and `--print-stats` choose where it goes (stdout without a trace file); also for the `-t`
+  testbenches. Off by default, no change to the outputs (`doc/numerics.md`)
+* Golden harness: `run_golden.py stats-record` / `stats-compare` record the event counters of every case for
+  two builds and compare them exactly (gate of the F-15 engine refactors)
+* `specs --progress[=seconds]`: a periodic progress line on stderr (wall time, simulated time, delta cycles),
+  without effect on the simulation
+* Expert options for ablation studies (F-15, `doc/numerics.md`): no coalescing of the writes of a port for the
+  same time and wavelength (`.options coalesce=0`, `--no-coalescing`; equal times in write order) and an event
+  cap (`.options maxevents=N`, `--max-events N`: a `.tran` ends there with a warning, an `.op`/`.dc` stops
+  with an error). Defaults unchanged
 
 ### Changed
 

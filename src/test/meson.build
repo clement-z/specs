@@ -23,6 +23,7 @@ if gtest_dep.found()
       'parser_state.cpp',
       'rng.cpp',
       'run_manifest.cpp',
+      'run_stats.cpp',
       'specs_config.cpp',
       'sysc_utils.cpp',
       'trace_table.cpp',

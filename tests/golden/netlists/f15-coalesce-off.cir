@@ -1,0 +1,20 @@
+* F-15 expert option .options coalesce=0: every write of an output port is its own pending entry (no
+* merge of the writes for the same time and wavelength), entries of the same time in write order.
+* Same circuit as b001-fd-multilambda-stale.cir (two wavelengths through three mergers, .op), where the
+* mergers write the same (time, wavelength) twice per delta cycle: with coalescing, --stats counts 2
+* coalesced values; here none, and 2 more processed entries.
+* Expected: the same values per wavelength as regress/b001-fd-multilambda-stale (the last write of a
+* (time, wavelength) is processed last): m(1550) = o(1550) = 0.750000 sqrt(W) = 0.5625 W, u(1550) =
+* 0.353553, v(1550) = 0.707107 sqrt(W). A net holds only the last value written to it, of any wavelength:
+* the OP listing shows v @ 1550 nm here and v @ 1560 nm (0.070711 sqrt(W)) with coalescing, whose
+* equal-time entries are taken by decreasing |E| instead of in write order (decision Q8).
+cwsrc1 a1 wl=1.55e-6 power=0.25
+cwsrc2 a2 wl=1.56e-6 power=4
+cwsrc3 b1 wl=1.55e-6 power=1
+cwsrc4 b2 wl=1.56e-6 power=0.01
+mergeru a1 a2 u
+mergerv b1 b2 v
+mergerm u v m
+wg1 m o length=1e-6 neff=2.3 ng=4 att=0
+.options coalesce=0
+.op

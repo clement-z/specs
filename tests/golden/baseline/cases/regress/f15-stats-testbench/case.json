@@ -1,0 +1,31 @@
+{
+ "args": [
+  "-t",
+  "ac_crow",
+  "--nrings_crow",
+  "2",
+  "--stats=ports"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/crow_tb.manifest.json": {
+   "bytes": 291,
+   "kind": "json",
+   "sha256": "8c0e06417b00c636d5e5552d6ac615101d3378e088133b66f689da14bdd19262",
+   "stored": "files/traces/crow_tb.manifest.json"
+  },
+  "traces/crow_tb.stats.json": {
+   "bytes": 3895,
+   "kind": "json",
+   "sha256": "7e589281e13f8834844c80f897008d5d34d0a2c8d9ecefd1dfef83a436661c25",
+   "stored": "files/traces/crow_tb.stats.json"
+  },
+  "traces/crow_tb.vcd": {
+   "bytes": 84060,
+   "kind": "vcd",
+   "sha256": "0f7663f0453c222b6dcae8459a478cc5ce50087ee44d19827b19710cf9be5305",
+   "stored": "files/traces/crow_tb.vcd"
+  }
+ },
+ "id": "regress/f15-stats-testbench"
+}
