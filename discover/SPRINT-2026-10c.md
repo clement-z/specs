@@ -75,3 +75,4 @@ outside the decisions stops the chain and goes to the maintainer. v0.3.0: tag an
 - 2026-10-22 — v0.2.0 tagged on 6c7514a and pushed. Phase D prompts updated (pixi builds, strict golden after B-183, D1 delivers the per-case counter tool, bench case `C-notrace N=30`, Opus high per the model rule); launch plan above, awaiting go.
 - 2026-10-22 — **go for D1, D2, D3** (chained by the coordinator per the launch plan).
 - 2026-10-22 — D1 launched: agent 3dcd77a3 (`ws/stats`, Opus 5.5 high); coordinator heartbeat e715987a (5 min, 7 days) chains D2 and D3 after each gate.
+- 2026-10-22 — D1 done (report d408167 on ws/stats); coordinator gate running.
