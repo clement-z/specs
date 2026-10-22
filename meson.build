@@ -27,6 +27,10 @@ add_project_arguments('-Wfatal-errors', '-iquote', src_root, language: 'cpp')
 if get_option('native')
   add_project_arguments('-march=native', language: 'cpp')
 endif
+# F-15: debug ids of optical signals (OpticalSignal::m_id), off by default
+if get_option('signal_ids')
+  add_project_arguments('-DSPECS_SIGNAL_IDS', language: 'cpp')
+endif
 
 # ---- Dependencies -------------------------------------------------------------------------------
 

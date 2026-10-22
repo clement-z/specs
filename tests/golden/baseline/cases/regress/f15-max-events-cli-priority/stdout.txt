@@ -62,15 +62,15 @@ Info: (I703) tracing timescale unit set: 100 fs (traces/x.vcd)
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/in (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/ring_bl (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/ring_br (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/ring_bl (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/ring_br (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: [#5]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@1 ps, ROOT/VLSRC1 emitted: [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@1 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 51 ps
 Run statistics written to traces/x.stats.json
 ╔═══════════════════╗

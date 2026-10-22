@@ -401,9 +401,9 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
     {
         // zero threshold (abstol = 0, and reltol = 0 or |E_last| = 0, B-153): any change is
         // infinitely above it (said explicitly rather than divided by 0)
-        if (oop->m_last_emission_threshold == 0)
+        if (oop->lastEmissionThreshold() == 0)
             return std::numeric_limits<double>::infinity();
-        return oop->m_last_emission_change / oop->m_last_emission_threshold;
+        return oop->lastEmissionChange() / oop->lastEmissionThreshold();
     };
     // largest change relative to its threshold first, by order of magnitude, then in name order:
     // the ratios of a loop's ports differ only in the last bits, which differ between compilers
@@ -426,7 +426,7 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
         if (device)
             cerr << " (" << device->name() << ")";
         cerr << " @ " << OpticalSignal::getWavelength(oop->m_last_emission_wlid) * 1e9 << " nm: |dE| = "
-             << oop->m_last_emission_change << " > " << oop->m_last_emission_threshold
+             << oop->lastEmissionChange() << " > " << oop->lastEmissionThreshold()
              << " (" << ratio(oop) << " x)" << endl;
     }
     if (changing.size() > max_listed)

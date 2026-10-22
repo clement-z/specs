@@ -1,0 +1,19 @@
+{
+  "format": "specs-run-stats",
+  "format_version": 1,
+  "analysis": "TRAN",
+  "sections": ["summary", "ports"],
+  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "coalesce": true, "maxevents": 0},
+  "event_cap_reached": false,
+  "end_time_s": 2e-10,
+  "wall_time_s": "<WALL_TIME>",
+  "totals": {"output_ports": 6, "scheduled": 19, "coalesced": 0, "processed": 19, "emitted": 16, "suppressed": {"abstol": 3, "reltol": 0, "snap": 0}, "pending_max": 4, "pending_mean": 1.4210526315789473, "pending_end": 0, "last_emission_s": 1.806e-10},
+  "ports": [
+    {"port": "ROOT/VLSRC1.ROOT/VLSRC1_out_writer", "net": "ROOT/in", "writer": "ROOT/VLSRC1", "wavelengths_m": [1.54e-06, 1.55e-06, 1.56e-06], "scheduled": 5, "coalesced": 0, "processed": 5, "emitted": 4, "suppressed": {"abstol": 1, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 2.1000000000000002e-11},
+    {"port": "ROOT/VLSRC2.ROOT/VLSRC2_out_writer", "net": "ROOT/a:1", "writer": "ROOT/VLSRC2", "wavelengths_m": [1.54e-06, 1.55e-06], "scheduled": 3, "coalesced": 0, "processed": 3, "emitted": 2, "suppressed": {"abstol": 1, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 3e-11},
+    {"port": "ROOT/VLSRC3.ROOT/VLSRC3_out_writer", "net": "ROOT/b:0", "writer": "ROOT/VLSRC3", "wavelengths_m": [1.54e-06], "scheduled": 3, "coalesced": 0, "processed": 3, "emitted": 2, "suppressed": {"abstol": 1, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 4.0000000000000004e-11},
+    {"port": "ROOT/WG_BI.p0_out_delayed_writer", "net": "ROOT/a:0", "writer": "ROOT/WG_BI", "wavelengths_m": [1.54e-06], "scheduled": 2, "coalesced": 0, "processed": 2, "emitted": 2, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 2, "pending_mean": 1.5, "pending_end": 0, "last_emission_s": 1.806e-10},
+    {"port": "ROOT/WG_BI.p1_out_delayed_writer", "net": "ROOT/b:1", "writer": "ROOT/WG_BI", "wavelengths_m": [1.55e-06], "scheduled": 2, "coalesced": 0, "processed": 2, "emitted": 2, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 2, "pending_mean": 1.5, "pending_end": 0, "last_emission_s": 1.701e-10},
+    {"port": "ROOT/WG_UNI.out_delayed_writer", "net": "ROOT/out", "writer": "ROOT/WG_UNI", "wavelengths_m": [1.55e-06, 1.56e-06], "scheduled": 4, "coalesced": 0, "processed": 4, "emitted": 4, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 4, "pending_mean": 2.5, "pending_end": 0, "last_emission_s": 1.654e-10}
+  ]
+}

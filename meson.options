@@ -1,5 +1,7 @@
 option('native', type: 'boolean', value: false,
        description: 'Compile with -march=native: faster on the build host, but the binaries only run on CPUs like it and results differ from the golden baseline in the last bits (B-183)')
+option('signal_ids', type: 'boolean', value: false,
+       description: 'Debug ids of optical signals, printed as [NNNN] in signal listings (defines SPECS_SIGNAL_IDS; every copy of a signal then bumps a global counter)')
 option('old_tb', type: 'boolean', value: true,
        description: 'Build the legacy testbenches in src/tb (specs -t/-p); defines BUILD_TB=1 for specs')
 option('spx', type: 'boolean', value: false,

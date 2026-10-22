@@ -34,7 +34,7 @@ specs -f circuit.cir [-o trace] [-T ts] [--abstol/--reltol] [-t tb]
   global specsGlobalConfig (SPECSConfig : sc_module, specs.cpp:19) ◄┘ owns all objects, runs analyses
      .op/.dc → every output port NO_DELAY, delta-cycle fixed point   .tran → OP first, then event-driven
   Device SC_THREAD ─ read p_in ─► compute ─► OpticalOutputPort.delayedWrite(sig, delay)
-                                           └► PQueue + sc_event_queue ─ abstol∧reltol gate ─► sc_signal write
+                                           └► PQueue + pending sc_event ─ abstol∧reltol gate ─► sc_signal write
   Sinks: Probe / MLambdaProbe / Detector / PowerMeter ─► VCD + stdout
 ```
 - WDM is time-multiplexed: a net holds only the **last (λ, field)** written. Stateful devices keep per-λ maps.

@@ -14,18 +14,25 @@
 
 using namespace std;
 
+// F-15 (decision Q2): signals can carry a debug id, printed as "[NNNN]" by operator<<, only when
+// built with -Dsignal_ids=true (SPECS_SIGNAL_IDS). Off by default: every new value and every copy
+// took the next id from a global counter
 class OpticalSignal {
 public:
     typedef complex<double> field_type;
 
+#ifdef SPECS_SIGNAL_IDS
 private:
     // class variable for holding next id to attribute
     static unsigned int nextId;
+#endif
 
 public:
     field_type m_field; // complex field of the signal (sqrt(W))
     uint32_t m_wavelength_id; // accesses the global vector of wavelengths
+#ifdef SPECS_SIGNAL_IDS
     unsigned int m_id;
+#endif
 
     // Constructor from values
     OpticalSignal(const field_type &field = 0.0,
@@ -48,18 +55,23 @@ public:
         getNewId();
     }
 
-    // Copy constructor
+#ifdef SPECS_SIGNAL_IDS
+    // Copy constructor (a copy gets a new id)
     OpticalSignal(const OpticalSignal &s)
         : m_field(s.m_field)
         , m_wavelength_id(s.m_wavelength_id)
         , m_id(s.m_id)
     { getNewId(); }
+#else
+    OpticalSignal(const OpticalSignal &s) = default;
+#endif
 
-    virtual ~OpticalSignal() {}
-
+    // Gives the signal a new debug id (nothing without SPECS_SIGNAL_IDS)
     inline void getNewId()
     {
+#ifdef SPECS_SIGNAL_IDS
         m_id = nextId++;
+#endif
     }
 
     void setWavelength(const double &wavelength)
@@ -134,6 +146,7 @@ public:
         return m_field;
     }
 
+#ifdef SPECS_SIGNAL_IDS
     OpticalSignal operator=(const OpticalSignal &rhs)
     {
         m_field = rhs.m_field;
@@ -141,6 +154,9 @@ public:
         getNewId();
         return *this;
     }
+#else
+    OpticalSignal &operator=(const OpticalSignal &rhs) = default;
+#endif
 
     OpticalSignal &operator+=(const OpticalSignal &rhs);
     OpticalSignal &operator-=(const OpticalSignal &rhs);
@@ -218,8 +234,11 @@ inline std::ostream &operator<<(std::ostream &os, const OpticalSignal &s)
 
     std::ostringstream oss;
 
+#ifdef SPECS_SIGNAL_IDS
     oss << "[" << setw(4) << setfill('0') << s.m_id << setfill(' ') << "] ";
-    oss << " @ " << setw(4) << setprecision(8) << s.getWavelength() * 1e9 << setw(2)
+    oss << " ";
+#endif
+    oss << "@ " << setw(4) << setprecision(8) << s.getWavelength() * 1e9 << setw(2)
         << (isnan(s.getWavelength()) ? "" : " nm");
     oss << " (" << setprecision(6) << fixed << s.modulus() << " √W";
     oss << ", " << setprecision(6) << fixed << s.power() << " W";
@@ -236,6 +255,8 @@ inline void sc_trace(sc_trace_file *tf, const OpticalSignal &s, const std::strin
 
     // Note: C++ complex doesn't provide access to real and imaginary part
     // Therefore we cannot have references or pointers to it...
+#ifdef SPECS_SIGNAL_IDS
     sc_trace(tf, s.m_id, NAME + ".id");
+#endif
     sc_trace(tf, s.m_wavelength_id, NAME + ".wavelengthid");
 }

@@ -6,7 +6,7 @@ I read the code and checked the SystemC 3.0.1 kernel sources in `thirdparty/syst
 ## 1. Summary
 
 - SPECS is a single-threaded SystemC 3.0.1 (C++20) program. `sc_main` (main.cpp:191) parses the CLI, runs the flex/bison netlist parser, elaborates modules and signals in `ParseTree::build_circuit`, and then hands control to one global `SPECSConfig specsGlobalConfig` (an `sc_module`, specs.cpp:19). That global holds all configuration, owns every elaborated object, and runs the analyses.
-- An event is a scheduled write of one `OpticalSignal` (complex field plus wavelength id) to one output port. Each device output owns an `OpticalOutputPort` (OOP). The OOP is a child `sc_module` with an `SC_THREAD`, a private priority queue and an `sc_event_queue`. It emits only when the change passes **both** abstol and reltol (optical_output_port.cpp:161-165).
+- An event is a scheduled write of one `OpticalSignal` (complex field plus wavelength id) to one output port. Each device output owns an `OpticalOutputPort` (OOP). The OOP is a child `sc_module` with an `SC_THREAD`, a private priority queue and an `sc_event_queue` (F-15: replaced by its own allocation-free equivalent, an `sc_event`, a heap of times and an `SC_METHOD`). It emits only when the change passes **both** abstol and reltol (optical_output_port.cpp:161-165).
 - WDM is time-multiplexed: a net (`sc_signal<OpticalSignal>`) holds only the **last written (λ, field) pair**. Each wavelength is a separate write in a separate delta cycle, and stateful consumers keep their own per-λ maps.
 - Analyses: `.op` and `.dc` run in "frequency domain" (every OOP is forced to `NO_DELAY` and the circuit iterates in delta cycles to a fixed point). `.tran` always runs an OP first, then time-domain event-driven simulation. Outputs are stdout, one VCD file and an optional flattened-netlist JSON.
 - Main risks: error handling is `cerr`+`exit(1)` everywhere; several CLI options are silently broken (`-m sampled-time`, `--mon`); delays are quantized to the time resolution, sometimes to zero, with no warning; results/output order depend on pointer order; per-event overhead is high (linear queue scan, heap allocations, SC_THREAD-only processes).
@@ -110,7 +110,7 @@ I read the code and checked the SystemC 3.0.1 kernel sources in `thirdparty/syst
 - **`OpticalSignal`** (optical_signal.h:17-191):
   - `complex<double> m_field`: the comment says V/m, but `power()=norm(field)` is printed in W and `CWSource::setPower` uses `sqrt(P)`, so the field is actually √W-normalized.
   - `uint32_t m_wavelength_id`: index into the global `specsGlobalConfig.wavelengths_vector` (metres).
-  - `unsigned m_id`: debug id from a global counter, re-drawn on **every** copy or assignment.
+  - `unsigned m_id`: debug id from a global counter, re-drawn on **every** copy or assignment (F-15: only in builds with `-Dsignal_ids=true`; no virtual destructor any more).
   - A virtual destructor, which adds a vptr (≈32 B per value instead of 24).
 - **Wavelength registry** (optical_signal.cpp:111-147):
   - Lookup is a linear `find` with exact `double ==`; a new λ is appended.

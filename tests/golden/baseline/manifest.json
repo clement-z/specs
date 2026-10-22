@@ -200,6 +200,7 @@
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
   "regress/f15-coalesce-options",
+  "regress/f15-dispersive-waveguide",
   "regress/f15-max-events-cli-priority",
   "regress/f15-maxevents-options-tran",
   "regress/f15-no-coalescing-cli",
@@ -252,6 +253,36 @@
    "only": "^(cli/help|cli/no-args|regress/f15-stats-testbench|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-15 (PD1): --stats also for the -t testbenches (help text of --stats loses 'netlists only'); new case regress/f15-stats-testbench; gtest RunStats.PortOfADestroyedSignalHasNoNet"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:13:53Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-15 (PD2 item 1): new unit test OpticalOutputPort.SquaredNormGateMatchesFormerGate"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:22:12Z",
+   "only": "^regress/f15-dispersive-waveguide$",
+   "gtest": false,
+   "note": "F-15 (PD2 item 2): new case, dispersive waveguides (recorded with the build before the per-wavelength caches)"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:22:37Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-15 (PD2 item 2): new unit tests TransmissionCache.*"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:50:26Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-15 (PD2 item 3, bit-identical part): new unit tests OpticalOutputPort.Pending*"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:55:18Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/subckt_test|cir/subckt_tests|err/b153\\-zerotol\\-lossless\\-ring\\-op|err/f15\\-max\\-events\\-op|err/f28\\-lossless\\-ring\\-dc|err/f28\\-lossless\\-ring\\-op|err/f28\\-lossless\\-ring\\-tran|err/f28\\-maxiter\\-small|opt/mode\\-fd|opt/multi\\-file|opt/tol\\-resolution\\-overrides|opt/tracefile\\-o|opt/vci|regress/b001\\-fd\\-multilambda\\-stale|regress/b004\\-mode\\-fd\\-tran|regress/b004\\-mode\\-td\\-dc|regress/b004\\-mode\\-td\\-op|regress/b006\\-empty\\-output|regress/b014\\-delay\\-rounding\\-warning|regress/b014\\-device\\-internal\\-rounds\\-to\\-zero|regress/b021\\-snapfactor|regress/b021\\-snapfactor\\-default|regress/b021\\-snapfactor\\-zero|regress/b031\\-mzi\\-bidir|regress/b032\\-crossing\\-isolation\\-sign|regress/b032\\-crossing\\-passive|regress/b033\\-crossing\\-two\\-lambda|regress/b033\\-crossing\\-two\\-lambda\\-tran|regress/b048\\-mlprobe\\-cw\\-tran|regress/b048\\-probe\\-cw\\-tran|regress/b048\\-undriven\\-tran|regress/b049\\-pdet\\-drives\\-net|regress/b050\\-pdet\\-beat|regress/b050\\-pdet\\-two\\-open\\-tran|regress/b051\\-pcmcell\\-tc\\-zero|regress/b052\\-cwsrc\\-positional|regress/b052\\-pcmcell\\-positional|regress/b052\\-vlsrc\\-positional|regress/b060\\-pcmcell\\-k\\-eq\\-n|regress/b124\\-allpass\\-ring\\-default\\-reltol|regress/b124\\-allpass\\-ring\\-tight\\-reltol|regress/b144\\-bidir\\-source\\-first|regress/b144\\-three\\-writers|regress/b144\\-two\\-sources\\-one\\-net|regress/b144\\-uni\\-writer\\-first|regress/b144\\-uni\\-writer\\-second|regress/b145\\-upgrade\\-reader|regress/b145\\-upgrade\\-reader\\-case2|regress/b145\\-upgrade\\-reader\\-case2\\-ref|regress/b145\\-upgrade\\-reader\\-ref|regress/b145\\-upgrade\\-roles|regress/b146\\-x\\-shared\\-delayed|regress/b146\\-x\\-shared\\-delayed\\-flat|regress/b146\\-x\\-shared\\-net|regress/b146\\-x\\-shared\\-net\\-flat|regress/b147\\-crossing\\-out\\-bidir|regress/b147\\-crossing\\-out\\-explicit\\-splitter|regress/b147\\-crossing\\-out\\-explicit\\-splitter\\-first|regress/b147\\-crossing\\-out\\-explicit\\-wg|regress/b150\\-include\\-in\\-subckt|regress/b153\\-reltol\\-zero|regress/b153\\-zerotol\\-cli|regress/b153\\-zerotol\\-lossy\\-ring\\-tran|regress/b153\\-zerotol\\-open\\-loop|regress/b153\\-zerotol\\-ring\\-op|regress/b159\\-crossing\\-backward|regress/b180\\-numeric\\-net\\-names|regress/f01\\-manifest|regress/f01\\-options\\-seed|regress/f01\\-options\\-seed\\-cli\\-priority|regress/f01\\-options\\-seed\\-int64\\-max|regress/f01\\-options\\-seed\\-int\\-literal|regress/f01\\-options\\-seed\\-int\\-max|regress/f01\\-options\\-seed\\-large|regress/f01\\-pdet\\-darkfield|regress/f01\\-pdet\\-noise\\-default\\-seed|regress/f01\\-pdet\\-noise\\-seed|regress/f01\\-seed\\-large|regress/f01\\-seed\\-max|regress/f05\\-format\\-csv\\-npz|regress/f05\\-format\\-npz\\-mlprobe\\-pdet|regress/f05\\-format\\-vcd\\-csv\\-dc|regress/f05\\-mlprobe\\-in\\-subckt|regress/f05\\-no\\-trace|regress/f05\\-save\\-paper\\-fig1b|regress/f05\\-save\\-traceall\\-bidir|regress/f05\\-save\\-tran|regress/f12\\-dc\\-p\\-alias|regress/f12\\-dc\\-wl\\-alias|regress/f12\\-dc\\-wl\\-slash|regress/f12\\-ends\\-name|regress/f12\\-include\\-both\\-differ|regress/f12\\-include\\-relative|regress/f12\\-param\\-override|regress/f12\\-param\\-undefined|regress/f12\\-si\\-op|regress/f15\\-coalesce\\-options|regress/f15\\-dispersive\\-waveguide|regress/f15\\-max\\-events\\-cli\\-priority|regress/f15\\-maxevents\\-options\\-tran|regress/f15\\-no\\-coalescing\\-cli|regress/f15\\-progress\\-quiet|regress/f15\\-stats\\-dc|regress/f15\\-stats\\-file\\-print|regress/f15\\-stats\\-op\\-no\\-trace|regress/f15\\-stats\\-tran|regress/f28\\-maxiter\\-cli\\-priority|regress/f28\\-maxiter\\-zero|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg)$",
+   "gtest": false,
+   "note": "F-15 Q2 (PD2 item 4): OpticalSignal ids behind -Dsignal_ids (off by default): signal listings lose the [NNNN] prefix ('[0042]  @ 1550 nm' -> '@ 1550 nm'); 127 cases, every file identical once the prefix is removed (checked), values unchanged"
   }
  ]
 }

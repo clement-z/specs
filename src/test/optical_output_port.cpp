@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
 #include <systemc.h>
+#include <cmath>
+#include <limits>
+#include <set>
+#include <vector>
 
 #include "optical_output_port.h"
 #include "specs.h"
@@ -39,7 +43,7 @@ TEST(OpticalOutputPort, EmptyQueueStopsWithoutEmitting)
         OOPHarness h("h");
         sc_start(SC_ZERO_TIME);
 
-        h.m_out_writer.m_event_queue.notify(sc_time(1, SC_NS));
+        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_EQ(sc_get_status(), SC_STOPPED);
@@ -58,7 +62,7 @@ TEST(OpticalOutputPort, DesyncStopsWithoutEmitting)
         sc_start(SC_ZERO_TIME);
 
         h.enqueue(sc_time(5, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
-        h.m_out_writer.m_event_queue.notify(sc_time(1, SC_NS));
+        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_EQ(sc_get_status(), SC_STOPPED);
@@ -76,7 +80,7 @@ TEST(OpticalOutputPort, KeepsValueQueuedBeforeThreadStart)
         OOPHarness h("h");
 
         h.enqueue(sc_time(1, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
-        h.m_out_writer.m_event_queue.notify(sc_time(1, SC_NS));
+        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_NE(sc_get_status(), SC_STOPPED);
@@ -208,7 +212,7 @@ TEST(OpticalOutputPort, EmissionGateWithZeroTolerances)
         EXPECT_EQ(write(F(1e-9, 0)), F(1e-9, 0)) << "below the default abstol and snap (1e-7): emitted as is";
         EXPECT_EQ(write(F(1e-9, 1e-25)), F(1e-9, 1e-25)) << "relative change 1e-16: emitted";
         EXPECT_EQ(write(F(5e-324, 0)), F(5e-324, 0)) << "smallest subnormal: emitted, not snapped";
-        EXPECT_EQ(oop.m_last_emission_threshold, 0);
+        EXPECT_EQ(oop.lastEmissionThreshold(), 0);
         const sc_dt::uint64 last_emission = oop.m_last_emission_delta;
         EXPECT_EQ(write(F(5e-324, 0)), F(5e-324, 0));
         EXPECT_EQ(oop.m_last_emission_delta, last_emission) << "identical value: not emitted";
@@ -361,6 +365,324 @@ TEST(DelayRoundingDeathTest, CheckDelayRounding)
         EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
         specsGlobalConfig.analysis_type = SPECSConfig::DC;
         EXPECT_EXIT(check(13.34e-15, true), ok, "^end$");
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// F-15: the gate decides on squared norms (std::norm) when the roundings cannot change the
+// result, on the magnitudes (std::abs) otherwise. It must take the same decisions as the
+// former gate, below, for every input: zero, NaN, infinities, subnormals, huge values and
+// values one ulp around each threshold
+namespace {
+typedef OpticalSignal::field_type GateField;
+
+bool formerAbstolGate(double abstol, const GateField &desired, const GateField &last)
+{
+    return abs(desired - last) > abstol;
+}
+
+bool formerReltolGate(double reltol, const GateField &desired, const GateField &last)
+{
+    double vector_distance = abs(desired - last);
+    double last_size = abs(last);
+    if (last_size == 0)
+        return vector_distance > 0;
+    if (reltol == 0)
+        return vector_distance > 0;
+    return (vector_distance/last_size) > reltol;
+}
+
+bool formerSnap(double snap_factor, double abstol, const GateField &desired)
+{
+    return abs(desired) < snap_factor*abstol;
+}
+
+// Magnitudes around the thresholds of the default and zero tolerances, and edge values
+std::vector<double> gateTestMagnitudes()
+{
+    const double inf = std::numeric_limits<double>::infinity();
+    const double nan = std::numeric_limits<double>::quiet_NaN();
+    std::vector<double> v = {0.0, -0.0, 5e-324, 1e-320, 2.2250738585072014e-308, 1e-300, 1e-200, 1e-160,
+                             1e-150, 1e-20, 1e-12, 1e-4, 0.5, 1, 1.5, 1e100, 1e150, 1e160, 1e300,
+                             1.7976931348623157e308, inf, -inf, nan};
+    for (double t : {1e-8, 1e-7, 1e-4, 1e-12, 1e-16})
+    {
+        double x = t;
+        for (int i = 0; i < 3; ++i)
+            x = std::nextafter(x, 0.0);
+        for (int i = 0; i < 7; ++i, x = std::nextafter(x, 1.0))
+        {
+            v.push_back(x);
+            v.push_back(-x);
+            v.push_back(x * 1e-4); // reltol: |dE| = 1e-4 * |E_last|
+            v.push_back(1 + x);
+        }
+    }
+    return v;
+}
+} // namespace
+
+TEST(OpticalOutputPort, SquaredNormGateMatchesFormerGate)
+{
+    SPECS_TEST_HEADER()
+    {
+        OOPHarness h("h");
+        auto &oop = h.m_out_writer;
+        const std::vector<double> mags = gateTestMagnitudes();
+        // a few complex values from those magnitudes (pure real, pure imaginary, mixed)
+        std::vector<GateField> fields;
+        for (double m : mags)
+        {
+            fields.emplace_back(m, 0);
+            fields.emplace_back(0, m);
+            fields.emplace_back(m * 0.6, m * 0.8);
+        }
+        // relative changes around reltol = 1e-4 of a few last values
+        std::vector<GateField> lasts = {GateField(0, 0), GateField(1, 0), GateField(0.6, -0.8),
+                                        GateField(1e-3, 2e-3), GateField(1e-8, 0), GateField(1e-300, 0),
+                                        GateField(std::numeric_limits<double>::infinity(), 0),
+                                        GateField(std::numeric_limits<double>::quiet_NaN(), 0)};
+
+        size_t checked = 0;
+        for (double abstol : {1e-8, 0.0, 1e-12})
+        {
+            for (double reltol : {1e-4, 0.0, 1e-9})
+            {
+                for (double snap_factor : {10.0, 0.0, 1.0})
+                {
+                    auto config = make_shared<OpticalOutputPortConfig>();
+                    config->m_abstol = abstol;
+                    config->m_reltol = reltol;
+                    config->m_snap_factor = snap_factor;
+                    oop.setConfig(config);
+                    oop.applyConfig();
+                    for (const GateField &last : lasts)
+                    {
+                        auto check = [&](const GateField &desired) {
+                            ASSERT_EQ(oop.check_emit_by_abstol(desired, last), formerAbstolGate(abstol, desired, last))
+                                << "abstol " << abstol << ", desired " << desired << ", last " << last;
+                            ASSERT_EQ(oop.check_emit_by_reltol(desired, last), formerReltolGate(reltol, desired, last))
+                                << "reltol " << reltol << ", desired " << desired << ", last " << last;
+                            ASSERT_EQ(oop.check_snap_to_zero(desired), formerSnap(snap_factor, abstol, desired))
+                                << "snap " << snap_factor << " x abstol " << abstol << ", desired " << desired;
+                            ++checked;
+                        };
+                        for (const GateField &f : fields)
+                        {
+                            check(f);
+                            check(last + f); // changes relative to last
+                            check(last * (1 + f.real())); // relative changes along last
+                        }
+                        // exactly at and one ulp around the reltol threshold, along last
+                        for (double r : {reltol, 1e-4, 1e-9})
+                        {
+                            double x = r;
+                            for (int i = 0; i < 3; ++i)
+                                x = std::nextafter(x, 0.0);
+                            for (int i = 0; i < 7; ++i, x = std::nextafter(x, 1.0))
+                                check(last * (1 + x));
+                        }
+                    }
+                }
+            }
+        }
+        EXPECT_GT(checked, 100000u);
+
+        // the edge cases named by F-15, explicitly (default tolerances)
+        auto default_config = make_shared<OpticalOutputPortConfig>();
+        oop.setConfig(default_config);
+        oop.applyConfig();
+        const double inf = std::numeric_limits<double>::infinity();
+        const double nan = std::numeric_limits<double>::quiet_NaN();
+        // |last| = 0
+        EXPECT_TRUE(oop.check_emit_by_reltol(GateField(1e-300, 0), GateField(0, 0)));
+        EXPECT_TRUE(oop.check_emit_by_reltol(GateField(0, 5e-324), GateField(0, -0.0)));
+        EXPECT_FALSE(oop.check_emit_by_abstol(GateField(0, 5e-324), GateField(0, 0)));
+        // NaN: never emitted (comparisons with NaN are false)
+        EXPECT_FALSE(oop.check_emit_by_abstol(GateField(nan, 0), GateField(1, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(GateField(nan, 0), GateField(1, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(GateField(1, 0), GateField(nan, 0)));
+        EXPECT_FALSE(oop.check_snap_to_zero(GateField(nan, 0)));
+        // infinities: hypot(inf, NaN) = inf, so inf - inf = NaN in one part still passes abstol
+        EXPECT_TRUE(oop.check_emit_by_abstol(GateField(inf, 0), GateField(1, 0)));
+        EXPECT_TRUE(oop.check_emit_by_abstol(GateField(inf, inf), GateField(inf, 0)));
+        EXPECT_FALSE(oop.check_emit_by_reltol(GateField(1, 0), GateField(inf, 0)));
+        EXPECT_FALSE(oop.check_snap_to_zero(GateField(inf, 0)));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// F-15: the notifications of the pending entries (were made by an sc_event_queue). Records every
+// value the port writes, with time and delta cycle
+class PendingHarness : public sc_module {
+public:
+    struct Write {
+        sc_time t;
+        sc_dt::uint64 delta;
+        OpticalSignal::field_type field;
+        uint32_t wavelength_id;
+    };
+
+    spx::oa_port_out_type p_out;
+    OpticalOutputPort m_out_writer;
+    spx::oa_signal_type out{"out"};
+    std::vector<Write> seen;
+
+    PendingHarness(sc_module_name name, bool coalesce = true)
+        : sc_module(name)
+        , m_out_writer("out_writer", p_out)
+    {
+        SC_HAS_PROCESS(PendingHarness);
+        p_out(out);
+        auto config = make_shared<OpticalOutputPortConfig>();
+        config->m_coalesce = coalesce;
+        m_out_writer.setConfig(config);
+        SC_METHOD(on_out_changed);
+        sensitive << out;
+        dont_initialize();
+    }
+
+    void on_out_changed()
+    {
+        seen.push_back({sc_time_stamp(), sc_delta_count(), out.read().m_field, out.read().m_wavelength_id});
+    }
+
+    void write(double field, double wavelength, double delay_ns)
+    {
+        m_out_writer.delayedWrite(OpticalSignal(OpticalSignal::field_type(field, 0), wavelength),
+                                  sc_time(delay_ns, SC_NS));
+    }
+};
+
+// Equal times: one entry per delta cycle, larger |E| first (the order of the coalescing
+// queue); the last one taken is the value left on the net
+TEST(OpticalOutputPort, PendingEqualTimesOnePerDeltaCycle)
+{
+    SPECS_TEST_HEADER()
+    {
+        PendingHarness h("h");
+        sc_start(SC_ZERO_TIME);
+        h.write(1, 1.55e-6, 1);
+        h.write(3, 1.56e-6, 1);
+        h.write(2, 1.57e-6, 1);
+        EXPECT_EQ(h.m_out_writer.pending(), 3u);
+        sc_start(2, SC_NS);
+
+        ASSERT_EQ(h.seen.size(), 3u);
+        const double wl[] = {1.56e-6, 1.57e-6, 1.55e-6};
+        for (size_t i = 0; i < 3; ++i)
+        {
+            EXPECT_EQ(h.seen[i].t, sc_time(1, SC_NS));
+            EXPECT_EQ(OpticalSignal::getWavelength(h.seen[i].wavelength_id), wl[i]);
+            if (i > 0)
+                EXPECT_EQ(h.seen[i].delta, h.seen[i - 1].delta + 1);
+        }
+        EXPECT_EQ(h.out.read().m_field, OpticalSignal::field_type(1, 0));
+        EXPECT_TRUE(h.m_out_writer.isempty());
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// A value for an earlier time than the pending ones moves the notification earlier
+TEST(OpticalOutputPort, PendingEarlierWriteIsTakenFirst)
+{
+    SPECS_TEST_HEADER()
+    {
+        PendingHarness h("h");
+        sc_start(SC_ZERO_TIME);
+        h.write(5, 1.55e-6, 5);
+        h.write(2, 1.55e-6, 2);
+        h.write(3, 1.55e-6, 3);
+        sc_start(1, SC_NS);
+        h.write(4, 1.55e-6, 3); // at 4 ns
+        h.write(1.5, 1.55e-6, 0.5); // at 1.5 ns, before all of them
+        sc_start(10, SC_NS);
+
+        ASSERT_EQ(h.seen.size(), 5u);
+        const double t_ns[] = {1.5, 2, 3, 4, 5};
+        for (size_t i = 0; i < 5; ++i)
+        {
+            EXPECT_EQ(h.seen[i].t, sc_time(t_ns[i], SC_NS));
+            EXPECT_EQ(h.seen[i].field, OpticalSignal::field_type(t_ns[i], 0));
+        }
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// A value for a (time, wavelength) already pending replaces it; another time or wavelength is a
+// new entry
+TEST(OpticalOutputPort, PendingSameTimeAndWavelengthMerges)
+{
+    SPECS_TEST_HEADER()
+    {
+        PendingHarness h("h");
+        auto &oop = h.m_out_writer;
+        sc_start(SC_ZERO_TIME);
+        h.write(1, 1.55e-6, 3);
+        h.write(2, 1.55e-6, 5);
+        h.write(3, 1.56e-6, 3);
+        h.write(4, 1.55e-6, 3); // replaces the first one
+        EXPECT_EQ(oop.pending(), 3u);
+        h.write(5, 1.56e-6, 5); // new
+        EXPECT_EQ(oop.pending(), 4u);
+        sc_start(10, SC_NS);
+
+        // (the order of equal times is not tested: a merged entry keeps its place in the heap)
+        ASSERT_EQ(h.seen.size(), 4u);
+        std::set<std::pair<double, double>> at3, at5; // (field, wavelength)
+        for (const auto &w : h.seen)
+        {
+            ASSERT_TRUE(w.t == sc_time(3, SC_NS) || w.t == sc_time(5, SC_NS));
+            (w.t == sc_time(3, SC_NS) ? at3 : at5).insert({w.field.real(), OpticalSignal::getWavelength(w.wavelength_id)});
+        }
+        EXPECT_EQ(at3, (std::set<std::pair<double, double>>{{4, 1.55e-6}, {3, 1.56e-6}}));
+        EXPECT_EQ(at5, (std::set<std::pair<double, double>>{{2, 1.55e-6}, {5, 1.56e-6}}));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// reset() (between the points of a .dc sweep) drops the pending entries and their notification
+TEST(OpticalOutputPort, PendingResetCancelsNotification)
+{
+    SPECS_TEST_HEADER()
+    {
+        PendingHarness h("h");
+        auto &oop = h.m_out_writer;
+        sc_start(SC_ZERO_TIME);
+        h.write(1, 1.55e-6, 5);
+        h.write(2, 1.56e-6, 5);
+        sc_start(1, SC_NS);
+        oop.reset();
+        EXPECT_TRUE(oop.isempty());
+        h.write(3, 1.55e-6, 6); // at 7 ns
+        sc_start(10, SC_NS);
+
+        EXPECT_NE(sc_get_status(), SC_STOPPED) << "no notification left without an entry";
+        ASSERT_EQ(h.seen.size(), 1u);
+        EXPECT_EQ(h.seen[0].t, sc_time(7, SC_NS));
+        EXPECT_EQ(h.seen[0].field, OpticalSignal::field_type(3, 0));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// Without coalescing (F-15 expert option) every write is kept, equal times in write order
+TEST(OpticalOutputPort, PendingWithoutCoalescingKeepsEveryWrite)
+{
+    SPECS_TEST_HEADER()
+    {
+        PendingHarness h("h", false);
+        sc_start(SC_ZERO_TIME);
+        h.write(1, 1.55e-6, 2);
+        h.write(2, 1.55e-6, 1);
+        h.write(3, 1.55e-6, 2);
+        h.write(4, 1.56e-6, 1);
+        EXPECT_EQ(h.m_out_writer.pending(), 4u);
+        sc_start(5, SC_NS);
+
+        ASSERT_EQ(h.seen.size(), 4u);
+        const double field[] = {2, 4, 1, 3};
+        for (size_t i = 0; i < 4; ++i)
+            EXPECT_EQ(h.seen[i].field, OpticalSignal::field_type(field[i], 0));
     }
     SPECS_TEST_FOOTER();
 }

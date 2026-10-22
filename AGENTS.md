@@ -12,7 +12,8 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   build. An installed SystemC/args only on request: `-Dforce_fallback_for= -Dcmake_prefix_path=<prefix>`
   (or `--wrap-mode=nofallback`, which errors if none is usable).
 - Build (Meson, release by default): `meson setup build && meson compile -C build`
-  - Options (`meson.options`): `native` (`-march=native`, default off: B-183), `old_tb`, `spx`, `tests`, `golden`, `docs`.
+  - Options (`meson.options`): `native` (`-march=native`, default off: B-183), `signal_ids` (debug ids of
+    optical signals, default off), `old_tb`, `spx`, `tests`, `golden`, `docs`.
     `libspx.so`: `meson compile -C build spx`. Docs: `ninja -C build doc`. Decisions: `discover/meson/DECISIONS.md`.
   - Asserts are on by default (`b_ndebug=false`); `-Db_ndebug=true` gives the same outputs.
   - **Don't run `ninja clang-format`** (Meson's automatic target): it reformats every file.

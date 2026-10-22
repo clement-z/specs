@@ -62,16 +62,16 @@ In file: sc_simcontext.cpp
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/a (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/a (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/PDET1 was enabled
 ROOT/PDET2 was enabled
 ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: [#2]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@10 ps, ROOT/VLSRC1 emitted: [#3]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
-@20 ps, ROOT/VLSRC1 emitted: [#4]  @ 1550 nm (0.022361 √W, 0.000500 W, 0.0000 rad)
-@30 ps, ROOT/VLSRC1 emitted: [#5]  @ 1550 nm (0.038730 √W, 0.001500 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@10 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+@20 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.022361 √W, 0.000500 W, 0.0000 rad)
+@30 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.038730 √W, 0.001500 W, 0.0000 rad)
 Simulated 50 ps
 ╔═══════════════════╗
 ║        DONE       ║
