@@ -105,8 +105,13 @@ OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
 {
     SC_HAS_PROCESS(OpticalOutputPort);
 
+    // created before the thread, as the method of the former sc_event_queue member was
+    SC_METHOD(fire_pending);
+    sensitive << m_pending_event;
+    dont_initialize();
+
     SC_THREAD(on_data_ready);
-    sensitive << m_event_queue;
+    sensitive << m_pending_event;
 }
 
 void OpticalOutputPort::applyConfig() {
@@ -164,10 +169,6 @@ void OpticalOutputPort::on_data_ready()
             m_queue.pop();
         else
             m_fifo_queue.erase(m_fifo_queue.begin());
-
-        // If next event is also now, notify event queue
-        // if (m_queue.top().first == now)
-        //     m_event_queue.notify(SC_ZERO_TIME);
 
         // Assign to more readable names
         const auto &t = tuple.first; //time
@@ -275,6 +276,28 @@ void OpticalOutputPort::on_data_ready()
     }
 }
 
+// F-15: an entry pending in delay (sc_event_queue::notify(): the event is notified only when
+// the entry is earlier than all the pending ones)
+void OpticalOutputPort::notify_pending(const sc_time &delay)
+{
+    const sc_time t = sc_time_stamp() + delay;
+    if (m_pending_times.empty() || t < m_pending_times.top())
+        m_pending_event.notify(delay);
+    m_pending_times.push(t);
+}
+
+// F-15: m_pending_event fired (sc_event_queue::fire_event()): one entry is due now, notify the
+// next one
+void OpticalOutputPort::fire_pending()
+{
+    // cancelled (drop_queue())
+    if (m_pending_times.empty())
+        return;
+    m_pending_times.pop();
+    if (!m_pending_times.empty())
+        m_pending_event.notify(m_pending_times.top() - sc_time_stamp());
+}
+
 sc_time OpticalOutputPort::snap_to_next_valid_time(const sc_time &t, const unsigned int resolution_multiplier)
 {
     // Squash time to closest timestamp using device temporal resolution and multiplier
@@ -317,7 +340,7 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
     // without coalescing (F-15): always a new entry, after those of the same time
     if (!m_coalesce) {
         m_fifo_queue.emplace(t, value);
-        m_event_queue.notify(t - sc_time_stamp());
+        notify_pending(t - sc_time_stamp());
         if (m_collect_stats)
             count_scheduled(false);
         return;
@@ -333,7 +356,7 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
     if (it == m_queue.cend()) {
         // if not, just schedule the new event
         m_queue.push(std::make_pair(t, value));
-        m_event_queue.notify(t - sc_time_stamp());
+        notify_pending(t - sc_time_stamp());
     }
     else {
         // if yes, just replace or sum with the old one
@@ -378,7 +401,7 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
     // without coalescing (F-15): always a new entry, after those of the same time
     if (!m_coalesce) {
         m_fifo_queue.emplace(now, value);
-        m_event_queue.notify(SC_ZERO_TIME);
+        notify_pending(SC_ZERO_TIME);
         if (m_collect_stats)
             count_scheduled(false);
         return;
@@ -394,7 +417,7 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
     if (it == m_queue.end()) {
         // if not, schedule the signal for the current time
         m_queue.push(make_pair(now, value));
-        m_event_queue.notify(SC_ZERO_TIME);
+        notify_pending(SC_ZERO_TIME);
     }
     else {
         // if yes, just replace or sum with the old one

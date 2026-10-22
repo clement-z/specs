@@ -114,7 +114,14 @@ public:
     port_type &m_port;
     queue_type m_queue;
     fifo_queue_type m_fifo_queue; // used instead of m_queue when m_coalesce is off
-    sc_event_queue m_event_queue;
+
+    // F-15: the notifications of the pending entries, as the sc_event_queue used here before
+    // made them, without its allocation per notification: m_pending_event fires once per entry,
+    // at its time (equal times in successive delta cycles). m_pending_times holds the times not
+    // yet fired; fire_pending() (a method, as in sc_event_queue, so that the kernel runs the
+    // processes in the same order) takes the time that fired and notifies the next one
+    sc_event m_pending_event;
+    std::priority_queue<sc_time, std::vector<sc_time>, std::greater<sc_time>> m_pending_times;
 
     std::map<uint32_t,OpticalSignal::field_type> m_desired_fields;
     std::map<uint32_t,OpticalSignal::field_type> m_emitted_fields;
@@ -154,6 +161,8 @@ public:
     std::shared_ptr<const OpticalOutputPortConfig> m_config;
 
     void on_data_ready();
+    void fire_pending();
+    void notify_pending(const sc_time &delay);
     void count_scheduled(bool coalesced);
     bool check_emit_by_abstol(const OpticalSignal::field_type &desired, const OpticalSignal::field_type &last);
     bool check_emit_by_reltol(const OpticalSignal::field_type &desired, const OpticalSignal::field_type &last);
@@ -200,7 +209,8 @@ public:
             cerr << "Cannot drop if simulation is running" << endl;
             exit(1);
         }
-        m_event_queue.cancel_all();
+        m_pending_times = decltype(m_pending_times)();
+        m_pending_event.cancel();
         m_queue = queue_type();
         m_fifo_queue.clear();
     }
