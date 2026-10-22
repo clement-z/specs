@@ -63,16 +63,16 @@ Info: (I703) tracing timescale unit set: 10 fs (traces/delete_me.vcd)
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/a (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/in (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/ring_in (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/ring_out (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/a (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/ring_in (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/ring_out (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: [#6]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@100 ps, ROOT/VLSRC1 emitted: [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@100 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 1 ns
 ╔═══════════════════╗
 ║        DONE       ║

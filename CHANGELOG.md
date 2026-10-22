@@ -28,6 +28,11 @@
   build machine's CPU. `-Dnative=true` (pixi: `pixi run build-native`, toolchains `gcc-native`/`clang-native`) gives
   host-tuned binaries, whose results differ in the last bits (B-183). The golden baseline is re-recorded without
   `-march=native`: 28 cases change in the last one or two digits of floats (within 1e-12 relative)
+* Signal listings (`.op`/`.dc` net listings, source and testbench prints) no longer start with the `[NNNN]`
+  debug id of the signal: the id is a build option, `-Dsignal_ids=true`, off by default (F-15). Values unchanged
+* Faster engine, same results bit for bit (F-15): emission gate on squared norms, waveguide transmissions and
+  delays computed once per wavelength, the output ports' event notifications without an allocation per event.
+  CROW benchmark (30 rings, no tracing): about 1.5x less CPU time than v0.2.0
 
 ## [0.2.0] - 2026-10-21
 

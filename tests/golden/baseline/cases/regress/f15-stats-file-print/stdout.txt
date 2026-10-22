@@ -73,22 +73,22 @@ Current SPECS config:
 - trace all optical nets: 1
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/x.vcd)
-ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.500000 √W, 0.250000 W, 0.0000 rad)
-ROOT/CWSRC2 emitted: [#2]  @ 1560 nm (2.000000 √W, 4.000000 W, 0.0000 rad)
-ROOT/CWSRC3 emitted: [#3]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-ROOT/CWSRC4 emitted: [#4]  @ 1560 nm (0.100000 √W, 0.010000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: @ 1550 nm (0.500000 √W, 0.250000 W, 0.0000 rad)
+ROOT/CWSRC2 emitted: @ 1560 nm (2.000000 √W, 4.000000 W, 0.0000 rad)
+ROOT/CWSRC3 emitted: @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC4 emitted: @ 1560 nm (0.100000 √W, 0.010000 W, 0.0000 rad)
 ╔═══════════════════╗
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/a1 (OPTICAL) = [#5]  @ 1550 nm (0.500000 √W, 0.250000 W, 0.0000 rad)
-║ - ROOT/a2 (OPTICAL) = [#6]  @ 1560 nm (2.000000 √W, 4.000000 W, 0.0000 rad)
-║ - ROOT/b1 (OPTICAL) = [#7]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-║ - ROOT/b2 (OPTICAL) = [#8]  @ 1560 nm (0.100000 √W, 0.010000 W, 0.0000 rad)
-║ - ROOT/m (OPTICAL) = [#9]  @ 1550 nm (0.750000 √W, 0.562500 W, 0.0000 rad)
-║ - ROOT/o (OPTICAL) = [#10]  @ 1550 nm (0.750000 √W, 0.562500 W, 3.0403 rad)
-║ - ROOT/u (OPTICAL) = [#11]  @ 1550 nm (0.353553 √W, 0.125000 W, 0.0000 rad)
-║ - ROOT/v (OPTICAL) = [#12]  @ 1560 nm (0.070711 √W, 0.005000 W, 0.0000 rad)
+║ - ROOT/a1 (OPTICAL) = @ 1550 nm (0.500000 √W, 0.250000 W, 0.0000 rad)
+║ - ROOT/a2 (OPTICAL) = @ 1560 nm (2.000000 √W, 4.000000 W, 0.0000 rad)
+║ - ROOT/b1 (OPTICAL) = @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/b2 (OPTICAL) = @ 1560 nm (0.100000 √W, 0.010000 W, 0.0000 rad)
+║ - ROOT/m (OPTICAL) = @ 1550 nm (0.750000 √W, 0.562500 W, 0.0000 rad)
+║ - ROOT/o (OPTICAL) = @ 1550 nm (0.750000 √W, 0.562500 W, 3.0403 rad)
+║ - ROOT/u (OPTICAL) = @ 1550 nm (0.353553 √W, 0.125000 W, 0.0000 rad)
+║ - ROOT/v (OPTICAL) = @ 1560 nm (0.070711 √W, 0.005000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 Run statistics written to traces/custom.stats.json
