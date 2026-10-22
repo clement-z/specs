@@ -73,3 +73,4 @@ outside the decisions stops the chain and goes to the maintainer. v0.3.0: tag an
 - 2026-10-22 — CI green on dev (run 39804758732) and master (run 39804765284): all blocking jobs pass; pixi macOS fails at Test as on the sprint branch (non-blocking).
 - 2026-10-22 — maintainer: macOS port set aside for now (the non-blocking pixi macOS CI job stays as is; its failure is expected).
 - 2026-10-22 — v0.2.0 tagged on 6c7514a and pushed. Phase D prompts updated (pixi builds, strict golden after B-183, D1 delivers the per-case counter tool, bench case `C-notrace N=30`, Opus high per the model rule); launch plan above, awaiting go.
+- 2026-10-22 — **go for D1, D2, D3** (chained by the coordinator per the launch plan).
