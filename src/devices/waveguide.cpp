@@ -1,5 +1,6 @@
 #include "specs.h"
 #include "devices/waveguide.h"
+#include "utils/transmission_cache.h"
 
 using namespace std;
 
@@ -55,6 +56,11 @@ void WaveguideUni::on_port_in_changed()
         cout << endl;
     }
 
+    // F-15: per-wavelength transmission (and delay), same arithmetic as per event
+    WavelengthCache<OpticalSignal::field_type> S12_cache;
+    WavelengthCache<std::pair<OpticalSignal::field_type, sc_time>> S12_delay_cache;
+    const sc_time group_delay(group_delay_ns, SC_NS);
+
     if(m_D == 0)
     {
         while (true) {
@@ -63,20 +69,24 @@ void WaveguideUni::on_port_in_changed()
             // Read the input signal
             auto s = p_in->read();
 
-            // calculate phase-delay
-            const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6);
+            // Transmission function at the wavelength (computed once per wavelength, F-15)
+            const OpticalSignal::field_type &S12 = S12_cache.get(s.m_wavelength_id, [&]() {
+                // calculate phase-delay
+                const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6);
 
-            const double phase_delay = phase_delay_factor * neff / s.getWavelength();
+                const double phase_delay = phase_delay_factor * neff / s.getWavelength();
+
+                return polar(transmission, phase_delay);
+            });
 
             // Apply transmission function
-            const OpticalSignal::field_type S12 = polar(transmission, phase_delay);
             s *= S12;
 
             // Get new ID for output event
             s.getNewId();
 
             // Write to ouput port after group delay
-            m_out_writer.delayedWrite(s, sc_time(group_delay_ns, SC_NS));
+            m_out_writer.delayedWrite(s, group_delay);
         }
     }
     else // dispersion has a defined value
@@ -87,22 +97,27 @@ void WaveguideUni::on_port_in_changed()
             // Read the input signal
             auto s = p_in->read();
 
-            // calculate phase-delay
-            const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6)
-                                 + d2neff_dlambda2_over_2 * pow(s.getWavelength() - 1.55e-6, 2);
-            const double ng = m_ng + dng_dlambda * (s.getWavelength() - 1.55e-6);
+            // Transmission function and group delay at the wavelength (computed once per
+            // wavelength, F-15)
+            const auto &S12_delay = S12_delay_cache.get(s.m_wavelength_id, [&]() {
+                // calculate phase-delay
+                const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6)
+                                     + d2neff_dlambda2_over_2 * pow(s.getWavelength() - 1.55e-6, 2);
+                const double ng = m_ng + dng_dlambda * (s.getWavelength() - 1.55e-6);
 
-            const double phase_delay_disp = phase_delay_factor * neff / s.getWavelength();
-            const double group_delay_ns_disp = 1e9 * m_length_cm * 1e-2 / (c / ng);
+                const double phase_delay_disp = phase_delay_factor * neff / s.getWavelength();
+                const double group_delay_ns_disp = 1e9 * m_length_cm * 1e-2 / (c / ng);
+                return std::make_pair(OpticalSignal::field_type(polar(transmission, phase_delay_disp)),
+                                      sc_time(group_delay_ns_disp, SC_NS));
+            });
             // Apply transmission function
-            const OpticalSignal::field_type S12 = polar(transmission, phase_delay_disp);
-            s *= S12;
+            s *= S12_delay.first;
 
             // Get new ID for output event
             s.getNewId();
 
             // Write to ouput port after group delay
-            m_out_writer.delayedWrite(s, sc_time(group_delay_ns_disp, SC_NS));
+            m_out_writer.delayedWrite(s, S12_delay.second);
         }
     }
 }
@@ -162,6 +177,11 @@ void WaveguideBi::on_p0_in_changed()
         cout << endl;
     }
 
+    // F-15: per-wavelength transmission (and delay), same arithmetic as per event
+    WavelengthCache<OpticalSignal::field_type> S12_cache;
+    WavelengthCache<std::pair<OpticalSignal::field_type, sc_time>> S12_delay_cache;
+    const sc_time group_delay(group_delay_ns, SC_NS);
+
     if(m_D == 0)
     {
         while (true) {
@@ -170,20 +190,24 @@ void WaveguideBi::on_p0_in_changed()
             // Read the input signal
             auto s = p0_in->read();
 
-            // calculate phase-delay
-            const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6);
+            // Transmission function at the wavelength (computed once per wavelength, F-15)
+            const OpticalSignal::field_type &S12 = S12_cache.get(s.m_wavelength_id, [&]() {
+                // calculate phase-delay
+                const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6);
 
-            const double phase_delay = phase_delay_factor * neff / s.getWavelength();
+                const double phase_delay = phase_delay_factor * neff / s.getWavelength();
+
+                return polar(transmission, phase_delay);
+            });
 
             // Apply transmission function
-            const OpticalSignal::field_type S12 = polar(transmission, phase_delay);
             s *= S12;
 
             // Get new ID for output event
             s.getNewId();
 
             // Write to ouput port after group delay
-            m_p1_out_writer.delayedWrite(s, sc_time(group_delay_ns, SC_NS));
+            m_p1_out_writer.delayedWrite(s, group_delay);
         }
     }
     else // dispersion has a defined value
@@ -194,22 +218,27 @@ void WaveguideBi::on_p0_in_changed()
             // Read the input signal
             auto s = p0_in->read();
 
-            // calculate phase-delay
-            const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6)
-                                 + d2neff_dlambda2_over_2 * pow(s.getWavelength() - 1.55e-6, 2);
-            const double ng = m_ng + dng_dlambda * (s.getWavelength() - 1.55e-6);
+            // Transmission function and group delay at the wavelength (computed once per
+            // wavelength, F-15)
+            const auto &S12_delay = S12_delay_cache.get(s.m_wavelength_id, [&]() {
+                // calculate phase-delay
+                const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6)
+                                     + d2neff_dlambda2_over_2 * pow(s.getWavelength() - 1.55e-6, 2);
+                const double ng = m_ng + dng_dlambda * (s.getWavelength() - 1.55e-6);
 
-            const double phase_delay_disp = phase_delay_factor * neff / s.getWavelength();
-            const double group_delay_ns_disp = 1e9 * m_length_cm * 1e-2 / (c / ng);
+                const double phase_delay_disp = phase_delay_factor * neff / s.getWavelength();
+                const double group_delay_ns_disp = 1e9 * m_length_cm * 1e-2 / (c / ng);
+                return std::make_pair(OpticalSignal::field_type(polar(transmission, phase_delay_disp)),
+                                      sc_time(group_delay_ns_disp, SC_NS));
+            });
             // Apply transmission function
-            const OpticalSignal::field_type S12 = polar(transmission, phase_delay_disp);
-            s *= S12;
+            s *= S12_delay.first;
 
             // Get new ID for output event
             s.getNewId();
 
             // Write to ouput port after group delay
-            m_p1_out_writer.delayedWrite(s, sc_time(group_delay_ns_disp, SC_NS));
+            m_p1_out_writer.delayedWrite(s, S12_delay.second);
         }
     }
 }
@@ -239,6 +268,11 @@ void WaveguideBi::on_p1_in_changed()
     double d2neff_dlambda2_over_2 = -1 * c * m_D / (2 * 1.55e-6);
     double dng_dlambda = c*m_D;
 
+    // F-15: per-wavelength transmission (and delay), same arithmetic as per event
+    WavelengthCache<OpticalSignal::field_type> S12_cache;
+    WavelengthCache<std::pair<OpticalSignal::field_type, sc_time>> S12_delay_cache;
+    const sc_time group_delay(group_delay_ns, SC_NS);
+
     if(m_D == 0)
     {
         while (true) {
@@ -247,20 +281,24 @@ void WaveguideBi::on_p1_in_changed()
             // Read the input signal
             auto s = p1_in->read();
 
-            // calculate phase-delay
-            const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6);
+            // Transmission function at the wavelength (computed once per wavelength, F-15)
+            const OpticalSignal::field_type &S12 = S12_cache.get(s.m_wavelength_id, [&]() {
+                // calculate phase-delay
+                const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6);
 
-            const double phase_delay = phase_delay_factor * neff / s.getWavelength();
+                const double phase_delay = phase_delay_factor * neff / s.getWavelength();
+
+                return polar(transmission, phase_delay);
+            });
 
             // Apply transmission function
-            const OpticalSignal::field_type S12 = polar(transmission, phase_delay);
             s *= S12;
 
             // Get new ID for output event
             s.getNewId();
 
             // Write to ouput port after group delay
-            m_p0_out_writer.delayedWrite(s, sc_time(group_delay_ns, SC_NS));
+            m_p0_out_writer.delayedWrite(s, group_delay);
         }
     }
     else // dispersion has a defined value
@@ -271,22 +309,27 @@ void WaveguideBi::on_p1_in_changed()
             // Read the input signal
             auto s = p1_in->read();
 
-            // calculate phase-delay
-            const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6)
-                                 + d2neff_dlambda2_over_2 * pow(s.getWavelength() - 1.55e-6, 2);
-            const double ng = m_ng + dng_dlambda * (s.getWavelength() - 1.55e-6);
+            // Transmission function and group delay at the wavelength (computed once per
+            // wavelength, F-15)
+            const auto &S12_delay = S12_delay_cache.get(s.m_wavelength_id, [&]() {
+                // calculate phase-delay
+                const double neff = m_neff + dneff_dlambda * (s.getWavelength() - 1.55e-6)
+                                     + d2neff_dlambda2_over_2 * pow(s.getWavelength() - 1.55e-6, 2);
+                const double ng = m_ng + dng_dlambda * (s.getWavelength() - 1.55e-6);
 
-            const double phase_delay_disp = phase_delay_factor * neff / s.getWavelength();
-            const double group_delay_ns_disp = 1e9 * m_length_cm * 1e-2 / (c / ng);
+                const double phase_delay_disp = phase_delay_factor * neff / s.getWavelength();
+                const double group_delay_ns_disp = 1e9 * m_length_cm * 1e-2 / (c / ng);
+                return std::make_pair(OpticalSignal::field_type(polar(transmission, phase_delay_disp)),
+                                      sc_time(group_delay_ns_disp, SC_NS));
+            });
             // Apply transmission function
-            const OpticalSignal::field_type S12 = polar(transmission, phase_delay_disp);
-            s *= S12;
+            s *= S12_delay.first;
 
             // Get new ID for output event
             s.getNewId();
 
             // Write to ouput port after group delay
-            m_p0_out_writer.delayedWrite(s, sc_time(group_delay_ns_disp, SC_NS));
+            m_p0_out_writer.delayedWrite(s, S12_delay.second);
         }
     }
 }

@@ -3571,6 +3571,24 @@
    "note": "F-15 expert option .options coalesce=0 on the circuit of regress/b001-fd-multilambda-stale: same values per wavelength; the OP listing shows v @ 1550 nm (last write; 1560 nm with coalescing, equal times by |E|); stats: coalesced 0, scheduled = processed = 16 (14/12 with coalescing)"
   },
   {
+   "id": "regress/f15-dispersive-waveguide",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=ports",
+    "-f",
+    "tests/golden/netlists/f15-dispersive-waveguide.cir"
+   ],
+   "note": "F-15 (PD2): waveguides with dispersion (D != 0, no other case has one): wavelength-dependent transmission and group delay, cached per wavelength since F-15; uni (two wavelengths on one net) and bidirectional; arrival times and powers in the netlist header"
+  },
+  {
    "id": "regress/f15-no-coalescing-cli",
    "args": [
     "--no-coalescing",

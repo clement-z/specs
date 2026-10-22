@@ -1,5 +1,6 @@
 #include "specs.h"
 #include "devices/phaseshifter.h"
+#include "utils/transmission_cache.h"
 
 using namespace std;
 
@@ -7,6 +8,8 @@ void PhaseShifterUni::on_port_in_changed()
 {
     auto transmission_field = pow(10.0, - m_attenuation_dB / 20);
     m_memory_in[0] = 0; // initializing for nan wavelength
+    // F-15: polar() only when the phase changes
+    PolarCache transmission(transmission_field);
 
     if (specsGlobalConfig.verbose_component_initialization)
     {
@@ -38,7 +41,7 @@ void PhaseShifterUni::on_port_in_changed()
         s.getNewId();
 
         // Apply transmission and phase-shift
-        s *= polar(transmission_field, m_sensitivity * p_vin->read());
+        s *= transmission.get(m_sensitivity * p_vin->read());
 
         // Write to ouput port after zero delay
         m_out_writer.delayedWrite(s, SC_ZERO_TIME);
@@ -57,6 +60,8 @@ void PhaseShifterUni::on_port_vin_changed()
         wait();
         // Read the new phase-delay
         m_phaseshift_rad = m_sensitivity * p_vin->read();
+        // F-15: the same for every wavelength, computed once
+        const OpticalSignal::field_type transmission = polar(transmission_field, m_phaseshift_rad);
 
         // writes the signals of all wavelengths with the new phase shift
         for(auto id_field : m_memory_in)
@@ -69,7 +74,7 @@ void PhaseShifterUni::on_port_vin_changed()
             s.getNewId();
 
             // Apply transmission and phase-shift
-            s *= polar(transmission_field, m_phaseshift_rad);
+            s *= transmission;
 
             // Write to ouput port after zero delay
             m_out_writer.delayedWrite(s, SC_ZERO_TIME);
@@ -82,6 +87,8 @@ void PhaseShifterBi::on_p0_in_changed()
 {
     auto transmission_field = pow(10.0, - m_attenuation_dB / 20);
     m_memory_p0[0] = 0; // initializing for nan wavelength
+    // F-15: polar() only when the phase changes
+    PolarCache transmission(transmission_field);
 
     if (specsGlobalConfig.verbose_component_initialization)
     {
@@ -117,7 +124,7 @@ void PhaseShifterBi::on_p0_in_changed()
         s.getNewId();
 
         // Apply transmission and phase-shift
-        s *= polar(transmission_field, m_sensitivity * p_vin->read());
+        s *= transmission.get(m_sensitivity * p_vin->read());
 
         // Write to ouput port after zero delay
         m_p1_writer.delayedWrite(s, SC_ZERO_TIME);
@@ -128,6 +135,8 @@ void PhaseShifterBi::on_p1_in_changed()
 {
     auto transmission_field = pow(10.0, - m_attenuation_dB / 20);
     m_memory_p1[0] = 0; // initializing for nan wavelength
+    // F-15: polar() only when the phase changes
+    PolarCache transmission(transmission_field);
 
     while (true) {
         // Wait for a new input signal
@@ -143,7 +152,7 @@ void PhaseShifterBi::on_p1_in_changed()
         s.getNewId();
 
         // Apply transmission and phase-shift
-        s *= polar(transmission_field, m_sensitivity * p_vin->read());
+        s *= transmission.get(m_sensitivity * p_vin->read());
 
         // Write to ouput port after zero delay
         m_p0_writer.delayedWrite(s, SC_ZERO_TIME);
@@ -162,6 +171,8 @@ void PhaseShifterBi::on_port_vin_changed()
         wait();
         // Read the new phase-delay
         m_phaseshift_rad = m_sensitivity * p_vin->read();
+        // F-15: the same for every wavelength, computed once
+        const OpticalSignal::field_type transmission = polar(transmission_field, m_phaseshift_rad);
 
         // writes the signals of all wavelengths with the new phase shift
         for(auto id_field : m_memory_p0)
@@ -174,7 +185,7 @@ void PhaseShifterBi::on_port_vin_changed()
             s.getNewId();
 
             // Apply transmission and phase-shift
-            s *= polar(transmission_field, m_phaseshift_rad);
+            s *= transmission;
 
             // Write to ouput port after zero delay
             m_p1_writer.delayedWrite(s, SC_ZERO_TIME);
@@ -189,7 +200,7 @@ void PhaseShifterBi::on_port_vin_changed()
             s.getNewId();
 
             // Apply transmission and phase-shift
-            s *= polar(transmission_field, m_phaseshift_rad);
+            s *= transmission;
 
             // Write to ouput port after zero delay
             m_p0_writer.delayedWrite(s, SC_ZERO_TIME);

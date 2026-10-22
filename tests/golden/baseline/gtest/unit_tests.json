@@ -102,6 +102,8 @@
   "TraceTable.NpzIsAStoredZipOfNpyArrays": "PASS",
   "TraceTable.ProbesWriteToTheTableWithoutVcd": "PASS",
   "TranStart.ProbesSampleAfterOperatingPointAndInitialConditions": "PASS",
+  "TransmissionCache.PolarCacheMatchesPolarBitForBit": "PASS",
+  "TransmissionCache.WavelengthCacheComputesOncePerWavelength": "PASS",
   "Waveguide.Instantiation": "PASS",
   "Waveguide.OperatingPoint": "PASS",
   "WaveguideDeathTest.DelayRoundingReportedOncePerDevice": "PASS",

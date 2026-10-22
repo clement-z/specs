@@ -200,6 +200,7 @@
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
   "regress/f15-coalesce-options",
+  "regress/f15-dispersive-waveguide",
   "regress/f15-max-events-cli-priority",
   "regress/f15-maxevents-options-tran",
   "regress/f15-no-coalescing-cli",
@@ -258,6 +259,18 @@
    "only": "^gtest/unit_tests$",
    "gtest": true,
    "note": "F-15 (PD2 item 1): new unit test OpticalOutputPort.SquaredNormGateMatchesFormerGate"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:22:12Z",
+   "only": "^regress/f15-dispersive-waveguide$",
+   "gtest": false,
+   "note": "F-15 (PD2 item 2): new case, dispersive waveguides (recorded with the build before the per-wavelength caches)"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T21:22:37Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-15 (PD2 item 2): new unit tests TransmissionCache.*"
   }
  ]
 }

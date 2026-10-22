@@ -1,0 +1,20 @@
+* F-15 (PD2): waveguides with dispersion (D != 0), whose transmission and group delay depend on
+* the wavelength (cached per wavelength since F-15). L = 1 cm, ng = 4.2 or 4.3 at 1.55 um:
+* 140.1 or 143.4 ps; D adds c*D*(wl - 1.55 um)*L/c = D * 1e-10 s per nm (D = 1e-2: +1 ps per
+* 10 nm). Pulses at three wavelengths, written on one net by one source each:
+* - wg_uni (unidirectional, D = 1e-2): 1.55 um (1 mW from 1 ps to 20 ps) and 1.56 um (2 mW from
+*   2 ps to 21 ps) arrive at out 1 ps apart in delay (143.4 and 144.4 ps after they leave in);
+* - wg_bi (bidirectional: a source at each end, D = -5e-3): 1.55 um from a to b, 1.54 um from
+*   b to a (+0.5 ps).
+* Expected (VCD, MLPROBE): out@1550 = 1 mW * 10^(-0.1) = 0.794 mW at 144.4 ps, back to 0 at
+* 163.4 ps; out@1560 = 2 mW * 10^(-0.1) = 1.589 mW at 146.4 ps, 0 at 165.4 ps; b@1550 = 1 mW *
+* 10^(-0.2) = 0.631 mW at 143.1 ps, 0 at 170.1 ps. The probe of a reads the slot written by vlsrc2,
+* not the backward wave, which shows only in the run statistics (--stats: ROOT/wg_bi ports).
+vlsrc1 in values=[[1e-12, 1e-3, 1.55e-6], [2e-12, 2e-3, 1.56e-6], [20e-12, 0, 1.55e-6], [21e-12, 0, 1.56e-6]]
+wg_uni in out length=1e-2 att=1 neff=2.3 ng=4.3 D=1e-2
+vlsrc2 a values=[[3e-12, 1e-3, 1.55e-6], [30e-12, 0, 1.55e-6]]
+vlsrc3 b values=[[4e-12, 4e-3, 1.54e-6], [40e-12, 0, 1.54e-6]]
+wg_bi a b length=1e-2 att=2 neff=2.2 ng=4.2 D=-5e-3
+mlprobe1 out wl=[1.55e-6, 1.56e-6]
+mlprobe2 b wl=[1.55e-6]
+.tran 200e-12

@@ -40,6 +40,8 @@ void DirectionalCouplerUni::on_port_in1_changed()
     }
 
     OpticalSignal p_in1_read;
+    // F-15: built once, not per event
+    const sc_time delay(m_delay_ns, SC_NS);
 
     while (true) {
         // Wait for a new input signal
@@ -60,8 +62,8 @@ void DirectionalCouplerUni::on_port_in1_changed()
                                 m_memory_in2[cur_wavelength_id] * S24
                                 , cur_wavelength_id);
 
-        m_out1_writer.delayedWrite(s3, sc_time(m_delay_ns, SC_NS));
-        m_out2_writer.delayedWrite(s4, sc_time(m_delay_ns, SC_NS));
+        m_out1_writer.delayedWrite(s3, delay);
+        m_out2_writer.delayedWrite(s4, delay);
     }
 }
 
@@ -81,6 +83,8 @@ void DirectionalCouplerUni::on_port_in2_changed()
     S23 = polar(transmission_cross, m_cross_phase_rad);
 
     OpticalSignal p_in2_read;
+    // F-15: built once, not per event
+    const sc_time delay(m_delay_ns, SC_NS);
 
     while (true) {
         // Wait for a new input signal
@@ -101,8 +105,8 @@ void DirectionalCouplerUni::on_port_in2_changed()
                                 m_memory_in2[cur_wavelength_id] * S24
                                 , cur_wavelength_id);
 
-        m_out1_writer.delayedWrite(s3, sc_time(m_delay_ns, SC_NS));
-        m_out2_writer.delayedWrite(s4, sc_time(m_delay_ns, SC_NS));
+        m_out1_writer.delayedWrite(s3, delay);
+        m_out2_writer.delayedWrite(s4, delay);
     }
 }
 
@@ -153,6 +157,8 @@ void DirectionalCouplerBi::on_p0_in_changed()
     }
 
     OpticalSignal p0_in_read;
+    // F-15: built once, not per event
+    const sc_time delay(m_delay_ns, SC_NS);
 
     while (true) {
         // Wait for a new input signal
@@ -174,8 +180,8 @@ void DirectionalCouplerBi::on_p0_in_changed()
                                 m_memory_in1[cur_wavelength_id] * S13
                                 , cur_wavelength_id);
 
-        m_p2_out_writer.delayedWrite(s2, sc_time(m_delay_ns, SC_NS));
-        m_p3_out_writer.delayedWrite(s3, sc_time(m_delay_ns, SC_NS));
+        m_p2_out_writer.delayedWrite(s2, delay);
+        m_p3_out_writer.delayedWrite(s3, delay);
     }
 }
 
@@ -195,6 +201,8 @@ void DirectionalCouplerBi::on_p1_in_changed()
     S12 = polar(transmission_cross, m_cross_phase_rad);
 
     OpticalSignal p1_in_read;
+    // F-15: built once, not per event
+    const sc_time delay(m_delay_ns, SC_NS);
 
     while (true) {
         // Wait for a new input signal
@@ -216,8 +224,8 @@ void DirectionalCouplerBi::on_p1_in_changed()
                                 m_memory_in1[cur_wavelength_id] * S13
                                 , cur_wavelength_id);
 
-        m_p2_out_writer.delayedWrite(s2, sc_time(m_delay_ns, SC_NS));
-        m_p3_out_writer.delayedWrite(s3, sc_time(m_delay_ns, SC_NS));
+        m_p2_out_writer.delayedWrite(s2, delay);
+        m_p3_out_writer.delayedWrite(s3, delay);
     }
 }
 
@@ -237,6 +245,8 @@ void DirectionalCouplerBi::on_p2_in_changed()
     S12 = polar(transmission_cross, m_cross_phase_rad);
 
     OpticalSignal p2_in_read;
+    // F-15: built once, not per event
+    const sc_time delay(m_delay_ns, SC_NS);
 
     while (true) {
         // Wait for a new input signal
@@ -258,8 +268,8 @@ void DirectionalCouplerBi::on_p2_in_changed()
                                 m_memory_in3[cur_wavelength_id] * S13
                                 , cur_wavelength_id);
 
-        m_p0_out_writer.delayedWrite(s0, sc_time(m_delay_ns, SC_NS));
-        m_p1_out_writer.delayedWrite(s1, sc_time(m_delay_ns, SC_NS));
+        m_p0_out_writer.delayedWrite(s0, delay);
+        m_p1_out_writer.delayedWrite(s1, delay);
     }
 }
 
@@ -279,6 +289,8 @@ void DirectionalCouplerBi::on_p3_in_changed()
     S12 = polar(transmission_cross, m_cross_phase_rad);
 
     OpticalSignal p3_in_read;
+    // F-15: built once, not per event
+    const sc_time delay(m_delay_ns, SC_NS);
 
     while (true) {
         // Wait for a new input signal
@@ -300,7 +312,7 @@ void DirectionalCouplerBi::on_p3_in_changed()
                                 m_memory_in3[cur_wavelength_id] * S13
                                 , cur_wavelength_id);
 
-        m_p0_out_writer.delayedWrite(s0, sc_time(m_delay_ns, SC_NS));
-        m_p1_out_writer.delayedWrite(s1, sc_time(m_delay_ns, SC_NS));
+        m_p0_out_writer.delayedWrite(s0, delay);
+        m_p1_out_writer.delayedWrite(s1, delay);
     }
 }
