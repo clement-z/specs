@@ -79,3 +79,11 @@ Push the branch after the final verification (no PR creation, no merge into `dev
 | Installed SystemC | Used **only on explicit request**, through Meson's standard mechanism (`force_fallback_for` / `--wrap-mode`), still with the C++-standard ABI check. |
 | Layout and sources | `thirdparty/` is renamed **`subprojects/`** (Meson's default; `subproject_dir` dropped). SystemC 3.0.2 and taywee/args 6.4.7 come from **wrap files** (release tarballs with sha256), like gtest; the git submodules are removed. Offline: `meson subprojects download`. |
 | Release | Lands in v0.2.0, before the tag. Push, tag and merges still only on the maintainer's request. |
+
+## Decisions of 2026-10-22 (development environment)
+| Topic | Decision |
+|---|---|
+| Tool | **pixi** (conda-forge only, no Anaconda `defaults` channel): `pixi.toml` + committed `pixi.lock`, optional next to the plain Meson build (README keeps both routes). Platforms linux-64, linux-aarch64, osx-64, osx-arm64; no Windows (fork-based tests). |
+| Contents | **Compilers in pixi** (gcc and clang with their sanitizer runtimes; plain compiler packages, not the activation flags of `cxx-compiler`), meson, ninja, cmake, pkg-config, flex, bison, Python, ccache, debugger, clang-format; features `py` (pyspecs: numpy, pandas, matplotlib, jupyter, pyDigitalWaveTools from PyPI) and `docs` (doxygen, graphviz); tasks for setup/build/test/golden/sanitizers; ccache and wrap download shared across worktrees. |
+| CI | A pixi job **next to** the existing apt jobs (they keep testing the distro toolchains and produce the artefacts): Ubuntu blocking, macOS non-blocking until the macOS port is done (a later phase). |
+| Release | After `v0.2.0`: under `[unreleased]`; the tag goes on the release candidate before this merge. |
