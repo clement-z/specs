@@ -92,6 +92,10 @@
   "err/f12-ends-name-mismatch",
   "err/f12-param-malformed",
   "err/f12-si-unit-letters",
+  "err/f15-max-events-invalid",
+  "err/f15-max-events-op",
+  "err/f15-options-maxevents-fraction",
+  "err/f15-progress-invalid",
   "err/f15-stats-bad-section",
   "err/f28-lossless-ring-dc",
   "err/f28-lossless-ring-op",
@@ -195,6 +199,11 @@
   "regress/f12-param-undefined",
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
+  "regress/f15-coalesce-options",
+  "regress/f15-max-events-cli-priority",
+  "regress/f15-maxevents-options-tran",
+  "regress/f15-no-coalescing-cli",
+  "regress/f15-progress-quiet",
   "regress/f15-stats-dc",
   "regress/f15-stats-file-print",
   "regress/f15-stats-op-no-trace",
@@ -230,6 +239,12 @@
    "only": "^(cli/help|cli/no-args|regress/f15-stats-tran|regress/f15-stats-op-no-trace|regress/f15-stats-file-print|regress/f15-stats-dc|err/f15-stats-bad-section|gtest/unit_tests)$",
    "gtest": true,
    "note": "F-15 (PD1): --stats, --stats-file, --print-stats, --progress, --no-coalescing, --max-events: new help lines (cli/help, cli/no-args); new cases regress/f15-stats-{tran,op-no-trace,file-print,dc}, err/f15-stats-bad-section; gtest: RunStats.*, RunProgress.*"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T20:27:11Z",
+   "only": "^(regress/f15-coalesce-options|regress/f15-no-coalescing-cli|regress/f15-maxevents-options-tran|regress/f15-max-events-cli-priority|err/f15-max-events-op|err/f15-max-events-invalid|err/f15-options-maxevents-fraction|regress/f15-progress-quiet|err/f15-progress-invalid)$",
+   "gtest": false,
+   "note": "F-15 (PD1): expert options coalesce/maxevents (.options, --no-coalescing, --max-events) and --progress: new cases"
   }
  ]
 }

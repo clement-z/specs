@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--max-events",
+  "-1",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f15-max-events-invalid"
+}

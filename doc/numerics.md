@@ -27,14 +27,17 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
 | `seed` | 0 | master seed of the random numbers (see below) | integer: a literal 0 to 9223372036854775807 (2^63 - 1), exponent form 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
 | `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer: a literal 0 to 2^63 - 1, exponent form 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
+| `coalesce` | 1 | expert: merge the writes of a port for the same time and wavelength (see [Expert options](#expert-options-ablation)) | 0 or 1 | `--no-coalescing` |
+| `maxevents` | 0 | expert: stop the run after this many processed entries (0: no cap) | integer, as `maxiter` | `--max-events` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
 - An invalid value is an error and the simulation does not start.
 - With `-f`, the CLI values are appended to the netlist as `.options` lines, so they override the netlist.
   They are ignored by the legacy testbenches (`-t`), except `--seed`, which is applied directly: it also
-  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter` is
-  applied directly too and takes priority over `.options maxiter`.
+  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter`,
+  `--no-coalescing` and `--max-events` are applied directly too and take priority over `.options maxiter`,
+  `coalesce` and `maxevents`.
 - `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
   reproducible: the default seed is 0, and the same netlist and seed give the same values. An integer
@@ -235,6 +238,36 @@ name: the parser marks the waveguides it creates from netlist lines.
 
 In the paper's CROW benchmark (N = 3, L ≈ 350 µm), Interconnect differed from Photontorch and SPECS at 100 fs.
 At 1 fs all three agreed, with pairwise RMS errors below about 3 µW.
+
+## Expert options (ablation)
+
+Two switches change how the engine handles events, to measure what a mechanism contributes (ablation
+studies, performance work). They are not meant for normal runs, and outputs with them are not covered by the
+compatibility of the defaults.
+
+**No coalescing** (`.options coalesce=0`, `specs --no-coalescing`). An output port keeps the values its device
+writes in a queue until their time. By default a value written for a (time, wavelength) that is already
+pending replaces it (or is added to it, for devices that write deltas): only the last write of a time step
+is processed, and the queue holds at most one entry per (time, wavelength). Equal-time entries are then
+taken by decreasing |E|. Without coalescing, every write is its own entry, and entries of the same time are
+taken in the order they were written (FIFO). The values per wavelength stay the same (the last write is
+taken last) but every intermediate value goes through the emission gate and may be emitted, in its own delta
+cycle: more events, longer queues. A net holds only the last value written to it, of any wavelength, so a
+plain probe (or the `.op` listing) of a multi-wavelength net can show another wavelength at the end of a time
+step: `tests/golden/netlists/f15-coalesce-off.cir` shows `v` at 1550 nm where the default shows 1560 nm;
+MLPROBEs and per-wavelength values do not change. `--stats` counts the difference (`coalesced`).
+
+**Event cap** (`.options maxevents=N`, `specs --max-events N`; 0, the default: no cap). The run stops once the
+output ports have processed N pending entries in total (the `processed` counter of `--stats`), at the end of
+that delta cycle, so a few more entries of the same delta cycle are processed too. In a `.tran` the
+transient ends there: traces up to that time, `Simulated <t>`, exit status 0, and on stderr
+
+    Warning: .tran stopped at the event cap at 30 ps: 21 pending entries processed (.options maxevents=20)
+
+In an `.op`, a `.dc` or the operating point before a `.tran`, a fixed point cut short is not a result: error
+`Error: .op: the operating point stopped at the event cap: ...` and exit status 1. With `--stats`, the
+statistics are written in both cases (`"event_cap_reached": true`). Use it to bound a run whose activity may
+not die out (zero tolerances, no coalescing, a lossless loop) or to time a fixed number of events.
 
 ## Run statistics (`--stats`)
 

@@ -1,0 +1,10 @@
+{
+ "args": [
+  "-n",
+  "-f",
+  "tests/golden/netlists/f15-options-maxevents-fraction.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f15-options-maxevents-fraction"
+}

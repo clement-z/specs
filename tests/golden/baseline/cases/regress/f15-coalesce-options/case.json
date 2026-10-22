@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--no-trace",
+  "--stats",
+  "-f",
+  "tests/golden/netlists/f15-coalesce-off.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/f15-coalesce-options"
+}

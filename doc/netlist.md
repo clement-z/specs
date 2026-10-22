@@ -198,7 +198,7 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 ## Directives
 
 - `.options key=value ...` (keys case-insensitive): `abstol`, `reltol`, `snapfactor`, `timescale` (alias `ts`),
-  `resolution`, `seed`, `maxiter`: see [numerics.md](numerics.md). `traceall` (0 or 1): trace every optical net
+  `resolution`, `seed`, `maxiter`, and the expert options `coalesce`, `maxevents`: see [numerics.md](numerics.md). `traceall` (0 or 1): trace every optical net
   (automatic probes `PROBE{<net>}`). Without it, a netlist with probes (PROBE, MLPROBE, also inside a subcircuit)
   or `.save` targets traces only them, and a netlist with neither traces every optical net (F-05, see "PROBE, MLPROBE and traced nets"
   below). An unknown key stops with `Unknown keyword: foo (value: 1 (INTEGER))`.
@@ -232,6 +232,7 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `--maxiter N` | `.options maxiter`, overrides the netlist |
 | `--stats[=ports,devices]`, `--stats-file path`, `--print-stats` | run statistics (event counters), `<name>.stats.json`; see "Run statistics" in [numerics.md](numerics.md) |
 | `--progress[=s]` | a progress line on stderr every s seconds of wall-clock time (default 1) |
+| `--no-coalescing`, `--max-events N` | expert options `.options coalesce=0`, `maxevents=N`, override the netlist |
 | `--abstol x`, `--reltol x`, `-R n` | tolerances and timescale, see [numerics.md](numerics.md) |
 | `--seed N` | master seed, see [reproducibility.md](reproducibility.md) |
 

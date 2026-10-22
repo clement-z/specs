@@ -1,0 +1,13 @@
+{
+ "args": [
+  "--max-events",
+  "10",
+  "--no-trace",
+  "--stats",
+  "-f",
+  "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f15-max-events-op"
+}

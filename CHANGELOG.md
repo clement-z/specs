@@ -15,6 +15,10 @@
   change to the outputs (`doc/numerics.md`)
 * `specs --progress[=seconds]`: a periodic progress line on stderr (wall time, simulated time, delta cycles),
   without effect on the simulation
+* Expert options for ablation studies (F-15, `doc/numerics.md`): no coalescing of the writes of a port for the
+  same time and wavelength (`.options coalesce=0`, `--no-coalescing`; equal times in write order) and an event
+  cap (`.options maxevents=N`, `--max-events N`: a `.tran` ends there with a warning, an `.op`/`.dc` stops
+  with an error). Defaults unchanged
 
 ### Changed
 
