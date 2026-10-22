@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b159-crossing-backward.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b159-crossing-backward.cir", "sha256": "6b2c3c94940e1d19dc4d8f6e4bc69154a175c40c6c282674b9b30d7a29f986ad"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

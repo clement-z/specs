@@ -1,0 +1,11 @@
+* A3 repro: PROBE (and auto-probes) on a WDM net trace only the last event,
+* whatever its wavelength. After 2 ps 'out' carries 0.5 mW @1550 nm and
+* 1 mW @1551 nm (1.5 mW total) but probe1.power shows 1 mW, and the
+* wavelength trace jumps between carriers.
+vlsrc1 a values=[[1e-12,1e-3,1.55e-6]]
+vlsrc2 b values=[[2e-12,2e-3,1.551e-6]]
+merger1 a b out
+probe1 out
+pwr1 out
+.options traceall=0
+.tran 5e-12

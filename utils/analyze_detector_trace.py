@@ -371,12 +371,12 @@ def xor_bitstream(bitstream):
     return bitstream
 
 def bitstream_as_values(bitstream, nbits_per_value=8, pad_with=0):
-    padding_length = nbits_per_value - (len(bitstream) % nbits_per_value)
+    padding_length = (-len(bitstream)) % nbits_per_value
     bitstream = [*bitstream, *[pad_with for i in range(padding_length)]]
     
     values = []
     for i in range(len(bitstream) // nbits_per_value):
-        values.append(int(''.join([str(b) for b in bitstream[i:i+nbits_per_value]]), 2))
+        values.append(int(''.join(str(b) for b in bitstream[i*nbits_per_value:(i+1)*nbits_per_value]), 2))
     return values
 
 def test_bitstreams():

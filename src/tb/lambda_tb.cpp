@@ -3,7 +3,6 @@
 #include "tb/lambda_tb.h"
 
 #include "utils/general_utils.h"
-#include "devices/generic_waveguide.h"
 
 void lambda_tb::run_1()
 {
@@ -18,8 +17,6 @@ void lambda_tb::run_1()
 void lambda_tb::monitor()
 {
     unsigned int event_counter = 0;
-    unsigned int success_counter = 0;
-    const unsigned int test_number = 0;
     while(true)
     {
         wait();

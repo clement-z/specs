@@ -1,0 +1,2 @@
+Error: .options: RESOLUTION must be >= 1 and < 2^64 (got 0.5)
+

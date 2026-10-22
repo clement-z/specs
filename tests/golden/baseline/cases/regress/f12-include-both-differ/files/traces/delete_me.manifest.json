@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f12-include/both.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f12-include/both.cir", "sha256": "2d8cd9440fae54cc6049cdfede9d2db4bb559ffe0b8c8f34172f753df6437c7e"},
+    {"path": "tests/golden/netlists/f12-include/circuits/add_drop_sub.cir", "sha256": "92a23e1e485b0bdd5e1d1274bed091f5c3dee45f8647cc6e91a6dc09dc940b51"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

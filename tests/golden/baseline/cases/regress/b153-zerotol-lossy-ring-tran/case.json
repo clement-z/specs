@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 453,
+   "kind": "json",
+   "sha256": "7925f36d143376e63f429504cb53a6a4e0c747908adb906cb08fe0e0a81ed61c",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 15858,
+   "kind": "vcd",
+   "sha256": "33aeb61051ff7777def300861d370ff540fd686d91a7d30934e43e50019f0f5c",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b153-zerotol-lossy-ring-tran"
+}

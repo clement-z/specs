@@ -32,7 +32,6 @@ private:
         TM.clear();
         TM.resize(nports);
 
-        double lambda0 = 1550e-9;
         double transmission_cross = sqrt(m_k_power) * pow(10.0, -m_insertion_loss/20.0);
         transmission_cross = max(0.0, min(1.0, transmission_cross));
         double transmission_through = sqrt(1 - m_k_power) * pow(10.0, -m_insertion_loss/20.0);
@@ -41,10 +40,6 @@ private:
         double phi_cross = M_PI / 2.0;
         double tau = 0.0;
         size_t k;
-
-        // cout << transmission_through << endl;
-        // cout << transmission_cross << endl;
-        // cout << m_k_power << endl << endl << endl;
 
         // (13, 14, 23, 24 are the only active ones)
 
@@ -75,12 +70,8 @@ private:
         TM.Malpha[k] = {transmission_through};
         TM.Mphi[k] = {phi_through};
         TM.Mtau[k] = {tau};
-
-        // cout << TM.Mphi.size() << endl;
-        // cout << TM.Mphi[0].size() << endl;
-        // cout << TM.Mphi[1].size() << endl;
     }
 
     double m_insertion_loss;
-    double m_k_power; // power coupling factor (1-k = transmission factor)
+    double m_k_power; // cross-coupling POWER ratio (P_cross = k_power, P_through = 1 - k_power)
 };

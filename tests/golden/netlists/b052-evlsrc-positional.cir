@@ -1,0 +1,9 @@
+* B-052: EVLSRC positional argument is the values file (it was silently ignored,
+* only the initial 0 was emitted). File format (EVLSource::setValues): one
+* `time,voltage` row per line, SI units (s, V). The first line of the file is
+* always discarded (B-053), hence the header line in the file.
+* Expected emissions: @0 s 0 (initial 0 at enable), @100 ps 1.5, @200 ps -0.5,
+* @300 ps 0. (The W571 "no activity" warning of the .op step is expected: nothing
+* optical in the circuit.)
+evlsrc1 e "tests/golden/netlists/b052-evlsrc-values.csv"
+.tran 1e-9

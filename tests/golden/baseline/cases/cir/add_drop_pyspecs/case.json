@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "circuits/add_drop_pyspecs.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 403,
+   "kind": "json",
+   "sha256": "f9780b6acd56a59b5b2b80e06879000712415728720393734e46bfeb8701a43d",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 403588,
+   "kind": "vcd",
+   "sha256": "96acdaa0b72c46fe3f55d5bd03218bd1390de82613769dcb881ead1a1ba9dd14",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "cir/add_drop_pyspecs"
+}

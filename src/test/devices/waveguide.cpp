@@ -4,78 +4,12 @@
 
 #include <gtest/gtest.h>
 #include <systemc.h>
-#include <sys/wait.h>
 
 #include "devices/waveguide.h"
 #include "optical_output_port.h"
 #include "specs.h"
 
 #include "test/utils.h"
-
-#if 0
-
-#define SPECS_TEST_HEADER() \
-int pipe_stdout[2];\
-int pipe_stderr[2];\
-pipe(pipe_stdout); \
-pipe(pipe_stderr);\
-\
-std::cout << "Forking..." << std::endl;\
-int pid = fork();\
-char buf;\
-ASSERT_NE(pid, -1);\
-if (pid > 0) {\
-    int status;\
-    ::waitpid(pid, &status, 0);\
-    close(pipe_stdout[1]); \
-    std::string_view prefix = "[child process] ";\
-    std::cout << prefix << std::flush;\
-    while (read(pipe_stdout[0], &buf, 1) > 0) \
-    {\
-        write(STDOUT_FILENO, &buf, 1);\
-        if (buf == '\n')\
-            std::cout << prefix << std::flush;\
-    }\
-    std::cout << std::endl;\
-\
-    close(pipe_stdout[0]); \
-    close(pipe_stderr[0]); \
-\
-    std::cout << "Child process return with status: " << WEXITSTATUS(status) << std::endl;\
-    ASSERT_EQ(WIFEXITED(status), 1);\
-    EXPECT_EQ(WEXITSTATUS(status), 0);\
-    std::cout << "Test complete" << std::endl;\
-    return;\
-}\
-else {\
-i_am_parent = false;\
-EXPECT_NE(dup2(pipe_stdout[1], STDOUT_FILENO), -1);\
-close(pipe_stdout[0]);\
-close(pipe_stdout[1]);\
-close(pipe_stderr[0]);\
-close(pipe_stderr[1]);\
-try
-
-#define SPECS_TEST_FOOTER() \
-catch (std::exception &e) {\
-std::cerr << "Test threw an exception: " << e.what() << std::endl;\
-std::cout << std::flush;\
-std::cerr << std::flush;\
-exit(-1);  \
-}\
-}\
-std::cout << std::flush;\
-std::cerr << std::flush;\
-exit(testing::Test::HasFailure());
-
-
-#define SPECS_TEST(test_suite_name, test_name) \
-TEST_F(SpecsTest, test_suite_name##_##test_name)\
-{ try { TestBody_body(); } catch (std::exception &e) { std::cerr << e.what() << std::endl; exit(1); } exit(0); }\
-void GTEST_TEST_CLASS_NAME_(SpecsTest, test_suite_name##_##test_name)::TestBody_body()
-
-
-#endif
 
 class WaveguideTest {
 public:
@@ -119,7 +53,7 @@ TEST(Waveguide, Instantiation)
     {
         specsGlobalConfig.analysis_type = SPECSConfig::OP;
         specsGlobalConfig.trace_all_optical_nets = false;
-        specsGlobalConfig.trace_filename = "/tmp/specs_test2";
+        specsGlobalConfig.trace_filename = testing::TempDir() + "specs_test_" + std::to_string(getpid());
         specsGlobalConfig.engine_timescale = SPECSConfig::ONE_FS;
         specsGlobalConfig.applyEngineResolution();
 
@@ -128,7 +62,7 @@ TEST(Waveguide, Instantiation)
         EXPECT_CPLX_EQ(tb.a_in.read().m_field, std::complex(0,0));
         EXPECT_CPLX_EQ(tb.b_in.read().m_field, std::complex(0,0));
         EXPECT_CPLX_EQ(tb.a_out.read().m_field, std::complex(0,0));
-        EXPECT_CPLX_EQ(tb.a_out.read().m_field, std::complex(0,0));
+        EXPECT_CPLX_EQ(tb.b_out.read().m_field, std::complex(0,0));
     }
     SPECS_TEST_FOOTER();
 }
@@ -139,7 +73,7 @@ TEST(Waveguide, OperatingPoint)
     {
         specsGlobalConfig.analysis_type = SPECSConfig::OP;
         specsGlobalConfig.trace_all_optical_nets = false;
-        specsGlobalConfig.trace_filename = "/tmp/specs_test2";
+        specsGlobalConfig.trace_filename = testing::TempDir() + "specs_test_" + std::to_string(getpid());
         specsGlobalConfig.engine_timescale = SPECSConfig::ONE_FS;
         specsGlobalConfig.applyEngineResolution();
 
@@ -164,6 +98,62 @@ TEST(Waveguide, OperatingPoint)
 
             EXPECT_ANGLE_EQ(tb.b_out.read(), tb.expected_phase_delay(wl));
         }
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-014: a bidirectional waveguide checks the rounding of its group delay once,
+// before the simulation, and reports it once (not once per direction)
+TEST(WaveguideDeathTest, DelayRoundingReportedOncePerDevice)
+{
+    SPECS_TEST_HEADER()
+    {
+        specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
+        specsGlobalConfig.engine_timescale = SPECSConfig::HUNDRED_FS;
+        specsGlobalConfig.applyEngineResolution();
+
+        WaveguideTest tb;
+        tb.uut.m_ng = 4;
+        tb.uut.m_length_cm = 4e-4; // 4 um: L*ng/c = 53.4 fs -> 100 fs
+        auto config = make_shared<OpticalOutputPortConfig>();
+        tb.uut.m_p0_out_writer.setConfig(config);
+        tb.uut.m_p1_out_writer.setConfig(config);
+
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(0),
+                    "^Warning \\(uut\\): delay 5.33703e-14 s rounded to 1e-13 s \\(\\+87.4 %\\)[^\n]*\nend$");
+
+        // .op: delays are ignored, nothing to report
+        specsGlobalConfig.analysis_type = SPECSConfig::OP;
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(0), "^end$");
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-014: a delay that rounds to 0 time steps is an error for a waveguide written in
+// the netlist (m_from_netlist, set by the parser) and a warning for one created by a
+// device or a testbench (the default)
+TEST(WaveguideDeathTest, DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides)
+{
+    SPECS_TEST_HEADER()
+    {
+        specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
+        specsGlobalConfig.engine_timescale = SPECSConfig::HUNDRED_FS;
+        specsGlobalConfig.applyEngineResolution();
+
+        WaveguideTest tb;
+        tb.uut.m_ng = 4;
+        tb.uut.m_length_cm = 1e-4; // 1 um: L*ng/c = 13.3 fs -> 0
+        auto config = make_shared<OpticalOutputPortConfig>();
+        tb.uut.m_p0_out_writer.setConfig(config);
+        tb.uut.m_p1_out_writer.setConfig(config);
+
+        EXPECT_FALSE(tb.uut.m_from_netlist);
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(0),
+                    "^Warning \\(uut\\): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s[^\n]*\nend$");
+
+        tb.uut.m_from_netlist = true;
+        EXPECT_EXIT({ tb.uut.start_of_simulation(); std::cerr << "end"; exit(0); }, testing::ExitedWithCode(1),
+                    "^Error \\(uut\\): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s[^\n]*\n$");
     }
     SPECS_TEST_FOOTER();
 }

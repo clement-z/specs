@@ -1,0 +1,8 @@
+* Crossing output c is on a bidirectional net (wg1 is bidirectional because e has 2 writers)
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=1e-3
+crossing1 a b c d
+wg1 c e length=1e-4
+wg2 f e length=1e-4
+probe1 d
+.tran 1e-11

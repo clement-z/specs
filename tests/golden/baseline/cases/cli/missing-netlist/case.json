@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "does_not_exist.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cli/missing-netlist"
+}

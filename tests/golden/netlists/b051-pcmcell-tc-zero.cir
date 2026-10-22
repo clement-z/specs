@@ -1,0 +1,8 @@
+* B-051: tc/ta are a presence check: tc = 0 is valid, and the aliases count
+* (t_c for tc, ep for ta).
+* Model (PCMElement::update_transmission_local, nothing programs in an .op):
+*   T(k) = tc + (ta - tc) * tanh(3 * k / n) = tanh(3 * 5 / 10) = tanh(1.5) = 0.905148
+* Expected, P_in = 1 mW: ROOT/out = 0.000905 W (0.030086 sqrt(W)).
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=10 t_c=0 ep=1 k=5
+.op

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b021-snapfactor-negative.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b021-snapfactor-negative"
+}

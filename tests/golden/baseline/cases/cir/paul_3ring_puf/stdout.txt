@@ -1,0 +1,112 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Including file: circuits/add_drop_sub.cir
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+14 local assignments
+ - L_access (DOUBLE) = 0
+ - L_r2r (DOUBLE) = 3e-06
+ - R (DOUBLE) = 1e-05
+ - R1 (DOUBLE) = 1e-05
+ - R2 (DOUBLE) = 1.001e-05
+ - R3 (DOUBLE) = 1.002e-05
+ - att (INTEGER) = 3
+ - dR (DOUBLE) = 1e-08
+ - filename (STRING) = paul_puf_bitstream_158b_3wl.csv
+ - k (DOUBLE) = 0.223607
+ - neff (DOUBLE) = 2.44
+ - ng (DOUBLE) = 4.3
+ - tau (DOUBLE) = 1e-12
+ - wl0 (DOUBLE) = 1.55e-06
+-----------
+24 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/in {} {values (STRING) = paul_puf_bitstream_158b_3wl.csv, }
+ - ROOT/SPLITTER1 (SPLITTER) ROOT/in ROOT/in_top ROOT/in_bot {} {}
+ - ROOT/MERGER1 (MERGER) ROOT/drop_top_1 ROOT/drop_bot_1 ROOT/out_drop {} {}
+ - ROOT/MLPROBE1 (MULTIWAVELENGTH PROBE) ROOT/in {[{"type":"DOUBLE","value":1.550000e-06}, {"type":"DOUBLE","value":1.560000e-06}, {"type":"DOUBLE","value":1.570000e-06}] (LIST), } {}
+ - ROOT/PDET1 (PHOTODETECTOR) ROOT/out_drop ROOT/_0 {1e-15 (DOUBLE), } {}
+ - ROOT/PROBE1 (PROBE) ROOT/out_drop {} {}
+ - ROOT/WG1 (WAVEGUIDE (bidir)) ROOT/in_top ROOT/in_top_1 {} {L (DOUBLE) = 0, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG2 (WAVEGUIDE (bidir)) ROOT/in_bot ROOT/in_bot_1 {} {L (DOUBLE) = 0, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG3 (WAVEGUIDE (bidir)) ROOT/through_bot_1 ROOT/in_bot_2 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG4 (WAVEGUIDE (bidir)) ROOT/through_bot_2 ROOT/in_bot_3 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG5 (WAVEGUIDE (bidir)) ROOT/through_top_2 ROOT/in_top_3 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG6 (WAVEGUIDE (bidir)) ROOT/through_top_1 ROOT/in_top_2 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/XAD_TOP_1 (SUBCIRCUIT) {in_top_1 (STRING), drop_top_1 (STRING), through_top_1 (STRING), add_top_1 (STRING), add_drop_filter (STRING), } {att_wg (INTEGER) = 3, k1 (DOUBLE) = 0.223607, k2 (DOUBLE) = 0.223607, neff_wg (DOUBLE) = 2.44, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 1e-05, }
+ - ROOT/XAD_TOP_2 (SUBCIRCUIT) {in_top_2 (STRING), drop_top_2 (STRING), through_top_2 (STRING), add_top_2 (STRING), add_drop_filter (STRING), } {att_wg (INTEGER) = 3, k1 (DOUBLE) = 0.223607, k2 (DOUBLE) = 0.223607, neff_wg (DOUBLE) = 2.44, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 1.001e-05, }
+ - ROOT/XAD_TOP_3 (SUBCIRCUIT) {in_top_3 (STRING), drop_top_3 (STRING), through_top_3 (STRING), nothing (STRING), add_drop_filter (STRING), } {att_wg (INTEGER) = 3, k1 (DOUBLE) = 0.223607, k2 (DOUBLE) = 0.223607, neff_wg (DOUBLE) = 2.44, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 1.002e-05, }
+ - ROOT/XAD_BOT_1 (SUBCIRCUIT) {in_bot_1 (STRING), drop_bot_1 (STRING), through_bot_1 (STRING), add_bot_1 (STRING), add_drop_filter (STRING), } {att_wg (INTEGER) = 3, k1 (DOUBLE) = 0.223607, k2 (DOUBLE) = 0.223607, neff_wg (DOUBLE) = 2.44, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 1e-05, }
+ - ROOT/XAD_BOT_2 (SUBCIRCUIT) {in_bot_2 (STRING), drop_bot_2 (STRING), through_bot_2 (STRING), add_bot_2 (STRING), add_drop_filter (STRING), } {att_wg (INTEGER) = 3, k1 (DOUBLE) = 0.223607, k2 (DOUBLE) = 0.223607, neff_wg (DOUBLE) = 2.44, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 1.001e-05, }
+ - ROOT/XAD_BOT_3 (SUBCIRCUIT) {in_bot_3 (STRING), drop_bot_3 (STRING), through_bot_3 (STRING), nothing (STRING), add_drop_filter (STRING), } {att_wg (INTEGER) = 3, k1 (DOUBLE) = 0.223607, k2 (DOUBLE) = 0.223607, neff_wg (DOUBLE) = 2.44, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 1.002e-05, }
+ - ROOT/WG13 (WAVEGUIDE (bidir)) ROOT/drop_bot_3 ROOT/add_bot_2 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG14 (WAVEGUIDE (bidir)) ROOT/drop_bot_2 ROOT/add_bot_1 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG16 (WAVEGUIDE (bidir)) ROOT/drop_top_3 ROOT/add_top_2 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG17 (WAVEGUIDE (bidir)) ROOT/drop_top_2 ROOT/add_top_1 {} {L (DOUBLE) = 3e-06, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG18 (WAVEGUIDE (bidir)) ROOT/through_top_3 ROOT/out_top {} {L (DOUBLE) = 0, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+ - ROOT/WG15 (WAVEGUIDE (bidir)) ROOT/through_bot_3 ROOT/out_bot {} {L (DOUBLE) = 0, att (INTEGER) = 3, neff (DOUBLE) = 2.44, ng (DOUBLE) = 4.3, }
+-----------
+29 named nets
+ - ROOT/_0: EANALOG<1>u (0|0)
+ - ROOT/add_bot_1: OANALOG<1>u (1|0)
+ - ROOT/add_bot_2: OANALOG<1>u (1|0)
+ - ROOT/add_top_1: OANALOG<1>u (1|0)
+ - ROOT/add_top_2: OANALOG<1>u (1|0)
+ - ROOT/drop_bot_1: OANALOG<1>u (0|1)
+ - ROOT/drop_bot_2: OANALOG<1>u (0|1)
+ - ROOT/drop_bot_3: OANALOG<1>u (0|1)
+ - ROOT/drop_top_1: OANALOG<1>u (0|1)
+ - ROOT/drop_top_2: OANALOG<1>u (0|1)
+ - ROOT/drop_top_3: OANALOG<1>u (0|1)
+ - ROOT/in: OANALOG<1>u (1|2)
+ - ROOT/in_bot: OANALOG<1>u (1|1)
+ - ROOT/in_bot_1: OANALOG<1>u (1|0)
+ - ROOT/in_bot_2: OANALOG<1>u (1|0)
+ - ROOT/in_bot_3: OANALOG<1>u (1|0)
+ - ROOT/in_top: OANALOG<1>u (1|1)
+ - ROOT/in_top_1: OANALOG<1>u (1|0)
+ - ROOT/in_top_2: OANALOG<1>u (1|0)
+ - ROOT/in_top_3: OANALOG<1>u (1|0)
+ - ROOT/out_bot: OANALOG<1>u (1|0)
+ - ROOT/out_drop: OANALOG<1>u (1|2)
+ - ROOT/out_top: OANALOG<1>u (1|0)
+ - ROOT/through_bot_1: OANALOG<1>u (0|1)
+ - ROOT/through_bot_2: OANALOG<1>u (0|1)
+ - ROOT/through_bot_3: OANALOG<1>u (0|1)
+ - ROOT/through_top_1: OANALOG<1>u (0|1)
+ - ROOT/through_top_2: OANALOG<1>u (0|1)
+ - ROOT/through_top_3: OANALOG<1>u (0|1)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-05, reltol (DOUBLE) = 0.0001, resolution (INTEGER) = 1, timescale (DOUBLE) = -14, traceall (INTEGER) = 0, }
+-----------
+1 subcircuits
+ - ADD_DROP_FILTER (SUBCIRCUIT DEFINITION) in drop out add {att_wg (INTEGER) = 2, k1 (DOUBLE) = 0.85, k2 (DOUBLE) = 0.85, neff_wg (DOUBLE) = 2.2, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 5e-05, }
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {8e-09 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/XAD_TOP_1
+Flattening ROOT/XAD_TOP_2
+Flattening ROOT/XAD_TOP_3
+Flattening ROOT/XAD_BOT_1
+Flattening ROOT/XAD_BOT_2
+Flattening ROOT/XAD_BOT_3
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/XAD_BOT_1/ring_bl...
+Creating ROOT/XAD_BOT_1/COUPLER1 (reason: connection to unidir net)
+Done creating ROOT/XAD_BOT_1/COUPLER1
+Creating ROOT/WG2 (reason: unidir backlog)
+Done creating ROOT/WG2
+Creating ROOT/SPLITTER1 (reason: unidir backlog)
+Done creating ROOT/SPLITTER1
+Creating ROOT/VLSRC1 (reason: unidir backlog)
+

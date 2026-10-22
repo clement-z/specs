@@ -1,0 +1,18 @@
+* B-145 reference for b145-upgrade-reader (repro: backlog/repro/a4-upgrade-reader-ref.cir):
+* the same circuit without the explicit '&' on e, so wg1, wge and c, e, f are unidirectional.
+* Expected (fields in sqrt(mW); every waveguide: L = 1e-4 m, neff 2.2111, att 0: lossless,
+* phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped, 2*phi = 1.9052 rad):
+*   a:0 = a:1 = 1 mW at phi; s1:0 = s2:0 = 1 mW at 2*phi; s1:1 = s2:1 = 1 mW at 0
+*   f = 4 mW at 0, e = 4 mW at phi, c = 4 mW at 2*phi
+*   out = (4 + 1 + 4 cos(phi)) / 2 = 1.3409 mW at 2.4261 rad (see b145-upgrade-reader)
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 s1 wl=1.55e-6 power=1e-3
+wga s1 a length=1e-4
+cwsrc2 s2 wl=1.55e-6 power=1e-3
+wgb s2 a length=1e-4
+merger1 c a out
+cwsrc3 f wl=1.55e-6 power=4e-3
+wge f e length=1e-4
+wg1 e c length=1e-4
+probe1 out
+.tran 1e-11

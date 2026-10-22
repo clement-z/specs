@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b050-pdet-two-open-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 443,
+   "kind": "json",
+   "sha256": "6dde34b738fa6e2741ab476a37267d8ce1d59b8b82ef46923cbc4027d3c3c553",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1187,
+   "kind": "vcd",
+   "sha256": "ec4947246a476c8771b181ea09cb66f4b0b462bc3988fd1902a4f1cb8aeec12e",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b050-pdet-two-open-tran"
+}

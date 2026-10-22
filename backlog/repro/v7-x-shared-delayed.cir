@@ -1,0 +1,10 @@
+* V7: two subckt instances both drive net "mid", but at different times (no E115 today)
+.subckt s a b
+wg1 a b length=1e-4
+.ends
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2_ wl=1.55e-6 power=2e-3
+wgd in2_ in2 length=1e-2
+x1 in1 mid s
+x2 in2 mid s
+.tran 1e-9

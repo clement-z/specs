@@ -1,0 +1,2 @@
+Error: --no-trace and --format cannot be combined
+

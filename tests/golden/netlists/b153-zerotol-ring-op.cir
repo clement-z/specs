@@ -1,0 +1,15 @@
+* B-153 / decision 2026-10-21: zero tolerances in .op, on the all-pass ring of
+* b124-allpass-ring-default-reltol.cir (lossless, k = sqrt(0.15), round-trip field transmission
+* t = sqrt(0.85) = 0.922, on resonance). With abstol = reltol = 0 the fixed point stops only when every
+* port value repeats exactly. This loop contracts (t < 1), so the floating-point iteration reaches such a
+* repeat and the .op converges within the default maxiter, to the exact result instead of the truncated one.
+* Exact: out = 1 W (phase pi), ring_br = ring_bl = k^2 / (1 - t)^2 = 24.626059 W.
+* Expected: exit 0; stderr exactly one line (the zero-tolerance warning); out = 1.000000 W,
+* ring_br = ring_bl = 24.626059 W (default tolerances: 0.995098 W and 24.563207 W; reltol 1e-9:
+* 1.000000 W and 24.626058 W).
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=0.3872983346207417
+wg_ring ring_br ring_bl length=775e-6 neff=1 ng=1 att=0
+probe1 out
+.options timescale=-13 abstol=0 reltol=0
+.op

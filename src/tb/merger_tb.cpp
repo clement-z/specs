@@ -70,7 +70,7 @@ void Merger_tb::monitor()
             {
                 std::cout << "-----------------/! \\---------------" << std::endl;
                 std::cout << "Failure!" << std::endl;
-                std::cout << "Expected 2W as output power!" << std::endl;
+                std::cout << "Expected 4W as output power!" << std::endl;
                 std::cout << "-----------------/! \\---------------" << std::endl;
             }
 

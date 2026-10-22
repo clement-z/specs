@@ -1,0 +1,2 @@
+Error: subcircuit instance ROOT/X1 has no subcircuit name
+

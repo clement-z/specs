@@ -1,0 +1,4 @@
+Parsing error (circuits/legacy/paul_simple_ring.cir:4): syntax error
+-- offending token: "one"
+-- while parsing line: "one 0"
+

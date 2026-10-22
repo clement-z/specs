@@ -1,0 +1,2 @@
+PCM Cell needs values for both Emelt and Nstates
+

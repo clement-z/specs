@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b050-pdet-two-open-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b050-pdet-two-open-tran.cir", "sha256": "708abbd5f75240b3bc2a2ea867491631a9eb9a1fd79a4394d4093f3bb3f75523"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

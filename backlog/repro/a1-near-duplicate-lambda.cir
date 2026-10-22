@@ -1,0 +1,7 @@
+* F-A1: 1550*1e-9 != 1.55e-6 in double -> two wavelength ids. Expected coherent sum m = 2 W; observed 0.5 W
+* (two independent wavelengths, both printed "@ 1550 nm"). Control: write both as 1.55e-6 -> 2 W.
+* two in-phase CW sources at the "same" wavelength written two ways
+cwsrc1 a wl=1.55e-6 power=1
+cwsrc2 b wl=1550*1e-9 power=1
+merger1 a b m
+.op

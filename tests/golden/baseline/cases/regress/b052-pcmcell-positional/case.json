@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b052-pcmcell-positional.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 443,
+   "kind": "json",
+   "sha256": "2528426fd2b370e1285314f0cfe24eb0e9e7e30856336d88f7f091f04556af53",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b052-pcmcell-positional"
+}

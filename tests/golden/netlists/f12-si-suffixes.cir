@@ -1,0 +1,44 @@
+* F-12 (B-160): scale suffixes on numbers, SPICE semantics (caseless, so M is milli):
+*   f=1e-15 p=1e-12 n=1e-9 u=1e-6 m=M=1e-3 k=1e3 meg=MEG=1e6 g=1e9 t=1e12
+* Each pair of elements (and of .param) gives the same values, with suffixes in the
+* first one and in exponent form in the second one, so the flattened JSON shows equal values:
+*   cwsrc1/cwsrc2  wl = 1.55e-06 (1.55u), power = 0.001 (1m)
+*   cwsrc3/cwsrc4  positional wl power phi = 1.55e-06 ({2*775n}), 0.001 ({2*500u}), 0.5
+*   cwsrc5/cwsrc6  wl = 1.55e-06 ({wl_u}, a .param with a suffix), power = 0.001 (1000u)
+*   wg1/wg2        length = 1e-05 (10u), att = 1000 (1k), neff = 2.35, ng = 4.2
+*   wg3/wg4        length = 1e+06 (1meg), att = 0.001 (1M: milli, not mega)
+*   wg5/wg6        length = 1e+06 (1MEG), att = 1.5e+06 (1.5e3k: suffix on top of an exponent)
+*   pdet1/pdet2    ts = 1e-11 (10p), fop = 1.934e+14 (193.4t), r = 1e-15 (1f)
+*   f_g/f_e        1e+11 (100g)
+* A suffixed number is always a DOUBLE, also with an integer mantissa (1k -> 1000).
+* The value is correctly rounded (the suffix shifts the decimal exponent, the result is the
+* double of the exponent form): every rel_* is (suffixed / exponent form - 1) * 1e20 and
+* must be exactly 0 (mantissa * 10^k would give +-1.1e4 or +-2.2e4 for each of them).
+.param wl_u = 1.55u
+.param f_g = 100g
+.param f_e = 100e9
+.param rel_n = (1.55n / 1.55e-9 - 1) * 1e20
+.param rel_m = (1.31m / 1.31e-3 - 1) * 1e20
+.param rel_M = (1.31M / 1.31e-3 - 1) * 1e20
+.param rel_u = (7.7u / 7.7e-6 - 1) * 1e20
+.param rel_U = (3.3U / 3.3e-6 - 1) * 1e20
+.param rel_p = (1.1p / 1.1e-12 - 1) * 1e20
+.param rel_f = (2.2f / 2.2e-15 - 1) * 1e20
+.param rel_t = (4.35t / 4.35e12 - 1) * 1e20
+
+cwsrc1 a1 wl=1.55u power=1m
+cwsrc2 b1 wl=1.55e-6 power=1e-3
+cwsrc3 a2 {2*775n} {2*500u} 0.5
+cwsrc4 b2 {2*775e-9} {2*500e-6} 0.5
+cwsrc5 a3 wl={wl_u} power=1000u
+cwsrc6 b3 wl=1.55e-6 power=1000e-6
+
+wg1 a1 c1 length=10u att=1k neff=2.35 ng=4.2
+wg2 b1 d1 length=10e-6 att=1e3 neff=2.35 ng=4.2
+wg3 c1 c2 length=1meg att=1M
+wg4 d1 d2 length=1e6 att=1e-3
+wg5 c2 c3 length=1MEG att=1.5e3k
+wg6 d2 d3 length=1e6 att=1.5e6
+
+pdet1 c3 e1 ts=10p fop=193.4t r=1f
+pdet2 d3 e2 ts=10e-12 fop=193.4e12 r=1e-15

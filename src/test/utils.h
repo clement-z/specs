@@ -6,17 +6,24 @@
 #include <complex>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <numbers>
+#include <cmath>
+#include <string_view>
 
 #include "optical_output_port.h"
 #include "specs.h"
 
 #define EXPECT_CPLX_EQ(a,b) \
-EXPECT_FLOAT_EQ(a.real(), b.real()); \
-EXPECT_FLOAT_EQ(a.imag(), b.imag());
+do { \
+    EXPECT_DOUBLE_EQ((a).real(), (b).real()); \
+    EXPECT_DOUBLE_EQ((a).imag(), (b).imag()); \
+} while (0)
 
 #define ASSERT_CPLX_EQ(a,b) \
-ASSERT_FLOAT_EQ(a.real(), b.real()); \
-ASSERT_FLOAT_EQ(a.imag(), b.imag());
+do { \
+    ASSERT_DOUBLE_EQ((a).real(), (b).real()); \
+    ASSERT_DOUBLE_EQ((a).imag(), (b).imag()); \
+} while (0)
 
 #define EXPECT_ANGLE_EQ(x, y) \
 EXPECT_PRED_FORMAT2(::testing::CmpHelperAngleEQ, x, y);
@@ -26,49 +33,49 @@ ASSERT_FLOAT_EQ(field.phase(), std::arg(std::polar<double>(1.0f, phi)));
 
 #define SPECS_TEST_HEADER() \
     int pipe_stdout[2];\
-    int pipe_stderr[2];\
-    pipe(pipe_stdout); \
-    pipe(pipe_stderr);\
-    \
-    /*std::cout << "Forking..." << std::endl; */\
+    ASSERT_EQ(pipe(pipe_stdout), 0);\
     int pid = fork();\
-    char buf;\
     ASSERT_NE(pid, -1);\
     if (pid > 0) {\
-        int status;\
-        ::waitpid(pid, &status, 0);\
-        close(pipe_stdout[1]); \
+        /* parent: close our copy of the write end, drain the pipe until EOF, only then reap the child */\
+        close(pipe_stdout[1]);\
         std::string_view prefix = "> ";\
         std::cout << prefix << std::flush;\
-        while (read(pipe_stdout[0], &buf, 1) > 0) \
+        char buf[4096];\
+        ssize_t n_read;\
+        while ((n_read = read(pipe_stdout[0], buf, sizeof(buf))) > 0)\
         {\
-            write(STDOUT_FILENO, &buf, 1);\
-            if (buf == '\n')\
-            std::cout << prefix << std::flush;\
+            for (ssize_t i = 0; i < n_read; ++i)\
+            {\
+                std::cout << buf[i];\
+                if (buf[i] == '\n')\
+                    std::cout << prefix;\
+            }\
         }\
         std::cout << std::endl;\
-        \
-        close(pipe_stdout[0]); \
-        close(pipe_stderr[0]); \
-        \
-        /* std::cout << "Child process return with status: " << WEXITSTATUS(status) << std::endl; */\
-    int test_exit_status = WEXITSTATUS(status);\
-        if(WIFEXITED(status) != 1 || test_exit_status != 0)\
-            FAIL() << "Test case exited abnormally";\
-        if(WEXITSTATUS(status) != 0)\
+        close(pipe_stdout[0]);\
+        int status = 0;\
+        ASSERT_EQ(::waitpid(pid, &status, 0), pid);\
+        if (WIFSIGNALED(status))\
+            FAIL() << "Test case killed by signal " << WTERMSIG(status);\
+        if (WEXITSTATUS(status) != 0)\
             FAIL() << "Test case exited with non-zero status: " << WEXITSTATUS(status);\
         return;\
     } else {\
-        EXPECT_NE(dup2(pipe_stdout[1], STDOUT_FILENO), -1);\
+        if (dup2(pipe_stdout[1], STDOUT_FILENO) == -1) _exit(2);\
         close(pipe_stdout[0]);\
         close(pipe_stdout[1]);\
-        close(pipe_stderr[0]);\
-        close(pipe_stderr[1]);\
-        try
+        /* run the body in a lambda so that ASSERT_*()/FAIL() (which `return`) cannot skip the exit() below */\
+        auto specs_test_body_ = [&]() -> void
 
 #define SPECS_TEST_FOOTER() \
+        ;\
+        try { specs_test_body_(); }\
         catch (std::exception &e) {\
             ADD_FAILURE() << "Exception caught while running test: " << e.what() << std::endl; \
+        }\
+        catch (...) {\
+            ADD_FAILURE() << "Unknown exception caught while running test" << std::endl; \
         }\
     }\
     std::cout << std::flush;\

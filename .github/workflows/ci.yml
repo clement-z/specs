@@ -1,0 +1,223 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  MESON_VERSION: "1.11.2"
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_MAXSIZE: 500M
+
+jobs:
+  build-test:
+    name: build + test (${{ matrix.compiler }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+    env:
+      # CC too: the SystemC subproject compiles C and assembly (QuickThreads) with it, using flags
+      # chosen for $CXX (clang-only -Qunused-arguments breaks a gcc `cc`). ccache: Meson only adds
+      # it by itself when CC/CXX are unset.
+      CC: ccache ${{ matrix.cc }}
+      CXX: ccache ${{ matrix.cxx }}
+    steps:
+      # Full history: the version comes from `git describe --tags` (utils/git-version.sh)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build flex bison doxygen graphviz ccache
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install meson
+        run: python -m pip install "meson==${MESON_VERSION}"
+
+      # Wrap downloads (SystemC, args, gtest), and the compiler cache (SystemC is built every run)
+      - name: Cache wrap downloads
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: wraps-${{ hashFiles('subprojects/*.wrap') }}
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-${{ matrix.compiler }}-${{ github.sha }}
+          restore-keys: ccache-${{ runner.os }}-${{ matrix.compiler }}-
+
+      - name: Configure
+        run: meson setup build -Dnative=false -Dspx=true
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Documentation
+        if: matrix.compiler == 'gcc'
+        run: ninja -C build doc
+
+      # They need libsystemc.so.3.0 at run time (shipped here, from the SystemC subproject; use
+      # LD_LIBRARY_PATH). The pattern skips the libsystemc.so.<version>.p/ object directory.
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: specs-${{ matrix.compiler }}
+          path: |
+            build/specs
+            build/libspx.so
+            build/subprojects/systemc-*/libsystemc.so.[0-9]*[0-9]
+
+      - name: Upload documentation
+        if: matrix.compiler == 'gcc'
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-html
+          path: build/doc/html
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meson-logs-${{ matrix.compiler }}
+          path: build/meson-logs
+
+  # Not gating yet: known memory bugs (backlog, e.g. `specs -t mesh` use-after-free), and the
+  # sanitizer reports change the stderr the golden test compares.
+  sanitizers:
+    name: asan + ubsan (debug, gcc)
+    runs-on: ubuntu-24.04
+    # Blocking: LeakSanitizer suppressions in tests/sanitizers/lsan.supp (applied by meson test).
+    env:
+      CC: ccache gcc
+      CXX: ccache g++
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build flex bison ccache
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install meson
+        run: python -m pip install "meson==${MESON_VERSION}"
+
+      - name: Cache wrap downloads
+        uses: actions/cache@v4
+        with:
+          path: subprojects/packagecache
+          key: wraps-${{ hashFiles('subprojects/*.wrap') }}
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-sanitizers-${{ github.sha }}
+          restore-keys: ccache-${{ runner.os }}-sanitizers-
+
+      - name: Configure
+        run: >
+          meson setup build -Dnative=false
+          -Dbuildtype=debug -Db_sanitize=address,undefined -Db_lundef=false
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meson-logs-sanitizers
+          path: build/meson-logs
+
+  # The pixi environment (pixi.toml, pixi.lock): conda-forge compilers and tools instead of the
+  # distro's. Same steps as `pixi run` locally (build directory build-pixi/<toolchain>).
+  pixi:
+    name: pixi (${{ matrix.os }}, ${{ matrix.toolchain }})
+    runs-on: ${{ matrix.os }}
+    # macOS: not blocking until the macOS port is done (a later phase).
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            toolchain: gcc
+            experimental: false
+          # The latest arm64 macOS runner
+          - os: macos-latest
+            toolchain: clang
+            experimental: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Installs the default environment from pixi.lock (fails if the lock is out of date) and
+      # caches it, keyed on pixi.lock.
+      - uses: prefix-dev/setup-pixi@v0.11.2
+        with:
+          pixi-version: v0.82.1
+          environments: default
+          locked: true
+          cache: true
+
+      # pixi.toml points MESON_PACKAGE_CACHE_DIR there (shared by all worktrees locally)
+      - name: Cache wrap downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/specs/meson-packagecache
+          key: wraps-pixi-${{ hashFiles('subprojects/*.wrap') }}
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-pixi-${{ matrix.toolchain }}-${{ github.sha }}
+          restore-keys: ccache-${{ runner.os }}-pixi-${{ matrix.toolchain }}-
+
+      - name: Configure
+        run: pixi run setup ${{ matrix.toolchain }} -- -Dnative=false
+
+      - name: Build
+        run: pixi run build ${{ matrix.toolchain }}
+
+      - name: Test
+        run: pixi run test ${{ matrix.toolchain }}
+
+      - name: Golden
+        run: pixi run golden ${{ matrix.toolchain }}
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: meson-logs-pixi-${{ matrix.os }}-${{ matrix.toolchain }}
+          path: build-pixi/${{ matrix.toolchain }}/meson-logs

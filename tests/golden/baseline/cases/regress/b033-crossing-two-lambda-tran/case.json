@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 455,
+   "kind": "json",
+   "sha256": "54387af93be5b22a5a1858c29dcb64b03d1e76803fe17f66e690e5a11b1ef345",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 2777,
+   "kind": "vcd",
+   "sha256": "d6d138aa82a20f9129bb0237882217f36eae3a6dbdca97e7cc3404959c3cba6a",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b033-crossing-two-lambda-tran"
+}

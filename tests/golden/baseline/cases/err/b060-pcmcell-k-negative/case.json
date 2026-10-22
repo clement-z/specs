@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b060-pcmcell-k-negative.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b060-pcmcell-k-negative"
+}

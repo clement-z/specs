@@ -21,12 +21,24 @@ detector_trace.txt
 **/.clangd/**
 detector_traces/**
 .vimrc.local
-config.local.mk
-specs
-libspecs.so
+/specs
+/libspecs.so
 gmon.out
 **/main
 **/a.out
 *.exe
 *.cir
+!/circuits/*.cir
+!/circuits/legacy/*.cir
 tmp/
+# Meson: build dirs, and everything in subprojects/ but the wrap files (downloads, extracted
+# sources, packagecache/, .wraplock)
+builddir/
+/subprojects/*
+!/subprojects/*.wrap
+!/subprojects/packagefiles/
+# CI: compiler cache
+.ccache/
+# pixi (pixi.toml): environments, and the build directories of its tasks
+/.pixi/
+/build-pixi/

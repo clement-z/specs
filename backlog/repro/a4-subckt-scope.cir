@@ -1,0 +1,11 @@
+* Subckt t instantiates top-level subckt s
+.subckt s a b
+wg1 a b length=1e-4
+.ends
+.subckt t a b
+x1 a b s
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in out t
+probe1 out
+.tran 1e-11

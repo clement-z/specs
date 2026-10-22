@@ -1,0 +1,35 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+0 elements
+-----------
+0 named nets
+-----------
+0 directives
+-----------
+1 subcircuits
+ - ADD_DROP_FILTER (SUBCIRCUIT DEFINITION) in drop out add {att_wg (INTEGER) = 2, k1 (DOUBLE) = 0.85, k2 (DOUBLE) = 0.85, neff_wg (DOUBLE) = 2.2, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 5e-05, }
+-----------
+0 analyses
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Exported flattened circuit as JSON > flat.json
+╔══════════════════════╗
+║  SIMULATION SKIPPED  ║
+╚══════════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

@@ -1,0 +1,27 @@
+* B-145 regression (repro: backlog/repro/a4-upgrade-reader.cir). Net c is unidirectional
+* (written by wg1, read by merger1). merger1 is created first (it sits on the bidirectional
+* net a), then wg1 (bidirectional because of e&) upgrades c to two signals while merger1 is
+* already bound to it as a reader. upgrade_signal() used to swap the two signals, which left
+* merger1 on the signal nobody writes: c = 0, c:1 = 4 mW, out = 0.5 mW.
+* wg1 WRITES c (c is its output), so the signals are no longer swapped: merger1 reads wg1's
+* output (signal ROOT/c), and ROOT/c:1 is the signal wg1 reads (nothing comes back).
+* Expected (fields in sqrt(mW); every waveguide: L = 1e-4 m, neff 2.2111, att 0: lossless,
+* phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped, 2*phi = 1.9052 rad):
+*   a:0 = a:1 = 1 mW at phi (wga, wgb outputs); s1:0 = s2:0 = 1 mW at 2*phi (the light
+*     of the other waveguide, back through wga/wgb); s1:1 = s2:1 = 1 mW at 0 (sources)
+*   f:1 = 4 mW at 0 (cwsrc3), e:1 = 4 mW at phi (wge), c = 4 mW at 2*phi (wg1), c:1 = e:0 = f:0 = 0
+*   out = |2 e^(i 2phi) + 1 e^(i phi)|^2 / 2 = (4 + 1 + 4 cos(phi)) / 2
+*       = (5 + 4*(-0.579556)) / 2 = 1.3409 mW, phase phi + arg(2 e^(i phi) + 1) = 2.4261 rad
+*   (merger: out = (in1 + in2)/sqrt2 per wavelength; merger1 reads a:0 or a:1, both 1 mW at phi)
+* Same values as b145-upgrade-reader-ref (no '&', wg1 unidirectional).
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 s1 wl=1.55e-6 power=1e-3
+wga s1 a length=1e-4
+cwsrc2 s2 wl=1.55e-6 power=1e-3
+wgb s2 a length=1e-4
+merger1 c a out
+cwsrc3 f wl=1.55e-6 power=4e-3
+wge f e length=1e-4
+wg1 e& c length=1e-4
+probe1 out
+.tran 1e-11

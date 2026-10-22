@@ -1,0 +1,36 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+2 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/PCMCELL1 (PCM CELL) ROOT/in ROOT/out {} {emelt (DOUBLE) = 1e-12, n (INTEGER) = 3000000000, ta (DOUBLE) = 0.95, tc (DOUBLE) = 0.85, }
+-----------
+2 named nets
+ - ROOT/in: OANALOG<1>u (1|1)
+ - ROOT/out: OANALOG<1>u (1|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[OP] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/in...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/PCMCELL1 (reason: unidir backlog)
+

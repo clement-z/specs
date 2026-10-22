@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--seed",
+  "abc",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f01-seed-invalid"
+}

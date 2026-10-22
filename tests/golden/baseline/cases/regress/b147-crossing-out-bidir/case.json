@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b147-crossing-out-bidir.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 443,
+   "kind": "json",
+   "sha256": "cb3282ed5de3b0e47aa135c507c06dc53c4e1eff9968906691a9638311191116",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1012,
+   "kind": "vcd",
+   "sha256": "45870dddf99139f836907cf2b875565231a043b99ac17e14e2b6bb0b6eb2e80f",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b147-crossing-out-bidir"
+}

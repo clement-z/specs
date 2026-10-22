@@ -1,0 +1,7 @@
+* JSON export: writers count, backslash in a string, inf parameter, precision
+.param big = 1/0
+.param path = "C:\x.csv"
+cwsrc1 a wl=1.5512345678e-6 power=1e-3
+probe1 a
+probe2 a
+.tran 1e-11

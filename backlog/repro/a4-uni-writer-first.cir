@@ -1,0 +1,5 @@
+* CW source drives the OUTPUT port of a waveguide (net a has 2 writers -> bidirectional); source listed first
+cwsrc1 a wl=1.55e-6 power=1e-3
+wg1 b a length=1e-4
+probe1 b
+.tran 1e-11

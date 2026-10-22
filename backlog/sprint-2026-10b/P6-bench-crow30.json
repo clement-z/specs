@@ -1,0 +1,84 @@
+[
+ {
+  "label": "old binary, default (full tracing)",
+  "user_s": 19.45,
+  "runs": [
+   19.45,
+   19.7,
+   19.43
+  ],
+  "mb": {
+   "crow.vcd": 1003.27
+  },
+  "simulated": "20 ns",
+  "probes_vs_old": "reference"
+ },
+ {
+  "label": "new binary, .options traceall=1 (full tracing)",
+  "user_s": 19.63,
+  "runs": [
+   19.81,
+   19.58,
+   19.63
+  ],
+  "mb": {
+   "crow.vcd": 1003.27
+  },
+  "simulated": "20 ns",
+  "probes_vs_old": "identical"
+ },
+ {
+  "label": "new binary, default (probes only), VCD",
+  "user_s": 5.28,
+  "runs": [
+   5.32,
+   5.28,
+   5.25
+  ],
+  "mb": {
+   "crow.vcd": 15.38
+  },
+  "simulated": "20 ns",
+  "probes_vs_old": "identical"
+ },
+ {
+  "label": "new binary, probes only, --format csv",
+  "user_s": 4.88,
+  "runs": [
+   4.85,
+   4.89,
+   4.88
+  ],
+  "mb": {
+   "crow.csv": 16.96
+  },
+  "simulated": "20 ns",
+  "probes_vs_old": "-"
+ },
+ {
+  "label": "new binary, probes only, --format npz",
+  "user_s": 4.9,
+  "runs": [
+   4.9,
+   5.02,
+   4.88
+  ],
+  "mb": {
+   "crow.npz": 7.4
+  },
+  "simulated": "20 ns",
+  "probes_vs_old": "-"
+ },
+ {
+  "label": "new binary, --no-trace",
+  "user_s": 4.75,
+  "runs": [
+   4.73,
+   4.77,
+   4.75
+  ],
+  "mb": {},
+  "simulated": "20 ns",
+  "probes_vs_old": "-"
+ }
+]

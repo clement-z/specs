@@ -1,0 +1,62 @@
+--- a/src/test/utils.h
++++ b/src/test/utils.h
+@@ -6,6 +6,8 @@
+ #include <complex>
+ #include <sys/wait.h>
+ #include <unistd.h>
++#include <numbers>
++#include <cmath>
+ 
+ #include "optical_output_port.h"
+ #include "specs.h"
+@@ -18,11 +20,11 @@
+ ASSERT_FLOAT_EQ(a.real(), b.real()); \
+ ASSERT_FLOAT_EQ(a.imag(), b.imag());
+ 
+-#define EXPECT_ANGLE_EQ(x, y) \
+-EXPECT_PRED_FORMAT2(angleIsEqual, x, y);
++#define EXPECT_ANGLE_EQ(sig, phi) \
++EXPECT_TRUE(angleIsEqual((sig).phase(), (phi))) << "phase " << (sig).phase() << " rad != " << (phi) << " rad (mod 2pi)"
+ 
+-#define ASSERT_ANGLE_EQ(field, phi) \
+-ASSERT_FLOAT_EQ(field.phase(), std::arg(std::polar<double>(1.0f, phi)));
++#define ASSERT_ANGLE_EQ(sig, phi) \
++ASSERT_TRUE(angleIsEqual((sig).phase(), (phi))) << "phase " << (sig).phase() << " rad != " << (phi) << " rad (mod 2pi)"
+ 
+ 
+ #define SPECS_TEST_HEADER() \
+@@ -78,30 +80,8 @@
+ 
+ using std::numbers::pi;
+ 
+-static_assert(false, "Work in progress: implement angleIsEqual (it should validate angle modulo 2pi");
+-
+-template<typename T1, typename T2>
+-bool angleIsEqual(T1 v1, T2 v2)
+-{
+-    return std::arg(v1 - v2) < std::numeric_limits<T1>::epsilon();
+-}
+-
+-template<typename FloatT>
+-requires is_floating_point_v<FloatT>
+-bool angleIsEqual(std::complex<FloatT> v1, std::complex<FloatT> v2)
++/** True if the angles a and b (radians) are equal modulo 2*pi within tol. */
++inline bool angleIsEqual(double a, double b, double tol = 1e-9)
+ {
+-    return std::abs(v1 - v2) < std::numeric_limits<FloatT>::epsilon();
++    return std::abs(std::remainder(a - b, 2 * pi)) < tol;
+ }
+-
+-template<typename FloatT, typename T>
+-requires is_floating_point_v<FloatT> && is_arithmetic_v<T>
+-bool angleIsEqual(std::complex<FloatT> v, T angle)
+-{
+-    return std::fmod(std::arg(v) - angle, 2*std::numbers::pi) < std::numeric_limits<FloatT>::epsilon();
+-}
+-template<typename FloatT, typename T>
+-requires is_floating_point_v<FloatT> && is_arithmetic_v<T>
+-bool angleIsEqual(T angle, std::complex<FloatT> v)
+-{
+-    return angleIsEqual(v, angle);
+-}
+\ No newline at end of file

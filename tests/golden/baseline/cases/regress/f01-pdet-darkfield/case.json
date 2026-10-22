@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f01-pdet-darkfield.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 433,
+   "kind": "json",
+   "sha256": "67e79a913646a64ea658498ba4370c427c444d68fbd2ded02882737fc0367a97",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1072,
+   "kind": "vcd",
+   "sha256": "cbed522acba5aead6f44d47c2a57759d3951c987629cfd6c29f9210c9cb4e125",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f01-pdet-darkfield"
+}

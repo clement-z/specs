@@ -1,0 +1,10 @@
+* B-180: numeric net names use the full 64-bit range of integer literals: net 3000000000 is N3000000000
+* (it was N2147483647, clamped), net 9223372036854775807 is N9223372036854775807; small ones keep their
+* zero padding (7 is N00007).
+* Expected: .op runs; ROOT/N00007 = 1 mW, ROOT/N3000000000 = 1 mW (a lossless 100 um waveguide),
+*   ROOT/N9223372036854775807 = 1 mW (another one).
+cwsrc1 7 wl=1.55e-6 power=1e-3
+wg1 7 3000000000 length=100e-6 neff=2.2 ng=4.2
+wg2 3000000000 9223372036854775807 length=100e-6 neff=2.2 ng=4.2
+probe1 9223372036854775807
+.op

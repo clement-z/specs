@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "circuits/paul_3ring_puf.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cir/paul_3ring_puf"
+}

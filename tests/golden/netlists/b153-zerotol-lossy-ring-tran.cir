@@ -1,0 +1,21 @@
+* B-153 / decision 2026-10-21: zero tolerances, lossy all-pass ring in an open-ended .tran. With
+* abstol = reltol = 0 nothing is gated and nothing is snapped, yet the run ends: once the source is off
+* the ring field decays geometrically and becomes exactly 0 when it underflows (the smallest double is
+* the subnormal 4.94e-324; a product below half of it rounds to 0).
+* vlsrc1: a 1 ps pulse of 1 mW (field 0.0316228 sqrt(W)) at 1550 nm.
+* coupler1, kp=0.5: k = t = sqrt(0.5) (field). wg_ring: 1 mm at 200 dB/cm = 20 dB (field x a = 0.1);
+*   ng = 3: round trip 10.007 ps, rounded to 10 ps (100 fs steps).
+* Round-trip field transmission r = t * a = 0.0707107. The out pulse of round trip n (at n * 10 ps,
+* 1 ps long) has |E| = k * 0.0316228 * a * k * r^(n-1) = 0.00158114 * 0.0707107^(n-1) sqrt(W).
+* It underflows after about ln(0.00158114 / 2.47e-324) / ln(1 / r) + 1 = 280 round trips:
+* n = 279 gives 2.3e-323 (1.97626e-323 = 4 x 4.94e-324 after the subnormal rounding), n = 280 gives 0.
+* Expected: exit 0; stderr exactly one line (the warning); probe1 traces |E| only: 0.0316228 from 0 to
+* 1 ps, then 0.00158114 at 10 ps, 0.000111803 at 20 ps, 7.90569e-06 at 30 ps, ..., 1.97626e-323 at
+* 2790 ps, each back to 0 1 ps later (279 pulses); "Simulated 2801 ps": the values scheduled at 2800
+* and 2801 ps have underflowed to 0, equal to the last emitted value, and are not emitted.
+vlsrc1 in values=[[0, 1e-3, 1.55e-6], [1e-12, 0, 1.55e-6]]
+coupler1 in ring_bl out ring_br kp=0.5
+wg_ring ring_br ring_bl length=1e-3 att=200 neff=3 ng=3
+probe1 out 0 1 0 0
+.options abstol=0 reltol=0
+.tran

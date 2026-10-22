@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--print-manifest",
+  "-n",
+  "-f",
+  "tests/golden/netlists/f01-manifest.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/f01-print-manifest"
+}

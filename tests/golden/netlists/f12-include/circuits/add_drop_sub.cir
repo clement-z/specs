@@ -1,0 +1,4 @@
+* F-12: stand-in for the shipped circuits/add_drop_sub.cir, next to both.cir: the
+* ".include circuits/add_drop_sub.cir" of both.cir opens this file (relative to the including
+* file) and warns that the working-directory file is a different one
+.param included_from="f12-include/circuits"

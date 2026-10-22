@@ -1,0 +1,4 @@
+* A3 repro: PCMCELL positional Tc/Ta (args 3 and 4) vs assert(args.size() <= 2)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out 1e-12 10 0.85 0.95
+.op

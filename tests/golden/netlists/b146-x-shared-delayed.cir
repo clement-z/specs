@@ -1,0 +1,24 @@
+* B-146 regression (repro: backlog/repro/v7-x-shared-delayed.cir): two subcircuit instances
+* drive mid, but the 1 cm delay waveguide wgd puts the two writes at different times, so
+* there was no E115: mid stayed unidirectional and the last write won (mid = 2 mW, rc 0).
+* flatten() now merges against nets_flat, so mid is bidirectional, exactly as in the flat
+* netlist b146-x-shared-delayed-flat (same stdout values and VCD, apart from instance names).
+* Expected (waveguides lossless, neff 2.2111; phi = 2*pi*2.2111*1e-4/1.55e-6 = -2.1890 rad
+* wrapped for the 1e-4 m ones, phid = 2*pi*2.2111*1e-2/1.55e-6 = 89630.6518 rad = 1.0134 rad
+* wrapped for wgd, group delay of wgd = 1e-2*2.2637/c = 75.5 ps < 1 ns):
+*   in1:1 = 1 mW at 0, in2_:1 = 2 mW at 0 (sources)
+*   in2:1 = 2 mW at phid = 1.0134 rad (wgd output)
+*   mid:0 = 1 mW at phi = -2.1890 rad (X1 output), mid:1 = 2 mW at phid + phi = -1.1756 rad (X2)
+*   in1:0 = 2 mW at phid + 2*phi = 2.9186 rad (source 2, through X2 and back through X1)
+*   in2:0 = 1 mW at 2*phi = 1.9052 rad, in2_:0 = 1 mW at 2*phi + phid = 2.9186 rad (source 1,
+*     back through X2 and wgd)
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+.subckt s a b
+wg1 a b length=1e-4
+.ends
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2_ wl=1.55e-6 power=2e-3
+wgd in2_ in2 length=1e-2
+x1 in1 mid s
+x2 in2 mid s
+.tran 1e-9

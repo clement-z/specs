@@ -63,51 +63,6 @@ OpticalSignal &OpticalSignal::operator-=(const OpticalSignal &rhs)
     return *this;
 }
 
-OpticalSignal OpticalSignal::sumSignals(OpticalSignal s0, OpticalSignal s1)
-{
-    cerr << "Use of deprecated" << __FUNCTION__<< endl;
-
-    // Maybe doing just the sum is faster than this
-    if (s0.m_field == 0.0) {
-        OpticalSignal os_sum = s1;
-        os_sum.getNewId();
-        return os_sum;
-    }
-    if (s1.m_field == (complex<double>) 0) {
-        OpticalSignal os_sum = s0;
-        os_sum.getNewId();
-        return os_sum;
-    }
-
-    if (s0.getWavelength() != s1.getWavelength())
-    {
-        bool ignore_wavelength_error = false;
-        if (ignore_wavelength_error)
-        {
-            cerr << "Signals have different wavelengths:" << std::endl;
-            cerr << "\t" << s0.getWavelength() << "(" << norm(s0.m_field) << ")"
-                 << "\t" << s1.getWavelength() << "(" << norm(s1.m_field) << ")"
-                 << std::endl;
-
-            sc_stop();
-        } else {
-            OpticalSignal os_sum = s0;
-            if (norm(s1.m_field) > norm(s0.m_field))
-                os_sum = s1;
-            os_sum.getNewId();
-            return os_sum;
-        }
-    }
-
-    complex<double> Asum = s0.m_field + s1.m_field;
-
-    OpticalSignal os_sum = s0;
-    os_sum.m_field = Asum;
-    os_sum.getNewId();
-
-    return os_sum;
-}
-
 uint32_t OpticalSignal::getIDFromWavelength(const double &wavelength)
 {
     auto it = find (specsGlobalConfig.wavelengths_vector.cbegin(),

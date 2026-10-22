@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b050-pdet-beat.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 425,
+   "kind": "json",
+   "sha256": "bb7928d551b2eba386bd2b762c2d275a7952fc9e6f1143a9900b3d17ea4f1553",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1564,
+   "kind": "vcd",
+   "sha256": "7d89ec0e47e8c34dd75234d6554037afd8125366d5d00ae58af529fc011ad696",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b050-pdet-beat"
+}

@@ -1,0 +1,8 @@
+{
+ "args": [
+  "-h"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "cli/help"
+}

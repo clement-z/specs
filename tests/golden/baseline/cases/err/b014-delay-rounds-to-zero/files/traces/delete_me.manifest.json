@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b014-delay-rounds-to-zero.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b014-delay-rounds-to-zero.cir", "sha256": "31d1b5aa2c51207a3c1dadf888cc467fe2441a5fc6e9bec8023b29de9959435d"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

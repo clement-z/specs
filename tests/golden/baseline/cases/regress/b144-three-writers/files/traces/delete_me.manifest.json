@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b144-three-writers.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b144-three-writers.cir", "sha256": "dc2e34f8712b322ddb83aa5bc024ac9c78462daf99383f3d673b0ce1b71ce641"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

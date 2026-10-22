@@ -1,0 +1,12 @@
+* B-004: an explicit -m overrides the default mode of the analysis directive (.op: frequency domain).
+* Run with: specs -m td -f b004-mode-td-op.cir
+* Expected: the config printout says "simulation mode: Event-driven time-domain" (was overridden to
+* frequency-domain), and the operating point is the same as without -m, because runOPAnalysis()
+* puts every optical output port in NO_DELAY mode whatever the global mode:
+*   lossless all-pass ring, out = 0.995098 W with the default reltol 1e-4 (exact: 1 W), exit 0
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=0.3872983346207417
+wg_ring ring_br ring_bl length=775e-6 neff=1 ng=1 att=0
+probe1 out
+.options timescale=-13
+.op

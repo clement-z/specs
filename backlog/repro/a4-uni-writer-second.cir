@@ -1,0 +1,5 @@
+* Same circuit, waveguide listed first
+wg1 b a length=1e-4
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 b
+.tran 1e-11

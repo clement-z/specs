@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-zerotol-ring-op.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "b869369423497ee2b48a7f448c7f888fc0e2e7fe9ba649d06dec5a2ea19c319b",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b153-zerotol-ring-op"
+}

@@ -1,0 +1,3472 @@
+{
+ "format": 1,
+ "description": "SPECS golden-output cases. Each case runs `specs <args>` in a fresh temporary working directory prepared by `setup` (circuits/ copied from the repo so that `.include circuits/...` resolves, and an empty traces/ dir because testbenches and the default trace file write to traces/<name>.vcd relative to the cwd). Optional keys: expect (documentation only: fail|crash), note, timeout (s), vcd_ignore_values (regexes on hierarchical VCD signal names that are not compared at all, only their declaration), ignore_files (globs), ignore_streams / unordered_streams ([stdout|stderr]: not compared / compared as a multiset of lines; every other stream must keep its line order), rlimit_nofile (soft open-files limit of the specs process).",
+ "defaults": {
+  "timeout": 120,
+  "setup": {
+   "copy": [
+    "circuits"
+   ],
+   "mkdir": [
+    "traces"
+   ]
+  }
+ },
+ "gtest": {
+  "timeout": 600
+ },
+ "cases": [
+  {
+   "id": "cir/add_drop",
+   "args": [
+    "-f",
+    "circuits/add_drop.cir"
+   ]
+  },
+  {
+   "id": "cir/add_drop_pyspecs",
+   "args": [
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ]
+  },
+  {
+   "id": "cir/add_drop_sub",
+   "args": [
+    "-f",
+    "circuits/add_drop_sub.cir"
+   ],
+   "note": "subcircuit definition only: nothing to simulate, no trace file is produced"
+  },
+  {
+   "id": "cir/double_ring",
+   "args": [
+    "-f",
+    "circuits/legacy/double_ring.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
+  },
+  {
+   "id": "cir/paul_3ring_puf",
+   "args": [
+    "-f",
+    "circuits/paul_3ring_puf.cir"
+   ],
+   "expect": "fail",
+   "note": "VLSRC values file 'paul_puf_bitstream_158b_3wl.csv' is not in the repo ('Error: Cannot open the file \"paul_puf_bitstream_158b_3wl.csv\".')"
+  },
+  {
+   "id": "cir/paul_simple_ring",
+   "args": [
+    "-f",
+    "circuits/legacy/paul_simple_ring.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
+  },
+  {
+   "id": "cir/subckt_test",
+   "args": [
+    "-f",
+    "circuits/subckt_test.cir"
+   ]
+  },
+  {
+   "id": "cir/subckt_tests",
+   "args": [
+    "-f",
+    "circuits/subckt_tests.cir"
+   ]
+  },
+  {
+   "id": "cir/triple_ring",
+   "args": [
+    "-f",
+    "circuits/legacy/triple_ring.cir"
+   ],
+   "expect": "fail",
+   "note": "parse error: pre-release netlist syntax ('one 0' at line 4), kept for reference in circuits/legacy/ (F-12; moved from circuits/, same output but the path)"
+  },
+  {
+   "id": "err/b149-x-noargs",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b149-x-noargs.cir"
+   ],
+   "expect": "fail",
+   "note": "B-149: 'x1' without a subcircuit name used to crash; clean error, exit 1"
+  },
+  {
+   "id": "err/b149-x-kwargs-only",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b149-x-kwargs-only.cir"
+   ],
+   "expect": "fail",
+   "note": "B-149: 'x1 L=1' (kwargs only, no subcircuit name) used to crash; clean error, exit 1"
+  },
+  {
+   "id": "regress/b150-include-in-subckt",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b150-include-in-subckt.cir"
+   ],
+   "note": "B-150: .include inside a .subckt body is run per instance at flatten time (was a syntax error)"
+  },
+  {
+   "id": "regress/b156-many-includes",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/b156-many-includes.cir"
+   ],
+   "rlimit_nofile": 64,
+   "note": "B-156: 110 nested .include under a 64 open-files limit (included files were never closed)"
+  },
+  {
+   "id": "cir-json/add_drop",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "cir-json/add_drop_pyspecs",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "cir-json/add_drop_sub",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/add_drop_sub.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "cir-json/subckt_tests",
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "circuits/subckt_tests.cir"
+   ],
+   "note": "dry run (-n) + flattened-netlist JSON export: exercises parser/elaboration without simulating"
+  },
+  {
+   "id": "err/b008-dc-bare",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b008-dc-bare.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-008: bare .dc (no sweep order) gives a clean error (was an assert abort, or UB in specs.cpp with NDEBUG)"
+  },
+  {
+   "id": "err/b148-tran-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-tran-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: .tran with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-options-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-options-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: .options with a positional arg gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pshift-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pshift-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PSHIFT with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-mzi-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-mzi-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: MZI with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-crossing-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-crossing-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: CROSSING with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-probe-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-probe-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PROBE with 5 positional args gives the existing 'Too many input arguments' error (was an assert abort)"
+  },
+  {
+   "id": "err/b148-mlprobe-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-mlprobe-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: MLPROBE with 2 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pwr-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pwr-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PWR with a positional arg gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b148-pdet-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b148-pdet-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-148: PDET with 3 positional args gives a clean error (was an assert abort / silently ignored with NDEBUG)"
+  },
+  {
+   "id": "err/b165-op-stray-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-op-stray-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .op with a stray positional arg is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-op-stray-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-op-stray-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .op with a stray keyword arg is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-dc-stray-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-dc-stray-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .dc with a positional arg after the sweep order is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b165-dc-stray-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b165-dc-stray-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-165: .dc with a keyword arg after the sweep order is rejected (was silently ignored)"
+  },
+  {
+   "id": "err/b153-resolution-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-resolution-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options resolution=-1 is rejected (was cast to 2^64-1 and accepted)"
+  },
+  {
+   "id": "err/b153-resolution-below-one",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-resolution-below-one.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options resolution=0.5 is rejected (truncated to 0: verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "err/b153-timescale-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-timescale-out-of-range.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options timescale=-20 is rejected (verifyConfig assert / SystemC E705 with NDEBUG)"
+  },
+  {
+   "id": "err/b153-abstol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-abstol-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: .options abstol=-1 is rejected (verifyConfig assert / accepted with NDEBUG)"
+  },
+  {
+   "id": "regress/b153-reltol-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-reltol-zero.cir"
+   ],
+   "note": "B-153, decision 2026-10-21 (zero tolerances): .options reltol=0 is allowed (replaces err/b153-reltol-zero, same netlist). abstol keeps its default 1e-8, so stderr is empty (only abstol = reltol = 0 warns); probe1 b = 1 mW from t = 0, 'Simulated 10 ps'"
+  },
+  {
+   "id": "regress/b153-zerotol-open-loop",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-open-loop.cir"
+   ],
+   "note": "B-153: .options abstol=0 reltol=0 on a feed-forward circuit (value list -> 10 dB waveguide -> 25/75 splitter): every change is emitted unsnapped, out1/out2 = 2.5e-05/7.5e-05 W at 10 ps, 2.5000025e-05/7.5000075e-05 W at 20 ps (truncated by the default reltol), 2.5e-22/7.5e-22 W at 30 ps (snapped to 0 by default), 0 at 40 ps; open-ended .tran ends ('Simulated 50 ps'); stderr: exactly one zero-tolerance warning"
+  },
+  {
+   "id": "regress/b153-zerotol-cli",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--abstol",
+    "0",
+    "--reltol",
+    "0",
+    "-f",
+    "tests/golden/netlists/b153-zerotol-cli.cir"
+   ],
+   "note": "B-153: specs --abstol 0 --reltol 0 overrides the netlist's .options abstol=1e-6 reltol=1e-3 (footer): same traces as regress/b153-zerotol-open-loop, config printout abstol 0 / reltol 0, and exactly one warning line on stderr although verifyConfig() runs twice (runAnalysis(), prepareSimulation())"
+  },
+  {
+   "id": "regress/b153-zerotol-lossy-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"
+   ],
+   "timeout": 30,
+   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| only; stderr: one warning. Short timeout so that a regression (never quiescing) fails fast"
+  },
+  {
+   "id": "err/b153-zerotol-lossless-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-lossless-ring-op.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: the F-28 weakly coupled lossless ring in .op at abstol = reltol = 0 with .options maxiter=1000: the zero-tolerance warning, then the F-28 non-convergence error, residual of 3 ports (out, ring_br, ring_bl), each '> 0 (inf x)' (zero threshold), exit 1"
+  },
+  {
+   "id": "regress/b153-zerotol-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b153-zerotol-ring-op.cir"
+   ],
+   "note": "B-153 (optional case): the B-124 all-pass ring in .op at abstol = reltol = 0 converges (the contracting floating-point iteration repeats exactly) to the exact result, out = 1.000000 W, ring = 24.626059 W (default tolerances: 0.995098 W, 24.563207 W); stderr: one warning"
+  },
+  {
+   "id": "err/b153-zerotol-cli-abstol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--abstol",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: specs --abstol -1 is still rejected before parsing ('Invalid abs_tol value'), exit 1; 0 is now allowed"
+  },
+  {
+   "id": "err/b153-zerotol-cli-reltol-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--reltol",
+    "-1e-3",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-153: specs --reltol -1e-3 is still rejected before parsing ('Invalid reltol value'), exit 1; 0 is now allowed"
+  },
+  {
+   "id": "err/b161-ic-unsupported",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b161-ic-unsupported.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-161: .ic gives a parse error naming the unsupported directive (was exit 1 with no message)"
+  },
+  {
+   "id": "err/b034-coupler-k-gt-1",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-coupler-k-gt-1.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: COUPLER k=1.1 is rejected (through power < 0: NaN, silent 0 W with NDEBUG, std::polar abort with assertions)"
+  },
+  {
+   "id": "err/b034-coupler-kp-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-coupler-kp-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: COUPLER kp=-0.01 is rejected (through power > 1: NaN cross output)"
+  },
+  {
+   "id": "err/b034-splitter-ratio-gt-1",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b034-splitter-ratio-gt-1.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-034: SPLITTER ratio=1.5 is rejected (was accepted: NaN on out2 and gain on out1)"
+  },
+  {
+   "id": "opt/tracefile-o",
+   "args": [
+    "-o",
+    "traces/custom",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "-o overrides the default trace file name."
+  },
+  {
+   "id": "opt/tol-resolution-overrides",
+   "args": [
+    "--abstol",
+    "1e-10",
+    "--reltol",
+    "1e-5",
+    "-R",
+    "-14",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "command-line options are appended as a .options footer and take priority over the netlist"
+  },
+  {
+   "id": "opt/mode-sampled-time",
+   "args": [
+    "-m",
+    "sampled-time",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-002: sampled-time is not implemented (delayedWriteSampledTime() dropped every write): -m sampled-time is rejected with a clean error, exit 1 (was exit 0; before B-004 the .tran directive silently overrode the mode)"
+  },
+  {
+   "id": "opt/mode-fd",
+   "args": [
+    "-m",
+    "fd",
+    "-f",
+    "circuits/add_drop.cir"
+   ]
+  },
+  {
+   "id": "opt/multi-file",
+   "args": [
+    "-f",
+    "circuits/common_definitions.def",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "several -f files are concatenated."
+  },
+  {
+   "id": "opt/vci",
+   "args": [
+    "--vci",
+    "-f",
+    "circuits/subckt_tests.cir"
+   ],
+   "note": "verbose component initialisation."
+  },
+  {
+   "id": "regress/b031-mzi-bidir",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b031-mzi-bidir.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-014: stderr has one delay-rounding warning per MZI-internal waveguide (arms of 43 fs round to 0, 88 fs to 100 fs at the default 100 fs); they are created by the MZI init() calls, in name order since F-01 (B-016)"
+  },
+  {
+   "id": "regress/b036-vci-crow",
+   "args": [
+    "--vci",
+    "-t",
+    "ac_crow"
+   ],
+   "ignore_files": [
+    "traces/crow_tb.vcd"
+   ],
+   "note": "B-036: --vci printing used to segfault (exit 139) on ports bound to a channel that is not an spx::oa_signal_type (CROW uses sc_signal<OpticalSignal>). The VCD is that of tb/ac_crow (apart from verbose_component_initialization), so it is not stored"
+  },
+  {
+   "id": "tb/wg",
+   "args": [
+    "-t",
+    "wg"
+   ],
+   "note": "src/tb/alltestbenches.cpp: wg_tb_run"
+  },
+  {
+   "id": "tb/waveguide",
+   "args": [
+    "-t",
+    "waveguide"
+   ],
+   "note": "src/tb/alltestbenches.cpp: wg_tb_run"
+  },
+  {
+   "id": "tb/merg",
+   "args": [
+    "-t",
+    "merg"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Merger_tb_run"
+  },
+  {
+   "id": "tb/merger",
+   "args": [
+    "-t",
+    "merger"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Merger_tb_run"
+  },
+  {
+   "id": "tb/dc",
+   "args": [
+    "-t",
+    "dc"
+   ],
+   "note": "src/tb/alltestbenches.cpp: DirectionalCoupler_tb_run"
+  },
+  {
+   "id": "tb/directional_coupler",
+   "args": [
+    "-t",
+    "directional_coupler"
+   ],
+   "note": "src/tb/alltestbenches.cpp: DirectionalCoupler_tb_run"
+  },
+  {
+   "id": "tb/spli",
+   "args": [
+    "-t",
+    "spli"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Splitter_tb_run"
+  },
+  {
+   "id": "tb/splitter",
+   "args": [
+    "-t",
+    "splitter"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Splitter_tb_run"
+  },
+  {
+   "id": "tb/det",
+   "args": [
+    "-t",
+    "det"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON, drawn from the seeded per-detector streams (F-01, default seed 0), so the readout VCD values are reproducible and compared; the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)"
+  },
+  {
+   "id": "tb/detector",
+   "args": [
+    "-t",
+    "detector"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Detector_tb_run. Since B-049/B-050 the detectors are enabled (default) and write their readout on input events; noise is ON, drawn from the seeded per-detector streams (F-01, default seed 0), so the readout VCD values are reproducible and compared; the tb prints them with 3 decimals; stdout checks the self-checks (Success rate: 3/3)"
+  },
+  {
+   "id": "tb/pcm",
+   "args": [
+    "-t",
+    "pcm"
+   ],
+   "note": "src/tb/alltestbenches.cpp: PCMElement_tb_run"
+  },
+  {
+   "id": "tb/mzi",
+   "args": [
+    "-t",
+    "mzi"
+   ],
+   "note": "src/tb/alltestbenches.cpp: MZI_tb_run"
+  },
+  {
+   "id": "tb/ring",
+   "args": [
+    "-t",
+    "ring"
+   ],
+   "note": "src/tb/alltestbenches.cpp: Ring_tb_run"
+  },
+  {
+   "id": "tb/ac_add_drop",
+   "args": [
+    "-t",
+    "ac_add_drop"
+   ],
+   "note": "src/tb/alltestbenches.cpp: freqsweep_tb_run_add_drop"
+  },
+  {
+   "id": "tb/ac_crow",
+   "args": [
+    "-t",
+    "ac_crow"
+   ],
+   "note": "src/tb/alltestbenches.cpp: crow_tb_run"
+  },
+  {
+   "id": "tb/ac_add_drop-fd",
+   "args": [
+    "-t",
+    "ac_add_drop",
+    "-m",
+    "fd"
+   ],
+   "note": "B-138: frequency sweep branch of freqsweep_tb"
+  },
+  {
+   "id": "tb/lambda",
+   "args": [
+    "-t",
+    "lambda"
+   ],
+   "note": "src/tb/alltestbenches.cpp: lambda_tb_run"
+  },
+  {
+   "id": "tb/phaseshifter",
+   "args": [
+    "-t",
+    "phaseshifter"
+   ],
+   "note": "src/tb/alltestbenches.cpp: ps_tb_run"
+  },
+  {
+   "id": "tb/ps",
+   "args": [
+    "-t",
+    "ps"
+   ],
+   "note": "src/tb/alltestbenches.cpp: ps_tb_run"
+  },
+  {
+   "id": "tb/mesh",
+   "args": [
+    "-t",
+    "mesh"
+   ],
+   "note": "src/tb/alltestbenches.cpp: mesh_tb_run"
+  },
+  {
+   "id": "err/b064-evlsrc-missing-file",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b064_evlsrc_missing_file.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "expect": "fail",
+   "note": "B-064: the error names the missing EVLSRC values file"
+  },
+  {
+   "id": "cli/help",
+   "args": [
+    "-h"
+   ]
+  },
+  {
+   "id": "cli/no-args",
+   "args": [],
+   "note": "prints help, exit 1"
+  },
+  {
+   "id": "cli/list-testbenches",
+   "args": [
+    "-p"
+   ],
+   "note": "guards the testbench registry (BUILD_TB)"
+  },
+  {
+   "id": "cli/unknown-testbench",
+   "args": [
+    "-t",
+    "nonexistent"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "cli/missing-netlist",
+   "args": [
+    "-f",
+    "does_not_exist.cir"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "cli/bad-mode",
+   "args": [
+    "-m",
+    "bogus",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "regress/b006-empty-output",
+   "args": [
+    "-o",
+    "",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "B-006: -o \"\" runs without a VCD (was SIGSEGV on the null default trace file)."
+  },
+  {
+   "id": "err/b017-json-unwritable",
+   "args": [
+    "-n",
+    "--json",
+    "no_such_dir/flat.json",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "B-017: --json to a path that cannot be opened is an error (was: 'Exported ...', exit 0, no file)"
+  },
+  {
+   "id": "err/b018-resolution-below-fs",
+   "args": [
+    "-R",
+    "-16",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "B-018: -R below -15 (1 fs) is rejected by the CLI (was: assert abort, or E705 with NDEBUG)"
+  },
+  {
+   "id": "regress/b131-nrings-crow",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "2"
+   ],
+   "note": "B-131: --nrings_crow sets the number of rings of the ac_crow testbench (was ignored: always 3)"
+  },
+  {
+   "id": "err/b131-nrings-crow-zero",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "0"
+   ],
+   "expect": "fail",
+   "note": "B-131: --nrings_crow outside 1..1024 is rejected"
+  },
+  {
+   "id": "regress/b001-fd-multilambda-stale",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-001: multi-wavelength .op; a stale partial value of one wavelength used to be emitted as the converged value (m = o = 0.25 W at 1550 nm instead of 0.5625 W)"
+  },
+  {
+   "id": "regress/b052-cwsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-cwsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: CWSRC positional `wl power phi` (cwsrc1 a 1.55e-6 1e-3 0.5 -> 1550 nm, 1 mW, 0.5 rad; was 0 W at 1 mm)"
+  },
+  {
+   "id": "regress/b052-vlsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-vlsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: VLSRC positional values file is loaded (emissions at 100/200/300 ps; was silently ignored)"
+  },
+  {
+   "id": "regress/b052-evlsrc-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-evlsrc-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: EVLSRC positional values file is loaded (emissions at 100/200/300 ps; was silently ignored)"
+  },
+  {
+   "id": "regress/b052-pcmcell-positional",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-pcmcell-positional.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-052: PCMCELL positional `emelt n tc ta` (out = 0.85 mW at k=0, 0.9495 mW at k=n; was an assert abort in Debug)"
+  },
+  {
+   "id": "err/b052-cwsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-cwsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: CWSRC with 4 positional args gives a clean error (was an assert abort / args shifted with NDEBUG)"
+  },
+  {
+   "id": "err/b052-vlsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-vlsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: VLSRC with 2 positional args gives a clean error (was an assert abort / loaded the first file with NDEBUG)"
+  },
+  {
+   "id": "err/b052-evlsrc-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-evlsrc-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: EVLSRC with 2 positional args gives a clean error (was an assert abort / loaded the first file with NDEBUG)"
+  },
+  {
+   "id": "err/b052-pcmcell-args",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b052-pcmcell-args.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-052: PCMCELL with 5 positional args gives a clean error (at most 4: emelt n tc ta)"
+  },
+  {
+   "id": "regress/b051-pcmcell-tc-zero",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-tc-zero.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-051: tc/ta are a presence check: t_c=0 ep=1 (aliases) is valid; out = tanh(1.5) mW = 0.000905 W at k=5, n=10"
+  },
+  {
+   "id": "err/b051-pcmcell-no-tc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-no-tc.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-051: PCMCELL without tc gives a clean error (was fully opaque: constructor defaults Tc = Ta = 0)"
+  },
+  {
+   "id": "err/b051-pcmcell-no-ta",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b051-pcmcell-no-ta.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-051: PCMCELL without ta (tc given positionally) gives a clean error (was T(0) = tc, ta silently 0)"
+  },
+  {
+   "id": "regress/b060-pcmcell-k-eq-n",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-eq-n.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-060: k = n is a valid initial state (n=4 k=4 tc=0.2 ta=0.8: out = 0.2+0.6*tanh(3) mW = 0.000797 W)"
+  },
+  {
+   "id": "err/b060-pcmcell-n-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-n-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with n = -1 gives a clean error (was accepted, frozen state)"
+  },
+  {
+   "id": "err/b060-pcmcell-n-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-n-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with n = 0 keeps its existing error (PCM Cell needs values for both Emelt and Nstates)"
+  },
+  {
+   "id": "err/b060-pcmcell-k-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with initial state k = -1 gives a clean error (was accepted)"
+  },
+  {
+   "id": "err/b060-pcmcell-k-gt-n",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b060-pcmcell-k-gt-n.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-060: PCMCELL with initial state k = n + 1 gives a clean error (was accepted)"
+  },
+  {
+   "id": "regress/b004-mode-fd-tran",
+   "args": [
+    "-m",
+    "fd",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "B-004: an explicit -m overrides the .tran default (time domain): the transient runs in frequency domain (NO_DELAY ports), i.e. a CW steady state at each source event (drop ~1 W from 500 ps to 2 ns, no ring build-up)."
+  },
+  {
+   "id": "regress/b004-mode-td-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-m",
+    "td",
+    "-f",
+    "tests/golden/netlists/b004-mode-td-op.cir"
+   ],
+   "note": "B-004: an explicit -m td is kept with .op (was overridden to frequency domain); the operating point is unchanged (OP runs every port in NO_DELAY mode)"
+  },
+  {
+   "id": "regress/b004-mode-td-dc",
+   "args": [
+    "-m",
+    "td",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "B-004: an explicit -m td is kept with .dc (was overridden to frequency domain); the sweep is unchanged (DC runs every port in NO_DELAY mode), only the printed and traced simulation_mode differ from cir/add_drop"
+  },
+  {
+   "id": "regress/b144-bidir-source-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-bidir-source-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: uni source created before a bidirectional WG on an explicit '&' net; the light now reaches the WG (out:0 = 1 W at -2.1890 rad, was 0)."
+  },
+  {
+   "id": "regress/b144-uni-writer-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-uni-writer-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: uni writer created first on a bidirectional net takes slot :0 (b:0 = 1 mW at -2.1890 rad, was 0); same values as b144-uni-writer-second."
+  },
+  {
+   "id": "regress/b144-uni-writer-second",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-uni-writer-second.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: same circuit as b144-uni-writer-first, WG created first (b:0 = 1 mW at -2.1890 rad, unchanged by the fix)."
+  },
+  {
+   "id": "regress/b144-two-sources-one-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-two-sources-one-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-144: two sources on one net take slots :0 and :1 (a:0 = 1 mW, a:1 = 2 mW, exit 0; was E115, exit 1)."
+  },
+  {
+   "id": "regress/b144-three-writers",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b144-three-writers.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-144 known limitation (out of scope): three writers on one optical net still stop with SystemC E115, exit 1 (bidirectional() only tests m_writers_count == 2; validation is B-164)"
+  },
+  {
+   "id": "regress/b145-upgrade-reader",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: a bidirectional WG that writes a net with a uni reader already bound no longer swaps the signals (out = 1.3409 mW at 2.4261 rad, was 0.5 mW); same as b145-upgrade-reader-ref."
+  },
+  {
+   "id": "regress/b145-upgrade-reader-ref",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-ref.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: reference for b145-upgrade-reader without '&' (out = 1.3409 mW at 2.4261 rad)."
+  },
+  {
+   "id": "regress/b145-upgrade-reader-case2",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-case2.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: counter-case, a bidirectional WG that reads the upgraded net still swaps (out = 1.3409 mW at -0.5209 rad, unchanged by the fix); same as b145-upgrade-reader-case2-ref."
+  },
+  {
+   "id": "regress/b145-upgrade-reader-case2-ref",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-reader-case2-ref.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: reference for b145-upgrade-reader-case2 without '&' (out = 1.3409 mW at -0.5209 rad)."
+  },
+  {
+   "id": "regress/b145-upgrade-roles",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b145-upgrade-roles.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-145: role-aware upgrade for PSHIFT, COUPLER and MZI, writing (no swap) and reading (swap) the upgraded net; out_wps = out_r* = 4.5 mW, out_wdc = 3.38 mW, out_wmzi = 2.5 mW at 1.1071 rad (were 0 / 2 mW)."
+  },
+  {
+   "id": "regress/b147-crossing-out-bidir",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-bidir.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147: crossing outputs bound as writers; a crossing output on a bidirectional net reaches the WG (e:0 = 1 mW at -2.1890 rad, was 0). Since B-159 the crossing is a CrossingBi there (a, b, d become bidirectional: a:1 = b:1 = 1 mW from the sources, crossing backward outputs a:0 = b:0 = 0, d:0 = 1 mW); values follow the passive crossing model (B-032, defaults t = 1, x = 0)."
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-wg",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-wg.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a WG (e:0 = 1 mW, z1 = z2 = 0.5 mW at -2.1890 rad, were 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-splitter",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-splitter.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: crossing output on an explicit '&' net read by a uni splitter (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
+  },
+  {
+   "id": "regress/b147-crossing-out-explicit-splitter-first",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b147-crossing-out-explicit-splitter-first.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-147 + B-144: as b147-crossing-out-explicit-splitter with the splitter created first (z1 = z2 = 0.5 mW, unchanged; B-147 alone gave 0). Since B-159 the crossing is a CrossingBi (a, b, d split into :0/:1 slots; passive model B-032, defaults t = 1, x = 0)."
+  },
+  {
+   "id": "regress/b146-x-shared-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: two subckt instances driving one net merge against nets_flat; mid is bidirectional as in the flat netlist (mid:0 = mid:1 = 1 mW at -2.1890 rad; was E115, exit 1)."
+  },
+  {
+   "id": "regress/b146-x-shared-net-flat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-net-flat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: flat reference for b146-x-shared-net (same values)."
+  },
+  {
+   "id": "regress/b146-x-shared-delayed",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-delayed.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: two subckt instances writing one net at different times; mid is bidirectional as in the flat netlist (mid:0 = 1 mW, mid:1 = 2 mW; was unidirectional, last write wins, mid = 2 mW)."
+  },
+  {
+   "id": "regress/b146-x-shared-delayed-flat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-shared-delayed-flat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-146: flat reference for b146-x-shared-delayed (same values)."
+  },
+  {
+   "id": "err/b146-x-net-type-mismatch",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b146-x-net-type-mismatch.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-146: a net optical in one subckt instance and electrical in another is rejected while flattening ('Could not reconcile nets: ROOT/X2/e and ROOT/n', exit 1; was 'Wrong signal type for 0 connected to ROOT/n' at elaboration; message wording is B-155)"
+  },
+  {
+   "id": "regress/b032-crossing-passive",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b032-crossing-passive.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-032: passive crossing S-matrix (t = 10^(-att/20) sqrt(1-x^2), cross j*x, x = 10^(-|xtalk|/20)); two coherent 1 W inputs, att=0 xtalk=-20: out1 = out2 = 1 W at 0.1002 rad, total 2 W (was 1.21 W + 1.21 W at 0)"
+  },
+  {
+   "id": "regress/b032-crossing-isolation-sign",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b032-crossing-isolation-sign.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-032: att is the excess loss on top of crosstalk, positive xtalk read as isolation; 1 W into in1, att=1, xtalk=10 (positional) and xtalk=-10 (keywords) give the same: through 0.714895 W at 0, cross 0.1 W at 1.5708 rad (xtalk=10 gave 10 W)"
+  },
+  {
+   "id": "regress/b033-crossing-two-lambda",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-033: per-wavelength crossing memories in .op; in1 = 1 W @1550 nm, in2 = 1 W @1560 nm, ideal crossing: out1 = 1 W @1550 nm (was 0 W @1560 nm), out2 = 1 W @1560 nm."
+  },
+  {
+   "id": "regress/b033-crossing-two-lambda-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-033: per-wavelength crossing memories in .tran, overlapping VLSRC pulses at 1550/1560 nm, xtalk=-10: no 'Attempted to sum signals of different wavelengths' on stderr (was 6 lines); MLPROBE per-wavelength powers 0.9/0.1 W on out1 and 0.1/0.9 W on out2 (hand values in the netlist header)"
+  },
+  {
+   "id": "regress/b159-crossing-backward",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b159-crossing-backward.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-159: a crossing on a bidirectional net is a CrossingBi; 1 mW backward into out1, 4 mW forward into in2, xtalk=-10: a:0 = 0.9 mW at 0, b:0 = 0.1 mW at 1.5708 rad (backward, was lost), c:1 = 0.4 mW at 1.5708 rad, d:0 = 3.6 mW (slots explained in the netlist header)"
+  },
+  {
+   "id": "regress/b049-pdet-drives-net",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b049-pdet-drives-net.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-049: the PDET readout (1 mA, written from the start of the transient) drives its electrical net: the phase shifter it controls gives out2 a 1 rad phase at 10 ps (was 0: p_readout was never written)"
+  },
+  {
+   "id": "regress/b050-pdet-two-open-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b050-pdet-two-open-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "timeout": 30,
+   "note": "B-050: an open-ended .tran with two PDETs ends (was: never, the detectors kept each other's 1 ps sampling loop alive); readouts 0.5 mA, then 2 mA at 1 ns, one VCD record per change, 'Simulated 2 ns'. Short timeout so that a regression fails fast"
+  },
+  {
+   "id": "regress/b050-pdet-beat",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b050-pdet-beat.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-050: two CW wavelengths (1550/1551 nm) on one PDET are sampled every Ts = 1 ps while they beat: readout 0.625 + 0.5 cos(2 pi 124.703 GHz t) mA (period 8.019 ps, between 0.125 and 1.125 mA)"
+  },
+  {
+   "id": "regress/b048-probe-cw-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-probe-cw-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: PROBE and traceall auto-probes on a CW path in .tran sample the OP value of their net at TRAN start: ROOT/in = 1 mW, 0.031623 sqrt(W), 0 rad; ROOT/out = 1 mW, 0.031623 sqrt(W), -0.40537 rad (2*pi*2.2*100e-6/1.55e-6 wrapped), 1.55e-6, from t = 0 (was 0 for the whole transient)"
+  },
+  {
+   "id": "regress/b048-mlprobe-cw-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-mlprobe-cw-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: MLPROBE wl=[1.55e-6] on a CW net in .tran samples the OP value at TRAN start: power@1550 = 1 mW, abs 0.031623 sqrt(W), phase 0.5 rad from t = 0 (was 0 for the whole transient)"
+  },
+  {
+   "id": "regress/b048-undriven-tran",
+   "args": [
+    "-f",
+    "tests/golden/netlists/b048-undriven-tran.cir"
+   ],
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "note": "B-048: probes on an undriven net in .tran: the sample taken at TRAN start is skipped silently (PROBE2, PROBE{ROOT/nc}, MLPROBE2 stay 0; no 'received unsupported signal (lambda = 1.55e-06m)' although wavelength id 0 aliases 1550 nm, B-012); the CW net next to it reads 1 mW from t = 0"
+  },
+  {
+   "id": "err/b014-delay-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-delay-rounds-to-zero.cir"
+   ],
+   "note": "B-014: a 13 fs ring round trip of a waveguide written in the netlist rounds to 0 at 100 fs (the response collapsed into delta cycles at 1 ps, silently; a warning in sprint 2026-10b): clean error before the simulation, exit 1 (decision option (b))",
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail"
+  },
+  {
+   "id": "err/b014-subckt-wg-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-subckt-wg-rounds-to-zero.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-014: a waveguide inside a .subckt is written in the netlist too: its 13 fs delay rounding to 0 at 100 fs is an error (ROOT/X1/WGR), exit 1 (decision option (b))"
+  },
+  {
+   "id": "regress/b014-device-internal-rounds-to-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-device-internal-rounds-to-zero.cir"
+   ],
+   "note": "B-014: the arms of an MZI (created by the device, 43 fs) round to 0 at 100 fs: a warning only, the run goes on (decision option (b)); the netlist waveguide (755 fs) gives no message"
+  },
+  {
+   "id": "regress/b014-delay-rounding-warning",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b014-delay-rounding-warning.cir"
+   ],
+   "note": "B-014: a 53 fs ring round trip rounded to 100 fs (+87 %): one warning on stderr before the simulation (was silent), simulation unchanged"
+  },
+  {
+   "id": "regress/b021-snapfactor-default",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-default.cir"
+   ],
+   "note": "B-021: with abstol=1e-2, fields below 10 * abstol are emitted as 0 (default snapfactor 10): out_a = out_b = 0, out_c = 0.2 sqrt(W)."
+  },
+  {
+   "id": "regress/b021-snapfactor",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor.cir"
+   ],
+   "note": "B-021: .options snapfactor=4 (abstol=1e-2): only fields below 0.04 sqrt(W) are emitted as 0: out_a = 0, out_b = 0.06, out_c = 0.2 sqrt(W)."
+  },
+  {
+   "id": "regress/b021-snapfactor-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-zero.cir"
+   ],
+   "note": "B-021: .options snapfactor=0 disables the snap to 0: out_a = 0.03, out_b = 0.06, out_c = 0.2 sqrt(W)."
+  },
+  {
+   "id": "err/b021-snapfactor-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b021-snapfactor-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-021: .options snapfactor=-1 is rejected (must be >= 0)"
+  },
+  {
+   "id": "regress/b124-allpass-ring-default-reltol",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "note": "B-124: lossless all-pass ring .op with the default reltol 1e-4: out = 0.995098 W instead of 1 W (truncation error about 49 x reltol)."
+  },
+  {
+   "id": "regress/b124-allpass-ring-tight-reltol",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-tight-reltol.cir"
+   ],
+   "note": "B-124: same ring with .options reltol=1e-9: out = 1.000000 W."
+  },
+  {
+   "id": "regress/f01-pdet-noise-default-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01 (B-055): two PDETs with noise (nb=0) on the same input, no --seed: default seed 0. The noise is drawn from rng_for(seed, instance name), so the readouts are reproducible (were seeded from std::random_device) and pdet1 and pdet2 get different noise. One record per input event (0, 10, 20, 30 ps): P * 1 A/W plus a noise of about 0.7 uA"
+  },
+  {
+   "id": "regress/f01-pdet-noise-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "12345",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: same netlist as regress/f01-pdet-noise-default-seed with --seed 12345: same record times, different noise values"
+  },
+  {
+   "id": "regress/f01-options-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+   ],
+   "note": "F-01: .options seed=12345 (f01-pdet-noise.cir included): the VCD must be identical to the one of regress/f01-pdet-noise-seed (--seed 12345); stdout differs only by the .include and the extra directive"
+  },
+  {
+   "id": "regress/f01-options-seed-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "0",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise-options-seed.cir"
+   ],
+   "note": "F-01: --seed takes priority over .options seed: --seed 0 with .options seed=12345 gives the VCD of regress/f01-pdet-noise-default-seed (seed 0)"
+  },
+  {
+   "id": "regress/f01-seed-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "18446744073709551615",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: --seed accepts the full unsigned 64-bit range (2^64 - 1 here): other noise values than seed 0 and 12345"
+  },
+  {
+   "id": "regress/f01-pdet-darkfield",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-pdet-darkfield.cir"
+   ],
+   "note": "F-01 (B-056): dark PDETs (0 W input). darkfield=0: readout exactly 0 (no dark-field injection). darkfield=1 (default): one readout of about 1e-40 A (1e-20 * N(0,1) sqrt(W) field), now seeded and reproducible (was random at every run)"
+  },
+  {
+   "id": "err/f01-seed-invalid",
+   "args": [
+    "--seed",
+    "abc",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed must be a decimal unsigned 64-bit integer: 'abc' is rejected (Invalid seed value), exit 1"
+  },
+  {
+   "id": "err/f01-seed-negative",
+   "args": [
+    "--seed",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed -1 is rejected (Invalid seed value), exit 1"
+  },
+  {
+   "id": "err/f01-seed-not-integer",
+   "args": [
+    "--seed",
+    "1.5",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed 1.5 is rejected (trailing characters after the integer), exit 1"
+  },
+  {
+   "id": "err/f01-seed-overflow",
+   "args": [
+    "--seed",
+    "18446744073709551616",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-01: --seed 2^64 is rejected (out of the unsigned 64-bit range), exit 1"
+  },
+  {
+   "id": "err/f01-options-seed-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-invalid.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=1.5 is rejected (must be an integer between 0 and 2^53)"
+  },
+  {
+   "id": "err/f01-options-seed-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=-1 is rejected (must be an integer between 0 and 2^53)"
+  },
+  {
+   "id": "err/f01-options-seed-too-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-too-large.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01: .options seed=1e16 is rejected (above 2^53, the netlist number would not be exact)"
+  },
+  {
+   "id": "regress/f01-seed-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "3000000000",
+    "-f",
+    "tests/golden/netlists/f01-pdet-noise.cir"
+   ],
+   "note": "F-01: --seed 3000000000 (beyond the int range), reference for regress/f01-options-seed-large"
+  },
+  {
+   "id": "regress/f01-options-seed-large",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-large.cir"
+   ],
+   "note": "F-01: .options seed=3e9 (a large netlist seed in exponent form): the VCD must be identical to the one of regress/f01-seed-large (--seed 3000000000)"
+  },
+  {
+   "id": "err/f01-options-seed-huge-integer",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-huge-integer.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-01, B-180: .options seed=99999999999999999999 is a parse error: integer literals are 64-bit and this one is beyond 9223372036854775807 (Parsing error (file:7): integer literal ... is out of range (the limit is 9223372036854775807)), exit 1. It was read as 2147483647 and rejected by a guard in .options seed"
+  },
+  {
+   "id": "regress/f01-options-seed-int-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int-max.cir"
+   ],
+   "note": "F-01, B-180: .options seed=2147483647 (f01-pdet-noise.cir included), the int maximum to which longer literals were clamped (it was rejected, as err/f01-options-seed-int-max): now an ordinary seed, taken exactly; the VCD is identical to the one of specs --seed 2147483647 on f01-pdet-noise.cir"
+  },
+  {
+   "id": "regress/f01-options-seed-int-literal",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int-literal.cir"
+   ],
+   "note": "F-01, B-180: .options seed=3000000000 as an integer literal (beyond the int range, was clamped to 2147483647): the VCD must be identical to the one of regress/f01-seed-large (--seed 3000000000) and regress/f01-options-seed-large (seed=3e9)"
+  },
+  {
+   "id": "regress/f01-options-seed-int64-max",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f01-options-seed-int64-max.cir"
+   ],
+   "note": "F-01, B-180: the largest integer literal, .options seed=9223372036854775807 (2^63 - 1), is a valid seed taken exactly (no conversion through double): the VCD is identical to the one of specs --seed 9223372036854775807 on f01-pdet-noise.cir"
+  },
+  {
+   "id": "err/b180-int-literal-kwarg",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-kwarg.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: an integer literal beyond 9223372036854775807 in a keyword argument (power=9223372036854775808, i.e. 2^63) is a parse error with file:line and the limit, exit 1 (was clamped to 2147483647 silently)"
+  },
+  {
+   "id": "err/b180-int-literal-positional",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-positional.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: an integer literal beyond 9223372036854775807 in a positional argument (CWSRC power 99999999999999999999) is a parse error with file:line and the limit, exit 1 (was clamped to 2147483647 silently)"
+  },
+  {
+   "id": "err/b180-int-literal-net-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-int-literal-net-name.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: a numeric net name beyond 9223372036854775807 (18446744073709551616, i.e. 2^64) is a parse error with file:line and the limit, exit 1 (was net N2147483647)"
+  },
+  {
+   "id": "regress/b180-numeric-net-names",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-numeric-net-names.cir"
+   ],
+   "note": "B-180: numeric net names use the full 64-bit range: nets 3000000000 and 9223372036854775807 are N3000000000 and N9223372036854775807 (3000000000 was N2147483647); 7 keeps its zero padding (N00007); .op gives 1 mW on all three"
+  },
+  {
+   "id": "err/b180-pcmcell-n-beyond-int",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-pcmcell-n-beyond-int.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: PCMCELL stores n as an int: n=3000000000 (a 64-bit integer literal beyond the int range) is rejected with Error (ROOT/PCMCELL1): the number of states n must be between 1 and 2147483647 (got 3000000000), exit 1 (was clamped to 2147483647)"
+  },
+  {
+   "id": "err/b180-pcmcell-k-beyond-int",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b180-pcmcell-k-beyond-int.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-180: PCMCELL stores the initial state k as an int: k=3e9 (a double beyond the int range) is rejected with Error (ROOT/PCMCELL1): the initial state k must be between 0 and 2147483647 (got 3000000000), exit 1 (the double-to-int conversion was undefined behaviour)"
+  },
+  {
+   "id": "regress/f01-manifest",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-o",
+    "traces/m",
+    "-f",
+    "tests/golden/netlists/f01-manifest.cir"
+   ],
+   "note": "F-01: run manifest traces/m.manifest.json next to traces/m.vcd: seed, argv, trace file, and the SHA-256 of the 3 netlist files opened by the parser (-f file, .include, .include in a subcircuit body opened twice while flattening, listed once); specs_version masked by the harness"
+  },
+  {
+   "id": "regress/f01-print-manifest",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--print-manifest",
+    "-n",
+    "-f",
+    "tests/golden/netlists/f01-manifest.cir"
+   ],
+   "note": "F-01: --print-manifest in a dry run prints the run manifest on stdout after building the circuit, with \"trace_file\": null; no file is written"
+  },
+  {
+   "id": "err/f28-lossless-ring-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-op.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: weakly coupled lossless ring (k = 1e-4, off resonance): the .op fixed point stops after the default 1000000 iterations (delta cycles) with the residual of the two ring nets and exit 1 (it ran for hours before)"
+  },
+  {
+   "id": "err/f28-lossless-ring-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-dc.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: the same ring in a .dc sweep with .options maxiter=100000: sweep point 1 of 3 does not converge, residual, exit 1"
+  },
+  {
+   "id": "err/f28-lossless-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "20000",
+    "-f",
+    "tests/golden/netlists/f28-lossless-ring-tran.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: the same ring in a .tran with specs --maxiter 20000: the operating point before the transient does not converge, residual, exit 1"
+  },
+  {
+   "id": "err/f28-maxiter-small",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-maxiter-small.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=100 stops the converging all-pass ring of b124 (869 delta cycles): exit 1, residual lists the 4 ports that changed"
+  },
+  {
+   "id": "regress/f28-maxiter-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "1000000",
+    "-f",
+    "tests/golden/netlists/f28-maxiter-small.cir"
+   ],
+   "note": "F-28: specs --maxiter overrides .options maxiter=100 of the netlist: converges to the operating point of regress/b124-allpass-ring-default-reltol (out = 0.995098 W)"
+  },
+  {
+   "id": "regress/f28-maxiter-zero",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "0",
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "note": "F-28: --maxiter 0 is no limit: same operating point and outputs as regress/b124-allpass-ring-default-reltol"
+  },
+  {
+   "id": "err/f28-options-maxiter-negative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-options-maxiter-negative.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=-1 is rejected (integer between 0 and 2^53), exit 1"
+  },
+  {
+   "id": "err/f28-options-maxiter-fraction",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f28-options-maxiter-fraction.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-28: .options maxiter=1.5 is rejected (integer between 0 and 2^53), exit 1"
+  },
+  {
+   "id": "err/f28-maxiter-cli-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--maxiter",
+    "abc",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-28: specs --maxiter abc is rejected before parsing (decimal integer), exit 1"
+  },
+  {
+   "id": "regress/f12-si-suffixes",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "--json",
+    "flat.json",
+    "-f",
+    "tests/golden/netlists/f12-si-suffixes.cir"
+   ],
+   "note": "F-12 (B-160): scale suffixes f p n u m k meg g t on numbers (SPICE, caseless: M is milli, MEG mega), dry run with JSON export: each pair of elements/.params gives equal values with the suffix and the exponent form (1.55u = 1.55e-6, 1k = 1000 as a DOUBLE, 1M = 1e-3, 1.5e3k = 1.5e6, {2*775n} in a positional expression, a .param with a suffix); the rel_* .params check that the suffixed value is the correctly rounded double of the exponent form (exactly 0)"
+  },
+  {
+   "id": "regress/f12-si-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-si-op.cir"
+   ],
+   "note": "F-12 (B-160): .op with scale suffixes in element kwargs (wl=1.55u power=1m length=500u), positional arguments (1.31u 2m) and .options (abstol=1p reltol=10u); expected values in the netlist header"
+  },
+  {
+   "id": "err/f12-si-unit-letters",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-si-unit-letters.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12 (B-160): unit letters after the scale suffix are not accepted: wl=1.55um lexes as 1.55u followed by the identifier m, a syntax error (offending token \"m\"), exit 1"
+  },
+  {
+   "id": "regress/f12-ends-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-ends-name.cir"
+   ],
+   "note": "F-12 (B-169): .ends NAME accepted, name compared case-insensitively with the .subckt name (.ends DELAY, nested .ends Delay_Line inside ring_path checked when the body is parsed per instance, plus a bare .ends); .op output identical to the same netlist with bare .ends lines"
+  },
+  {
+   "id": "err/f12-ends-name-mismatch",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-ends-name-mismatch.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12 (B-169): .ends rong closing .subckt ring is rejected with a parsing error naming both names, exit 1"
+  },
+  {
+   "id": "regress/f12-dc-wl-alias",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-wl-alias.cir"
+   ],
+   "note": "F-12: .dc WL(cwsrc1) start stop step (ATTR(elem), the paper/cheatsheet syntax) on an unbalanced MZI; stdout and VCD must be identical to regress/f12-dc-wl-slash (.dc /cwsrc1/WL), only the run manifest differs (netlist path and hash)"
+  },
+  {
+   "id": "regress/f12-dc-wl-slash",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-wl-slash.cir"
+   ],
+   "note": "F-12: reference for regress/f12-dc-wl-alias: the same circuit and sweep with .dc /cwsrc1/WL"
+  },
+  {
+   "id": "regress/f12-dc-p-alias",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-p-alias.cir"
+   ],
+   "note": "F-12: .dc P(cwsrc1) start stop step (power sweep through the ATTR(elem) alias) on the circuit of regress/f12-dc-wl-alias at 1550 nm: output power proportional to the source power"
+  },
+  {
+   "id": "err/f12-dc-alias-unknown-attr",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-dc-alias-unknown-attr.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-12: .dc Q(cwsrc1) is rejected with the existing message of the /elem/ATTR form (Unknown attribute for CWSRC1: Q), exit 1"
+  },
+  {
+   "id": "regress/f12-param-override",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "pin=4e-3/2",
+    "--param",
+    "att=0",
+    "-f",
+    "tests/golden/netlists/f12-param-override.cir"
+   ],
+   "note": "F-12: --param overrides the root-level .param/.assign of the same name whatever the order (uses before and after the netlist's second .param pin both see 0.002 W), the value is parsed as in .param (4e-3/2, att=0 INTEGER); the subcircuit parameter pin keeps its default (0.005 W)"
+  },
+  {
+   "id": "regress/f12-param-undefined",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "pin=2e-3",
+    "-f",
+    "tests/golden/netlists/f12-param-undefined.cir"
+   ],
+   "note": "F-12: --param of a name the netlist never assigns at root level is defined anyway ({pin} = 0.002 W), with the warning 'Warning: --param pin: the netlist has no .param pin' on stderr"
+  },
+  {
+   "id": "err/f12-param-malformed",
+   "args": [
+    "--param",
+    "lambda-min=1.54e-6",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-12: --param needs name=value with an identifier name ('-' is not allowed): Invalid --param value, exit 1"
+  },
+  {
+   "id": "regress/f12-include-relative",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-include/main.cir"
+   ],
+   "note": "F-12 (B-143): .include relative to the including file first: main.cir -> mid.cir (same dir) -> sub/leaf.cir then sub/probes.cir (relative to mid.cir, after sub/leaf.cir has ended); the body of subcircuit SRC, defined in sub/leaf.cir, includes src_body.cir next to sub/leaf.cir when X1 is flattened. 'Including file:' and the run manifest give the paths opened"
+  },
+  {
+   "id": "regress/f12-include-both-differ",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f12-include/both.cir"
+   ],
+   "note": "F-12 (B-143): .include circuits/add_drop_sub.cir exists next to both.cir and in the working directory, with different contents: the file-relative one is used (sets .param included_from, no subcircuit), with a warning on stderr"
+  },
+  {
+   "id": "regress/f05-mlprobe-in-subckt",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-mlprobe-in-subckt.cir"
+   ],
+   "note": "F-05: the only probe is an MLPROBE inside a subcircuit and there is no .options traceall: only that probe is traced (no PROBE{<net>} auto-probes)"
+  },
+  {
+   "id": "regress/f05-save-paper-fig1b",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-paper-fig1b.cir"
+   ],
+   "note": "F-05: the paper's Fig. 1b netlist (DC part, couplers renamed) with .save P(out) P(drop): only those two power signals are traced, bit-identical to the old automatic probes of these nets"
+  },
+  {
+   "id": "regress/f05-save-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "note": "F-05: .save out e(ring_in) PHASE(ring_in) in .tran: PROBE{ROOT/out} with all four quantities, PROBE{ROOT/ring_in} with abs and phase only; bit-identical to the old automatic probes"
+  },
+  {
+   "id": "regress/f05-save-traceall-bidir",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-traceall-bidir.cir"
+   ],
+   "note": "F-05: .save P(a) with an explicit .options traceall=1 on bidirectional nets: every net keeps its automatic probe (both signals net:0, net:1), the saved net traces power only"
+  },
+  {
+   "id": "err/f05-save-unknown-net",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-unknown-net.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: .save of a net that does not exist: 'Error: .save nope: no net named 'nope' in the netlist', exit 1"
+  },
+  {
+   "id": "err/f05-save-electrical-net",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-electrical-net.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: .save of an electrical net: 'Error: .save P(v): 'v' is not an optical net (EANALOG)', exit 1"
+  },
+  {
+   "id": "err/f05-save-unknown-quantity",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f05-save-unknown-quantity.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: .save I(out): unknown quantity, parse error with file:line, exit 1"
+  },
+  {
+   "id": "regress/f05-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "-o",
+    "traces/ignored",
+    "--print-manifest",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "note": "F-05: --no-trace wins over -o: no trace file and no run manifest file are written (--print-manifest shows \"trace_file\": null); the simulation runs as usual (Simulated 1 ns)"
+  },
+  {
+   "id": "regress/f05-format-csv-npz",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "--format",
+    "npz",
+    "-o",
+    "traces/t",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "note": "F-05: --format csv --format npz on the .save transient: traces/t.csv and traces/t.npz (decoded to text by the harness), no VCD; the manifest's trace_file is the CSV. One row per (time step, probe, wavelength)"
+  },
+  {
+   "id": "regress/f05-format-vcd-csv-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/f05-save-paper-fig1b.cir"
+   ],
+   "note": "F-05: --format vcd --format csv on the paper's Fig. 1b sweep: the VCD is unchanged (same as regress/f05-save-paper-fig1b) and the CSV has one row per sweep point and probe (402 rows: the converged value, not the delta-cycle iterations)"
+  },
+  {
+   "id": "regress/f05-format-npz-mlprobe-pdet",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "npz",
+    "-f",
+    "tests/golden/netlists/f05-format-mlprobe-pdet.cir"
+   ],
+   "note": "F-05: --format npz with an MLPROBE and a PDET: MLPROBE rows only, warning that PDET readouts are only traced in the VCD"
+  },
+  {
+   "id": "err/f05-format-invalid",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "hdf5",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "expect": "fail",
+   "note": "F-05: --format hdf5: 'Invalid --format value: 'hdf5' (expected vcd, csv or npz)', exit 1"
+  },
+  {
+   "id": "err/f05-format-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "expect": "fail",
+   "note": "F-05: --no-trace with --format: 'Error: --no-trace and --format cannot be combined', exit 1"
+  },
+  {
+   "id": "err/f05-format-unwritable",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-o",
+    "no_such_dir/t",
+    "-f",
+    "tests/golden/netlists/f05-save-tran.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "F-05: the CSV cannot be created (no such directory): 'Error: cannot open trace file \"no_such_dir/t.csv\"', exit 1"
+  }
+ ]
+}

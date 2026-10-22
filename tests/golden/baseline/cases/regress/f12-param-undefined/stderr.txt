@@ -1,0 +1,2 @@
+Warning: --param pin: the netlist has no .param pin
+

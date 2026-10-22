@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b048-mlprobe-cw-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "accb94865f4407047ed511344f65c307fb5ef7e31a20da3a30a96e53d7b3e218",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 975,
+   "kind": "vcd",
+   "sha256": "2cff952f489b3abf182f114f5e51802e41f04dc5898981c66feeaf63c61299e5",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b048-mlprobe-cw-tran"
+}

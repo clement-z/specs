@@ -1,0 +1,4 @@
+* B-149: subcircuit instance with keyword arguments only (no subcircuit name)
+* used to crash (args.back() on an empty vector); must give a clean error
+x1 L=1
+.tran 1e-11

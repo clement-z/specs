@@ -1,0 +1,175 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/lambda_tb.vcd)
+cw1 emitted: [#1]  @ 1550 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
+cw2 emitted: [#2]  @ 1660 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
+3300 fs:
+	OUT: [#3]  @ 1660 nm (0.707107 √W, 0.500000 W, 2.5738 rad)
+	COUNT: 1
+3300 fs:
+	OUT: [#4]  @ 1550 nm (0.707107 √W, 0.500000 W, 1.0134 rad)
+	COUNT: 2
+5900 fs:
+	OUT: [#5]  @ 1550 nm (1.207107 √W, 1.457107 W, 1.0134 rad)
+	COUNT: 3
+5900 fs:
+	OUT: [#6]  @ 1660 nm (1.052335 √W, 1.107409 W, 2.1514 rad)
+	COUNT: 4
+8500 fs:
+	OUT: [#7]  @ 1660 nm (1.139395 √W, 1.298222 W, 2.4656 rad)
+	COUNT: 5
+8500 fs:
+	OUT: [#8]  @ 1550 nm (0.853553 √W, 0.728553 W, 1.0134 rad)
+	COUNT: 6
+11100 fs:
+	OUT: [#9]  @ 1550 nm (1.103553 √W, 1.217830 W, 1.0134 rad)
+	COUNT: 7
+11100 fs:
+	OUT: [#10]  @ 1660 nm (0.891976 √W, 0.795621 W, 2.4301 rad)
+	COUNT: 8
+13700 fs:
+	OUT: [#11]  @ 1660 nm (1.014018 √W, 1.028233 W, 2.2955 rad)
+	COUNT: 9
+13700 fs:
+	OUT: [#12]  @ 1550 nm (0.926777 √W, 0.858915 W, 1.0134 rad)
+	COUNT: 10
+16300 fs:
+	OUT: [#13]  @ 1550 nm (1.051777 √W, 1.106234 W, 1.0134 rad)
+	COUNT: 11
+16300 fs:
+	OUT: [#14]  @ 1660 nm (1.047680 √W, 1.097633 W, 2.4124 rad)
+	COUNT: 12
+18900 fs:
+	OUT: [#15]  @ 1550 nm (0.963388 √W, 0.928117 W, 1.0134 rad)
+	COUNT: 13
+18900 fs:
+	OUT: [#16]  @ 1660 nm (0.961200 √W, 0.923906 W, 2.3942 rad)
+	COUNT: 14
+21500 fs:
+	OUT: [#17]  @ 1550 nm (1.025888 √W, 1.052447 W, 1.0134 rad)
+	COUNT: 15
+21500 fs:
+	OUT: [#18]  @ 1660 nm (1.004730 √W, 1.009483 W, 2.3485 rad)
+	COUNT: 16
+24100 fs:
+	OUT: [#19]  @ 1660 nm (1.016475 √W, 1.033221 W, 2.3907 rad)
+	COUNT: 17
+24100 fs:
+	OUT: [#20]  @ 1550 nm (0.981694 √W, 0.963723 W, 1.0134 rad)
+	COUNT: 18
+26700 fs:
+	OUT: [#21]  @ 1550 nm (1.012944 √W, 1.026056 W, 1.0134 rad)
+	COUNT: 19
+26700 fs:
+	OUT: [#22]  @ 1660 nm (0.986148 √W, 0.972488 W, 2.3832 rad)
+	COUNT: 20
+29300 fs:
+	OUT: [#23]  @ 1660 nm (1.001770 √W, 1.003544 W, 2.3675 rad)
+	COUNT: 21
+29300 fs:
+	OUT: [#24]  @ 1550 nm (0.990847 √W, 0.981778 W, 1.0134 rad)
+	COUNT: 22
+31900 fs:
+	OUT: [#25]  @ 1550 nm (1.006472 √W, 1.012986 W, 1.0134 rad)
+	COUNT: 23
+31900 fs:
+	OUT: [#26]  @ 1660 nm (1.005717 √W, 1.011467 W, 2.3825 rad)
+	COUNT: 24
+34500 fs:
+	OUT: [#27]  @ 1550 nm (0.995424 √W, 0.990868 W, 1.0134 rad)
+	COUNT: 25
+34500 fs:
+	OUT: [#28]  @ 1660 nm (0.995064 √W, 0.990153 W, 2.3796 rad)
+	COUNT: 26
+37100 fs:
+	OUT: [#29]  @ 1550 nm (1.003236 √W, 1.006483 W, 1.0134 rad)
+	COUNT: 27
+37100 fs:
+	OUT: [#30]  @ 1660 nm (1.000683 √W, 1.001366 W, 2.3741 rad)
+	COUNT: 28
+39700 fs:
+	OUT: [#31]  @ 1660 nm (1.001987 √W, 1.003977 W, 2.3795 rad)
+	COUNT: 29
+39700 fs:
+	OUT: [#32]  @ 1550 nm (0.997712 √W, 0.995429 W, 1.0134 rad)
+	COUNT: 30
+42300 fs:
+	OUT: [#33]  @ 1550 nm (1.001618 √W, 1.003239 W, 1.0134 rad)
+	COUNT: 31
+42300 fs:
+	OUT: [#34]  @ 1660 nm (0.998243 √W, 0.996489 W, 2.3784 rad)
+	COUNT: 32
+44900 fs:
+	OUT: [#35]  @ 1660 nm (1.000264 √W, 1.000529 W, 2.3765 rad)
+	COUNT: 33
+44900 fs:
+	OUT: [#36]  @ 1550 nm (0.998856 √W, 0.997713 W, 1.0134 rad)
+	COUNT: 34
+47500 fs:
+	OUT: [#37]  @ 1550 nm (1.000809 √W, 1.001619 W, 1.0134 rad)
+	COUNT: 35
+47500 fs:
+	OUT: [#38]  @ 1660 nm (1.000690 √W, 1.001381 W, 2.3784 rad)
+	COUNT: 36
+50100 fs:
+	OUT: [#39]  @ 1550 nm (0.999428 √W, 0.998856 W, 1.0134 rad)
+	COUNT: 37
+50100 fs:
+	OUT: [#40]  @ 1660 nm (0.999375 √W, 0.998750 W, 2.3780 rad)
+	COUNT: 38
+52700 fs:
+	OUT: [#41]  @ 1550 nm (1.000405 √W, 1.000809 W, 1.0134 rad)
+	COUNT: 39
+52700 fs:
+	OUT: [#42]  @ 1660 nm (1.000102 √W, 1.000204 W, 2.3773 rad)
+	COUNT: 40
+55300 fs:
+	OUT: [#43]  @ 1660 nm (1.000240 √W, 1.000480 W, 2.3780 rad)
+	COUNT: 41
+55300 fs:
+	OUT: [#44]  @ 1550 nm (0.999714 √W, 0.999428 W, 1.0134 rad)
+	COUNT: 42
+57900 fs:
+	OUT: [#45]  @ 1550 nm (1.000202 √W, 1.000405 W, 1.0134 rad)
+	COUNT: 43
+57900 fs:
+	OUT: [#46]  @ 1660 nm (0.999778 √W, 0.999555 W, 2.3779 rad)
+	COUNT: 44
+60500 fs:
+	OUT: [#47]  @ 1660 nm (1.000039 √W, 1.000078 W, 2.3776 rad)
+	COUNT: 45
+60500 fs:
+	OUT: [#48]  @ 1550 nm (0.999857 √W, 0.999714 W, 1.0134 rad)
+	COUNT: 46
+63100 fs:
+	OUT: [#49]  @ 1550 nm (1.000101 √W, 1.000202 W, 1.0134 rad)
+	COUNT: 47
+63100 fs:
+	OUT: [#50]  @ 1660 nm (1.000083 √W, 1.000167 W, 2.3779 rad)
+	COUNT: 48
+65700 fs:
+	OUT: [#51]  @ 1550 nm (0.999928 √W, 0.999857 W, 1.0134 rad)
+	COUNT: 49
+65700 fs:
+	OUT: [#52]  @ 1660 nm (0.999921 √W, 0.999842 W, 2.3778 rad)
+	COUNT: 50
+68300 fs:
+	OUT: [#53]  @ 1550 nm (1.000051 √W, 1.000101 W, 1.0134 rad)
+	COUNT: 51
+68300 fs:
+	OUT: [#54]  @ 1660 nm (1.000015 √W, 1.000030 W, 2.3777 rad)
+	COUNT: 52
+
+Info: /OSCI/SystemC: Simulation stopped by user.
+
+
+.vcd trace file: traces/lambda_tb
+Total runtime: <DURATION> ms
+

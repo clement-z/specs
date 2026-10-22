@@ -1,9 +1,5 @@
 #include "devices/octane_segment.h"
 
-
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
 using std::size_t;
 using std::pow;
 
@@ -90,7 +86,7 @@ void OctaneSegment::init_full()
 
     // cout << "Initializing submodules of " << name() << endl;
     
-    m_oct = make_unique<OctaneCell>(__modname("OCT_", 0), m_meltEnergy, m_nStates, m_isCompact);
+    m_oct = make_unique<OctaneCell>(spx_child_name(this, "_OCT_", 0).c_str(), m_meltEnergy, m_nStates, m_Tc, m_Ta, m_isCompact);
     m_oct->init();
 
     if (m_term_row && m_term_col)
@@ -98,57 +94,57 @@ void OctaneSegment::init_full()
         // Last element
         for(size_t i = 0; i < 2; i++)
         {
-            m_wg.push_back(make_unique<Waveguide>(__modname("WG_", i), length_for_2pi, loss_per_cm, neff, ng));
-            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", i)));
+            m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", i).c_str(), length_for_2pi, loss_per_cm, neff, ng));
+            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", i).c_str()));
         }
     }
     else if(m_term_row)
     {
         // Last row
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_R_", 0), m_coupling_through_row, dc_loss));
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_R_", 0).c_str(), m_coupling_through_row, dc_loss));
         for(size_t i = 0; i < 4; i++)
         {
-            m_wg.push_back(make_unique<Waveguide>(__modname("WG_", i), length_for_2pi, loss_per_cm, neff, ng));
-            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", i)));
+            m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", i).c_str(), length_for_2pi, loss_per_cm, neff, ng));
+            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", i).c_str()));
         }
         // Adjusting the last waveguide to give pi/2 shift
         // compensating for the lack of DC
         m_wg.at(3)->m_length_cm = length_for_2pi + length_for_pi_2;
         // We have one extra wire with respect to waveguides
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 4)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 0))); // terminator
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 4).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 0).c_str())); // terminator
     }
     else if(m_term_col)
     {
         // Last column
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_C_", 0), m_coupling_through_col, dc_loss));
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_C_", 0).c_str(), m_coupling_through_col, dc_loss));
         for(size_t i = 0; i < 4; i++)
         {
-            m_wg.push_back(make_unique<Waveguide>(__modname("WG_", i), length_for_2pi, loss_per_cm, neff, ng));
-            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", i)));
+            m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", i).c_str(), length_for_2pi, loss_per_cm, neff, ng));
+            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", i).c_str()));
         }
         // Adjusting the last waveguide to give pi/2 shift
         // compensating for the lack of DC
         m_wg.at(3)->m_length_cm = length_for_2pi + length_for_pi_2;
         // We have one extra wire with respect to waveguides
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 4)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 0))); // terminator
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 4).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 0).c_str())); // terminator
     }
     else
     {
         // Internal element
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_R_", 0), m_coupling_through_row, dc_loss));
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_C_", 0), m_coupling_through_col, dc_loss));
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_R_", 0).c_str(), m_coupling_through_row, dc_loss));
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_C_", 0).c_str(), m_coupling_through_col, dc_loss));
         for(size_t i = 0; i < 6; i++)
         {
-            m_wg.push_back(make_unique<Waveguide>(__modname("WG_", i), length_for_2pi, loss_per_cm, neff, ng));
-            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", i)));
+            m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", i).c_str(), length_for_2pi, loss_per_cm, neff, ng));
+            m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", i).c_str()));
         }
         // We have two extra wires with respect to waveguides
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 6)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 7)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 0))); // terminator
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 1))); // terminator
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 6).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 7).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 0).c_str())); // terminator
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 1).c_str())); // terminator
     }
 
     // cout << "Successful module initialization of " << name() << endl;
@@ -287,7 +283,7 @@ void OctaneSegment::init_compact()
 
     // cout << "Initializing submodules of " << name() << endl;
     
-    m_oct = make_unique<OctaneCell>(__modname("OCT_", 0), m_meltEnergy, m_nStates, m_isCompact);
+    m_oct = make_unique<OctaneCell>(spx_child_name(this, "_OCT_", 0).c_str(), m_meltEnergy, m_nStates, m_Tc, m_Ta, m_isCompact);
     m_oct->init();
 
     if (m_term_row && m_term_col)
@@ -297,31 +293,31 @@ void OctaneSegment::init_compact()
     else if(m_term_row)
     {
         // Last row
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_R_", 0), m_coupling_through_row, dc_loss));
-        m_wg.push_back(make_unique<Waveguide>(__modname("WG_", 0), length_for_pi_2, loss_per_cm, neff, ng));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 0)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 1)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 0))); // terminator
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_R_", 0).c_str(), m_coupling_through_row, dc_loss));
+        m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(), length_for_pi_2, loss_per_cm, neff, ng));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 0).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 1).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 0).c_str())); // terminator
     }
     else if(m_term_col)
     {
         // Last column
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_C_", 0), m_coupling_through_col, dc_loss));
-        m_wg.push_back(make_unique<Waveguide>(__modname("WG_", 0), length_for_pi_2, loss_per_cm, neff, ng));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 0)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 1)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 0))); // terminator
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_C_", 0).c_str(), m_coupling_through_col, dc_loss));
+        m_wg.push_back(make_unique<Waveguide>(spx_child_name(this, "_WG_", 0).c_str(), length_for_pi_2, loss_per_cm, neff, ng));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 0).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 1).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 0).c_str())); // terminator
     }
     else
     {
         // Internal element
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_R_", 0), m_coupling_through_row, dc_loss));
-        m_dc.push_back(make_unique<DirectionalCoupler>(__modname("DC_C_", 0), m_coupling_through_col, dc_loss));
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_R_", 0).c_str(), m_coupling_through_row, dc_loss));
+        m_dc.push_back(make_unique<DirectionalCoupler>(spx_child_name(this, "_DC_C_", 0).c_str(), m_coupling_through_col, dc_loss));
         // We have two extra wires with respect to waveguides
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 0)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("W_", 1)));
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 0))); // terminator
-        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("TERM_", 1))); // terminator
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 0).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_W_", 1).c_str()));
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 0).c_str())); // terminator
+        m_optical_connect.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_TERM_", 1).c_str())); // terminator
     }
 
     // cout << "Successful module initialization of " << name() << endl;

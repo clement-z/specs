@@ -1,0 +1,4 @@
+* B-148: MLPROBE with two positional arguments (at most 1)
+cwsrc1 a wl=1.55e-6 power=1e-3
+mlprobe1 a [1.55e-6] [1.3e-6]
+.tran 1e-11

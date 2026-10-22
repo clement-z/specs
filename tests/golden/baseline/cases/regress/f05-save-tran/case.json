@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f05-save-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 423,
+   "kind": "json",
+   "sha256": "f5698dd0ba6c93a3b1b78f76cccc71177e71bafb1b541e02b0120cda2646c6bf",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 28227,
+   "kind": "vcd",
+   "sha256": "2310e53804b18f963a8ee572e5d47ab76f14d71a432ba963c065b19009fbe409",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f05-save-tran"
+}

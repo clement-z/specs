@@ -1,0 +1,11 @@
+* A2 repro: CROSSING has no per-wavelength memory.
+* in1 carries 1 W at 1550 nm, in2 carries 1 W at 1560 nm; ideal crossing (att=0, no xtalk).
+* Expected: out1 = 1 W @1550 nm, out2 = 1 W @1560 nm.
+* Observed (.op, FD mode): out1 = 0 W @1560 nm (the 1550 nm light is lost), out2 correct.
+* With .tran (TD mode) instead: "Attempted to sum signals of different wavelengths" on stderr.
+cwsrc1 in1 wl=1.55e-6 power=1
+cwsrc2 in2 wl=1.56e-6 power=1
+crossing1 in1 in2 out1 out2
+pwr1 out1
+pwr2 out2
+.op

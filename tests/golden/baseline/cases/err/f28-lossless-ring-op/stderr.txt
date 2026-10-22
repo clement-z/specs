@@ -1,0 +1,6 @@
+Error: .op: the operating point did not converge within 1000000 iterations (delta cycles, .options maxiter)
+Residual: 2 optical output port(s) changed in the last 100000 delta cycles. Last change |dE| and emission threshold max(abstol, reltol*|E_last|), in sqrt(W):
+  ROOT/ring_br (ROOT/COUPLER1) @ 1550 nm: |dE| = 0.0001 > 1.38425e-08 (7224.15 x)
+  ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 0.0001 > 1.38425e-08 (7224.15 x)
+A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss
+

@@ -1,0 +1,5 @@
+* B-060: PCMCELL rejects an initial state k outside [0, n] (here k = n + 1).
+* Expected: Error (ROOT/PCMCELL1): the initial state k must be in [0, n] = [0, 10] (got 11)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=10 tc=0.85 ta=0.95 initial_state=11
+.op

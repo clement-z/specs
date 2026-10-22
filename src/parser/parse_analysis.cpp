@@ -23,20 +23,52 @@ using spx::ed_bus_type;
 void OPAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::OP;
-    specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+    // default mode of the analysis, unless one was given explicitly (-m, B-004)
+    if (!specsGlobalConfig.simulation_mode_explicit)
+        specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+
+    if (args.size() > 0)
+    {
+        cerr << "Error: .op: too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
+    for (const auto &p : kwargs)
+    {
+        string kw = p.first;
+        strutils::toupper(kw);
+        cerr << "Error: .op: unknown keyword " << kw << endl;
+        exit(1);
+    }
 }
 
 void DCAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::DC;
-    specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
+    // default mode of the analysis, unless one was given explicitly (-m, B-004)
+    if (!specsGlobalConfig.simulation_mode_explicit)
+        specsGlobalConfig.simulation_mode = OpticalOutputPortMode::FREQUENCY_DOMAIN;
 
-    assert(sweep_orders.size() > 0);
+    if (args.size() > 0)
+    {
+        cerr << "Error: .dc: too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
+    for (const auto &p : kwargs)
+    {
+        string kw = p.first;
+        strutils::toupper(kw);
+        cerr << "Error: .dc: unknown keyword " << kw << endl;
+        exit(1);
+    }
 
-    set<CWSource *>  all_cws = sc_get_all_object_by_type<CWSource>();
-    vector<CWSource *>  all_cws_vec(all_cws.begin(), all_cws.end());
+    if (sweep_orders.empty())
+    {
+        cerr << "Error: .dc analysis requires a sweep order (e.g. .dc /cwsrc1/WL start stop step)" << endl;
+        exit(1);
+    }
 
-    int i = 0;
+    vector<CWSource *>  all_cws_vec = sc_get_all_object_by_type<CWSource>();
+
     for (const auto &sweep_order: sweep_orders)
     {
         string element_name = parent->name_prefix() + sweep_order.first.first;
@@ -71,20 +103,25 @@ void DCAnalysis::create() const
             cerr << "Unknown attribute for " << sweep_order.first.first << ": " << attribute_name << endl;
             exit(1);
         }
-        auto values = range(sweep_order.second[0], sweep_order.second[1], sweep_order.second[2]);
+        auto values = sweep_values(sweep_order.second[0], sweep_order.second[1], sweep_order.second[2]);
         auto order = pair<function<void(double)>, vector<double>>(f, values);
         auto order_name = attribute_name + "(" + element_name + ")";
         specsGlobalConfig.cw_sweep_orders.emplace(order_name, order);
-        ++i;
     }
 }
 
 void TRANAnalysis::create() const
 {
     specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
-    specsGlobalConfig.simulation_mode = OpticalOutputPortMode::TIME_DOMAIN;
+    // default mode of the analysis, unless one was given explicitly (-m, B-004)
+    if (!specsGlobalConfig.simulation_mode_explicit)
+        specsGlobalConfig.simulation_mode = OpticalOutputPortMode::TIME_DOMAIN;
 
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error: .tran: too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
 
     if (args.size() >= 1)
     {

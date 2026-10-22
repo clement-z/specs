@@ -1,0 +1,12 @@
+* V7: net c = uni writer cwsrc3 + uni reader merger1 (created first) + bidir wg1 that READS c.
+* wg1 is listed before cwsrc3, so wg1 (and its upgrade of c) is created before cwsrc3.
+cwsrc1 s1 wl=1.55e-6 power=1e-3
+wga s1 a length=1e-4
+cwsrc2 s2 wl=1.55e-6 power=1e-3
+wgb s2 a length=1e-4
+merger1 c a out
+wg1 c e& length=1e-4
+cwsrc3 c wl=1.55e-6 power=4e-3
+probe1 out
+probe2 e
+.tran 1e-11

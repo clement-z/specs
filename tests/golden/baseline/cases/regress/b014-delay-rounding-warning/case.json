@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b014-delay-rounding-warning.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 451,
+   "kind": "json",
+   "sha256": "8ec3c896a02209bfe41b4a2308543667f1e16cf1bad17a46f910a14ecbea4d2a",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 10985,
+   "kind": "vcd",
+   "sha256": "927a40d1e96a392eaa9424194e7fcc23289f2adf6ddb0b8656e55dffc4e79e8b",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b014-delay-rounding-warning"
+}

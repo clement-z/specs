@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-resolution-below-one.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b153-resolution-below-one"
+}

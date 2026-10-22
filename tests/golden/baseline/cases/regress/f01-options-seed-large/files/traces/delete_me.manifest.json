@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 3000000000,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f01-options-seed-large.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f01-options-seed-large.cir", "sha256": "01e26ae4084cd5a2d672780fdb33983a04582bfe8a2a0e034438f0489853dc09"},
+    {"path": "tests/golden/netlists/f01-pdet-noise.cir", "sha256": "e87f5a7b5e9886959b227702f636dbc7c67b0ca52dbc7b3f358cd411f57711fc"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

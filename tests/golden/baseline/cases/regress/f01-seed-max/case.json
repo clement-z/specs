@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--seed",
+  "18446744073709551615",
+  "-f",
+  "tests/golden/netlists/f01-pdet-noise.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 478,
+   "kind": "json",
+   "sha256": "de35ba990710ac3407081d0cc04e93b68980dcad755d097efc866ad6fca949c3",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1483,
+   "kind": "vcd",
+   "sha256": "f1b338a17e4b6fe5cca92b725d2283f51bd27ed978ef905bc3b94c0c343f4e56",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f01-seed-max"
+}

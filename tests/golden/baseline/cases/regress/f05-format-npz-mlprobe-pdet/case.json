@@ -1,0 +1,26 @@
+{
+ "args": [
+  "--format",
+  "npz",
+  "-f",
+  "tests/golden/netlists/f05-format-mlprobe-pdet.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 462,
+   "kind": "json",
+   "sha256": "1e8fc00d181320d9e231c0adc09c43608cdd79b5953ad0737833189f31ed281e",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.npz": {
+   "bytes": 370,
+   "kind": "npz",
+   "raw_bytes": 1720,
+   "raw_sha256": "f9dc848a8983638e59edc94d4a8122e9a9541f3c3232d05656b6aec478d78148",
+   "sha256": "7e7b1d6729e3dff74415f08c843a724437ac5afc6b8c12c3b4468ace563532bf",
+   "stored": "files/traces/delete_me.npz.txt"
+  }
+ },
+ "id": "regress/f05-format-npz-mlprobe-pdet"
+}

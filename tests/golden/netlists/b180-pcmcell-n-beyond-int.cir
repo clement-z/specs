@@ -1,0 +1,6 @@
+* B-180: PCMCELL stores n (and k) as an int: an integer literal beyond the int range is an error naming the
+* element (with 32-bit literals, n=3000000000 was clamped to 2147483647).
+* Expected: Error (ROOT/PCMCELL1): the number of states n must be between 1 and 2147483647 (got 3000000000)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=3000000000 tc=0.85 ta=0.95
+.op

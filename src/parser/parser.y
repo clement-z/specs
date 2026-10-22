@@ -26,6 +26,7 @@
 #include "parser/parse_element.h"
 #include "parser/parse_analysis.h"
 #include "parser/parse_directive.h"
+#include "parser/parser_state.h"
 
 #include "parser.h"
 #include "scanner.h"
@@ -50,11 +51,9 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 
 %union {
     double                  d_val;
-    int                     i_val;
+    int64_t                 i_val; // T_INT: integer literals are 64-bit (B-180)
     char                    c_val;
     string                 *s_ptr;
-    char                   *c_ptr;
-    vector<double>         *vec_d_ptr;
     pair<string, Variable> *assig_ptr;
     Variable               *variable_ptr;
     vector<Variable>       *vec_var_ptr;
@@ -67,7 +66,6 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 
 %token <d_val> T_NUM
 %token <i_val> T_INT
-%token <i_val> T_NONE
 %token <s_ptr> T_STR
 %token <s_ptr> T_ASSIGN_ID
 %token <s_ptr> T_ELEM_CWSRC T_ELEM_VLSRC T_ELEM_EVLSRC
@@ -79,7 +77,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %token <i_val> T_DIRECTIVE_OPTIONS T_DIRECTIVE_NODESET
 %token <i_val> T_DIRECTIVE_SUBCKT
 %token <s_ptr> T_DIRECTIVE_ENDS
-%token <s_ptr> T_DIRECTIVE_SAVE
+%token <i_val> T_DIRECTIVE_SAVE
 %token <i_val> T_LOCAL_ASSIGNMENT
 %type <c_val> '='
 
@@ -111,18 +109,17 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 // Available directives
 %type <i_val> directive.options
 %type <i_val> directive.nodeset
+%type <i_val> directive.save
+%type <elemattr_ptr> save_target
 
 // Rules for circuit nets (value is index in PT elements)
 %type <s_ptr> net_name.base.str
 %type <s_ptr> net_name_base
 %type <s_ptr> net_name
-%type <s_ptr> net.oanalog net.eanalog net.edigital
+%type <s_ptr> net.oanalog net.eanalog
 %type <s_ptr> net.oa.explicit_bidir
-%type <s_ptr> net.oa.bidir
 %type <s_ptr> net.oa.in
 %type <s_ptr> net.oa.out
-
-//%type <s_ptr> bus_name bus bus.oanalog bus.eanalog bus.edigital
 
 // Rules related to subcircuits
 %type <i_val> subcircuit
@@ -147,7 +144,6 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <assig_ptr> assignment
 %type <variable_ptr> variable variable_base variable_or_empty
 %type <variable_ptr> variable.free_expr variable.delimited_expr
-//%type <variable_ptr> variable.str_without_quotes
 %type <netval_assign_ptr> netval_assignment
 %type <elemattr_ptr> element_attribute
 
@@ -186,14 +182,52 @@ line: %empty
 local_assignment: T_LOCAL_ASSIGNMENT assignment
                     {
                         cur_pt->set_local_variable($2->first, $2->second);
+                        delete $2;
                     }
                 | local_assignment assignment
                     {
                         cur_pt->set_local_variable($2->first, $2->second);
+                        delete $2;
                     }
 ;
 
 /* --------- Directives definitions parsing ----------- */
+
+/* .save net QTY(net) ... (F-05): probes on the listed optical nets */
+directive.save: T_DIRECTIVE_SAVE save_target
+                {
+                    $$ = cur_pt->register_directive(new SAVEDirective);
+                    static_cast<SAVEDirective *>(cur_pt->directives[$$])->add_target(*$2, cur_pt->name_prefix());
+                    delete $2;
+                }
+              | directive.save save_target
+                {
+                    static_cast<SAVEDirective *>(cur_pt->directives[$1])->add_target(*$2, cur_pt->name_prefix());
+                    $$ = $1;
+                    delete $2;
+                }
+;
+
+/* net (every quantity) or QTY(net), QTY as the keywords of PROBE (P, E, PHI, WL, ...) */
+save_target: net_name_base
+                {
+                    $$ = new pair<string, string>("", *$1);
+                    delete $1;
+                }
+           | T_STR '(' net_name_base ')'
+                {
+                    if (SAVEDirective::quantity(*$1) == SAVEDirective::UNKNOWN)
+                    {
+                        stringstream ss;
+                        ss << ".save: unknown quantity " << *$1 << "(" << *$3 << ")"
+                           << " (expected P, E, PHI or WL, or a net name alone for all of them)";
+                        yyerror(scanner, pt, ss.str().c_str());
+                    }
+                    $$ = new pair<string, string>(*$1, *$3);
+                    delete $1;
+                    delete $3;
+                }
+;
 
 directive.options: T_DIRECTIVE_OPTIONS { $$ = cur_pt->register_directive(new OPTIONSDirective); }
 ;
@@ -209,15 +243,12 @@ subcircuit.with_ports: T_DIRECTIVE_SUBCKT T_STR
                     {
                         // Register a new subcircuit in current parse tree
                         $$ = cur_pt->register_subcircuit(*$2);
+                        // directory of the file being scanned, for .include in the body (B-143)
+                        cur_pt->subcircuits[$$]->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                         delete $2;
                     }
                 | subcircuit.with_ports port_name
                     {
-                        if (!cur_pt->subcircuits[$1]->kwargs.empty())
-                        {
-                            cerr << "Expected keyword assignment in subcircuit declaration but got: " << *$2 << endl;
-                            exit(1);
-                        }
                         // cout << *$2 << endl;
                         cur_pt->subcircuits[$1]->register_port(*$2);
                         $$ = $1;
@@ -240,6 +271,20 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
                 // cout << "Parsed subcircuit " << cur_pt->subcircuits[$1]->name << endl;
                 cur_pt->subcircuits[$1]->netlist = *$2;
                 delete $2;
+            }
+          | subcircuit.with_assignments T_DIRECTIVE_ENDS T_STR
+            {
+                // .ends NAME: the name must be the one of the .subckt (case-insensitive)
+                const string &subckt_name = cur_pt->subcircuits[$1]->name;
+                if (!strutils::iequals(*$3, subckt_name))
+                {
+                    stringstream ss;
+                    ss << ".ends " << *$3 << " does not match the name of the subcircuit (.subckt " << subckt_name << ")";
+                    yyerror(scanner, pt, ss.str().c_str());
+                }
+                cur_pt->subcircuits[$1]->netlist = *$2;
+                delete $2;
+                delete $3;
             }
 ;
 
@@ -427,8 +472,6 @@ directive.with_args:
   directive.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->directives[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->directives[$1]->args.emplace_back(*$2);
                 $$ = $1;
                 delete $2;
@@ -448,6 +491,7 @@ directive.with_kwargs:
 ;
 
 directive: directive.with_kwargs
+         | directive.save
 ;
 
 /* --------- Elements arguments parsing ----------- */
@@ -473,8 +517,6 @@ element.with_args:
   element.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->elements[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->elements[$1]->args.emplace_back(*$2);
                 $$ = $1;
 
@@ -486,13 +528,6 @@ element.with_args:
                 // and therefore added to the element's nets array and discarded from args
                 // this will ensure that args will contain only [sub_name]
                 // for this to work, the X element cannot have args beyond sub_name (only kwargs)
-                if (cur_pt->elements[$1]->args.size() == 2)
-                {
-                    // check if the args[0] is a valid net name
-                    // create net with name args[0] (by default with type NONE)
-                    // add args[0] to nets
-                    // delete args[0] from args
-                }
 
                 delete $2;
             }
@@ -514,8 +549,6 @@ element.x.with_args:
   element.x.with_args net_name_base
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->elements[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->elements[$1]->args.emplace_back(Variable(*$2));
                 $$ = $1;
 
@@ -527,13 +560,6 @@ element.x.with_args:
                 // and therefore added to the element's nets array and discarded from args
                 // this will ensure that args will contain only [sub_name]
                 // for this to work, the X element cannot have args beyond sub_name (only kwargs)
-                if (cur_pt->elements[$1]->args.size() == 2)
-                {
-                    // check if the args[0] is a valid net name
-                    // create net with name args[0] (by default with type NONE)
-                    // add args[0] to nets
-                    // delete args[0] from args
-                }
 
                 delete $2;
             }
@@ -567,8 +593,6 @@ analysis.with_args:
   analysis.with_args variable.delimited_expr
             {
                 // cout << "found positional arg: " << $2->get_str() << endl;
-                if (!cur_pt->analyses[$1]->kwargs.empty())
-                    yyerror(scanner, pt, "positional arguments cannot follow keyword arguments");
                 cur_pt->analyses[$1]->args.emplace_back(*$2);
                 $$ = $1;
                 delete $2;
@@ -613,18 +637,6 @@ net.oa.explicit_bidir:
         // so increment both reader and writer count
         // and set the explicit "bidirectional" flag to true
         cur_pt->nets[*$1].m_bidirectional = true;
-        cur_pt->nets[*$1].m_readers_count++;
-        cur_pt->nets[*$1].m_writers_count++;
-        $$ = $1;
-    }
-;
-
-net.oa.bidir:
-  net.oa.explicit_bidir
-| net.oanalog
-    {
-        // this net will be both written to and read from by the new device
-        // so increment both reader and writer count
         cur_pt->nets[*$1].m_readers_count++;
         cur_pt->nets[*$1].m_writers_count++;
         $$ = $1;
@@ -679,49 +691,8 @@ net.eanalog: net_name
                     }
                     $$ = $1;
                 }
-
-net.edigital: net_name
-                {
-                    bool ok = cur_pt->nets[*$1].setType(ParseNet::EDIGITAL);
-                    if (!ok)
-                    {
-                        stringstream ret;
-                        ret << "Error creating net '" + *$1 + "': net already exists with a different type" << endl;
-                        ret << "\t (new type: " << "EDIGITAL" << ", old type: " << cur_pt->nets[*$1].type_str() << ")";
-                        yyerror(scanner, pt, ret.str().c_str());
-                    }
-                    $$ = $1;
-                }
 ;
 
-/* --------- BUS type parsing ----------- */
-
-/*
-bus.oanalog: bus_name
-                {
-                    cur_pt->nets[*$1].m_type = ParseNet::OANALOG;
-                    $$ = $1;
-                }
-;
-
-bus.eanalog: bus_name
-                {
-                    cur_pt->nets[*$1].m_type = ParseNet::EANALOG;
-                    $$ = $1;
-                }
-;
-
-bus.edigital: bus_name
-                {
-                    cur_pt->nets[*$1].m_type = ParseNet::EDIGITAL;
-                    $$ = $1;
-                }
-;
-bus: bus.oanalog { $$ = $1; }
-   | bus.eanalog { $$ = $1; }
-   | bus.edigital { $$ = $1; }
-;
-*/
 /* --------- NET and BUS name parsing ----------- */
 
 net_name.base.str:
@@ -757,15 +728,6 @@ net_name: net_name_base
             }
 ;
 
-/*
-bus_name: net_name { $$ = $1; }
-        | net_name_base '<' T_INT '>'
-            {
-                $$ = new string(cur_pt->get_or_create_net(*$1, $3));
-                delete $1;
-            }
-;
-*/
 port_name: net_name_base { $$ = $1; }
 ;
 
@@ -804,6 +766,13 @@ element_attribute: '/' T_STR '/' T_STR
                     delete $2;
                     delete $4;
                 }
+                 | T_STR '(' T_STR ')'
+                {
+                    // ATTR(elem), same as /elem/ATTR (e.g. .dc WL(cwsrc1) ...)
+                    $$ = new pair<string, string>(*$3,*$1);
+                    delete $1;
+                    delete $3;
+                }
 ;
 
 assignment: T_ASSIGN_ID '=' variable
@@ -822,10 +791,6 @@ variable_base:
         | T_NUM
             {
                 $$ = new Variable($1);
-            }
-        | T_NONE
-            {
-                $$ = new Variable(Variable::NONE);
             }
         | '{' T_STR '}'
             {
@@ -861,20 +826,6 @@ variable.free_expr:
 variable:
   variable.free_expr
 ;
-
-/*
-variable.str_without_quotes:
-  T_STR
-    {
-        if (*$1 == "None")
-            $$ = new Variable(Variable::NONE);
-        else
-            $$ = new Variable(*$1);
-        delete $1;
-    }
-| variable;
-;
-*/
 
 variable_or_empty:
   variable

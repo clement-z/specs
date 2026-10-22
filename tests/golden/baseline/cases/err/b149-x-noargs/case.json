@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b149-x-noargs.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b149-x-noargs"
+}

@@ -1,0 +1,11 @@
+* F-12: reference for f12-dc-wl-alias.cir: the .dc ATTR(elem) alias WL(cwsrc1) is the same sweep
+* order as /cwsrc1/WL, used here. Same circuit as f12-dc-wl-alias.cir: stdout and VCD must be identical
+* (only the run manifest differs: netlist path and hash). Unbalanced MZI (10 um difference),
+* so the output power depends on the wavelength.
+cwsrc1 in wl=1.55e-6 power=1e-3
+splitter1 in a b
+wg1 a c length=100e-6 neff=2.35 ng=4.2
+wg2 b d length=110e-6 neff=2.35 ng=4.2
+merger1 c d out
+probe1 out
+.dc /cwsrc1/WL 1.549e-6 1.551e-6 0.5e-9

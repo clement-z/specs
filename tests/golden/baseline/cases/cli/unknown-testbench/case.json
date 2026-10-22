@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-t",
+  "nonexistent"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cli/unknown-testbench"
+}

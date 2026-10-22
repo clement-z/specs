@@ -1,0 +1,5 @@
+* F-01: .options seed must be <= 2^53 (netlist numbers are doubles; specs --seed takes any 64-bit value).
+* Expected: "Error: .options: SEED must be an integer between 0 and 2^53 (got 1e+16)", exit 1
+pdet1 a v1 nb=0
+.options seed=1e16
+.tran 10e-12

@@ -1,0 +1,2 @@
+Error (ROOT/X1/WGR): delay 1.33426e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events would happen in the same time step); use a finer time resolution, e.g. .options timescale=-15
+

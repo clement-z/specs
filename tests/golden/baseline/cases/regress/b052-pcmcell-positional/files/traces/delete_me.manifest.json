@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b052-pcmcell-positional.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b052-pcmcell-positional.cir", "sha256": "a54180826bfc2416c2be16f1b842416c7d5ebe19dbdf2fd8fd2ae53f16dca773"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

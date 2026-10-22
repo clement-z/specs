@@ -1,0 +1,8 @@
+* B-180: integer literals are 64-bit; one beyond 9223372036854775807 is a parse error (it was clamped to
+* 2147483647 silently). Here a keyword argument, 2^63.
+* Expected: "Parsing error (tests/golden/netlists/b180-int-literal-kwarg.cir:6): integer literal
+*   9223372036854775808 is out of range (the limit is 9223372036854775807)", then
+*   -- while parsing line: "cwsrc1 a wl=1.55e-6 power=9223372036854775808", exit 1
+cwsrc1 a wl=1.55e-6 power=9223372036854775808
+probe1 a
+.op

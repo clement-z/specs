@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "circuits/subckt_test.cir"],
+  "netlist_files": [
+    {"path": "circuits/subckt_test.cir", "sha256": "8cf0dfc27853d851612aa3f528daaba75088a692e769fb4b11326eb7bf3153e6"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

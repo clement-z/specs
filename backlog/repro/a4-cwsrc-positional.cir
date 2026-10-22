@@ -1,0 +1,4 @@
+* CWSRC positional args: intended wl=1.3e-6 power=0.5
+cwsrc1 a 1.3e-6 0.5
+probe1 a
+.tran 1e-11

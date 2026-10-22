@@ -1,0 +1,6 @@
+* F-28: .options maxiter must be an integer.
+* Expected: exit 1, "Error: .options: MAXITER must be an integer between 0 and 2^53 (got 1.5)".
+cwsrc1 in wl=1.55e-6 power=1
+probe1 in
+.options maxiter=1.5
+.op

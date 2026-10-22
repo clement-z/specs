@@ -1,0 +1,18 @@
+{
+ "args": [
+  "--maxiter",
+  "0",
+  "-f",
+  "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 479,
+   "kind": "json",
+   "sha256": "fb2538c805a60f1c0a396295aa3b4af221878490376ad61ab61d60900668a026",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f28-maxiter-zero"
+}

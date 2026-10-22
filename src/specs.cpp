@@ -13,6 +13,12 @@
 #include "devices/detector.h"
 #include "devices/power_meter.h"
 #include "devices/generic_transmission_device.h"
+#include "run_manifest.h"
+#include "trace_table.h"
+
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 using std::string;
 
@@ -26,10 +32,12 @@ SPECSConfig::SPECSConfig(sc_module_name name)
     engine_timescale = HUNDRED_FS;
     simulation_mode = OpticalOutputPortMode::DEFAULT;
     analysis_type = AnalysisType::TIME_DOMAIN;
+    seed = DEFAULT_SEED;
 
     // Port options
     default_abstol = 1e-8;
     default_reltol = 1e-4;
+    default_snap_factor = 10;
     default_resolution_multiplier = 1;
 
     // Trace options
@@ -38,8 +46,11 @@ SPECSConfig::SPECSConfig(sc_module_name name)
     trace_all_optical_nets = 1;
 }
 
+SPECSConfig::~SPECSConfig() {}
+
 void SPECSConfig::runAnalysis()
 {
+    verifyConfig();
     applyEngineResolution();
     prepareSimulation();
 
@@ -57,6 +68,10 @@ void SPECSConfig::runAnalysis()
             cerr << "Undefined Analysis type";
             sc_stop();
     }
+
+    // F-05: write the .npz table, close the CSV
+    if (default_trace_table && !default_trace_table->close())
+        exit(1);
 }
 
 void SPECSConfig::runOPAnalysis()
@@ -66,6 +81,12 @@ void SPECSConfig::runOPAnalysis()
     auto all_photodetectors = sc_get_all_module_by_type<Detector>();
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
+
+    // Disable photodetectors before the first sc_start(): they are enabled by default
+    // (testbenches, C++ users) but must not write their readout during the OP
+    for (auto pdet: all_photodetectors) {
+        pdet->enable = sc_logic(0);
+    }
 
     // Run to initialize all threads and register first values
     sc_start();
@@ -86,11 +107,6 @@ void SPECSConfig::runOPAnalysis()
         mlprobe->enable = sc_logic(0);
     }
 
-    // Disable photodetectors
-    for (auto pdet: all_photodetectors) {
-        pdet->enable = sc_logic(0);
-    }
-
     // Set all ports mode to NO_DELAY
     for (auto oop: all_oop) {
         oop->m_mode = OpticalOutputPortMode::NO_DELAY;
@@ -100,8 +116,16 @@ void SPECSConfig::runOPAnalysis()
     for (auto cws: all_cws)
         cws->enable = sc_logic(1);
 
-    // Run operating point simulation
-    sc_start();
+    // Run operating point simulation: the delta-cycle fixed point, at most max_iterations
+    // delta cycles (F-28), then what is left at later times, as sc_start() did (nothing in FD)
+    const sc_dt::uint64 start_delta = sc_delta_count();
+    const bool idle = !sc_pending_activity_at_current_time();
+    if (!runFixedPoint())
+        reportNonConvergence(analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
+                                                          : ".op: the operating point", start_delta);
+    // (an idle circuit keeps the SystemC warning W571, no activity, that this sc_start() gave)
+    if (idle || sc_pending_activity())
+        sc_start();
 
     // Print results on the command line
     printOPAnalysisResult();
@@ -116,6 +140,13 @@ void SPECSConfig::runDCAnalysis()
     auto all_sig = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Disable photodetectors before the first sc_start() (they are enabled by default)
+    for (auto pdet: all_photodetectors) {
+        // Remark: Photodetectors could in fact be left enabled ?
+        // Would that serve any purpose though...?
+        pdet->enable = sc_logic(0);
+    }
+
     // Run to initialize all threads and register first values
     sc_start();
 
@@ -129,13 +160,6 @@ void SPECSConfig::runDCAnalysis()
         mlprobe->enable = sc_logic(0);
     }
 
-    // Enable photodetectors
-    for (auto pdet: all_photodetectors) {
-        // Remark: Photodetectors could in fact be left enabled ?
-        // Would that serve any purpose though...?
-        pdet->enable = sc_logic(0);
-    }
-
     // Set all ports mode to NO_DELAY
     for (auto oop: all_oop) {
         oop->m_mode = OpticalOutputPortMode::NO_DELAY;
@@ -146,12 +170,19 @@ void SPECSConfig::runDCAnalysis()
         cws->enable = sc_logic(1);
     }
 
+    if (cw_sweep_orders.empty())
+    {
+        cerr << "Error: .dc analysis requires a sweep order (e.g. .dc /cwsrc1/WL start stop step)" << endl;
+        exit(1);
+    }
     const auto &order = *cw_sweep_orders.begin();
     wavelengths_vector.reserve(order.second.second.size());
     cout << "Starting sweep on " << order.first;
     cout << " (" << order.second.second.size() << " points)" << endl;
+    size_t point = 0;
     for (const auto &val : order.second.second)
     {
+        ++point;
         // Apply sweep param
         order.second.first(val);
 
@@ -159,22 +190,19 @@ void SPECSConfig::runDCAnalysis()
 
         // Reset OOP and set internal signals to new wavelength
         for (auto oop: all_oop) {
-            #if 1 // reset OOP
             oop->reset();
             // TODO: also reset photodetectors?
-            #elif 0 // remove previous wavelengths from OOP but keep value
-            if (wavelengths_vector.size() >= 2)
-            {
-                oop->swap_wavelengths(wavelengths_vector.size()-1, wavelengths_vector.size()-2);
-                oop->delete_wavelength(wavelengths_vector.size()-2);
-                oop->m_skip_next_convergence_check = true;
-            }
-            #else
-            // do nothing
-            #endif
         }
 
-        // run simulation and advance one tick
+        // run the fixed point (at most max_iterations delta cycles, F-28) and advance one tick
+        const sc_dt::uint64 start_delta = sc_delta_count();
+        if (!runFixedPoint())
+        {
+            stringstream what;
+            what << ".dc: sweep point " << point << " of " << order.second.second.size()
+                 << " (" << order.first << " = " << val << ")";
+            reportNonConvergence(what.str(), start_delta);
+        }
         sc_start(sc_time::from_value(1));
 
         // Reset CW sources
@@ -196,26 +224,31 @@ void SPECSConfig::runTRANAnalysis()
     auto all_vl_src = sc_get_all_module_by_type<VLSource>();
     auto all_evl_src = sc_get_all_module_by_type<EVLSource>();
 
-    // Run OP analysis
+    // TRAN start sequence (B-048):
+    // (a) operating point, .nodeset values included
+    // (b) initial conditions
+    // (c) enable the probes: each one samples the current value of its net at that point
+    //     (and the photodetectors, which write their readout)
+    // (b) must stay before (c), so that the probes trace the post-OP, post-IC state at t = 0
+    // (B-048 maintainer condition, see TranStart.ProbesSampleAfterOperatingPointAndInitialConditions)
+
+    // (a) Run OP analysis
     runOPAnalysis();
 
-    // Set values of signals according to IC directive
-    for (auto &ic_order : ic_orders)
-    {
-        //ic_order.second.first->write(ic_order.second.second);
-    }
+    // (b) Apply initial conditions
+    applyInitialConditions();
 
-    // Enable probes
+    // (c) Enable probes
     for (auto probe: all_probes) {
         probe->enable = sc_logic(1);
     }
 
-    // Enable ML probes
+    // (c) Enable ML probes
     for (auto mlprobe: all_mlprobes) {
         mlprobe->enable = sc_logic(1);
     }
 
-    // Enable photodetectors
+    // (c) Enable photodetectors: each one writes the readout of the fields it stored (B-049)
     for (auto pdet: all_photodetectors) {
         pdet->enable = sc_logic(1);
     }
@@ -240,12 +273,96 @@ void SPECSConfig::runTRANAnalysis()
     cout << "Simulated " << sc_time_stamp() << endl;
 }
 
+// The .op/.dc fixed point (F-28): runs the delta cycles of the current time step one at a time,
+// as sc_start() would, but at most max_iterations of them (0: no limit). Returns false if
+// activity is still pending at the current time after that
+bool SPECSConfig::runFixedPoint()
+{
+    uint64_t iterations = 0;
+    while (sc_pending_activity_at_current_time() && sc_get_status() != SC_STOPPED)
+    {
+        if (max_iterations && iterations >= max_iterations)
+            return false;
+        sc_start(SC_ZERO_TIME);
+        ++iterations;
+    }
+    return true;
+}
+
+// Non-convergence of runFixedPoint() (F-28): error message and residual, then exit(1).
+// The residual lists the output ports that still emitted in the last tenth of the iterations
+// (at least the last 100 delta cycles), with their last change and its emission threshold
+void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_delta) const
+{
+    const sc_dt::uint64 end_delta = sc_delta_count();
+    const sc_dt::uint64 window = std::max<sc_dt::uint64>(100, max_iterations / 10);
+    const sc_dt::uint64 window_start = std::max(start_delta, end_delta > window ? end_delta - window : 0);
+
+    vector<OpticalOutputPort *> changing;
+    for (auto oop : sc_get_all_module_by_type<OpticalOutputPort>())
+    {
+        if (oop->m_has_emitted && oop->m_last_emission_delta >= window_start)
+            changing.push_back(oop);
+    }
+    auto ratio = [](const OpticalOutputPort *oop)
+    {
+        // zero threshold (abstol = 0, and reltol = 0 or |E_last| = 0, B-153): any change is
+        // infinitely above it (said explicitly rather than divided by 0)
+        if (oop->m_last_emission_threshold == 0)
+            return std::numeric_limits<double>::infinity();
+        return oop->m_last_emission_change / oop->m_last_emission_threshold;
+    };
+    // largest change relative to its threshold first, by order of magnitude, then in name order:
+    // the ratios of a loop's ports differ only in the last bits, which differ between compilers
+    auto decade = [&ratio](const OpticalOutputPort *oop) { return std::floor(std::log10(ratio(oop))); };
+    std::stable_sort(changing.begin(), changing.end(),
+                     [&decade](const OpticalOutputPort *a, const OpticalOutputPort *b) { return decade(a) > decade(b); });
+
+    cerr << "Error: " << what << " did not converge within " << max_iterations
+         << " iterations (delta cycles, .options maxiter)" << endl;
+    cerr << "Residual: " << changing.size() << " optical output port(s) changed in the last "
+         << end_delta - window_start << " delta cycles. Last change |dE| and emission threshold "
+         << "max(abstol, reltol*|E_last|), in sqrt(W):" << endl;
+    const size_t max_listed = 10;
+    for (size_t i = 0; i < changing.size() && i < max_listed; ++i)
+    {
+        OpticalOutputPort *oop = changing[i];
+        const sc_object *net = dynamic_cast<const sc_object *>(oop->m_port.get_interface());
+        const sc_object *device = oop->get_parent_object();
+        cerr << "  " << (net ? net->name() : oop->name());
+        if (device)
+            cerr << " (" << device->name() << ")";
+        cerr << " @ " << OpticalSignal::getWavelength(oop->m_last_emission_wlid) * 1e9 << " nm: |dE| = "
+             << oop->m_last_emission_change << " > " << oop->m_last_emission_threshold
+             << " (" << ratio(oop) << " x)" << endl;
+    }
+    if (changing.size() > max_listed)
+        cerr << "  ... and " << changing.size() - max_listed << " more" << endl;
+    cerr << "A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges "
+         << "slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss" << endl;
+    exit(1);
+}
+
+void SPECSConfig::applyInitialConditions()
+{
+    // Set values of signals according to the initial conditions (same mechanism as
+    // nodeset_orders, but applied after the OP). The writes take effect at the next
+    // sc_start(), in the same update phase as the probe enables of runTRANAnalysis().
+    // ic_orders is only filled from C++ for now: the parser rejects .ic (B-161). A future
+    // .ic directive must fill ic_orders, or keep this order (B-048).
+    for (auto &ic_order : ic_orders)
+    {
+        ic_order.second.first->write(ic_order.second.second);
+    }
+}
+
 void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
     //assert(!oop_configs.empty());
     auto oop_default_config = make_shared<OpticalOutputPortConfig>();
     oop_default_config->m_mode = simulation_mode;
     oop_default_config->m_abstol = default_abstol;
     oop_default_config->m_reltol = default_reltol;
+    oop_default_config->m_snap_factor = default_snap_factor;
     oop_default_config->m_timestep_value = default_resolution_multiplier; // relative to systemc timestep
 
     // apply default config to all optical output ports which don't have one
@@ -258,30 +375,34 @@ void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
 }
 
 void SPECSConfig::applyDefaultTraceFileToAllSignals() {
-    if (!default_trace_file)
+    TraceTable *table = default_trace_table.get();
+    if (!default_trace_file && !table)
         return;
 
     auto all_probes = sc_get_all_object_by_type<Probe>();
     for (auto p: all_probes) {
         p->setTraceFile(default_trace_file);
+        p->setTraceTable(table);
     }
-
-    // auto all_mlprobes = sc_get_all_object_by_type<MLambdaProbe>();
-    // for (auto p: all_mlprobes) {
-    //     p->m_Tf = default_trace_file;
-    //     p->prepare();
-    // }
 
     auto all_mlambda_probes = sc_get_all_object_by_type<MLambdaProbe>();
     for (auto p: all_mlambda_probes) {
         p->setTraceFile(default_trace_file);
+        p->setTraceTable(table);
     }
 
     if (trace_all_optical_nets)
     {
+        // nets that already have their automatic probe (.save, F-05) keep it
+        set<string> probe_names;
+        for (auto p: all_probes)
+            probe_names.insert(p->name());
+
         auto all_optical_sigs = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
         for (auto &sig: all_optical_sigs) {
             string signame = sig->name();
+            if (probe_names.count("PROBE{" + signame + "}"))
+                continue;
 
             // Check if the signal is explicitly marked as uninteresting
             stringstream ss (signame);
@@ -293,22 +414,27 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
 
             auto p = make_shared<Probe>(("PROBE{" + signame + "}").c_str(), true, true, true, true);
             p->setTraceFile(default_trace_file);
+            p->setTraceTable(table);
             p->p_in(*sig);
             additional_objects.push_back(p);
         }
     }
     // TODO: refactor ↓
     auto all_pdets = sc_get_all_object_by_type<Detector>();
+    auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
+    if (!default_trace_file)
+    {
+        // the tables only hold the probes (F-05)
+        if (!all_pdets.empty() || !all_pwr_meters.empty())
+            cerr << "Warning: photodetector and power meter readouts are only traced in the VCD "
+                 << "(add --format vcd)" << endl;
+        return;
+    }
     for (auto &pdet: all_pdets) {
-        string detname = pdet->name();
-        cout << detname << endl;
         pdet->trace(default_trace_file);
     }
 
-    auto all_pwr_meters = sc_get_all_object_by_type<PowerMeter>();
     for (auto &pwr_meter: all_pwr_meters) {
-        string pwr_meter_name = pwr_meter->name();
-        cout << pwr_meter_name << endl;
         pwr_meter->trace(default_trace_file);
     }
 }
@@ -339,6 +465,19 @@ void SPECSConfig::printConfig() const
     cout << "- trace all optical nets: " << trace_all_optical_nets << endl;
 }
 
+// Zero tolerances are allowed (B-153, decision 2026-10-21), e.g. to compare with a fixed-step
+// discrete model. With both at 0 nothing is gated: say so once per run (verifyConfig() is called
+// from runAnalysis() and from prepareSimulation())
+void SPECSConfig::warnZeroTolerances()
+{
+    if (zero_tolerances_warned || default_abstol != 0 || default_reltol != 0)
+        return;
+    zero_tolerances_warned = true;
+    cerr << "Warning: abstol = 0 and reltol = 0: the emission gate is off, every change of a value is emitted;"
+         << " a circuit with feedback may never quiesce in .tran (it stops only when its values repeat exactly),"
+         << " and .op/.dc may stop at .options maxiter with a non-convergence error" << endl;
+}
+
 void SPECSConfig::printOPAnalysisResult() const
 {
     cout << "╔═══════════════════╗" << endl;
@@ -363,10 +502,45 @@ void SPECSConfig::prepareSimulation() {
     verifyConfig();
 
     { // open default trace_file
-        if (!default_trace_file && trace_filename.size())
+        bool opened_default_trace_file = false;
+        if (!default_trace_file && trace_filename.size() && trace_vcd)
+        {
             default_trace_file = sc_create_vcd_trace_file(trace_filename.c_str());
+            opened_default_trace_file = true;
+        }
 
-        default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
+        if (default_trace_file)
+            default_trace_file->set_time_unit(std::pow(10, 15 + engine_timescale), SC_FS);
+
+        // tables of the probes (F-05, --format csv|npz)
+        bool opened_default_trace_table = false;
+        if (!default_trace_table && trace_filename.size() && (trace_csv || trace_npz))
+        {
+            default_trace_table = std::make_unique<TraceTable>(trace_csv ? trace_filename + ".csv" : "",
+                                                               trace_npz ? trace_filename + ".npz" : "");
+            opened_default_trace_table = true;
+        }
+
+        // Run manifest (F-01): written next to the default trace file opened above, and printed
+        // once with --print-manifest (with "trace_file": null if SPECS writes no default trace).
+        // Its trace file is the VCD, or the first table (CSV, then .npz) when there is no VCD
+        if (opened_default_trace_file || opened_default_trace_table || print_run_manifest)
+        {
+            // sc_create_vcd_trace_file() appends ".vcd"
+            string manifest_trace_file;
+            if (opened_default_trace_file)
+                manifest_trace_file = trace_filename + ".vcd";
+            else if (opened_default_trace_table)
+                manifest_trace_file = trace_filename + (trace_csv ? ".csv" : ".npz");
+            const string manifest_json = RunManifest(*this, manifest_trace_file).to_json();
+            if (opened_default_trace_file || opened_default_trace_table)
+                RunManifest::write_file(trace_filename + ".manifest.json", manifest_json);
+            if (print_run_manifest)
+            {
+                cout << manifest_json << flush;
+                print_run_manifest = false;
+            }
+        }
     }
 
     applyDefaultOpticalOutputPortConfig();

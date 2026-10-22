@@ -3,7 +3,6 @@
 #include "tb/wg_tb.h"
 
 #include "utils/general_utils.h"
-#include "devices/generic_waveguide.h"
 #include "specs.h"
 
 void wg_tb::run_1()

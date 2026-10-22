@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b146-x-shared-delayed.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b146-x-shared-delayed.cir", "sha256": "a87325a8202fab7cfdb3887b1bb823d4955166466309f2f64ff1bc03779a7466"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

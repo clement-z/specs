@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b145-upgrade-roles.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b145-upgrade-roles.cir", "sha256": "c508ff89c57eca30c832f677fd47cc5b1709727b35e3d2f086ddd40e9fbde360"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

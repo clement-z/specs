@@ -1,0 +1,9 @@
+* F-12 (B-169): the name after .ends must be the one of the .subckt (case-insensitive):
+* ".ends rong" for ".subckt ring" is rejected with both names, exit 1
+.subckt ring a b
+wg1 a b length=10e-6
+.ends rong
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in out ring
+probe1 out
+.op

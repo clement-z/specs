@@ -1,0 +1,78 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Including file: tests/golden/netlists/f12-include/mid.cir
+Including file: tests/golden/netlists/f12-include/sub/leaf.cir
+Including file: tests/golden/netlists/f12-include/sub/probes.cir
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+4 elements
+ - ROOT/PROBE1 (PROBE) ROOT/a {} {}
+ - ROOT/PROBE2 (PROBE) ROOT/b {} {}
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/a {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/X1 (SUBCIRCUIT) {b (STRING), src (STRING), } {}
+-----------
+2 named nets
+ - ROOT/a: OANALOG<1>u (1|1)
+ - ROOT/b: OANALOG<1>u (0|1)
+-----------
+0 directives
+-----------
+1 subcircuits
+ - SRC (SUBCIRCUIT DEFINITION) p {}
+-----------
+1 analyses
+ - ANALYSIS[OP] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Including file: tests/golden/netlists/f12-include/sub/src_body.cir
+Flattening ROOT/X1
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/a...
+Creating ROOT/PROBE1 (reason: connection to unidir net)
+Done creating ROOT/PROBE1
+Creating ROOT/CWSRC1 (reason: unidir backlog)
+Done creating ROOT/CWSRC1
+Done (elaborating network of ROOT/a)
+Elaborating network of ROOT/b...
+Creating ROOT/PROBE2 (reason: connection to unidir net)
+Done creating ROOT/PROBE2
+Creating ROOT/X1/CWSRC1 (reason: unidir backlog)
+Done creating ROOT/X1/CWSRC1
+Done (elaborating network of ROOT/b)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven frequency-domain
+- analysis type: CW OPERATING POINT
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/X1/CWSRC1 emitted: [#2]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/a (OPTICAL) = [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/b (OPTICAL) = [#4]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

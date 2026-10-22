@@ -1,0 +1,59 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/waveguide_tb.vcd)
+0 s:
+	IN:  [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+	OUT: [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 1
+33400 fs:
+	IN:  [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+	OUT: [#3]  @ 1550 nm (0.707107 √W, 0.500000 W, -2.4322 rad)
+	COUNT: 2
+100 ms:
+	IN:  [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#3]  @ 1550 nm (0.707107 √W, 0.500000 W, -2.4322 rad)
+	COUNT: 3
+100000000033400 fs:
+	IN:  [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 4
+200 ms:
+	IN:  [#6]  @ 1550 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
+	OUT: [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 5
+200000000033400 fs:
+	IN:  [#6]  @ 1550 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
+	OUT: [#7]  @ 1550 nm (1.000000 √W, 1.000000 W, -2.4322 rad)
+	COUNT: 6
+300 ms:
+	IN:  [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#7]  @ 1550 nm (1.000000 √W, 1.000000 W, -2.4322 rad)
+	COUNT: 7
+300000000010 ps:
+	IN:  [#9]  @ 1550 nm (1.732051 √W, 3.000000 W, 0.0000 rad)
+	OUT: [#7]  @ 1550 nm (1.000000 √W, 1.000000 W, -2.4322 rad)
+	COUNT: 8
+300000000033400 fs:
+	IN:  [#9]  @ 1550 nm (1.732051 √W, 3.000000 W, 0.0000 rad)
+	OUT: [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 9
+300000000043400 fs:
+	IN:  [#9]  @ 1550 nm (1.732051 √W, 3.000000 W, 0.0000 rad)
+	OUT: [#11]  @ 1550 nm (1.224745 √W, 1.500000 W, -2.4322 rad)
+	COUNT: 10
+-----------------/! \---------------
+Test finished!
+Success rate: 3/3
+-----------------/! \---------------
+
+
+.vcd trace file: traces/waveguide_tb
+Total runtime: <DURATION> ms
+

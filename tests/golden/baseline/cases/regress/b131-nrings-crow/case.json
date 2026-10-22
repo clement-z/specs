@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-t",
+  "ac_crow",
+  "--nrings_crow",
+  "2"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/crow_tb.manifest.json": {
+   "bytes": 274,
+   "kind": "json",
+   "sha256": "7ebef31a134a1ef062f2d86925e166373596e7a068480baa6f3e1e76e9c940fb",
+   "stored": "files/traces/crow_tb.manifest.json"
+  },
+  "traces/crow_tb.vcd": {
+   "bytes": 84060,
+   "kind": "vcd",
+   "sha256": "0f7663f0453c222b6dcae8459a478cc5ce50087ee44d19827b19710cf9be5305",
+   "stored": "files/traces/crow_tb.vcd"
+  }
+ },
+ "id": "regress/b131-nrings-crow"
+}

@@ -1,0 +1,5 @@
+* F-05: .save of an electrical net: error (only optical nets can be saved), exit 1
+cwsrc1 in wl=1.55e-6 power=1e-3
+pshift1 in out v
+.save P(v)
+.op

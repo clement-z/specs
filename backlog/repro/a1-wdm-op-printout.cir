@@ -1,0 +1,14 @@
+* F-A1: OP printout shows one (last-written) wavelength per net: ROOT/in shows only 1551 nm (0.15 W);
+* the 1550 nm component (0.5 W) is not printed anywhere.
+* WDM add-drop: two wavelengths share one ring
+.assign lambda0 = 1.55e-6
+.assign neff = 2.3
+.assign length_2pi = {lambda0}/{neff}
+cwsrc1 s1 wl=1.55e-6 power=1
+cwsrc2 s2 wl=1.551e-6 power=0.3
+merger1 s1 s2 in
+coupler1 in ring_bl out ring_br k=0.85
+coupler2 add ring_tr drop ring_tl k=0.85
+wg_ring_l ring_tl ring_bl att=2 length=101*{length_2pi} neff={neff} ng=4.3
+wg_ring_r ring_br ring_tr att=2 length=101*{length_2pi} neff={neff} ng=4.3
+.op

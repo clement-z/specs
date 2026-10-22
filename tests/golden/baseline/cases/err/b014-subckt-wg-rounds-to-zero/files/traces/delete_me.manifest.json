@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b014-subckt-wg-rounds-to-zero.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b014-subckt-wg-rounds-to-zero.cir", "sha256": "1801d8198019050b88fd3fda95bfe3b4ff256c55ebe42418c494c9b62205a3c0"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

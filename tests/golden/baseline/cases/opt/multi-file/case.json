@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-f",
+  "circuits/common_definitions.def",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 555,
+   "kind": "json",
+   "sha256": "c8e952e888aa8397a09fcc66b954a937a8d0d17fcd296fd8640c6698a27d6056",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 27050,
+   "kind": "vcd",
+   "sha256": "0ea8886ba1cc537b9a04ecd4bf46a35c6983b1985447a5e4c2de0f8f830a905d",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "opt/multi-file"
+}

@@ -1,0 +1,10 @@
+* Net "n" is optical in x1 and electrical in x2: no type error reported
+.subckt so o
+probe1 o
+.ends
+.subckt se e
+evlsrc1 e values=[[0,1]]
+.ends
+x1 n so
+x2 n se
+.tran 1e-11

@@ -1,0 +1,9 @@
+* Top-level .param used inside a subckt body
+.param L=1e-4
+.subckt s a b
+wg1 a b length={L}
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in out s
+probe1 out
+.tran 1e-11

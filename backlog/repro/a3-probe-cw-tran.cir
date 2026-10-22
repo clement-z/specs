@@ -1,0 +1,6 @@
+* A3 repro: probe on a constant CW path during .tran
+cwsrc1 in wl=1.55e-6 power=1e-3
+wg1 in out length=100e-6 neff=2.2 ng=4.2
+probe1 out
+.options traceall=1
+.tran 1e-9

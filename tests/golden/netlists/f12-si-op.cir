@@ -1,0 +1,11 @@
+* F-12 (B-160): .op with scale suffixes in element kwargs, positional args and .options
+* Expected:
+*   config: abstol 1e-12 (1p), default reltol 1e-05 (10u)
+*   ROOT/a = 1550 nm (1.55u), 0.031623 sqrt(W), 0.001000 W (1m)
+*   ROOT/b = 1550 nm, 0.000794 W: wg1 is 500u = 0.05 cm long with att = 20 dB/cm, i.e. 1 dB
+*   ROOT/c = 1310 nm (1.31u), 0.044721 sqrt(W), 0.002000 W (2m), 0.5000 rad (positional wl power phi)
+cwsrc1 a wl=1.55u power=1m
+wg1 a b length=500u att=20 neff=2.35 ng=4.2
+cwsrc2 c 1.31u 2m 0.5
+.options abstol=1p reltol=10u
+.op

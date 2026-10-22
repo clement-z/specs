@@ -1,0 +1,6 @@
+* B-180: PCMCELL stores the initial state k as an int: a value beyond the int range is an error naming the
+* element (a double such as 3e9 was converted to int, undefined behaviour).
+* Expected: Error (ROOT/PCMCELL1): the initial state k must be between 0 and 2147483647 (got 3000000000)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=10 k=3e9 tc=0.85 ta=0.95
+.op

@@ -1,0 +1,21 @@
+Valid testbench identifiers:
+	ac_add_drop
+	ac_crow
+	dc
+	det
+	detector
+	directional_coupler
+	lambda
+	merg
+	merger
+	mesh
+	mzi
+	pcm
+	phaseshifter
+	ps
+	ring
+	spli
+	splitter
+	waveguide
+	wg
+

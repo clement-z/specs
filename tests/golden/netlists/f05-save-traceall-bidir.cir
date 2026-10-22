@@ -1,0 +1,14 @@
+* F-05: .save with an explicit .options traceall=1 and on a bidirectional net.
+* - traceall=1 is explicit: every optical net keeps its automatic probe PROBE{<net>} (power, abs,
+*   phase, wavelength), except the saved nets, whose probe traces what .save asks for;
+* - a bidirectional net has two signals (net:0, net:1): .save probes both, PROBE{ROOT/a:0} and
+*   PROBE{ROOT/a:1}.
+* Every net is bidirectional here (wg1 has a bidirectional port, so in is too). Expected VCD:
+* PROBE{ROOT/a:0}, PROBE{ROOT/a:1}: power only; PROBE{ROOT/in:0|1}, PROBE{ROOT/b:0|1}: all four.
+* Values as without .save.
+cwsrc1 in wl=1.55e-6 power=1e-3
+wg1 in a& length=10e-6 neff=2.2 ng=4.2
+wg2 a& b& length=20e-6 neff=2.2 ng=4.2
+.save P(a)
+.options traceall=1 timescale=-14
+.tran 1e-11

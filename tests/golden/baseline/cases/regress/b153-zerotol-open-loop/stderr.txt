@@ -1,0 +1,2 @@
+Warning: abstol = 0 and reltol = 0: the emission gate is off, every change of a value is emitted; a circuit with feedback may never quiesce in .tran (it stops only when its values repeat exactly), and .op/.dc may stop at .options maxiter with a non-convergence error
+

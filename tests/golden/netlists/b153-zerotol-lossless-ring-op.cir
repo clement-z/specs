@@ -1,0 +1,16 @@
+* B-153 / decision 2026-10-21: zero tolerances in .op. The weakly coupled lossless ring of
+* f28-lossless-ring-op.cir (k = 1e-4, off resonance, round-trip field transmission t = 1 - 5e-9) needs
+* about 2e9 round trips to converge at the default tolerances. With abstol = reltol = 0 a port stops
+* emitting only when its value repeats exactly, so the fixed point runs into maxiter (here 1000 delta
+* cycles, to keep the case fast) and stops with the F-28 non-convergence error.
+* Expected: exit 1; stderr: the zero-tolerance warning (once), then the F-28 error and its residual,
+* 3 ports, each "> 0 (inf x)" since the threshold max(abstol, reltol * |E_last|) is 0:
+*   ROOT/ring_br and ROOT/ring_bl: |dE| about k * |E_in| = 1e-4 sqrt(W) per round trip;
+*   ROOT/out: |dE| about k * 1e-4 = 1e-8 sqrt(W) (not listed at the default tolerances, where its
+*   threshold is 1e-4 * |out| = 1e-4).
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=1e-4
+wg_ring ring_br ring_bl length=775.3e-6 neff=1 ng=1 att=0
+probe1 out
+.options abstol=0 reltol=0 maxiter=1000
+.op

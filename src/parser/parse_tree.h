@@ -3,6 +3,7 @@
 #include "specs.h"
 #include "utils/strutils.h"
 
+#include <cstdint>
 #include <initializer_list>
 #include <utility>
 #include <memory>
@@ -38,11 +39,13 @@ struct Variable {
         NONE,
         TYPE_MAX,
     };
-    Type type;
-    double num;
-    complex<double> cnum;
-    int inum;
-    bool bnum;
+    // Every member is initialised: the defaulted copy assignment copies all of them, and copying an
+    // indeterminate bool is undefined behaviour (UBSan -fsanitize=bool, B-181).
+    Type type = NONE;
+    double num = 0;
+    complex<double> cnum = 0;
+    int64_t inum = 0; // integer literals are 64-bit (B-180)
+    bool bnum = false;
     string str;
     vector<Variable> vec;
 
@@ -50,7 +53,9 @@ struct Variable {
     Variable(Type type): type(type) {}
     Variable(double num = 0): type(DOUBLE), num(num) {}
     explicit Variable(const complex<double> &cnum): type(COMPLEX_DOUBLE), cnum(cnum) {}
-    explicit Variable(int inum): type(INTEGER), inum(inum) {}
+    explicit Variable(int64_t inum): type(INTEGER), inum(inum) {}
+    // an int stays an INTEGER (without it, Variable(1) would be ambiguous with double and bool)
+    explicit Variable(int inum): Variable(static_cast<int64_t>(inum)) {}
     explicit Variable(bool bnum): type(BOOLEAN), bnum(bnum) {}
     explicit Variable(const string &str): type(STRING), str(str) {}
     explicit Variable(const vector<Variable> &vec): type(LIST), vec(vec) {}
@@ -177,10 +182,21 @@ struct Variable {
         exit(1);
     }
 
-    int as_integer() const
+    // A DOUBLE is truncated toward zero; outside the 64-bit range (or NaN) it is an error, as the
+    // cast would be undefined (B-180). Consumers that store a narrower type check their own range.
+    int64_t as_integer() const
     {
         if (type == DOUBLE)
-            return num;
+        {
+            // -2^63 and 2^63 are exact doubles
+            if (!(num >= -9223372036854775808.0 && num < 9223372036854775808.0))
+            {
+                cerr << "Variable cannot be converted to an integer value: " << get_str()
+                     << " (outside the 64-bit integer range)" << endl;
+                exit(1);
+            }
+            return static_cast<int64_t>(num);
+        }
         if (type == INTEGER)
             return inum;
         if (type == BOOLEAN)
@@ -355,6 +371,9 @@ struct ParseSubcircuit {
     vector<string> ports; // name of ports
     map<string, Variable> kwargs; // list of kw arguments found on netlist
     const ParseTree *parent;
+    // directory of the file that defines the subcircuit: .include in the body is relative to it
+    // first (B-143); "" if none
+    string include_dir;
 
     ParseSubcircuit(const string &name, ParseTree *parent = nullptr)
     : name(name)
@@ -389,16 +408,6 @@ struct ParseSubcircuit {
         if ( !kwargs.empty() )
             cout << "\b\b";
         cout << "}" << endl;
-        if (false)
-        {
-            cout << "###########################" << endl;
-            cout << "## Start netlist of " << name << endl;
-            cout << "###########################" << endl;
-            cout << netlist;
-            cout << "###########################" << endl;
-            cout << "## End netlist of " << name << endl;
-            cout << "###########################" << endl;
-        }
     }
     string to_json() const;
     string kind() const
@@ -457,10 +466,6 @@ struct ParseNet {
         return m_bidirectional || (m_writers_count == 2);
         //return m_bidirectional || (m_writers_count == 2) || (m_readers_count == 2);
     }
-    bool validate() const
-    {
-        return m_writers_count <= 2 && m_ports_count <= 2;
-    }
 
     /* setters */
     inline bool setType(Type type, bool force = false) {
@@ -501,7 +506,7 @@ struct ParseNet {
     shared_ptr<sc_object> create_uni(const string &name) const;
 
     /* Get a generic net name from net number (different from id) */
-    static string name_from_id(int net_number);
+    static string name_from_id(int64_t net_number);
 };
 
 struct ParseTreeCreationHelper;
@@ -515,9 +520,6 @@ struct ParseElement {
     vector<string> nets; // name of parent nets connected to element
     vector<Variable> args; // list of non-keyword arguments found on netlist
     map<string, Variable> kwargs; // list of kw arguments found on netlist
-
-    const int n_nets = 0;
-    const bool bidirectionalable = false;
 
     ParseElement(const string &name)
     : name(name)
@@ -560,7 +562,6 @@ struct ParseElement {
     }
 
     virtual string kind() const { return "UNDEFINED"; }
-    virtual bool bidir_capable() const { return false; }                            \
 
     virtual ~ParseElement() {}
 
@@ -581,10 +582,25 @@ struct ParseTree {
     vector<ParseSubcircuit *> subcircuits;
     map<string, Variable> local_assignments;
     static map<string, Variable> global_assignments;
+    // Netlist files opened by the parser (-f files, .include), in first-open order, for the run
+    // manifest (F-01). Only the root tree's list is filled: the subcircuit trees, parsed during
+    // flatten(), record their .include files into it (root_input_files()).
+    mutable vector<string> input_files;
+    // --param overrides (F-12), root tree only: name -> whether the netlist also assigns it.
+    // Set before the netlist is parsed; a .param/.assign of the same name does not replace them.
+    map<string, bool> param_overrides;
 
     ParseTree(const string &name = "ROOT")
     : name(name)
     {}
+
+    vector<string> *root_input_files() const
+    {
+        const ParseTree *root = this;
+        while (root->parent)
+            root = root->parent;
+        return &root->input_files;
+    }
 
     ParseTree(const string &name, const ParseSubcircuit &subcircuit, const map<string, Variable> &kwargs);
 
@@ -629,7 +645,7 @@ struct ParseTree {
         return full_net_name;
     }
 
-    string get_or_create_net(int i, unsigned int size = 1,
+    string get_or_create_net(int64_t i, unsigned int size = 1,
                              ParseNet::Type type = ParseNet::NONE)
     {
         return get_or_create_net(ParseNet::name_from_id(i), size, type);
@@ -668,15 +684,21 @@ struct ParseTree {
     template <typename T>
     void set_local_variable(string &name, T val)
     {
+        // a --param override wins over the netlist's assignment
+        auto it = param_overrides.find(name);
+        if (it != param_overrides.end())
+        {
+            it->second = true;
+            return;
+        }
         // will throw a compile error if type T is not supported by Variable
         local_assignments[name] = val;
     }
 
-    template <typename T>
-    void set_global_variable(string &name, T val)
+    void set_param_override(const string &name, const Variable &val)
     {
-        // will throw a compile error if type T is not supported by Variable
-        global_assignments[name] = val;
+        local_assignments[name] = val;
+        param_overrides.emplace(name, false);
     }
 
     Variable get_variable(string &name)
@@ -699,27 +721,6 @@ struct ParseTree {
     void print() const;
     string to_json() const;
 
-    ParseTree *clone() const
-    {
-        ParseTree *clone = new ParseTree(name);
-
-        clone->parent = nullptr;
-        clone->ports = ports;
-        clone->nets = nets;
-        clone->local_assignments = local_assignments;
-        clone->unnamed_net_count = unnamed_net_count;
-
-        for (const auto &x : elements)
-            clone->elements.push_back(x->clone());
-        for (const auto &x : analyses)
-            clone->analyses.push_back(x->clone());
-        for (const auto &x : directives)
-            clone->directives.push_back(x->clone());
-        for (const auto &x : subcircuits)
-            clone->subcircuits.push_back(x->clone());
-
-        return clone;
-    }
     void build_circuit();
     void flatten();
 
@@ -733,9 +734,11 @@ struct ParseTree {
                 if(x) delete x;
             for (const auto &x : directives)
                 if(x) delete x;
-            for (const auto &x : subcircuits)
-                if(x) delete x;
         }
+        // a sub-tree hands its elements over to its parent when flattened,
+        // but its subcircuit definitions are only used by its own flatten()
+        for (const auto &x : subcircuits)
+            if(x) delete x;
     }
 };
 
@@ -745,8 +748,9 @@ struct ParseTreeCreationHelper {
     // backlog: elements to be created in priority
     map<string, ParseNet> *nets;
 
-    // backlog: elements to be created in priority
-    set<const ParseElement *> elements_backlog;
+    // backlog: elements to be created in priority, as indices into pt->elements, so that they are
+    // created in netlist order (not in heap-address order, B-176)
+    set<size_t> elements_backlog;
 
     // Circuit elements generated by build
     map<string, vector<shared_ptr<sc_object>>> circuit_signals;
@@ -779,11 +783,26 @@ struct ParseTreeCreationHelper {
     // return next element which is connected to "net_name" and doesnt have a corresponding module in circuit_modules
     vector<ParseElement *>::iterator next_fresh_element_bound_to(const string &net_name, const set<const ParseElement *> &excludes = {});
 
-    // upgrade a signal to bidirectional
-    void upgrade_signal(const string &name);
+    // upgrade a signal to bidirectional (called by a bidirectional device
+    // before connect_bi(); device_writes_net is the role of the device on
+    // that net in its unidirectional variant: true for an output, false for
+    // an input)
+    void upgrade_signal(const string &name, bool device_writes_net);
 
     // Create signals connected to a given element
     void create_signals(const ParseElement *elem);
+
+    // Slot convention on a bidirectional net (two signals, net:0 and net:1):
+    // - every writer takes the next free slot, in creation order: the first
+    //   port that writes the net (uni writer or bidir device) writes net:0,
+    //   the second one writes net:1; a third writer is an error;
+    // - a bidir device (connect_bi) reads the other slot, i.e. what the other
+    //   side writes;
+    // - a uni reader (connect_uni) reads net:0 while the net has 0 or 1
+    //   writers, net:1 once it has 2: with 2 writers, which one it reads
+    //   depends on the creation order;
+    // - upgrade_signal() keeps this convention when a net created as
+    //   unidirectional, with ports already bound to it, becomes bidirectional.
 
     // Connect a port to a signal using the net name
     template <typename signal_type, typename port_type>
@@ -825,10 +844,11 @@ void ParseTreeCreationHelper::connect_uni(port_type &port, const string& net_nam
             exit(2);
         }
 
-        int i_write = pt->nets.at(net_name).m_connect_writer_count;
-        i_write = max(i_write, 1);// If there are already 2 writers, act as a reader for the second one (imitate the second writer but only as a reader)
-        int i_read = (i_write + 1) % 2;
-        int i = as_writer ? i_write : i_read;
+        // a writer takes the next free slot; a reader reads net:0 (the first
+        // writer's slot) until there are 2 writers, then net:1
+        int n_writers = pt->nets.at(net_name).m_connect_writer_count;
+        int i_read = (max(n_writers, 1) + 1) % 2;
+        int i = as_writer ? n_writers : i_read;
 
         sig_raw = circuit_signals.at(net_name)[i].get();
         sig = dynamic_cast<signal_type *>(sig_raw);
@@ -877,7 +897,8 @@ void ParseTreeCreationHelper::connect_bi(port_in_type &p_in, port_out_type &p_ou
             exit(1);
         }
 
-        // First get the signal to be written or read (in the right order)
+        // First get the signal to be written (next free slot) and the one
+        // to be read (the other slot)
         int i_write = pt->nets.at(net_name).m_connect_writer_count;
         int i_read = (i_write + 1) % 2;
 

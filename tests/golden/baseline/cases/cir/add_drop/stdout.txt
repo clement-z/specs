@@ -1,0 +1,118 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Recorded sweep order for WL(CWSRC1) (31points)
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+7 local assignments
+ - dlambda (DOUBLE) = 1e-09
+ - k (DOUBLE) = 0.85
+ - lambda0 (DOUBLE) = 1.55e-06
+ - lambda_max (DOUBLE) = 1.565e-06
+ - lambda_min (DOUBLE) = 1.535e-06
+ - length_2pi (DOUBLE) = 6.73913e-07
+ - neff (DOUBLE) = 2.3
+-----------
+6 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in_ {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/X1 (SUBCIRCUIT) {in_ (STRING), in (STRING), test (STRING), } {att (INTEGER) = 0, length (DOUBLE) = 0.001, neff (INTEGER) = 1, ng (INTEGER) = 4, }
+ - ROOT/COUPLER1 (DIRECTIONAL COUPLER (bidir)) ROOT/in ROOT/ring_bl ROOT/out ROOT/ring_br {} {k (DOUBLE) = 0.85, }
+ - ROOT/COUPLER2 (DIRECTIONAL COUPLER (bidir)) ROOT/add ROOT/ring_tr ROOT/drop ROOT/ring_tl {} {k (DOUBLE) = 0.85, }
+ - ROOT/WG_RING_L (WAVEGUIDE (bidir)) ROOT/ring_tl ROOT/ring_bl {} {att (INTEGER) = 2, length (DOUBLE) = 6.80652e-05, neff (DOUBLE) = 2.3, ng (DOUBLE) = 4.3, }
+ - ROOT/WG_RING_R (WAVEGUIDE (bidir)) ROOT/ring_br ROOT/ring_tr {} {att (INTEGER) = 2, length (DOUBLE) = 6.80652e-05, neff (DOUBLE) = 2.3, ng (DOUBLE) = 4.3, }
+-----------
+9 named nets
+ - ROOT/add: OANALOG<1>u (0|1)
+ - ROOT/drop: OANALOG<1>u (1|0)
+ - ROOT/in: OANALOG<1>u (0|1)
+ - ROOT/in_: OANALOG<1>u (1|0)
+ - ROOT/out: OANALOG<1>u (1|0)
+ - ROOT/ring_bl: OANALOG<1>u (1|1)
+ - ROOT/ring_br: OANALOG<1>u (1|1)
+ - ROOT/ring_tl: OANALOG<1>u (1|1)
+ - ROOT/ring_tr: OANALOG<1>u (1|1)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-12, reltol (DOUBLE) = 1e-06, timescale (DOUBLE) = -15, }
+-----------
+1 subcircuits
+ - TEST (SUBCIRCUIT DEFINITION) p1 p2 {att (INTEGER) = 1, length (DOUBLE) = 0.0001, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+-----------
+1 analyses
+ - ANALYSIS[DC] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/X1
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/X1/N00000...
+Creating ROOT/X1/WG1 (reason: connection to unidir net)
+Done creating ROOT/X1/WG1
+Creating ROOT/CWSRC1 (reason: unidir backlog)
+Done creating ROOT/CWSRC1
+Creating ROOT/X1/WG2 (reason: unidir backlog)
+Done creating ROOT/X1/WG2
+Creating ROOT/COUPLER1 (reason: unidir backlog)
+Done creating ROOT/COUPLER1
+Creating ROOT/WG_RING_L (reason: unidir backlog)
+Done creating ROOT/WG_RING_L
+Creating ROOT/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/COUPLER2
+Creating ROOT/WG_RING_R (reason: unidir backlog)
+Done creating ROOT/WG_RING_R
+Done (elaborating network of ROOT/X1/N00000)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven frequency-domain
+- analysis type: CW SWEEP
+- engine timescale (log10 of s): -15
+- abstol: 1e-12
+- default reltol: 1e-06
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 1 fs (traces/delete_me.vcd)
+Starting sweep on WL(ROOT/CWSRC1) (31 points)
+ROOT/CWSRC1 emitted: [#1]  @ 1535 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#2]  @ 1536 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#3]  @ 1537 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#4]  @ 1538 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#5]  @ 1539 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#6]  @ 1540 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#7]  @ 1541 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#8]  @ 1542 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#9]  @ 1543 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#10]  @ 1544 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#11]  @ 1545 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#12]  @ 1546 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#13]  @ 1547 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#14]  @ 1548 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#15]  @ 1549 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#16]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#17]  @ 1551 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#18]  @ 1552 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#19]  @ 1553 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#20]  @ 1554 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#21]  @ 1555 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#22]  @ 1556 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#23]  @ 1557 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#24]  @ 1558 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#25]  @ 1559 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#26]  @ 1560 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#27]  @ 1561 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#28]  @ 1562 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#29]  @ 1563 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#30]  @ 1564 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: [#31]  @ 1565 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

@@ -1,0 +1,28 @@
+{
+ "args": [
+  "--abstol",
+  "1e-10",
+  "--reltol",
+  "1e-5",
+  "-R",
+  "-14",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 441,
+   "kind": "json",
+   "sha256": "4e748450146440562112c022b839ef4f66d673dc79770b2baae185dfbba534fa",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 27039,
+   "kind": "vcd",
+   "sha256": "7a6d02d70773de93f27b1000790098aa87737c0b372e7bfcf6111e50508653d8",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "opt/tol-resolution-overrides"
+}

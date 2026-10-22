@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b150-include-in-subckt.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 562,
+   "kind": "json",
+   "sha256": "2d34fa6dbb647f5add78aecf97af13287b75c48cf79638b3ced35be8a0faee73",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1334,
+   "kind": "vcd",
+   "sha256": "6bbf81fd7f349506f08c4362fb3015685a89441b113a2f6303649b17d658c190",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b150-include-in-subckt"
+}

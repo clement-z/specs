@@ -1,0 +1,5 @@
+* F-01: a large netlist seed written in exponent form (.options seed=3e9 is the double 3000000000).
+* Expected: regress/f01-options-seed-large gives exactly the VCD of specs --seed 3000000000 on
+*   f01-pdet-noise.cir (regress/f01-seed-large).
+.include tests/golden/netlists/f01-pdet-noise.cir
+.options seed=3e9

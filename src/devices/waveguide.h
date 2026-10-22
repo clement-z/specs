@@ -26,6 +26,12 @@ public:
     /** The group velocity dispersion Dlambda of the waveguide in [s/m/m] */
     double m_D;
 
+    /** True for a waveguide written in the netlist (set by the parser, WGElement::create()),
+     * false for the waveguides that devices create internally (MZI arms, OCTANE, CROW,
+     * meshes) and for testbenches. B-014: a non-zero group delay that rounds to 0 time
+     * steps is an error for the former and a warning for the latter */
+    bool m_from_netlist = false;
+
     /** Constructor for WaveguideBase
      *
      * @param name name of the module
@@ -50,6 +56,14 @@ public:
         }
         m_length_cm = length_cm;
     }
+
+    /** Group delay in ns at the reference wavelength (1.55 um, where the group index is m_ng) */
+    inline double groupDelay_ns() const {
+        const double c = 299792458.0;
+        // vg = c/ng
+        // => delay = L / vg = (L * ng) / c
+        return 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    }
 };
 
 
@@ -65,7 +79,7 @@ public:
     // Timed ports writers
     /** Timed writer to the output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_out_writer;
 
@@ -79,6 +93,8 @@ public:
      *   **Sensitivity list:** p_in
      * */
     void on_port_in_changed();
+
+    virtual void start_of_simulation();
 
     /** Constructor for Waveguide
      *
@@ -115,7 +131,7 @@ public:
     // Timed ports writers
     /** Timed writer to the output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_p0_out_writer;
     OpticalOutputPort m_p1_out_writer;
@@ -131,6 +147,8 @@ public:
      * */
     void on_p0_in_changed();
     void on_p1_in_changed();
+
+    virtual void start_of_simulation();
 
     /** Constructor for Waveguide
      *

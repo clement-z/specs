@@ -1,0 +1,14 @@
+npz time_s.npy: descr=<f8 shape=(1,)
+0.0
+npz signal.npy: descr=<i4 shape=(1,)
+0
+npz wavelength_m.npy: descr=<f8 shape=(1,)
+1.55e-06
+npz power_W.npy: descr=<f8 shape=(1,)
+0.0004999999999999999
+npz field_re.npy: descr=<f8 shape=(1,)
+0.019623342642552895
+npz field_im.npy: descr=<f8 shape=(1,)
+0.010720280944684475
+npz signal_names.npy: descr=<U13 shape=(1,)
+ROOT/MLPROBE1

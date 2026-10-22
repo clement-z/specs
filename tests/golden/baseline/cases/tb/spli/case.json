@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "spli"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/splitter_tb.manifest.json": {
+   "bytes": 253,
+   "kind": "json",
+   "sha256": "1e69f78604bbe8b39ffc207efe5b07df98a6b03bc9b71fe6c59fb38af55175ff",
+   "stored": "files/traces/splitter_tb.manifest.json"
+  },
+  "traces/splitter_tb.vcd": {
+   "bytes": 1724,
+   "kind": "vcd",
+   "sha256": "10fc58c5c8a353a47c964ac9f9fa5c14ed2022873c1c14e88263c5feef85ef1d",
+   "stored": "files/traces/splitter_tb.vcd"
+  }
+ },
+ "id": "tb/spli"
+}

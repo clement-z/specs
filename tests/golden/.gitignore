@@ -1,0 +1,9 @@
+# The root .gitignore ignores *.vcd, *.cir, specs, build/, tmp/, ... repo-wide.
+# The golden baseline (VCD traces included) must be committed, so re-include
+# everything below baseline/ here.
+!*.vcd
+!*.cir
+!*.json
+!baseline/**
+# Local scratch output of `run_golden.py check --keep ...`
+candidate/

@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b052-vlsrc-positional.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 439,
+   "kind": "json",
+   "sha256": "ef82195f93538992fb97a4f3c0dbe74f83baa425334ab696439c0fc5bfaacf63",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1118,
+   "kind": "vcd",
+   "sha256": "4530515accf83cc4f5cb7d236aadae0de4f4b9d456ff137550c8de0662fbf264",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b052-vlsrc-positional"
+}

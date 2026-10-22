@@ -1,8 +1,5 @@
 #include "devices/generic_transmission_device.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + SUFFIX + "_" + to_string(IDX)).c_str())
-
 using std::size_t;
 using std::pow;
 
@@ -70,9 +67,9 @@ void GenericTransmissionDevice::pre_init()
 
     for (size_t i = 0; i < nports; ++i)
     {
-        ports_in.push_back(make_shared<port_in_type>(__modname("_IN", i)));
-        ports_out.push_back(make_shared<port_out_type>(__modname("_OUT", i)));
-        ports_out_writers.push_back(make_shared<OpticalOutputPort>(__modname("_OOP", i), (*ports_out[i])));
+        ports_in.push_back(make_shared<port_in_type>(spx_child_name(this, "_IN_", i).c_str()));
+        ports_out.push_back(make_shared<port_out_type>(spx_child_name(this, "_OUT_", i).c_str()));
+        ports_out_writers.push_back(make_shared<OpticalOutputPort>(spx_child_name(this, "_OOP_", i).c_str(), (*ports_out[i])));
         ports_out_writers[i]->m_use_deltas = true;
     }
 }
@@ -154,13 +151,12 @@ void GenericTransmissionDevice::input_on_i_output_on_j(size_t i, size_t j)
     //auto &p_out = (*ports_out[j]);
     auto &p_out_writer = (*ports_out_writers[j]);
     const bool active = TM.isActive(i, j);
-    cout << i << ", " << j << " is active" << endl;
 
     // Block if non active
     while (!active) { wait(); }
 
     complex<double> Sij;
-    double delay;
+    double delay = 0.0;
     
     // Wait for first signal to calculate Sij and delay
     volatile bool init_done = false;

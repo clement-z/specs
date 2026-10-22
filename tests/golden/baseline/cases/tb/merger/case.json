@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "merger"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/merger_tb.manifest.json": {
+   "bytes": 253,
+   "kind": "json",
+   "sha256": "dc7d93583b33dad70adc0c78f80468800222f52bc8fb66ccb2d62bdffc4d6af4",
+   "stored": "files/traces/merger_tb.manifest.json"
+  },
+  "traces/merger_tb.vcd": {
+   "bytes": 1108,
+   "kind": "vcd",
+   "sha256": "9ef73382d9a8ef47955e69c2d12e2188ea953522b128eb584e55b2688c579d47",
+   "stored": "files/traces/merger_tb.vcd"
+  }
+ },
+ "id": "tb/merger"
+}

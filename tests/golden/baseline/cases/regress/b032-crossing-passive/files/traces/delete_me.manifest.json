@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b032-crossing-passive.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b032-crossing-passive.cir", "sha256": "b37300f5d8dc35f843ffb861452d61adf1452915fea35201fb2efacb39258edd"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

@@ -1,0 +1,26 @@
+{
+ "args": [
+  "--abstol",
+  "0",
+  "--reltol",
+  "0",
+  "-f",
+  "tests/golden/netlists/b153-zerotol-cli.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 463,
+   "kind": "json",
+   "sha256": "134ea789ad08a030f4f7d7cf09ef0984caa68d903e0256935b4760b271c81fd5",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1698,
+   "kind": "vcd",
+   "sha256": "6e768eb06ea9c5f69c49900e898297a91044832555494a5ffa85c801686d27c0",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b153-zerotol-cli"
+}

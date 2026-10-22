@@ -1,0 +1,20 @@
+--- a/src/test/utils.h
++++ b/src/test/utils.h
+@@ -19,7 +19,7 @@
+ ASSERT_FLOAT_EQ(a.imag(), b.imag());
+ 
+ #define EXPECT_ANGLE_EQ(x, y) \
+-EXPECT_PRED_FORMAT2(angleIsEqual, x, y);
++EXPECT_PRED2([](const auto &a_, const auto &b_){ return angleIsEqual(a_.m_field, b_); }, x, y);
+ 
+ #define ASSERT_ANGLE_EQ(field, phi) \
+ ASSERT_FLOAT_EQ(field.phase(), std::arg(std::polar<double>(1.0f, phi)));
+@@ -78,7 +78,7 @@
+ 
+ using std::numbers::pi;
+ 
+-static_assert(false, "Work in progress: implement angleIsEqual (it should validate angle modulo 2pi");
++// [patched] static_assert removed
+ 
+ template<typename T1, typename T2>
+ bool angleIsEqual(T1 v1, T2 v2)

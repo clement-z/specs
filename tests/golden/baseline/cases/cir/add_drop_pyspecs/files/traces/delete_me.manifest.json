@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "circuits/add_drop_pyspecs.cir"],
+  "netlist_files": [
+    {"path": "circuits/add_drop_pyspecs.cir", "sha256": "ebb6b3304be16f61b8a3bc16ac0771f1c3a9fefa08fbc83f83e0b5361e315bef"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

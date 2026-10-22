@@ -1,0 +1,8 @@
+* A3 repro: MLPROBE matches wavelengths with exact double ==.
+* 1.55e-6 + 1.5e-9 = 1.5514999999999999e-06 != 1.5515e-6, so every event is
+* reported as "unsupported" and nothing is traced for that wavelength.
+.assign lambda0 = 1.55e-6
+vlsrc1 in values=[[1e-12,1e-3,{lambda0}+1.5e-9],[2e-12,2e-3,]]
+mlprobe1 in wl=[1.5515e-6]
+.options traceall=0
+.tran 5e-12

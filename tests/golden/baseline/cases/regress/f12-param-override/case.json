@@ -1,0 +1,20 @@
+{
+ "args": [
+  "--param",
+  "pin=4e-3/2",
+  "--param",
+  "att=0",
+  "-f",
+  "tests/golden/netlists/f12-param-override.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 478,
+   "kind": "json",
+   "sha256": "d0e987d9a47dcb2886595ff0c4ef2cc9e831f6973d2dcc65bc1a696eaab93b35",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f12-param-override"
+}

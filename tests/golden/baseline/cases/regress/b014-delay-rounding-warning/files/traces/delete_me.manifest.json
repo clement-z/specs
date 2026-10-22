@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b014-delay-rounding-warning.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b014-delay-rounding-warning.cir", "sha256": "9fa4dfe4eef255eb907d5b99428bc10a4ba6e7d6306ff30491e849104cbde62c"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}
