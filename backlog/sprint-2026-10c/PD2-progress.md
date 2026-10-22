@@ -16,4 +16,11 @@ binaries per step in `/tmp/pd2/bin/<step>/specs`.
 | 2 | per-wavelength S-parameter caches (waveguide, coupler, phase shifter) | done | 23bae2f | gcc strict 228/228 (new case regress/f15-dispersive-waveguide recorded with base build), counters same, clang + asan-gcc = base, asan-clang 12/12; ad hoc dispersive CROW/add-drop identical; bench C N=30 1.251x vs base (s1 1.164x) |
 | 3 | pending events: time-only order, insertion order on ties, single `sc_event`, merge as a lookup [Q8] | **partly done**: time-only order **stopped** (beyond Q8: per-lambda values change at default tol); landed the bit-identical part: sc_event_queue replaced by own allocation-free emulation (method re-arm kept) | 67d1702; WIP `PD2-wip/q8-time-order` 935f362, `PD2-wip/single-event-thread-rearm` cd450ed | 3a gate: gcc strict 228/228, counters 227 same, clang + asan-gcc = s2, asan-clang 12/12; WDM CROW VCD/stdout/counters identical. Thread-rearm variant: golden identical but WDM CROW plain probes + counters change (process order). Bench C N=30: s3 1.465x, Q8 WIP 1.844x vs base |
 | 4 | `OpticalSignal`: no virtual destructor, id behind a compile-time flag [Q2] | done | a935b7e | `-Dsignal_ids` (off); 127 cases re-recorded, every file identical up to the prefix (idcheck.py); counters 227 same; clang/asan-gcc same up to prefix; ids build = former listings; asan-clang 12/12 |
-| 5 | bench after each step, report | todo | | |
+| 5 | bench after each step, report | bench done; report pending | | C-notrace N=30 (5 rounds, interleaved): s1 1.163x, s2 1.243x, s3 1.474x, s4 1.514x; A N=30 1.461x, D-wdm N=10 nwl=4 1.474x (s4 vs base) |
+
+## Maintainer messages (2026-10-23, during the report)
+Found: `--no-coalescing` on a 4-wavelength 3-ring CROW exhausts memory (bad_alloc at 3 GB within 0.5 ns; base build
+too). Maintainer: "This blow up seems like a very logical finding. You will have an exponentially growing list of
+signals" / "Expected behavior. And it has only physical explanation if you work with deltas, not with fields. I
+think we can drop the deltaE idea too. ... Message the orchestrator for his guidance". Sent to the orchestrator
+(9a0fb35) with the PD2 status; nothing changed for it. Waiting for guidance before committing PD2-REPORT.md.
