@@ -17,10 +17,10 @@ journal publication. Merges into `dev`/`master`, tags and pushes only on an expl
 | C | v0.2.0 release prep | CHANGELOG `[0.2.0]`, version `0.2.0` in `meson.build`, `CITATION.cff` citing the ECOC paper (no DOI per version) | coordinator (or Sonnet) | Opus 5.5 | release-prep commit; **stop before tag/merge** | A, B | done (59c0362); tag/merge/push await the maintainer |
 | C2 | SystemC as a Meson subproject (v0.2.0) | `thirdparty/` → `subprojects/`; SystemC 3.0.2 and args 6.4.7 from wraps (submodules removed); subproject by default, installed SystemC on request; CI, `install.sh`, docs, CHANGELOG (decisions, third round) | `ws-subprojects` / `ws/subprojects` | Opus 5.5 high | `backlog/sprint-2026-10c/PC2-REPORT.md` | — | **done**, merged (4212520) |
 | F | pixi development environment (after v0.2.0) | `pixi.toml` + `pixi.lock` (compilers, build tools, pyspecs and docs features, tasks), shared ccache/wrap cache across worktrees, README/CLAUDE.md, CI pixi job (Ubuntu blocking, macOS non-blocking) (decisions of 2026-10-22) | `ws-pixi` / `ws/pixi` | Opus 5.5 high (+ Sonnet workers) | `backlog/sprint-2026-10c/PF-REPORT.md` | — | **done**, merged (ab4e1ac) |
-| D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 xhigh | `PD1-REPORT.md` | C | prepared (F-15 answers confirmed) |
-| D2 | F-15 part 2: bit-identical refactors | squared-norm gate, per-λ S-parameter caches, time-only ordered pending events + single `sc_event` per port, `OpticalSignal` id behind a flag | `ws-engine2` / `ws/engine2` | Opus 5.5 xhigh | `PD2-REPORT.md` | D1 | prepared (F-15 answers confirmed) |
-| D3 | F-15 part 3: `SC_METHOD` conversion | output port + stateless device reactions | `ws-methods` / `ws/methods` | Opus 5.5 xhigh | `PD3-REPORT.md` | D2 | prepared (F-15 answers confirmed) |
-| D4 | F-15 measurement (v0.3.0 candidate) | before/after per-event cost on the CROW benchmark (`discover/scout/bench/`); ratios only (shared host) | coordinator | Opus 5.5 | numbers in the D reports | D3 | draft |
+| D1 | F-15 part 1: `--stats` + ablation switches | counters, JSON next to the trace, documented expert switches; no output change otherwise | `ws-stats` / `ws/stats` | Opus 5.5 high | `PD1-REPORT.md` | — | prepared (updated 2026-10-22) |
+| D2 | F-15 part 2: bit-identical refactors | squared-norm gate, per-λ S-parameter caches, time-only ordered pending events + single `sc_event` per port, `OpticalSignal` id behind a flag | `ws-engine2` / `ws/engine2` | Opus 5.5 high | `PD2-REPORT.md` | D1 | prepared (updated 2026-10-22) |
+| D3 | F-15 part 3: `SC_METHOD` conversion | output port + stateless device reactions | `ws-methods` / `ws/methods` | Opus 5.5 high | `PD3-REPORT.md` | D2 | prepared (updated 2026-10-22) |
+| D4 | F-15 measurement (v0.3.0 candidate) | before/after per-event cost on the CROW benchmark (`discover/scout/bench/`); ratios only (shared host) | coordinator | Opus 5.5 | numbers in the D reports and the board | D1 (before D2), D3 (after) | prepared |
 | E | Private validation runs (optional) | instructions kept outside the repository at the maintainer's request | coordinator | Opus 5.5 | outside the repo | A | prepared (outside repo) |
 
 Why this order: A changes accepted inputs (zero tolerances) that D4 measures with; B and C make v0.2.0 releasable
@@ -40,6 +40,14 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 | B-014 (b) | none (`regress/b031-mzi-bidir` keeps passing at the default timescale; its device-internal arms warn) | netlist waveguide rounding to 0 → error; device-internal rounding → warning only |
 | 64-bit integers | `err/f01-options-seed-huge-integer` (new parse-error message); `err/f01-options-seed-int-max` becomes a passing case (the P4 guard is removed) | `.options seed=3000000000`; literal beyond 64 bits in a kwarg, a positional argument and a net name; a narrow consumer out of range |
 | Zero tolerances | `err/b153-reltol-zero` becomes a passing case (warning only if abstol is also 0) | open loop at zero tolerance; lossy ring `.tran` at zero tolerance; both zero → one warning; negative values still errors |
+
+## Phase D launch plan (prepared 2026-10-22, awaiting the maintainer's go)
+D1 → D2 → D3, one paseo agent per phase (Opus 5.5 high; subagents per `COMMON.md`), each branched from
+`sprint/2026-10c` after the previous merge. Per phase: the coordinator's gate (fresh clone, pixi gcc strict golden
+212/212 except predicted re-records, clang and asan builds before/after, `--stats` counters per [Q1], sanitizer
+builds, diff scope), then `--no-ff` merge and launch of the next phase. D4: CROW bench ratios by the coordinator
+on the tip after D1 (reference) and after D2 and D3. Any unpredicted output change, failed gate or design question
+outside the decisions stops the chain and goes to the maintainer. v0.3.0: tag and merges on request.
 
 ## Pending maintainer input
 
@@ -64,3 +72,4 @@ that predicted it, diff scope limited to the phase. For D2/D3 additionally: outp
 - 2026-10-22 — CI run 39803903484 on 8b3fbca: gcc, clang, gcc ASan/UBSan and pixi Ubuntu green; pixi macOS (non-blocking) configures and builds, fails at Test (logs need a GitHub login; macOS port is a later phase). Merged and pushed: dev 9ff5060 (= sprint tip tree, --no-ff), master a6bcc48 (--no-ff merge of dev); PR #16 marked merged by GitHub on that push. Tag v0.2.0 not created (not requested).
 - 2026-10-22 — CI green on dev (run 39804758732) and master (run 39804765284): all blocking jobs pass; pixi macOS fails at Test as on the sprint branch (non-blocking).
 - 2026-10-22 — maintainer: macOS port set aside for now (the non-blocking pixi macOS CI job stays as is; its failure is expected).
+- 2026-10-22 — v0.2.0 tagged on 6c7514a and pushed. Phase D prompts updated (pixi builds, strict golden after B-183, D1 delivers the per-case counter tool, bench case `C-notrace N=30`, Opus high per the model rule); launch plan above, awaiting go.

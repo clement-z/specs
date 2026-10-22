@@ -1,7 +1,7 @@
-# Phase D2 — bit-identical engine refactors (branch `ws/engine2`) — ready once the F-15 answers are confirmed
+# Phase D2 — bit-identical engine refactors (branch `ws/engine2`)
 
 Follow `COMMON.md` and `PD-common-f15.md`. Phase id: `PD2`. One commit per refactor, each gated on bit-identical
-outputs and on the `--stats` counters of D1 [Q1]:
+outputs and on identical per-case `--stats` counters (D1's collection tool) [Q1]:
 1. tolerance gate on squared norms (unit tests for `|last| = 0`, NaN, infinities);
 2. per-wavelength S-parameter caches (waveguide, coupler, phase shifter): same arithmetic, same bits;
 3. pending events [Q8]: order by **time only**; drop the \|E\| comparison (`OpticalSignal::operator<` inversion) and use
@@ -13,4 +13,4 @@ outputs and on the `--stats` counters of D1 [Q1]:
 4. `OpticalSignal`: drop the virtual destructor; the per-copy id goes behind a compile-time flag, off by default
    [Q2], in its own commit (the only output change of D2: listings lose the `[NNNN]` prefix, values unchanged,
    re-recorded with that note).
-Measure after each step with `discover/scout/bench/` (ratios only; shared host) and report.
+Measure after each step with `discover/scout/bench/` as in `PD-common-f15.md` (ratios only; shared host) and report.
