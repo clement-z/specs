@@ -102,12 +102,6 @@ void wg_tb_run()
     uut.p1_in(TERM_r);
     uut.p1_out(OUT);
 
-    // GenericWaveguide uut("uut",3.0103*100,1,1,0.01);
-    // uut.ports_in[0]->bind(IN);
-    // uut.ports_in[1]->bind(TERM_r);
-    // uut.ports_out[0]->bind(TERM_w);
-    // uut.ports_out[1]->bind(OUT);
-
     // Connect testbench to uut
     wg_tb tb("tb");
     tb.IN(IN);

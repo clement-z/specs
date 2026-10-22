@@ -120,8 +120,7 @@ std::string RunStats::to_json() const
     ss << "],\n";
 
     ss << "  \"options\": {\"abstol\": " << json_number(abstol) << ", \"reltol\": " << json_number(reltol)
-       << ", \"snapfactor\": " << json_number(snap_factor) << ", \"coalesce\": " << (coalesce ? "true" : "false")
-       << ", \"maxevents\": " << max_events << "},\n";
+       << ", \"snapfactor\": " << json_number(snap_factor) << ", \"maxevents\": " << max_events << "},\n";
     ss << "  \"event_cap_reached\": " << (event_cap_reached ? "true" : "false") << ",\n";
     ss << "  \"end_time_s\": " << json_number(end_time_s) << ",\n";
     // on its own line: the only value that differs between two runs of the same build

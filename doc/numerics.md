@@ -27,17 +27,15 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
 | `seed` | 0 | master seed of the random numbers (see below) | integer: a literal 0 to 9223372036854775807 (2^63 - 1), exponent form 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
 | `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer: a literal 0 to 2^63 - 1, exponent form 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
-| `coalesce` | 1 | expert: merge the writes of a port for the same time and wavelength (see [Expert options](#expert-options-ablation)) | 0 or 1 | `--no-coalescing` |
-| `maxevents` | 0 | expert: stop the run after this many processed entries (0: no cap) | integer, as `maxiter` | `--max-events` (0 to 2^64 - 1) |
+| `maxevents` | 0 | expert: stop the run after this many processed entries (0: no cap, see [Event cap](#event-cap-expert-option)) | integer, as `maxiter` | `--max-events` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
 - An invalid value is an error and the simulation does not start.
 - With `-f`, the CLI values are appended to the netlist as `.options` lines, so they override the netlist.
   They are ignored by the legacy testbenches (`-t`), except `--seed`, which is applied directly: it also
-  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter`,
-  `--no-coalescing` and `--max-events` are applied directly too and take priority over `.options maxiter`,
-  `coalesce` and `maxevents`.
+  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter`
+  and `--max-events` are applied directly too and take priority over `.options maxiter` and `maxevents`.
 - `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
   reproducible: the default seed is 0, and the same netlist and seed give the same values. An integer
@@ -239,23 +237,10 @@ name: the parser marks the waveguides it creates from netlist lines.
 In the paper's CROW benchmark (N = 3, L ≈ 350 µm), Interconnect differed from Photontorch and SPECS at 100 fs.
 At 1 fs all three agreed, with pairwise RMS errors below about 3 µW.
 
-## Expert options (ablation)
+## Event cap (expert option)
 
-Two switches change how the engine handles events, to measure what a mechanism contributes (ablation
-studies, performance work). They are not meant for normal runs, and outputs with them are not covered by the
-compatibility of the defaults.
-
-**No coalescing** (`.options coalesce=0`, `specs --no-coalescing`). An output port keeps the values its device
-writes in a queue until their time. By default a value written for a (time, wavelength) that is already
-pending replaces it (or is added to it, for devices that write deltas): only the last write of a time step
-is processed, and the queue holds at most one entry per (time, wavelength). Equal-time entries are then
-taken by decreasing |E|. Without coalescing, every write is its own entry, and entries of the same time are
-taken in the order they were written (FIFO). The values per wavelength stay the same (the last write is
-taken last) but every intermediate value goes through the emission gate and may be emitted, in its own delta
-cycle: more events, longer queues. A net holds only the last value written to it, of any wavelength, so a
-plain probe (or the `.op` listing) of a multi-wavelength net can show another wavelength at the end of a time
-step: `tests/golden/netlists/f15-coalesce-off.cir` shows `v` at 1550 nm where the default shows 1560 nm;
-MLPROBEs and per-wavelength values do not change. `--stats` counts the difference (`coalesced`).
+An expert option, not meant for normal runs: outputs with it are not covered by the compatibility of the
+defaults.
 
 **Event cap** (`.options maxevents=N`, `specs --max-events N`; 0, the default: no cap). The run stops once the
 output ports have processed N pending entries in total (the `processed` counter of `--stats`), at the end of
@@ -267,7 +252,7 @@ transient ends there: traces up to that time, `Simulated <t>`, exit status 0, an
 In an `.op`, a `.dc` or the operating point before a `.tran`, a fixed point cut short is not a result: error
 `Error: .op: the operating point stopped at the event cap: ...` and exit status 1. With `--stats`, the
 statistics are written in both cases (`"event_cap_reached": true`). Use it to bound a run whose activity may
-not die out (zero tolerances, no coalescing, a lossless loop) or to time a fixed number of events.
+not die out (zero tolerances, a lossless loop) or to time a fixed number of events.
 
 ## Run statistics (`--stats`)
 
@@ -296,7 +281,7 @@ Counters (per port, summed in `totals` and per device type):
 | Key | Counts |
 | --- | --- |
 | `scheduled` | values written to the port by its device (`delayedWrite()`), at a time and wavelength |
-| `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one, or is added to it for devices that write deltas) |
+| `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one) |
 | `processed` | pending entries taken at their time |
 | `emitted` | of which written to the net with a new value (the gate passed) |
 | `suppressed.abstol` | not written: \|E - E_last\| <= abstol |
@@ -309,7 +294,7 @@ Counters (per port, summed in `totals` and per device type):
 Every value is accounted for: `scheduled = coalesced + processed + pending_end` (plus the entries a `.dc`
 drops between two points, normally none) and `processed = emitted + suppressed.abstol + suppressed.reltol
 + suppressed.snap`. The other keys: `analysis` (`OP`, `DC`, `TRAN`), `sections`, `options` (the tolerances,
-`snapfactor` and the expert options below), `event_cap_reached`, `end_time_s` (simulated time at the end), and
+`snapfactor` and `maxevents`, see [Event cap](#event-cap-expert-option)), `event_cap_reached`, `end_time_s` (simulated time at the end), and
 `wall_time_s`, the wall-clock time from the start of the analysis (elaboration excluded), the only value that
 changes from one run to the next. In a `.dc` sweep, the counters cover every point (and the wavelengths of
 every point); in a `.tran`, the operating point before it too. Example (`--stats` on
@@ -320,7 +305,7 @@ every point); in a `.tran`, the operating point before it too. Example (`--stats
       "format_version": 1,
       "analysis": "OP",
       "sections": ["summary"],
-      "options": {"abstol": 0.01, "reltol": 1e-04, "snapfactor": 4, "coalesce": true, "maxevents": 0},
+      "options": {"abstol": 0.01, "reltol": 1e-04, "snapfactor": 4, "maxevents": 0},
       "event_cap_reached": false,
       "end_time_s": 0,
       "wall_time_s": 0.000218417,

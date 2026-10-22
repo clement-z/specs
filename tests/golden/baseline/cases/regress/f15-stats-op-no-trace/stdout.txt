@@ -88,7 +88,7 @@ ROOT/CWSRC_C emitted: @ 1550 nm (2.000000 √W, 4.000000 W, 0.0000 rad)
   "format_version": 1,
   "analysis": "OP",
   "sections": ["summary"],
-  "options": {"abstol": 0.01, "reltol": 1e-04, "snapfactor": 4, "coalesce": true, "maxevents": 0},
+  "options": {"abstol": 0.01, "reltol": 1e-04, "snapfactor": 4, "maxevents": 0},
   "event_cap_reached": false,
   "end_time_s": 0,
   "wall_time_s": "<WALL_TIME>",

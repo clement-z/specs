@@ -3,7 +3,7 @@
   "format_version": 1,
   "analysis": "TRAN",
   "sections": ["summary", "ports"],
-  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "coalesce": true, "maxevents": 0},
+  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "maxevents": 0},
   "event_cap_reached": false,
   "end_time_s": 5.0000000000000004e-08,
   "wall_time_s": "<WALL_TIME>",

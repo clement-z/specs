@@ -3552,25 +3552,6 @@
    "note": "F-15: unknown --stats section: 'Invalid --stats value', exit 1"
   },
   {
-   "id": "regress/f15-coalesce-options",
-   "setup": {
-    "copy": [
-     "circuits",
-     "tests/golden/netlists"
-    ],
-    "mkdir": [
-     "traces"
-    ]
-   },
-   "args": [
-    "--no-trace",
-    "--stats",
-    "-f",
-    "tests/golden/netlists/f15-coalesce-off.cir"
-   ],
-   "note": "F-15 expert option .options coalesce=0 on the circuit of regress/b001-fd-multilambda-stale: same values per wavelength; the OP listing shows v @ 1550 nm (last write; 1560 nm with coalescing, equal times by |E|); stats: coalesced 0, scheduled = processed = 16 (14/12 with coalescing)"
-  },
-  {
    "id": "regress/f15-dispersive-waveguide",
    "setup": {
     "copy": [
@@ -3587,18 +3568,6 @@
     "tests/golden/netlists/f15-dispersive-waveguide.cir"
    ],
    "note": "F-15 (PD2): waveguides with dispersion (D != 0, no other case has one): wavelength-dependent transmission and group delay, cached per wavelength since F-15; uni (two wavelengths on one net) and bidirectional; arrival times and powers in the netlist header"
-  },
-  {
-   "id": "regress/f15-no-coalescing-cli",
-   "args": [
-    "--no-coalescing",
-    "--stats",
-    "-o",
-    "traces/x",
-    "-f",
-    "circuits/add_drop_pyspecs.cir"
-   ],
-   "note": "F-15 expert option --no-coalescing on a .tran (ring): same VCD as cir/add_drop_pyspecs; stats: coalesced 0, more processed entries (scheduled 4649, processed 4648 vs 3755/3752 with coalescing) and pending_max 2"
   },
   {
    "id": "regress/f15-maxevents-options-tran",
@@ -3693,6 +3662,34 @@
    ],
    "expect": "fail",
    "note": "F-15: .options maxevents=2.5: 'Error: .options: MAXEVENTS must be an integer between 0 and 2^53 (got 2.5)', exit 1"
+  },
+  {
+   "id": "err/f15-options-coalesce-removed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f15-options-coalesce-removed.cir"
+   ],
+   "expect": "fail",
+   "note": "PD2b (decision 2026-10-23): .options coalesce was removed with --no-coalescing and is an unknown option like any other: 'Unknown keyword: coalesce (value: 0 (INTEGER))', exit 1"
+  },
+  {
+   "id": "err/f15-no-coalescing-removed",
+   "args": [
+    "--no-coalescing",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "PD2b (decision 2026-10-23): specs --no-coalescing was removed: an unknown option, exit 1"
   },
   {
    "id": "regress/f15-progress-quiet",

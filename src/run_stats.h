@@ -59,7 +59,6 @@ struct RunStats {
     double abstol = 0;
     double reltol = 0;
     double snap_factor = 0;
-    bool coalesce = true;
     uint64_t max_events = 0;
     bool event_cap_reached = false;
     double end_time_s = 0; // simulated time at the end of the run

@@ -12,7 +12,6 @@
 #include "devices/probe.h"
 #include "devices/detector.h"
 #include "devices/power_meter.h"
-#include "devices/generic_transmission_device.h"
 #include "run_manifest.h"
 #include "run_progress.h"
 #include "run_stats.h"
@@ -128,7 +127,6 @@ void SPECSConfig::writeRunStats() const
     stats.abstol = default_abstol;
     stats.reltol = default_reltol;
     stats.snap_factor = default_snap_factor;
-    stats.coalesce = coalesce;
     stats.max_events = max_events;
     stats.event_cap_reached = eventCapReached();
     stats.end_time_s = sc_time_stamp().to_seconds();
@@ -458,8 +456,7 @@ void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
     oop_default_config->m_reltol = default_reltol;
     oop_default_config->m_snap_factor = default_snap_factor;
     oop_default_config->m_timestep_value = default_resolution_multiplier; // relative to systemc timestep
-    // F-15: expert options and --stats
-    oop_default_config->m_coalesce = coalesce;
+    // F-15: event cap and --stats
     oop_default_config->m_collect_stats = stats_sections != 0;
     if (max_events && !event_cap)
         event_cap = make_shared<OpticalOutputPortEventCap>(max_events);

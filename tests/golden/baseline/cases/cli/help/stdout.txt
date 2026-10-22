@@ -73,12 +73,6 @@
                                         every <seconds> of wall-clock time
                                         (default 1); it never changes the
                                         simulation; netlists only
-      --no-coalescing                   Expert option (ablation): keep every
-                                        write of an optical output port as its
-                                        own pending entry, instead of merging
-                                        the writes for the same time and
-                                        wavelength; equal times are processed in
-                                        write order; overrides .options coalesce
       --max-events=[set_max_events]     Expert option: stop the run once the
                                         optical output ports have processed this
                                         many pending entries (decimal integer,

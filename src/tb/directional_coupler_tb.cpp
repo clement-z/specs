@@ -105,17 +105,6 @@ void DirectionalCoupler_tb_run()
     uut.p3_in(TERM_r);
     uut.p3_out(OUT2);
 
-    // Generic bidirectional variant
-    // Generic2x2Coupler uut("uut", 1-0.1, 3.0103);
-    // uut.ports_in[0]->bind(IN1);
-    // uut.ports_in[1]->bind(IN2);
-    // uut.ports_in[2]->bind(TERM_r);
-    // uut.ports_in[3]->bind(TERM_r);
-    // uut.ports_out[0]->bind(TERM_w);
-    // uut.ports_out[1]->bind(TERM_w);
-    // uut.ports_out[2]->bind(OUT1);
-    // uut.ports_out[3]->bind(OUT2);
-
     DirectionalCoupler_tb tb("tb");
     tb.IN1(IN1);
     tb.IN2(IN2);

@@ -528,14 +528,13 @@ public:
     spx::oa_signal_type out{"out"};
     std::vector<Write> seen;
 
-    PendingHarness(sc_module_name name, bool coalesce = true)
+    PendingHarness(sc_module_name name)
         : sc_module(name)
         , m_out_writer("out_writer", p_out)
     {
         SC_HAS_PROCESS(PendingHarness);
         p_out(out);
         auto config = make_shared<OpticalOutputPortConfig>();
-        config->m_coalesce = coalesce;
         m_out_writer.setConfig(config);
         SC_METHOD(on_out_changed);
         sensitive << out;
@@ -661,28 +660,6 @@ TEST(OpticalOutputPort, PendingResetCancelsNotification)
         ASSERT_EQ(h.seen.size(), 1u);
         EXPECT_EQ(h.seen[0].t, sc_time(7, SC_NS));
         EXPECT_EQ(h.seen[0].field, OpticalSignal::field_type(3, 0));
-    }
-    SPECS_TEST_FOOTER();
-}
-
-// Without coalescing (F-15 expert option) every write is kept, equal times in write order
-TEST(OpticalOutputPort, PendingWithoutCoalescingKeepsEveryWrite)
-{
-    SPECS_TEST_HEADER()
-    {
-        PendingHarness h("h", false);
-        sc_start(SC_ZERO_TIME);
-        h.write(1, 1.55e-6, 2);
-        h.write(2, 1.55e-6, 1);
-        h.write(3, 1.55e-6, 2);
-        h.write(4, 1.56e-6, 1);
-        EXPECT_EQ(h.m_out_writer.pending(), 4u);
-        sc_start(5, SC_NS);
-
-        ASSERT_EQ(h.seen.size(), 4u);
-        const double field[] = {2, 4, 1, 3};
-        for (size_t i = 0; i < 4; ++i)
-            EXPECT_EQ(h.seen[i].field, OpticalSignal::field_type(field[i], 0));
     }
     SPECS_TEST_FOOTER();
 }
