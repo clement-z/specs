@@ -10,7 +10,7 @@ Base binary for the bench: `/tmp/pd2/bin/base/specs`. Base recordings of clang, 
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| 1 | tolerance gate on squared norms (+ unit tests: last = 0, NaN, inf) | todo | | |
+| 1 | tolerance gate on squared norms (+ unit tests: last = 0, NaN, inf) | done | e50d693 | guarded: abs() decides near thresholds/out of range; gcc strict 227/227, counters 226 same, clang + asan-gcc = base, asan-clang 12/12; gtest re-recorded; bench C N=30 1.159x vs base |
 | 2 | per-wavelength S-parameter caches (waveguide, coupler, phase shifter) | todo | | |
 | 3 | pending events: time-only order, insertion order on ties, single `sc_event`, merge as a lookup [Q8] | todo | | predicted re-records: plain probes/VCD of multi-wavelength nets |
 | 4 | `OpticalSignal`: no virtual destructor, id behind a compile-time flag [Q2] | todo | | predicted re-record: `[NNNN]` prefix of listings |
