@@ -12,9 +12,9 @@
  "exit": 0,
  "files": {
   "traces/t.csv": {
-   "bytes": 39775,
+   "bytes": 39786,
    "kind": "text",
-   "sha256": "02e8ef2ecb0e363c72505697d8703260372505b733e5f71ad7ebf6e1ef195a69",
+   "sha256": "1d1551b58d7faf3ff4e811e28039543450d075c0071276626b54c2a2afe9ae3b",
    "stored": "files/traces/t.csv"
   },
   "traces/t.manifest.json": {
@@ -24,11 +24,11 @@
    "stored": "files/traces/t.manifest.json"
   },
   "traces/t.npz": {
-   "bytes": 33919,
+   "bytes": 33930,
    "kind": "npz",
    "raw_bytes": 18584,
-   "raw_sha256": "6971b89ca2a89c9f8905b826c890b09c2a30ebc5def8c67c6bbe117dc2386813",
-   "sha256": "555b4505afb4aad9564eb662f38599eec43de97b0d1bfbc81dfb2e838bb46bff",
+   "raw_sha256": "895eb8d78ead8533dc474e61daaceeb2c642d37367e9057e3058221a8ad88eea",
+   "sha256": "c05c4efd70648688e5cc385dfb808d4838676ef9666d38b06d5805ac3d358fe8",
    "stored": "files/traces/t.npz.txt"
   }
  },

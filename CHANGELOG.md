@@ -7,6 +7,14 @@
 * Optional pixi development environment (`pixi.toml`, `pixi.lock`): gcc 15 and clang 21 toolchains with `setup`,
   `build`, `test` and `golden` tasks in `build-pixi/<toolchain>` (also ASan+UBSan), a `py` and a `docs`
   environment. CI: pixi job on Ubuntu (blocking) and macOS (non-blocking), next to the apt jobs
+* Agent instructions moved from `CLAUDE.md` to `AGENTS.md` (read by all coding agents); `CLAUDE.md` imports it
+
+### Changed
+
+* `-Dnative` is off by default: builds are portable (no `-march=native`) and their results no longer depend on the
+  build machine's CPU. `-Dnative=true` (pixi: `pixi run build-native`, toolchains `gcc-native`/`clang-native`) gives
+  host-tuned binaries, whose results differ in the last bits (B-183). The golden baseline is re-recorded without
+  `-march=native`: 28 cases change in the last one or two digits of floats (within 1e-12 relative)
 
 ## [0.2.0] - 2026-10-21
 

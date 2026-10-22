@@ -12,9 +12,9 @@
    "stored": "files/traces/delete_me.manifest.json"
   },
   "traces/delete_me.vcd": {
-   "bytes": 28237,
+   "bytes": 28227,
    "kind": "vcd",
-   "sha256": "b6732b386660db25ca11ec9746dae7341291553407a1c15d43a5c6516fff7be9",
+   "sha256": "2310e53804b18f963a8ee572e5d47ab76f14d71a432ba963c065b19009fbe409",
    "stored": "files/traces/delete_me.vcd"
   }
  },

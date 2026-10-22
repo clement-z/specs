@@ -1,5 +1,5 @@
-option('native', type: 'boolean', value: true,
-       description: 'Compile with -march=native (fast, but the binaries only run on CPUs like the build host)')
+option('native', type: 'boolean', value: false,
+       description: 'Compile with -march=native: faster on the build host, but the binaries only run on CPUs like it and results differ from the golden baseline in the last bits (B-183)')
 option('old_tb', type: 'boolean', value: true,
        description: 'Build the legacy testbenches in src/tb (specs -t/-p); defines BUILD_TB=1 for specs')
 option('spx', type: 'boolean', value: false,

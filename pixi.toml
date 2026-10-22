@@ -3,6 +3,7 @@
 # stays supported; see README.md, "Development environment (pixi, optional)".
 #   pixi run test              # configure + build + meson test in build-pixi/gcc
 #   pixi run test clang        # same with clang, in build-pixi/clang (also: asan-gcc, asan-clang)
+#   pixi run build-native      # -march=native build in build-pixi/gcc-native (also: test clang-native)
 #   pixi run golden            # the golden check of AGENTS.md on build-pixi/gcc
 #   pixi shell                 # a shell with the environment (CC/CXX: ccache + gcc on Linux)
 # Binaries built here use the environment's libstdc++ (rpath into .pixi/envs/default/lib): they run
@@ -61,10 +62,11 @@ CXX = "ccache clang++"
 
 # Build directories: build-pixi/<toolchain>, never the plain route's build/ (a build directory keeps
 # the compilers it was configured with; utils/pixi-setup.sh refuses one configured elsewhere).
-# Toolchains: gcc (default), clang, asan-gcc, asan-clang. Extra Meson options after `--`, used when
-# the directory is created: pixi run setup gcc -- -Dspx=true
+# Toolchains: gcc (default), clang (portable, bit-identical to the golden baseline), gcc-native,
+# clang-native (-march=native: faster here, last bits differ, B-183), asan-gcc, asan-clang. Extra Meson
+# options after `--`, used when the directory is created: pixi run setup gcc -- -Dspx=true
 [tasks.setup]
-description = "Configure build-pixi/<toolchain> (gcc, clang, asan-gcc, asan-clang)"
+description = "Configure build-pixi/<toolchain> (gcc, clang, gcc-native, clang-native, asan-gcc, asan-clang)"
 args = [{ arg = "toolchain", default = "gcc" }]
 cmd = "sh utils/pixi-setup.sh {{ toolchain }}"
 
@@ -73,6 +75,10 @@ description = "Build build-pixi/<toolchain>"
 args = [{ arg = "toolchain", default = "gcc" }]
 cmd = "meson compile -C build-pixi/{{ toolchain }}"
 depends-on = [{ task = "setup", args = ["{{ toolchain }}"] }]
+
+[tasks.build-native]
+description = "Build with -march=native (build-pixi/gcc-native): faster on this machine, last bits differ from the baseline"
+depends-on = [{ task = "build", args = ["gcc-native"] }]
 
 [tasks.test]
 description = "meson test in build-pixi/<toolchain> (unit, golden, legacy testbenches)"

@@ -43,7 +43,8 @@ meson setup build --wrap-mode=nofallback -Dcmake_prefix_path=/path/to/systemc/pr
 ```
 
 SystemC is then looked up with pkg-config, then as a CMake package (`-Dcmake_prefix_path`); args as a CMake
-package (with `nofallback`, the unit tests also need an installed googletest). Useful options: `-Dnative=false` (portable binaries, no `-march=native`),
+package (with `nofallback`, the unit tests also need an installed googletest). Useful options: `-Dnative=true` (`-march=native`: faster on the build machine, but the binaries only run on CPUs like
+it and results differ from the golden baseline in the last bits),
 `-Dold_tb=false` (no built-in testbenches), `-Dtests=disabled` (no googletest download). The shared library
 is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs it), and the Doxygen docs with `ninja -C build doc`.
 `meson install` installs `specs` and, when SystemC is built from its wrap, `libsystemc.so` into `<prefix>/<libdir>`
@@ -58,6 +59,7 @@ unchanged and remains the reference.
 ```sh
 pixi run test                      # configure, build and meson test in build-pixi/gcc (gcc 15)
 pixi run test clang                # same with clang 21 in build-pixi/clang; also asan-gcc, asan-clang
+pixi run build-native              # -march=native build in build-pixi/gcc-native (also: test clang-native)
 pixi run golden                    # golden-output check only; setup and build tasks exist too
 pixi shell                         # shell with the environment (CC/CXX set to its gcc)
 pixi run -e py jupyter lab         # Python environment for pyspecs and the notebooks

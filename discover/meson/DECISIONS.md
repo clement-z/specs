@@ -26,7 +26,7 @@ chosen and why. Items a maintainer may want to revisit are marked **[review]**.
    `dlambda=5 pm`), user CPU time is the same 0.32 s for CMake Release, Meson default and Meson
    `-Db_ndebug=true` (VALIDATION.md §g). Users who want the exact CMake Release
    configuration can pass `-Db_ndebug=true`.
-7. **`-march=native` is the option `native` (default true)**, so the bit-compatibility with the baseline
+7. *(superseded by 46: `native` defaults to false since 2026-10-22)* **`-march=native` is the option `native` (default true)**, so the bit-compatibility with the baseline
    holds on the build host. CI uses `-Dnative=false` because its artefacts must run on other machines.
    The golden check also passes with `-Dnative=false` (VALIDATION.md).
 8. **`warning_level=2`** (`-Wall -Wextra`), **`-Wfatal-errors`**, and **`-iquote <repo>/src`** are project
@@ -240,3 +240,13 @@ Maintainer decisions of 2026-10-22 in `backlog/DECISIONS-2026-10-21.md`; impleme
 44. **`py` and `docs` environments do not include the default feature**, so they carry no second toolchain.
 45. **CI: a pixi job next to the apt jobs** (setup-pixi v0.11.2, pixi 0.82.1, locked, `-Dnative=false` like the
     apt jobs).
+
+## Native builds off by default (2026-10-22, B-183)
+
+46. **`native` defaults to false** (maintainer decision 2026-10-22, B-183 option (c)). With `-march=native` on an
+    FMA CPU, gcc contracts `a*b+c` into FMA (`gnu++20` → `-ffp-contract=fast`), so results depended on the build
+    machine and the compiler in the last bits, and the golden baseline was bit-exact only for gcc native builds.
+    The baseline is now recorded from a portable build. `-Dnative=true` stays available (pixi: `build-native`,
+    toolchains `gcc-native`, `clang-native`) for host-tuned runs. Side effect: without `-march=native`, ccache
+    hits across worktrees (ccache hashes the absolute paths of `g++ -### -march=native` output, PF report).
+

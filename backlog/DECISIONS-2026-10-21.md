@@ -87,3 +87,12 @@ Push the branch after the final verification (no PR creation, no merge into `dev
 | Contents | **Compilers in pixi** (gcc and clang with their sanitizer runtimes; plain compiler packages, not the activation flags of `cxx-compiler`), meson, ninja, cmake, pkg-config, flex, bison, Python, ccache, debugger, clang-format; features `py` (pyspecs: numpy, pandas, matplotlib, jupyter, pyDigitalWaveTools from PyPI) and `docs` (doxygen, graphviz); tasks for setup/build/test/golden/sanitizers; ccache and wrap download shared across worktrees. |
 | CI | A pixi job **next to** the existing apt jobs (they keep testing the distro toolchains and produce the artefacts): Ubuntu blocking, macOS non-blocking until the macOS port is done (a later phase). |
 | Release | After `v0.2.0`: under `[unreleased]`; the tag goes on the release candidate before this merge. |
+
+## Decisions of 2026-10-22, second round (after phase F)
+| Topic | Decision |
+|---|---|
+| B-183 golden bit-identity | **(c)**: the baseline is recorded without `-march=native`; together with the next row, default builds compare bit-identically. |
+| `native` option | **Off by default** (portable builds, shared ccache across worktrees); a pixi command builds with `-march=native` (`pixi run build-native`, toolchains `gcc-native`/`clang-native`). |
+| Worktree setup | **No `paseo.json`**: agents run `pixi install --locked` themselves when `.pixi/` is missing; written in the repo's agent instructions. |
+| Agent instructions | Moved from `CLAUDE.md` to **`AGENTS.md`**; `CLAUDE.md` redirects to it (imports it). |
+| Release | Push `sprint/2026-10c` and merge into `dev` and `master` authorised (tag `v0.2.0` not requested yet). |

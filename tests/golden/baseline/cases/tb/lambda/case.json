@@ -12,9 +12,9 @@
    "stored": "files/traces/lambda_tb.manifest.json"
   },
   "traces/lambda_tb.vcd": {
-   "bytes": 5405,
+   "bytes": 5407,
    "kind": "vcd",
-   "sha256": "2d8498904ba614a71bdbd82619ee3dddfaac4bae6a3c2ac49e1b3dcc48f57acd",
+   "sha256": "4a9b0ccbaabd74d52a5e736fb259aafb41e7307c4940d6b44887ff9f14ccb2b7",
    "stored": "files/traces/lambda_tb.vcd"
   }
  },

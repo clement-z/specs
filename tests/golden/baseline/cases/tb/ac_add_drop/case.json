@@ -12,9 +12,9 @@
    "stored": "files/traces/freqsweep_tb.manifest.json"
   },
   "traces/freqsweep_tb.vcd": {
-   "bytes": 23420,
+   "bytes": 23437,
    "kind": "vcd",
-   "sha256": "b05eddd83160335e6ce3ed08acfad349951b79f3eabab6c2e68148abefe7be97",
+   "sha256": "2b8bdc114826f3a4c908f5ad807d1afaa0c24094fa5d5f9bf947bf59dbfa63cf",
    "stored": "files/traces/freqsweep_tb.vcd"
   }
  },

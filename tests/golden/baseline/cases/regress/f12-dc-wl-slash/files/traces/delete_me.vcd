@@ -25,7 +25,7 @@ All initial values are dumped below at time 0 sec = 0 timescale units.
 $end
 
 $dumpvars
-r0.0007163417020255054 aaaaa
+r0.0007163417020255053 aaaaa
 r0.02676456056103865 aaaab
 r-0.7714137940913304 aaaac
 r1.549e-06 aaaad
@@ -58,7 +58,7 @@ r-2.50197326529613 aaaac
 r1.5505e-06 aaaad
 
 #4
-r0.0008093747280364948 aaaaa
+r0.0008093747280364947 aaaaa
 r0.02844951191209604 aaaab
 r-3.078082575611205 aaaac
 r1.551e-06 aaaad

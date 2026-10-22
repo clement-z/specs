@@ -1,7 +1,7 @@
 ╔═══════════════════╗
 ║  PARSING CIRCUIT  ║
 ╚═══════════════════╝
-Recorded sweep order for WL(CWSRC1) (9points)
+Recorded sweep order for WL(CWSRC1) (11points)
 -----------
 2 global assignments
  - c (DOUBLE) = 2.99792e+08

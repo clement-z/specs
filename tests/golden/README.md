@@ -196,13 +196,13 @@ baseline/cases/<group>/<name>/files/...    normalised output files (VCD, JSON; a
 baseline/gtest/unit_tests.json      per-test PASS/FAIL
 ```
 
-The current baseline was recorded with the CMake Release build (GCC 11.5,
-`-std=gnu++20 -O3 -march=native`, SystemC 3.0.1). It passes unchanged (`--atol 0
---strict`) with SystemC 3.0.2 and args 6.4.7, the versions on upstream `dev` the sprint was
-rebased onto; only `cli/help` and `cli/no-args` gained the upstream `--version` flag. Cases re-recorded or added
-since then (the `rerecords` list of `manifest.json`) come from the Meson GCC
-build with its default options. The largest file is about 400 kB, so nothing is
-gzipped or summarised.
+The current baseline was recorded on 2026-10-22 (B-183) with the Meson release build and the project
+defaults, **without `-march=native`** (`-Dnative=false` is the default since then), using pixi's gcc 15
+(`pixi run build gcc`), SystemC 3.0.2 and args 6.4.7 from the wraps. Before that full re-record the baseline
+came from a `-march=native` gcc build, whose FMA contractions made it bit-exact only for gcc native builds;
+the previous baseline and its partial re-records are in the git history of `baseline/`. Cases re-recorded or
+added since then are listed in the `rerecords` list of `manifest.json`. The largest file is about 400 kB, so
+nothing is gzipped or summarised.
 
 **gtest provenance:** the gtest baseline is recorded from the in-tree
 `unit_tests` (Meson: `<builddir>/src/test/unit_tests`) and re-recorded on its
@@ -252,6 +252,10 @@ the root `.gitignore` ignores `*.vcd` (and `*.cir`, `specs`, ...) repo-wide.
   * the Meson builds (2026-10, `discover/meson/VALIDATION.md`): GCC default
     and `-Db_ndebug=true` are bit-identical (`--rtol 0 --atol 0
     --print-slack 0`); clang and `-Dnative=false` pass with `--atol 0`.
+  * since the 2026-10-22 re-record (B-183), with `--rtol 0 --atol 0 --print-slack 0`: gcc release builds
+    (system gcc 11.5, pixi gcc 15.3) are bit-identical; clang (19.1, 21.1) and debug ASan+UBSan builds (gcc
+    and clang) differ in 6 cases at one sweep point (at most 1e-14 relative); `-Dnative=true` builds differ
+    in 28 cases (at most 1e-12). All pass at the default tolerances and with `--atol 0`.
 
   The largest numeric deviation was 1.1e-13 relative. All of them also pass
   with `--atol 0`.

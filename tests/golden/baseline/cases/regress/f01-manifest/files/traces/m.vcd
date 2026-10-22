@@ -26,8 +26,8 @@ $end
 
 $dumpvars
 r0.001 aaaaa
-r0.0316227766016838 aaaab
-r-0.8107335880228973 aaaac
+r0.03162277660168379 aaaab
+r-0.8107335880228972 aaaac
 r1.55e-06 aaaad
 r1e-08 aaaae
 r0.0001 aaaaf

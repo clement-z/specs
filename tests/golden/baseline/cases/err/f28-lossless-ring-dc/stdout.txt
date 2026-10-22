@@ -1,7 +1,7 @@
 ╔═══════════════════╗
 ║  PARSING CIRCUIT  ║
 ╚═══════════════════╝
-Recorded sweep order for WL(CWSRC1) (2points)
+Recorded sweep order for WL(CWSRC1) (3points)
 -----------
 2 global assignments
  - c (DOUBLE) = 2.99792e+08
@@ -55,7 +55,7 @@ Current SPECS config:
 - abstol: 1e-08
 - default reltol: 0.0001
 - resolution multiplier: 1
-- trace all optical nets: 1
+- trace all optical nets: 0
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
 Starting sweep on WL(ROOT/CWSRC1) (3 points)

@@ -1,5 +1,5 @@
 # B-183: Bit-identical golden outputs only hold for gcc with `-march=native` (FMA); other compilers and flags differ in the last bits
-severity: low | category: determinism | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: open
+severity: low | category: determinism | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed (option (c), see Resolution)
 location: tests/golden/baseline (recorded with gcc, `-march=native`); meson.build (`-march=native`, `cpp_std=gnu++20`)
 
 ## Problem
@@ -36,3 +36,23 @@ None until decided; (b) or (c) re-record the whole baseline.
 ## Related
 F-15 (D2/D3 compare outputs `--rtol 0 --atol 0 --print-slack 0` between builds of the same toolchain), `src/utils/rng.cpp`
 (already avoids an FMA-dependent last bit), phase PF report.
+
+## Resolution (2026-10-22)
+Maintainer decision: **(c)**, with `native` off by default (`meson.options`) and a pixi command for native builds
+(`pixi run build-native`, toolchains `gcc-native`, `clang-native`). The whole baseline was re-recorded from the pixi
+gcc 15 release build with the project defaults. Audit: before recording, that build passed the previous baseline at
+the default tolerances and at `--rtol 1e-12 --atol 0 --print-slack 0`; old vs new baseline differ strictly in exactly
+the 28 cases above (floats, last 1-2 digits; a VCD only records changes, so a last-bit flip can add or drop a line),
+plus the ignored stdout of 8 error/regress cases (`ignore_streams`) that had gone stale since F-05.
+
+Strict check (`--rtol 0 --atol 0 --print-slack 0`) against the new baseline, fresh clone:
+
+| build | strict failures |
+|---|---|
+| system gcc 11.5 and pixi gcc 15.3, release (default) | 0 |
+| system clang 19.1 and pixi clang 21.1, release | 6, one `.dc` sweep point (`cir/add_drop`, `opt/tol-resolution-overrides`, `opt/mode-fd`, `opt/multi-file`, `regress/b004-mode-td-dc`, `regress/f05-format-vcd-csv-dc`), <= 1e-14 relative |
+| pixi ASan+UBSan debug, gcc and clang | the same 6 |
+| pixi gcc 15, `-Dnative=true` | 28 (the list above) |
+
+All pass at the default tolerances and with `--atol 0`. The remaining 6 differ without FMA, so they come from how
+compilers and optimisation levels evaluate a few operations (e.g. math-function calls); not investigated further.

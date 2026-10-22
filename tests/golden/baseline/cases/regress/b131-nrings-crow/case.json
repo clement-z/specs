@@ -14,9 +14,9 @@
    "stored": "files/traces/crow_tb.manifest.json"
   },
   "traces/crow_tb.vcd": {
-   "bytes": 84024,
+   "bytes": 84060,
    "kind": "vcd",
-   "sha256": "7fd44483f1a4f823af2a9127bf21f4ca6cd348f9017a3025da0d8b5d2039ee80",
+   "sha256": "0f7663f0453c222b6dcae8459a478cc5ce50087ee44d19827b19710cf9be5305",
    "stored": "files/traces/crow_tb.vcd"
   }
  },
