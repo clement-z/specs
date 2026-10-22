@@ -130,6 +130,9 @@ void OpticalOutputPort::applyConfig() {
     m_reltol = m_config->m_reltol;
     m_abstol = m_config->m_abstol;
     m_snap_factor = m_config->m_snap_factor;
+    m_coalesce = m_config->m_coalesce;
+    m_collect_stats = m_config->m_collect_stats;
+    m_event_cap = m_config->m_event_cap.get();
 }
 
 void OpticalOutputPort::start_of_simulation() {
@@ -145,7 +148,7 @@ void OpticalOutputPort::on_data_ready()
         wait();
 
         // Check if output queue is empty (would be a bug)
-        if (m_queue.size() == 0) {
+        if (m_coalesce ? m_queue.size() == 0 : m_fifo_queue.empty()) {
             cerr << "error: write cancelled, because no values are present" << endl;
             sc_stop();
             continue;
@@ -154,9 +157,13 @@ void OpticalOutputPort::on_data_ready()
         // Get current time
         sc_time now = sc_time_stamp();
 
-        // Get the next queue item and pop it from the queue
-        auto tuple = m_queue.top();
-        m_queue.pop();
+        // Get the next queue item and pop it from the queue (without coalescing: the
+        // first one written for the earliest time, F-15)
+        auto tuple = m_coalesce ? m_queue.top() : pair_type(*m_fifo_queue.begin());
+        if (m_coalesce)
+            m_queue.pop();
+        else
+            m_fifo_queue.erase(m_fifo_queue.begin());
 
         // If next event is also now, notify event queue
         // if (m_queue.top().first == now)
@@ -205,8 +212,42 @@ void OpticalOutputPort::on_data_ready()
 
         // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
         // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
+        bool snapped = false;
         if (emit_signal && (abs(desired) < m_snap_factor*m_abstol))
+        {
             desired = complex<double>(0,0);
+            snapped = true;
+        }
+
+        // F-15 --stats: one count per processed entry (OpticalOutputPortStats)
+        if (m_collect_stats)
+        {
+            ++m_stats.processed;
+            m_stats.wavelength_ids.insert(wlid);
+            if (!emit_signal && !m_skip_next_convergence_check)
+            {
+                if (!pass_abstol)
+                    ++m_stats.suppressed_abstol;
+                else
+                    ++m_stats.suppressed_reltol;
+            }
+            else if (snapped && desired == emitted)
+                ++m_stats.suppressed_snap;
+            else
+            {
+                ++m_stats.emitted;
+                m_stats.has_emitted = true;
+                m_stats.last_emission = now;
+            }
+        }
+
+        // F-15 event cap: stop at the end of this delta cycle once the run has processed
+        // max_events entries (SPECSConfig reports it)
+        if (m_event_cap && ++m_event_cap->processed >= m_event_cap->max_events && !m_event_cap->reached)
+        {
+            m_event_cap->reached = true;
+            sc_stop();
+        }
 
 
         // cout << "emit: " << emit_signal << endl;
@@ -272,10 +313,20 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
     }
 
 
+    // without coalescing (F-15): always a new entry, after those of the same time
+    if (!m_coalesce) {
+        m_fifo_queue.emplace(t, value);
+        m_event_queue.notify(t - sc_time_stamp());
+        if (m_collect_stats)
+            count_scheduled(false);
+        return;
+    }
+
     // find first scheduled signal with this timestamp and this lambda
     auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&t](const auto &x) {
             return t == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
             });
+    const bool coalesced = it != m_queue.cend();
 
     // check if an event was already scheduled for the same timestamp
     if (it == m_queue.cend()) {
@@ -290,6 +341,19 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         else
             it->second = value;
     }
+    if (m_collect_stats)
+        count_scheduled(coalesced);
+}
+
+// F-15 --stats: a value written to the port, merged into a pending entry or not
+void OpticalOutputPort::count_scheduled(bool coalesced)
+{
+    ++m_stats.scheduled;
+    if (coalesced)
+        ++m_stats.coalesced;
+    const uint64_t n = pending();
+    m_stats.pending_sum += n;
+    m_stats.pending_max = std::max(m_stats.pending_max, n);
 }
 
 void OpticalOutputPort::delayedWriteSampledTime(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier)
@@ -310,11 +374,21 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
 
     const sc_time &now = sc_time_stamp();
 
+    // without coalescing (F-15): always a new entry, after those of the same time
+    if (!m_coalesce) {
+        m_fifo_queue.emplace(now, value);
+        m_event_queue.notify(SC_ZERO_TIME);
+        if (m_collect_stats)
+            count_scheduled(false);
+        return;
+    }
+
     // find a scheduled signal with this timestamp and this lambda anywhere in
     // the queue, not only at its top: another wavelength can be on top (B-001)
     auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&now](const auto &x) {
             return now == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
             });
+    const bool coalesced = it != m_queue.end();
 
     if (it == m_queue.end()) {
         // if not, schedule the signal for the current time
@@ -328,6 +402,8 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
         else
             it->second = value;
     }
+    if (m_collect_stats)
+        count_scheduled(coalesced);
 }
 
 void OpticalOutputPort::delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier)

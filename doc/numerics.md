@@ -235,3 +235,78 @@ name: the parser marks the waveguides it creates from netlist lines.
 
 In the paper's CROW benchmark (N = 3, L ≈ 350 µm), Interconnect differed from Photontorch and SPECS at 100 fs.
 At 1 fs all three agreed, with pairwise RMS errors below about 3 µW.
+
+## Run statistics (`--stats`)
+
+`specs --stats` counts what the optical output ports did during the run and writes it as JSON next to the
+trace file, `<name>.stats.json` (`-o name`, default `traces/delete_me`). It shows where the events went: how
+many values the devices produced, how many the emission gate dropped and why, how long the queues got. The
+counters are kept per output port (no global state) and summed at the end; they cost nothing when `--stats`
+is off. Netlists only (`-f`): the `-t` testbenches ignore it.
+
+| Option | Effect |
+| --- | --- |
+| `--stats` | run totals (section `summary`) |
+| `--stats=ports` | also one row per output port: port, net, writer (the device), wavelengths, counters |
+| `--stats=devices` | also one row per device type (the C++ class of the device that owns the port) |
+| `--stats=ports,devices` | both |
+| `--stats-file path` | write the JSON there instead (implies `--stats`) |
+| `--print-stats` | also print the JSON on stdout (implies `--stats`) |
+
+Without a trace file (`--no-trace`, `-o ""`) and without `--stats-file`, the JSON is printed on stdout. When
+it is written to a file, stdout shows `Run statistics written to <file>`. It is written at the end of the
+analysis, and also when the run stops on a non-convergence error or at the event cap (below).
+
+Counters (per port, summed in `totals` and per device type):
+
+| Key | Counts |
+| --- | --- |
+| `scheduled` | values written to the port by its device (`delayedWrite()`), at a time and wavelength |
+| `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one, or is added to it for devices that write deltas) |
+| `processed` | pending entries taken at their time |
+| `emitted` | of which written to the net with a new value (the gate passed) |
+| `suppressed.abstol` | not written: \|E - E_last\| <= abstol |
+| `suppressed.reltol` | not written: above abstol, \|E - E_last\| <= reltol·\|E_last\| |
+| `suppressed.snap` | the gate passed, but the value was snapped to 0 and 0 was already the last value emitted at that wavelength: written again, no change |
+| `pending_max`, `pending_mean` | entries pending in the port after each scheduled value: largest, mean |
+| `pending_end` | entries still pending at the end of the run (scheduled after its end) |
+| `last_emission_s` | time of the last emitted value (`null` if none); simulated time, 0 for `.op` |
+
+Every value is accounted for: `scheduled = coalesced + processed + pending_end` (plus the entries a `.dc`
+drops between two points, normally none) and `processed = emitted + suppressed.abstol + suppressed.reltol
++ suppressed.snap`. The other keys: `analysis` (`OP`, `DC`, `TRAN`), `sections`, `options` (the tolerances,
+`snapfactor` and the expert options below), `event_cap_reached`, `end_time_s` (simulated time at the end), and
+`wall_time_s`, the wall-clock time from the start of the analysis (elaboration excluded), the only value that
+changes from one run to the next. In a `.dc` sweep, the counters cover every point (and the wavelengths of
+every point); in a `.tran`, the operating point before it too. Example (`--stats` on
+`tests/golden/netlists/b021-snapfactor.cir`, an `.op`):
+
+    {
+      "format": "specs-run-stats",
+      "format_version": 1,
+      "analysis": "OP",
+      "sections": ["summary"],
+      "options": {"abstol": 0.01, "reltol": 1e-04, "snapfactor": 4, "coalesce": true, "maxevents": 0},
+      "event_cap_reached": false,
+      "end_time_s": 0,
+      "wall_time_s": 0.000218417,
+      "totals": {"output_ports": 6, "scheduled": 6, "coalesced": 0, "processed": 6, "emitted": 5, "suppressed": {"abstol": 0, "reltol": 0, "snap": 1}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 0}
+    }
+
+Numbers are written in the shortest form that reads back to the same double. The rows of `ports` are in name
+order, those of `devices` in type order; one row per line. A port that carries several wavelengths lists them
+all (a `.dc` wavelength sweep lists every swept wavelength).
+
+The golden harness (`tests/golden/run_golden.py`) masks `wall_time_s` in files named `*.stats.json` and on
+stdout.
+
+### Progress (`--progress`)
+
+`specs --progress` prints a line on stderr every second of wall-clock time (`--progress=0.2`: every 0.2 s):
+
+    Progress: 12.0 s wall, simulated 1234500 ps (41.2 % of 3 us), 8812431 delta cycles
+
+The share of the duration is shown for a `.tran` with a duration. The line is printed from a SystemC stage
+callback after a delta cycle; it only reads the simulation time and the delta count, so it never changes the
+results, advances time or stops the run. A long `.op` iteration shows the delta cycles going up at a fixed
+simulated time.

@@ -70,6 +70,12 @@ SPECS_VERSION_RE = re.compile(r'("specs_version"\s*:\s*)"(?:[^"\\]|\\.)*"')
 SPECS_VERSION_LINE_RE = re.compile(r'^(\s*"specs_version"\s*:\s*)"(?:[^"\\]|\\.)*"')
 VERSION_MASK = r'\1"<VERSION>"'
 
+# Run statistics of specs (F-15, src/run_stats.h): <trace>.stats.json (or --stats-file), and
+# `specs --print-stats` on stdout. "wall_time_s" (on its own line) is the only run-dependent value.
+RUN_STATS_SUFFIX = ".stats.json"
+WALL_TIME_LINE_RE = re.compile(r'^(\s*"wall_time_s"\s*:\s*)[-+0-9.eE]+')
+WALL_TIME_MASK = r'\1"<WALL_TIME>"'
+
 # Numbers embedded in text: not glued to identifiers (PS1, COL_0, uut2 ...).
 NUM_RE = re.compile(
     r"(?<![A-Za-z0-9_.])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![A-Za-z0-9_.])"
@@ -116,6 +122,7 @@ def normalise_text(text, pathmap):
         line = RUNTIME_RE.sub("Total runtime: <DURATION> ms", line)
         line = NEG_NAN_RE.sub("nan", line)
         line = SPECS_VERSION_LINE_RE.sub(VERSION_MASK, line)
+        line = WALL_TIME_LINE_RE.sub(WALL_TIME_MASK, line)
         out.append(line.rstrip())
     while out and out[0] == "":
         out.pop(0)
@@ -130,6 +137,13 @@ def normalise_run_manifest(text, pathmap):
     verbatim; the file is still compared as JSON."""
     text = SPECS_VERSION_RE.sub(VERSION_MASK, text.replace("\r\n", "\n"), count=1)
     return pathmap.apply(text)
+
+
+def normalise_run_stats(text):
+    """<trace>.stats.json: the value of "wall_time_s" becomes "<WALL_TIME>". Everything else is
+    kept verbatim; the file is still compared as JSON."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    return "\n".join(WALL_TIME_LINE_RE.sub(WALL_TIME_MASK, line) for line in lines)
 
 
 def canonical_ids(text):
@@ -761,6 +775,8 @@ def run_case(case, specs, repo, tmp_root):
                 content = normalise_vcd(decode(raw))
             elif kind == "json" and rel.endswith(RUN_MANIFEST_SUFFIX):
                 content = normalise_run_manifest(decode(raw), pathmap)
+            elif kind == "json" and rel.endswith(RUN_STATS_SUFFIX):
+                content = normalise_run_stats(decode(raw))
             elif kind == "npz":
                 content = decode_npz(raw)
             elif kind in ("text", "json"):

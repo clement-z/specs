@@ -7,6 +7,8 @@
 #include <vector>
 #include <queue>
 #include <map>
+#include <memory>
+#include <set>
 
 #include "optical_signal.h"
 #include "utils/pqueue.h"
@@ -44,6 +46,18 @@ enum DelayRoundingVerdict {
 double roundDelay(double exact_s, double resolution_s);
 DelayRoundingVerdict classifyDelayRounding(double exact_s, double resolution_s, double max_rel_error);
 
+// F-15 event cap (expert option, .options maxevents, specs --max-events): the simulation stops
+// (sc_stop(), at the end of the delta cycle) once the output ports sharing this object have
+// processed max_events pending entries in total. One per run, shared through the port
+// configuration (no global); SPECSConfig reports it
+struct OpticalOutputPortEventCap {
+    uint64_t max_events = 0;
+    uint64_t processed = 0;
+    bool reached = false;
+
+    OpticalOutputPortEventCap(uint64_t max) : max_events(max) {}
+};
+
 class OpticalOutputPortConfig {
 public:
     OpticalOutputPortMode m_mode = OpticalOutputPortMode::DEFAULT;
@@ -52,8 +66,37 @@ public:
     // Emitted values with |E| < m_snap_factor * m_abstol are replaced by 0; 0 disables it (B-021)
     double m_snap_factor = 10;
     sc_time::value_type m_timestep_value = 1; // relative to systemc timestep
+    // F-15 expert option (.options coalesce, specs --no-coalescing): a write for a (time, wavelength)
+    // already pending replaces (or adds to) that entry. Off: every write is a new entry, and entries
+    // of equal time are taken in write order (FIFO)
+    bool m_coalesce = true;
+    // F-15 --stats: count the activity of the port (OpticalOutputPortStats)
+    bool m_collect_stats = false;
+    // F-15 event cap; nullptr: no cap
+    std::shared_ptr<OpticalOutputPortEventCap> m_event_cap;
 
     OpticalOutputPortConfig() {}
+};
+
+// F-15 --stats: activity counters of one output port, collected when its configuration says so
+// (m_collect_stats) and kept over the whole run (reset() keeps them); RunStats sums them.
+// Every processed entry is counted once:
+//   processed = emitted + suppressed_abstol + suppressed_reltol + suppressed_snap
+struct OpticalOutputPortStats {
+    uint64_t scheduled = 0; // values written to the port (delayedWrite())
+    uint64_t coalesced = 0; // of which merged into the entry pending for the same (time, wavelength)
+    uint64_t processed = 0; // pending entries taken at their time
+    uint64_t emitted = 0; // of which written to the net with a new value (or forced)
+    uint64_t suppressed_abstol = 0; // not written: |E - E_last| <= abstol
+    uint64_t suppressed_reltol = 0; // not written: above abstol, |E - E_last| <= reltol * |E_last|
+    // passed the gate, but snapped to 0 (|E| < snapfactor * abstol) while 0 was the last value
+    // emitted at that wavelength: written again, no change
+    uint64_t suppressed_snap = 0;
+    uint64_t pending_max = 0; // pending entries after each scheduled value: largest
+    uint64_t pending_sum = 0; // and sum (mean: pending_sum / scheduled)
+    bool has_emitted = false;
+    sc_time last_emission; // time of the last emitted value
+    std::set<uint32_t> wavelength_ids; // wavelengths of the processed entries
 };
 
 class OpticalOutputPort : public sc_module {
@@ -62,12 +105,15 @@ public:
 	typedef sc_port<sc_signal_out_if<OpticalSignal>> port_type;
 	typedef pair<sc_time, OpticalSignal> pair_type;
     typedef PQueue<pair_type> queue_type;
+    // Pending entries without coalescing (F-15): equal times in insertion order
+    typedef std::multimap<sc_time, OpticalSignal> fifo_queue_type;
 
 
 // private:
 public:
     port_type &m_port;
     queue_type m_queue;
+    fifo_queue_type m_fifo_queue; // used instead of m_queue when m_coalesce is off
     sc_event_queue m_event_queue;
 
     std::map<uint32_t,OpticalSignal::field_type> m_desired_fields;
@@ -80,6 +126,12 @@ public:
     double m_snap_factor;
     bool m_use_deltas = false;
     bool m_skip_next_convergence_check = false;
+    bool m_coalesce = true;
+    bool m_collect_stats = false;
+    OpticalOutputPortEventCap *m_event_cap = nullptr; // owned by m_config
+
+    // F-15 --stats (kept over the whole run)
+    OpticalOutputPortStats m_stats;
 
     // Last emission, for the non-convergence report of the .op/.dc fixed point (F-28)
     bool m_has_emitted = false;
@@ -91,6 +143,7 @@ public:
     std::shared_ptr<const OpticalOutputPortConfig> m_config;
 
     void on_data_ready();
+    void count_scheduled(bool coalesced);
     bool check_emit_by_abstol(const OpticalSignal::field_type &desired, const OpticalSignal::field_type &last);
     bool check_emit_by_reltol(const OpticalSignal::field_type &desired, const OpticalSignal::field_type &last);
 
@@ -137,6 +190,7 @@ public:
         }
         m_event_queue.cancel_all();
         m_queue = queue_type();
+        m_fifo_queue.clear();
     }
 
     void reset()
@@ -148,7 +202,18 @@ public:
 
     inline bool isempty() const
     {
-        return m_queue.empty();
+        return m_queue.empty() && m_fifo_queue.empty();
+    }
+
+    // Pending entries (of the queue in use)
+    inline size_t pending() const
+    {
+        return m_coalesce ? m_queue.size() : m_fifo_queue.size();
+    }
+
+    const OpticalOutputPortStats &getStats() const
+    {
+        return m_stats;
     }
 
     void delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);

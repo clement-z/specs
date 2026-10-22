@@ -12,7 +12,7 @@ For now, you can have a look at:
 * [Netlist syntax and element arguments](netlist.md): numbers and SI suffixes, parameters and `--param`,
   `.include`, subcircuits, analyses, and the arguments and keywords of each netlist element
 * [Tolerances and time resolution](numerics.md) for `abstol`, `reltol`, `snapfactor`, `timescale` and `resolution`,
-  and the `.op`/`.dc` iteration cap (`maxiter`)
+  and the `.op`/`.dc` iteration cap (`maxiter`), run statistics (`--stats`), `--progress`
 * [Reproducible runs](reproducibility.md): `--seed` and `.options seed`, output order, the run manifest (`--print-manifest`)
 
 And refer to the auto-generated code documentation.

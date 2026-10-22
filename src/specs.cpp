@@ -14,10 +14,13 @@
 #include "devices/power_meter.h"
 #include "devices/generic_transmission_device.h"
 #include "run_manifest.h"
+#include "run_progress.h"
+#include "run_stats.h"
 #include "trace_table.h"
 
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <limits>
 
 using std::string;
@@ -50,9 +53,20 @@ SPECSConfig::~SPECSConfig() {}
 
 void SPECSConfig::runAnalysis()
 {
+    run_start = std::chrono::steady_clock::now();
     verifyConfig();
     applyEngineResolution();
     prepareSimulation();
+
+    // F-15 --progress: passive, from the first sc_start() to the end of the analysis
+    std::unique_ptr<RunProgress> progress;
+    if (progress_period_s > 0)
+    {
+        progress = std::make_unique<RunProgress>(progress_period_s,
+                                                 analysis_type == TIME_DOMAIN ? tran_duration
+                                                                              : std::numeric_limits<double>::infinity());
+        progress->start();
+    }
 
     switch (analysis_type) {
         case CW_OPERATING_POINT:
@@ -68,10 +82,78 @@ void SPECSConfig::runAnalysis()
             cerr << "Undefined Analysis type";
             sc_stop();
     }
+    if (progress)
+        progress->stop();
 
     // F-05: write the .npz table, close the CSV
     if (default_trace_table && !default_trace_table->close())
         exit(1);
+
+    writeRunStats();
+}
+
+// F-15 event cap reached during an .op/.dc fixed point (also the operating point of a .tran): the
+// fixed point was cut short, so its values are not a result. Error (exit 1), after writing the
+// run statistics
+void SPECSConfig::checkEventCap(const string &what) const
+{
+    if (!eventCapReached())
+        return;
+    cerr << "Error: " << what << " stopped at the event cap: " << event_cap->processed
+         << " pending entries processed (.options maxevents=" << max_events << ")" << endl;
+    writeRunStats();
+    exit(1);
+}
+
+// F-15 --stats: the counters of every optical output port, summed (src/run_stats.h)
+void SPECSConfig::writeRunStats() const
+{
+    if (!stats_sections)
+        return;
+    RunStats stats;
+    stats.sections = stats_sections;
+    switch (analysis_type) {
+        case CW_OPERATING_POINT:
+            stats.analysis = "OP";
+            break;
+        case CW_SWEEP:
+            stats.analysis = "DC";
+            break;
+        case TIME_DOMAIN:
+            stats.analysis = "TRAN";
+            break;
+        default:
+            stats.analysis = "UNDEFINED";
+    }
+    stats.abstol = default_abstol;
+    stats.reltol = default_reltol;
+    stats.snap_factor = default_snap_factor;
+    stats.coalesce = coalesce;
+    stats.max_events = max_events;
+    stats.event_cap_reached = eventCapReached();
+    stats.end_time_s = sc_time_stamp().to_seconds();
+    stats.collect(sc_get_all_module_by_type<OpticalOutputPort>());
+    stats.wall_time_s = std::chrono::duration<double>(std::chrono::steady_clock::now() - run_start).count();
+    const string json = stats.to_json();
+
+    // an explicit file, else next to the default trace file, else (no trace file) on stdout
+    const string filename = !stats_filename.empty() ? stats_filename
+                          : !trace_filename.empty() ? trace_filename + ".stats.json" : "";
+    if (!filename.empty())
+    {
+        std::ofstream outfile(filename, std::ios::out | std::ios::trunc);
+        if (outfile)
+            outfile << json;
+        outfile.close();
+        if (!outfile)
+        {
+            cerr << "Error: cannot write run statistics file \"" << filename << "\"" << endl;
+            exit(1);
+        }
+        cout << "Run statistics written to " << filename << endl;
+    }
+    if (filename.empty() || print_stats)
+        cout << json << flush;
 }
 
 void SPECSConfig::runOPAnalysis()
@@ -90,6 +172,8 @@ void SPECSConfig::runOPAnalysis()
 
     // Run to initialize all threads and register first values
     sc_start();
+    checkEventCap(analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
+                                               : ".op: the operating point");
 
     // Set values of signals according to NODESET directive
     for (auto &nodeset_order : nodeset_orders)
@@ -120,12 +204,15 @@ void SPECSConfig::runOPAnalysis()
     // delta cycles (F-28), then what is left at later times, as sc_start() did (nothing in FD)
     const sc_dt::uint64 start_delta = sc_delta_count();
     const bool idle = !sc_pending_activity_at_current_time();
+    const string what = analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
+                                                     : ".op: the operating point";
     if (!runFixedPoint())
-        reportNonConvergence(analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
-                                                          : ".op: the operating point", start_delta);
+        reportNonConvergence(what, start_delta);
+    checkEventCap(what);
     // (an idle circuit keeps the SystemC warning W571, no activity, that this sc_start() gave)
     if (idle || sc_pending_activity())
         sc_start();
+    checkEventCap(what);
 
     // Print results on the command line
     printOPAnalysisResult();
@@ -149,6 +236,7 @@ void SPECSConfig::runDCAnalysis()
 
     // Run to initialize all threads and register first values
     sc_start();
+    checkEventCap(".dc: the initialisation");
 
     // Enable normal probes
     for (auto probe: all_probes) {
@@ -196,14 +284,14 @@ void SPECSConfig::runDCAnalysis()
 
         // run the fixed point (at most max_iterations delta cycles, F-28) and advance one tick
         const sc_dt::uint64 start_delta = sc_delta_count();
+        stringstream what;
+        what << ".dc: sweep point " << point << " of " << order.second.second.size()
+             << " (" << order.first << " = " << val << ")";
         if (!runFixedPoint())
-        {
-            stringstream what;
-            what << ".dc: sweep point " << point << " of " << order.second.second.size()
-                 << " (" << order.first << " = " << val << ")";
             reportNonConvergence(what.str(), start_delta);
-        }
+        checkEventCap(what.str());
         sc_start(sc_time::from_value(1));
+        checkEventCap(what.str());
 
         // Reset CW sources
         for (auto cws: all_cws)
@@ -269,6 +357,11 @@ void SPECSConfig::runTRANAnalysis()
         sc_start(tran_duration, SC_SEC);
     else
         sc_start();
+
+    // F-15 event cap: the transient ends there (its traces stop at that time)
+    if (eventCapReached())
+        cerr << "Warning: .tran stopped at the event cap at " << sc_time_stamp() << ": " << event_cap->processed
+             << " pending entries processed (.options maxevents=" << max_events << ")" << endl;
 
     cout << "Simulated " << sc_time_stamp() << endl;
 }
@@ -340,6 +433,7 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
         cerr << "  ... and " << changing.size() - max_listed << " more" << endl;
     cerr << "A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges "
          << "slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss" << endl;
+    writeRunStats();
     exit(1);
 }
 
@@ -364,6 +458,12 @@ void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
     oop_default_config->m_reltol = default_reltol;
     oop_default_config->m_snap_factor = default_snap_factor;
     oop_default_config->m_timestep_value = default_resolution_multiplier; // relative to systemc timestep
+    // F-15: expert options and --stats
+    oop_default_config->m_coalesce = coalesce;
+    oop_default_config->m_collect_stats = stats_sections != 0;
+    if (max_events && !event_cap)
+        event_cap = make_shared<OpticalOutputPortEventCap>(max_events);
+    oop_default_config->m_event_cap = event_cap;
 
     // apply default config to all optical output ports which don't have one
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();

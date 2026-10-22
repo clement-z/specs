@@ -230,6 +230,8 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `--no-trace` | write no trace file and no run manifest file, as `-o ""` (F-05); wins over `-o`. Netlists only: the `-t` testbenches choose their own trace files |
 | `--param name=value` | set a top-level parameter (see Parameters) |
 | `--maxiter N` | `.options maxiter`, overrides the netlist |
+| `--stats[=ports,devices]`, `--stats-file path`, `--print-stats` | run statistics (event counters), `<name>.stats.json`; see "Run statistics" in [numerics.md](numerics.md) |
+| `--progress[=s]` | a progress line on stderr every s seconds of wall-clock time (default 1) |
 | `--abstol x`, `--reltol x`, `-R n` | tolerances and timescale, see [numerics.md](numerics.md) |
 | `--seed N` | master seed, see [reproducibility.md](reproducibility.md) |
 

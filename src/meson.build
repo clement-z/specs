@@ -3,6 +3,8 @@ core_sources = files(
   'optical_output_port.cpp',
   'optical_signal.cpp',
   'run_manifest.cpp',
+  'run_progress.cpp',
+  'run_stats.cpp',
   'specs.cpp',
   'trace_table.cpp',
   'utils/rng.cpp',

@@ -3467,6 +3467,89 @@
    ],
    "expect": "fail",
    "note": "F-05: the CSV cannot be created (no such directory): 'Error: cannot open trace file \"no_such_dir/t.csv\"', exit 1"
+  },
+  {
+   "id": "regress/f15-stats-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=ports,devices",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+   ],
+   "note": "F-15: --stats=ports,devices on a two-wavelength .tran: traces/x.stats.json next to the VCD (run totals, one row per output port, per device type; wall_time_s masked), 'Run statistics written to traces/x.stats.json' on stdout"
+  },
+  {
+   "id": "regress/f15-stats-op-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "--stats",
+    "-f",
+    "tests/golden/netlists/b021-snapfactor.cir"
+   ],
+   "note": "F-15: --stats without a trace file: the JSON (summary) is printed to stdout; out_a passes the gate from 0 but is snapped to 0 again (suppressed.snap = 1)"
+  },
+  {
+   "id": "regress/f15-stats-file-print",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=devices",
+    "--stats-file",
+    "traces/custom.stats.json",
+    "--print-stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+   ],
+   "note": "F-15: --stats-file writes the run statistics there (not next to the trace), --print-stats also prints them; multi-wavelength .op, devices section"
+  },
+  {
+   "id": "regress/f15-stats-dc",
+   "args": [
+    "--stats",
+    "-o",
+    "traces/ad",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "F-15: --stats on a .dc wavelength sweep: counters kept over every sweep point (reset() keeps them)"
+  },
+  {
+   "id": "err/f15-stats-bad-section",
+   "args": [
+    "--stats=port",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: unknown --stats section: 'Invalid --stats value', exit 1"
   }
  ]
 }

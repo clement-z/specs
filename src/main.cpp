@@ -15,6 +15,7 @@
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
 #include "run_manifest.h"
+#include "run_stats.h"
 #include <utils/version.h>
 
 using namespace std;
@@ -239,6 +240,41 @@ int sc_main(int argc, char *argv[])
                           "per operating point or sweep point (decimal integer, default 1000000, 0: no "
                           "limit); overrides .options maxiter",
                           { "maxiter" });
+    args::ImplicitValueFlag<string> set_stats(parser,
+                          "sections",
+                          "Write run statistics: counters of the optical output ports (values scheduled, "
+                          "coalesced, processed, emitted, suppressed by abstol/reltol/snap, pending entries, "
+                          "last emission) and the wall time, as JSON in <output>.stats.json. Sections: "
+                          "summary (default), ports (one row per output port), devices (per device type), "
+                          "comma-separated (--stats=ports,devices); netlists only",
+                          { "stats" }, string("summary"), string());
+    args::ValueFlag<string> set_stats_file(parser,
+                          "file",
+                          "Write the run statistics to this file instead (implies --stats); without it, "
+                          "--no-trace or -o \"\" print them to stdout",
+                          { "stats-file" });
+    args::Flag print_stats(parser,
+                          "print_stats",
+                          "Also print the run statistics (JSON) to stdout (implies --stats)",
+                          { "print-stats" });
+    args::ImplicitValueFlag<string> set_progress(parser,
+                          "seconds",
+                          "Print a progress line (wall time, simulated time, delta cycles) on stderr every "
+                          "<seconds> of wall-clock time (default 1); it never changes the simulation; "
+                          "netlists only",
+                          { "progress" }, string("1"), string());
+    args::Flag set_no_coalescing(parser,
+                          "no_coalescing",
+                          "Expert option (ablation): keep every write of an optical output port as its own "
+                          "pending entry, instead of merging the writes for the same time and wavelength; "
+                          "equal times are processed in write order; overrides .options coalesce",
+                          { "no-coalescing" });
+    args::ValueFlag<string> set_max_events(parser,
+                          "set_max_events",
+                          "Expert option: stop the run once the optical output ports have processed this "
+                          "many pending entries (decimal integer, default 0: no cap); a .tran ends there "
+                          "with a warning, an .op/.dc stops with an error; overrides .options maxevents",
+                          { "max-events" });
 
     args::ValueFlag<size_t> set_nrings_crow(parser,
                           "set_nrings_crow",
@@ -366,6 +402,52 @@ int sc_main(int argc, char *argv[])
         }
         specsGlobalConfig.max_iterations = maxiter_val;
         specsGlobalConfig.max_iterations_explicit = true;
+    }
+    if (set_stats || set_stats_file || print_stats) {
+        // F-15: --stats-file and --print-stats imply --stats (summary)
+        unsigned sections = RunStats::SUMMARY;
+        if (set_stats && !RunStats::parse_sections(set_stats.Get(), sections)) {
+            cerr << "Invalid --stats value: '" << set_stats.Get()
+                 << "' (expected summary, ports or devices, comma-separated)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.stats_sections = sections;
+        if (set_stats_file) {
+            if (set_stats_file.Get().empty()) {
+                cerr << "Invalid --stats-file value: empty file name" << endl;
+                return 1;
+            }
+            specsGlobalConfig.stats_filename = set_stats_file.Get();
+        }
+        specsGlobalConfig.print_stats = print_stats.Get();
+    }
+    if (set_progress) {
+        double period_s = 0;
+        stringstream ss;
+        ss << set_progress.Get();
+        ss >> period_s;
+        if (!ss.eof() || ss.fail() || !(period_s > 0) || !std::isfinite(period_s)) {
+            cerr << "Invalid --progress value: '" << set_progress.Get() << "' (expected a period in seconds > 0)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.progress_period_s = period_s;
+    }
+    if (set_no_coalescing) {
+        // F-15 expert option; takes priority over .options coalesce
+        specsGlobalConfig.coalesce = false;
+        specsGlobalConfig.coalesce_explicit = true;
+    }
+    if (set_max_events) {
+        // F-15 expert option, set directly like --maxiter; takes priority over .options maxevents
+        const string &s = set_max_events.Get();
+        uint64_t max_events_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), max_events_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid max-events value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.max_events = max_events_val;
+        specsGlobalConfig.max_events_explicit = true;
     }
     // F-12: validated here, applied to the netlist parse tree (ignored with -t, like --reltol)
     vector<pair<string, string>> param_overrides;

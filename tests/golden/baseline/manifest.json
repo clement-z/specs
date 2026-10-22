@@ -92,6 +92,7 @@
   "err/f12-ends-name-mismatch",
   "err/f12-param-malformed",
   "err/f12-si-unit-letters",
+  "err/f15-stats-bad-section",
   "err/f28-lossless-ring-dc",
   "err/f28-lossless-ring-op",
   "err/f28-lossless-ring-tran",
@@ -194,6 +195,10 @@
   "regress/f12-param-undefined",
   "regress/f12-si-op",
   "regress/f12-si-suffixes",
+  "regress/f15-stats-dc",
+  "regress/f15-stats-file-print",
+  "regress/f15-stats-op-no-trace",
+  "regress/f15-stats-tran",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
   "tb/ac_add_drop",
@@ -218,5 +223,13 @@
   "tb/wg"
  ],
  "gtest": "gtest/unit_tests",
- "note": "Full re-record without -march=native (B-183, maintainer decision 2026-10-22, option c), on sprint/2026-10c @ 3ddf577 + the native-default change: pixi gcc 15.3.0, Meson release build with the project defaults (-std=gnu++20 -O3, -Dnative=false, asserts on), SystemC 3.0.2 and args 6.4.7 from the wraps, x86-64 Linux. Before recording, the same build against the previous baseline: 212/212 at the default tolerances and at --rtol 1e-12 --atol 0 --print-slack 0; 28 cases differed with --rtol 0 (last 1-2 digits of floats, FMA contraction under -march=native in the previous baseline). Earlier partial re-records (the former rerecords list) are in the git history of this file."
+ "note": "Full re-record without -march=native (B-183, maintainer decision 2026-10-22, option c), on sprint/2026-10c @ 3ddf577 + the native-default change: pixi gcc 15.3.0, Meson release build with the project defaults (-std=gnu++20 -O3, -Dnative=false, asserts on), SystemC 3.0.2 and args 6.4.7 from the wraps, x86-64 Linux. Before recording, the same build against the previous baseline: 212/212 at the default tolerances and at --rtol 1e-12 --atol 0 --print-slack 0; 28 cases differed with --rtol 0 (last 1-2 digits of floats, FMA contraction under -march=native in the previous baseline). Earlier partial re-records (the former rerecords list) are in the git history of this file.",
+ "rerecords": [
+  {
+   "recorded_at_utc": "2026-10-22T20:23:00Z",
+   "only": "^(cli/help|cli/no-args|regress/f15-stats-tran|regress/f15-stats-op-no-trace|regress/f15-stats-file-print|regress/f15-stats-dc|err/f15-stats-bad-section|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-15 (PD1): --stats, --stats-file, --print-stats, --progress, --no-coalescing, --max-events: new help lines (cli/help, cli/no-args); new cases regress/f15-stats-{tran,op-no-trace,file-print,dc}, err/f15-stats-bad-section; gtest: RunStats.*, RunProgress.*"
+  }
+ ]
 }

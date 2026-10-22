@@ -1,0 +1,10 @@
+{
+ "args": [
+  "--stats=port",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f15-stats-bad-section"
+}

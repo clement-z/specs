@@ -366,6 +366,66 @@ class RunManifest(unittest.TestCase):
 
 
 
+STATS = """{
+  "format": "specs-run-stats",
+  "format_version": 1,
+  "end_time_s": 3e-09,
+  "wall_time_s": %s,
+  "totals": {"output_ports": 2, "scheduled": %d, "pending_mean": 1.5}
+}
+"""
+
+
+class RunStats(unittest.TestCase):
+    """F-15: "wall_time_s" of the run statistics (file and --print-stats) is masked, nothing else."""
+
+    def test_file_wall_time_masked(self):
+        out = rg.normalise_run_stats(STATS % ("0.004330671", 4))
+        self.assertEqual(out, STATS % ('"<WALL_TIME>"', 4))
+        self.assertEqual(json.loads(out)["wall_time_s"], "<WALL_TIME>")
+        self.assertEqual(rg.normalise_run_stats(out), out)
+        for t in ("1.25e-05", "12", "0"):
+            self.assertEqual(rg.normalise_run_stats(STATS % (t, 4)), out)
+
+    def test_counters_still_compared(self):
+        a = json.loads(rg.normalise_run_stats(STATS % ("0.1", 4)))
+        b = json.loads(rg.normalise_run_stats(STATS % ("0.2", 5)))
+        diffs = []
+        rg.compare_json_values(a, b, DEFAULT_TOL, "x.stats.json", diffs)
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("scheduled", diffs[0])
+
+    def test_print_stats_stdout_line_masked(self):
+        out = rg.normalise_text("Simulated 3 ns\n" + STATS % ("0.5", 4) + "DONE", rg.PathMap([]))
+        self.assertIn('\n  "wall_time_s": "<WALL_TIME>",\n', out)
+        self.assertIn('"end_time_s": 3e-09', out)
+        # elsewhere in a line, the text is not touched
+        line = 'note: "wall_time_s": 0.5'
+        self.assertEqual(rg.normalise_text(line, rg.PathMap([])), line)
+
+    def test_run_case_masks_the_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            fake = root / "bin" / "specs"
+            fake.parent.mkdir()
+            fake.write_text(
+                "#!/bin/sh\n"
+                "printf '{\\n  \"wall_time_s\": %s,\\n  \"processed\": 3\\n}\\n' \"$1\" > traces/m.stats.json\n"
+            )
+            fake.chmod(0o755)
+            (root / "repo").mkdir()
+            (root / "tmp").mkdir()
+            case = {"id": "x", "setup": {"mkdir": ["traces"]}}
+            res = [rg.run_case(dict(case, args=[v]), fake, root / "repo", str(root / "tmp"))
+                   for v in ("0.001", "2.5")]
+            for r in res:
+                self.assertEqual(r["exit"], 0, r["stderr"])
+                f = r["files"]["traces/m.stats.json"]
+                self.assertEqual(f["kind"], "json")
+                self.assertEqual(json.loads(f["content"]), {"wall_time_s": "<WALL_TIME>", "processed": 3})
+            self.assertEqual(res[0]["files"], res[1]["files"])
+
+
 def make_npy(descr, shape, payload, version=1):
     """An NPY file; the header is padded so that the data start at a multiple of 64 bytes, as numpy does."""
     header = "{'descr': '%s', 'fortran_order': False, 'shape': %r, }" % (descr, shape)

@@ -1,0 +1,28 @@
+{
+ "args": [
+  "--stats=devices",
+  "--stats-file",
+  "traces/custom.stats.json",
+  "--print-stats",
+  "-o",
+  "traces/x",
+  "-f",
+  "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/custom.stats.json": {
+   "bytes": 1328,
+   "kind": "json",
+   "sha256": "45e60aa6752550c651670886bde2dc1a16e81e82e6eabf7a9e8f5be09f57b9d1",
+   "stored": "files/traces/custom.stats.json"
+  },
+  "traces/x.manifest.json": {
+   "bytes": 537,
+   "kind": "json",
+   "sha256": "0ef2bb5c7c574de3f542466db87765be4885c5c4970b529e8a0534f7c6ee9738",
+   "stored": "files/traces/x.manifest.json"
+  }
+ },
+ "id": "regress/f15-stats-file-print"
+}

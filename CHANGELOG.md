@@ -8,6 +8,13 @@
   `build`, `test` and `golden` tasks in `build-pixi/<toolchain>` (also ASan+UBSan), a `py` and a `docs`
   environment. CI: pixi job on Ubuntu (blocking) and macOS (non-blocking), next to the apt jobs
 * Agent instructions moved from `CLAUDE.md` to `AGENTS.md` (read by all coding agents); `CLAUDE.md` imports it
+* Run statistics (F-15): `specs --stats` writes `<trace>.stats.json` with the counters of the optical output
+  ports (values scheduled, coalesced, processed, emitted, suppressed by abstol/reltol/snap, pending entries,
+  last emission) and the wall time; `--stats=ports,devices` adds one row per output port and per device type,
+  `--stats-file` and `--print-stats` choose where it goes (stdout without a trace file). Off by default, no
+  change to the outputs (`doc/numerics.md`)
+* `specs --progress[=seconds]`: a periodic progress line on stderr (wall time, simulated time, delta cycles),
+  without effect on the simulation
 
 ### Changed
 

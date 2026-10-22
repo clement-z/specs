@@ -1,0 +1,21 @@
+{
+  "format": "specs-run-stats",
+  "format_version": 1,
+  "analysis": "TRAN",
+  "sections": ["summary", "ports", "devices"],
+  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "coalesce": true, "maxevents": 0},
+  "event_cap_reached": false,
+  "end_time_s": 1.0000000000000001e-11,
+  "wall_time_s": "<WALL_TIME>",
+  "totals": {"output_ports": 4, "scheduled": 14, "coalesced": 0, "processed": 14, "emitted": 12, "suppressed": {"abstol": 2, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 6e-12},
+  "ports": [
+    {"port": "ROOT/CROSSING1.out1_delayed_writer", "net": "ROOT/out1", "writer": "ROOT/CROSSING1", "wavelengths_m": [1.55e-06, 1.56e-06], "scheduled": 4, "coalesced": 0, "processed": 4, "emitted": 4, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 6e-12},
+    {"port": "ROOT/CROSSING1.out2_delayed_writer", "net": "ROOT/out2", "writer": "ROOT/CROSSING1", "wavelengths_m": [1.55e-06, 1.56e-06], "scheduled": 4, "coalesced": 0, "processed": 4, "emitted": 4, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 6e-12},
+    {"port": "ROOT/VLSRC1.ROOT/VLSRC1_out_writer", "net": "ROOT/in1", "writer": "ROOT/VLSRC1", "wavelengths_m": [1.55e-06], "scheduled": 3, "coalesced": 0, "processed": 3, "emitted": 2, "suppressed": {"abstol": 1, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 5.0000000000000005e-12},
+    {"port": "ROOT/VLSRC2.ROOT/VLSRC2_out_writer", "net": "ROOT/in2", "writer": "ROOT/VLSRC2", "wavelengths_m": [1.55e-06, 1.56e-06], "scheduled": 3, "coalesced": 0, "processed": 3, "emitted": 2, "suppressed": {"abstol": 1, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 6e-12}
+  ],
+  "devices": [
+    {"type": "CrossingUni", "instances": 1, "output_ports": 2, "scheduled": 8, "coalesced": 0, "processed": 8, "emitted": 8, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 6e-12},
+    {"type": "VLSource", "instances": 2, "output_ports": 2, "scheduled": 6, "coalesced": 0, "processed": 6, "emitted": 4, "suppressed": {"abstol": 2, "reltol": 0, "snap": 0}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 6e-12}
+  ]
+}
