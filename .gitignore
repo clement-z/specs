@@ -39,3 +39,6 @@ builddir/
 !/subprojects/packagefiles/
 # CI: compiler cache
 .ccache/
+# pixi (pixi.toml): environments, and the build directories of its tasks
+/.pixi/
+/build-pixi/
