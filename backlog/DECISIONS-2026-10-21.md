@@ -96,3 +96,10 @@ Push the branch after the final verification (no PR creation, no merge into `dev
 | Worktree setup | **No `paseo.json`**: agents run `pixi install --locked` themselves when `.pixi/` is missing; written in the repo's agent instructions. |
 | Agent instructions | Moved from `CLAUDE.md` to **`AGENTS.md`**; `CLAUDE.md` redirects to it (imports it). |
 | Release | Push `sprint/2026-10c` and merge into `dev` and `master` authorised (tag `v0.2.0` not requested yet). |
+
+## Decisions of 2026-10-23 (phase D)
+| Topic | Decision |
+|---|---|
+| F-15 Q8 (revised) | **Keep the current equal-time order** (time, then \|E\|). The time-only order changed per-wavelength values at tolerance level (PD2 report); its WIP stays on `PD2-wip/q8-time-order`. |
+| No-coalescing switch | **Removed** (`--no-coalescing`, `.options coalesce`, the FIFO path). With absolute field writes it has no physical meaning and its events grow exponentially in feedback loops; its only use was a cost ablation, which can be run from the local reference branch `ablation/no-coalescing` (cc1e52e). The event cap (`--max-events`, `.options maxevents`) stays. |
+| Delta writes | **Removed**: the output port's delta-write mode (`m_use_deltas`) and the unused, single-wavelength generic transmission devices (`GenericTransmissionDevice`, `Generic2x2Coupler`, `GenericWaveguide`). A generic N-port device stays on the roadmap (F-03 S-parameter device), to be written in the state-holding style (per input and wavelength memories, full recomputation); the old code is in the history at cc1e52e. |
