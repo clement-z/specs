@@ -1,5 +1,5 @@
 # B-040: GenericWaveguide (disabled) has wrong Taylor phase coefficients
-severity: low | category: physics | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: low | category: physics | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: obsolete (GenericWaveguide removed in 54b15dc, decision 2026-10-23)
 location: src/devices/generic_waveguide.h:18-19, src/devices/generic_waveguide.h:37, src/devices/generic_waveguide.h:78-82, src/devices/generic_waveguide.h:117
 ## Problem
 The target is φ(λ) = 2π·L·neff(λ)/λ, expanded in Taylor coefficients (TransmissionMatrix applies 1/n!):
@@ -32,3 +32,5 @@ B-039.
 - Review ids: F-A2-10.
 ## Verification
 Code reading. The derivation is given above.
+
+**2026-10-23 (PD2b):** obsolete. `GenericWaveguide` and the rest of the `GenericTransmissionDevice` family were removed (54b15dc, maintainer decision 2026-10-23). A generic N-port device is to be written from scratch (scout F-03); the Taylor coefficients above apply if it offers a Taylor form. The old code is at cc1e52e.

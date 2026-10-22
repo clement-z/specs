@@ -7,6 +7,6 @@ Start: 2140dd4. "Before" builds: build-pixi/{gcc,clang,asan-gcc,asan-clang} at 2
 | item | status | commit | notes |
 |---|---|---|---|
 | 1 no-coalescing switch | done | 8c17275 | predicted golden impact only (help, 9 stats JSON lose "coalesce", gtest list); 2 cases removed, 2 added; gcc strict 228/228, meson test gcc + asan-clang OK |
-| 2 delta writes, generic devices | in progress | | |
-| 3 F-03 brief, MLPROBE backlog item | todo | | |
+| 2 delta writes, generic devices | done | 54b15dc | no golden change (228/228 strict, no re-record), counters identical on 225 cases; B-040 obsolete, B-069 partly, B-061 note | | |
+| 3 F-03 brief, MLPROBE backlog item | in progress | | |
 | 4 gate, report | todo | | |
