@@ -283,6 +283,53 @@ TEST(RunStats, CollectAndJson)
     SPECS_TEST_FOOTER();
 }
 
+// A port whose signal was destroyed before the statistics are collected (the -t testbenches
+// destroy theirs when their function returns): no net, and its dangling interface pointer is
+// never dereferenced (ASan builds check it)
+class ExternalSignalHarness : public sc_module {
+public:
+    spx::oa_port_out_type p_out;
+    OpticalOutputPort m_out_writer;
+
+    ExternalSignalHarness(sc_module_name name, spx::oa_signal_type &sig)
+        : sc_module(name)
+        , m_out_writer("out_writer", p_out)
+    {
+        p_out(sig);
+        auto config = make_shared<OpticalOutputPortConfig>();
+        config->m_collect_stats = true;
+        m_out_writer.setConfig(config);
+    }
+};
+
+TEST(RunStats, PortOfADestroyedSignalHasNoNet)
+{
+    SPECS_TEST_HEADER()
+    {
+        auto *sig = new spx::oa_signal_type("gone");
+        ExternalSignalHarness h("h", *sig);
+        sc_start(SC_ZERO_TIME);
+        h.m_out_writer.delayedWrite(OpticalSignal(F(1, 0), 1.55e-6), sc_time(1, SC_NS));
+        sc_start(2, SC_NS);
+        EXPECT_EQ(sig->read().m_field, F(1, 0));
+
+        RunStats stats;
+        stats.sections = RunStats::SUMMARY | RunStats::PORTS;
+        stats.collect({&h.m_out_writer});
+        ASSERT_EQ(stats.ports.size(), 1u);
+        EXPECT_EQ(stats.ports[0].net, "gone");
+
+        delete sig;
+        stats.collect({&h.m_out_writer});
+        ASSERT_EQ(stats.ports.size(), 1u);
+        EXPECT_EQ(stats.ports[0].net, "");
+        EXPECT_EQ(stats.ports[0].writer, "h");
+        EXPECT_EQ(stats.totals.emitted, 1u);
+        EXPECT_NE(stats.to_json().find("{\"port\": \"h.out_writer\", \"net\": null, \"writer\": \"h\""), std::string::npos);
+    }
+    SPECS_TEST_FOOTER();
+}
+
 TEST(RunStats, ParseSections)
 {
     unsigned sections = 0;

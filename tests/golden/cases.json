@@ -3696,6 +3696,17 @@
    ],
    "expect": "fail",
    "note": "F-15: --progress needs a period > 0: 'Invalid --progress value', exit 1"
+  },
+  {
+   "id": "regress/f15-stats-testbench",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "2",
+    "--stats=ports"
+   ],
+   "note": "F-15: --stats with a -t testbench: traces/crow_tb.stats.json next to its VCD; the two CROW ports bound to signals of the testbench function, destroyed when it returns, have \"net\": null (was a SIGSEGV while resolving them, found by stats-record)"
   }
  ]
 }

@@ -86,6 +86,7 @@
   "RunStats.NoCountersWhenOff": "PASS",
   "RunStats.ParseSections": "PASS",
   "RunStats.PortCountersClassifyEveryEntry": "PASS",
+  "RunStats.PortOfADestroyedSignalHasNoNet": "PASS",
   "SPECSConfig.VerifyConfigAcceptsValidValues": "PASS",
   "SPECSConfig.ZeroTolerancesWarnOnce": "PASS",
   "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",

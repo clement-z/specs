@@ -426,6 +426,120 @@ class RunStats(unittest.TestCase):
             self.assertEqual(res[0]["files"], res[1]["files"])
 
 
+# A fake specs for the stats commands: writes the file given to --stats-file (if any) with the wall
+# time of the run and "processed" = $PROCESSED (default 3), unless the first argument is "-n"
+FAKE_STATS_SPECS = (
+    "#!/bin/sh\n"
+    "[ \"$1\" = -n ] && exit 0\n"
+    "out=\"\"\n"
+    "while [ $# -gt 0 ]; do [ \"$1\" = --stats-file ] && out=\"$2\"; shift; done\n"
+    "[ -n \"$out\" ] || exit 1\n"
+    "printf '{\\n  \"format\": \"specs-run-stats\",\\n  \"wall_time_s\": %s,\\n  "
+    "\"totals\": {\"processed\": %s},\\n  \"ports\": [\\n    {\"port\": \"a.w\", \"processed\": %s},\\n"
+    "    {\"port\": \"b.w\", \"processed\": 1}\\n  ]\\n}\\n' \"$(date +%N)\" \"${PROCESSED:-3}\" "
+    "\"${PROCESSED:-3}\" > \"$out\"\n"
+)
+
+
+class Stats(unittest.TestCase):
+    """F-15: stats-record runs every case with --stats, stats-compare compares the counters exactly."""
+
+    def setUp(self):
+        self.td = tempfile.TemporaryDirectory()
+        self.root = Path(self.td.name)
+        self.fake = self.root / "bin" / "specs"
+        self.fake.parent.mkdir()
+        self.fake.write_text(FAKE_STATS_SPECS)
+        self.fake.chmod(0o755)
+        (self.root / "repo").mkdir()
+        (self.root / "tmp").mkdir()
+        self.cases = self.root / "cases.json"
+        self.cases.write_text(json.dumps({"cases": [
+            {"id": "a/run", "args": ["-f", "x.cir"]},
+            {"id": "b/dry", "args": ["-n"]},
+        ]}))
+
+    def tearDown(self):
+        self.td.cleanup()
+
+    def record(self, name, processed=None):
+        out = self.root / name
+        argv = ["stats-record", "--cases", str(self.cases), "--specs", str(self.fake), "--out", str(out),
+                "--repo", str(self.root / "repo"), "--tmpdir", str(self.root / "tmp")]
+        env = dict(rg.os.environ)
+        try:
+            if processed is not None:
+                rg.os.environ["PROCESSED"] = str(processed)
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(rg.main(argv), 0)
+        finally:
+            rg.os.environ.clear()
+            rg.os.environ.update(env)
+        return out
+
+    def compare(self, a, b, *extra):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = rg.main(["stats-compare", "--cases", str(self.cases), "--baseline", str(a),
+                          "--candidate", str(b)] + list(extra))
+        return rc, buf.getvalue()
+
+    def test_stats_case_appends_the_options(self):
+        c = {"id": "x", "args": ["-f", "a.cir"]}
+        self.assertEqual(rg.stats_case(c)["args"], ["-f", "a.cir"] + rg.STATS_ARGS)
+        self.assertEqual(c["args"], ["-f", "a.cir"])
+        self.assertIn("--stats=ports,devices", rg.STATS_ARGS)
+
+    def test_record_drops_the_wall_time(self):
+        out = self.record("a")
+        res = json.loads((out / "cases" / "a" / "run.json").read_text())
+        self.assertEqual(res["exit"], 0)
+        self.assertNotIn("wall_time_s", res["stats"])
+        self.assertEqual(res["stats"]["totals"], {"processed": 3})
+        dry = json.loads((out / "cases" / "b" / "dry.json").read_text())
+        self.assertIsNone(dry["stats"])
+        manifest = json.loads((out / "manifest.json").read_text())
+        self.assertEqual(manifest["format"], rg.STATS_FORMAT)
+        self.assertEqual(manifest["cases"], ["a/run", "b/dry"])
+
+    def test_same_build_compares_equal(self):
+        rc, text = self.compare(self.record("a"), self.record("b"))
+        self.assertEqual(rc, 0, text)
+        self.assertIn("2 same (1 of them without run statistics), 0 differ", text)
+
+    def test_counter_change_fails_and_names_the_row(self):
+        rc, text = self.compare(self.record("a"), self.record("b", processed=4))
+        self.assertEqual(rc, 1, text)
+        self.assertIn("DIFF     a/run", text)
+        self.assertIn("totals.processed: 3 -> 4", text)
+        self.assertIn("ports.a.w.processed: 3 -> 4", text)
+        self.assertNotIn("b.w", text)
+        rc, text = self.compare(self.record("c"), self.record("d", processed=4), "--ignore", "processed")
+        self.assertEqual(rc, 0, text)
+
+    def test_missing_result_fails(self):
+        a, b = self.record("a"), self.record("b")
+        (b / "cases" / "a" / "run.json").unlink()
+        rc, text = self.compare(a, b)
+        self.assertEqual(rc, 1)
+        self.assertIn("MISSING  a/run", text)
+
+    def test_compare_stats_exact(self):
+        a = {"exit": 0, "stats": {"totals": {"pending_mean": 1.5, "x": True}, "ports": [{"port": "p", "n": 1}]}}
+        self.assertEqual(rg.compare_stats(a, json.loads(json.dumps(a))), [])
+        b = json.loads(json.dumps(a))
+        b["stats"]["totals"]["pending_mean"] = 1.5000000000000002
+        b["stats"]["totals"]["x"] = 1
+        b["exit"] = 1
+        diffs = rg.compare_stats(a, b)
+        self.assertEqual(diffs, ["exit: 0 -> 1", "totals.pending_mean: 1.5 -> 1.5000000000000002",
+                                 "totals.x: true -> 1"])
+        c = json.loads(json.dumps(a))
+        c["stats"]["ports"].append({"port": "q", "n": 2})
+        self.assertEqual(rg.compare_stats(a, c), ['ports.q: (absent) -> {"port": "q", "n": 2}'])
+        self.assertEqual(rg.compare_stats(a, {"exit": 0, "stats": None})[0][:10], "stats: {\"t")
+
+
 def make_npy(descr, shape, payload, version=1):
     """An NPY file; the header is padded so that the data start at a multiple of 64 bytes, as numpy does."""
     header = "{'descr': '%s', 'fortran_order': False, 'shape': %r, }" % (descr, shape)

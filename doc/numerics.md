@@ -275,7 +275,8 @@ not die out (zero tolerances, no coalescing, a lossless loop) or to time a fixed
 trace file, `<name>.stats.json` (`-o name`, default `traces/delete_me`). It shows where the events went: how
 many values the devices produced, how many the emission gate dropped and why, how long the queues got. The
 counters are kept per output port (no global state) and summed at the end; they cost nothing when `--stats`
-is off. Netlists only (`-f`): the `-t` testbenches ignore it.
+is off. With `-t`, a testbench's statistics are written next to its trace file when it returns (a port whose
+net the testbench has already destroyed shows `"net": null`).
 
 | Option | Effect |
 | --- | --- |
@@ -331,7 +332,8 @@ order, those of `devices` in type order; one row per line. A port that carries s
 all (a `.dc` wavelength sweep lists every swept wavelength).
 
 The golden harness (`tests/golden/run_golden.py`) masks `wall_time_s` in files named `*.stats.json` and on
-stdout.
+stdout. Its `stats-record` and `stats-compare` commands record the counters of every golden case for two builds
+and compare them exactly (`tests/golden/README.md`).
 
 ### Progress (`--progress`)
 

@@ -51,11 +51,14 @@ int do_test(const string &testname)
     }
 
     // Call the testbench function associated with testname
+    specsGlobalConfig.run_start = steady_clock::now(); // wall time of --stats (F-15)
     auto start = high_resolution_clock::now();
     it->second();
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(stop - start);
     std::cout << "Total runtime: " << duration.count()/1000.0 << " ms" << std::endl;
+    // F-15 --stats: the counters of the testbench's ports, next to its trace file
+    specsGlobalConfig.writeRunStats();
     return 0;
 }
 
@@ -246,7 +249,7 @@ int sc_main(int argc, char *argv[])
                           "coalesced, processed, emitted, suppressed by abstol/reltol/snap, pending entries, "
                           "last emission) and the wall time, as JSON in <output>.stats.json. Sections: "
                           "summary (default), ports (one row per output port), devices (per device type), "
-                          "comma-separated (--stats=ports,devices); netlists only",
+                          "comma-separated (--stats=ports,devices)",
                           { "stats" }, string("summary"), string());
     args::ValueFlag<string> set_stats_file(parser,
                           "file",

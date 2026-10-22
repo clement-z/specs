@@ -62,8 +62,7 @@
                                         <output>.stats.json. Sections: summary
                                         (default), ports (one row per output
                                         port), devices (per device type),
-                                        comma-separated (--stats=ports,devices);
-                                        netlists only
+                                        comma-separated (--stats=ports,devices)
       --stats-file=[file]               Write the run statistics to this file
                                         instead (implies --stats); without it,
                                         --no-trace or -o "" print them to stdout

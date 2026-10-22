@@ -1,5 +1,6 @@
 #include "run_stats.h"
 #include "run_manifest.h"
+#include "utils/sysc_utils.h"
 
 #include <algorithm>
 #include <charconv>
@@ -39,6 +40,17 @@ void RunStats::collect(const std::vector<OpticalOutputPort *> &oops)
     ports.clear();
     devices.clear();
 
+    // The live channels, by interface pointer. A testbench (-t) may have destroyed the signals its
+    // ports were bound to (objects of the testbench function) when its statistics are written: such a
+    // port has no net, and its interface pointer is only compared, never dereferenced
+    typedef sc_signal_out_if<OpticalSignal> if_type; // OpticalOutputPort::port_type
+    std::map<const if_type *, const sc_object *> live_channels;
+    for (const sc_object *obj : sc_get_all_object())
+    {
+        if (const if_type *itf = dynamic_cast<const if_type *>(obj))
+            live_channels[itf] = obj;
+    }
+
     std::map<std::string, DeviceRow> by_type;
     std::map<std::string, std::set<const sc_object *>> writers_by_type;
     for (const OpticalOutputPort *oop : oops)
@@ -47,7 +59,9 @@ void RunStats::collect(const std::vector<OpticalOutputPort *> &oops)
         const uint64_t pending = oop->pending();
         totals.add(s, pending);
 
-        const sc_object *net = dynamic_cast<const sc_object *>(oop->m_port.get_interface());
+        // get_interface(0): the stored pointer, without the conversion to sc_interface * (a virtual base)
+        const auto channel = live_channels.find(oop->m_port.get_interface(0));
+        const sc_object *net = channel != live_channels.end() ? channel->second : nullptr;
         const sc_object *writer = oop->get_parent_object();
 
         PortRow row;

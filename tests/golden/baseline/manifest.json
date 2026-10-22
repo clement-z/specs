@@ -207,6 +207,7 @@
   "regress/f15-stats-dc",
   "regress/f15-stats-file-print",
   "regress/f15-stats-op-no-trace",
+  "regress/f15-stats-testbench",
   "regress/f15-stats-tran",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
@@ -245,6 +246,12 @@
    "only": "^(regress/f15-coalesce-options|regress/f15-no-coalescing-cli|regress/f15-maxevents-options-tran|regress/f15-max-events-cli-priority|err/f15-max-events-op|err/f15-max-events-invalid|err/f15-options-maxevents-fraction|regress/f15-progress-quiet|err/f15-progress-invalid)$",
    "gtest": false,
    "note": "F-15 (PD1): expert options coalesce/maxevents (.options, --no-coalescing, --max-events) and --progress: new cases"
+  },
+  {
+   "recorded_at_utc": "2026-10-22T20:32:44Z",
+   "only": "^(cli/help|cli/no-args|regress/f15-stats-testbench|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-15 (PD1): --stats also for the -t testbenches (help text of --stats loses 'netlists only'); new case regress/f15-stats-testbench; gtest RunStats.PortOfADestroyedSignalHasNoNet"
   }
  ]
 }

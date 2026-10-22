@@ -11,8 +11,10 @@
 * Run statistics (F-15): `specs --stats` writes `<trace>.stats.json` with the counters of the optical output
   ports (values scheduled, coalesced, processed, emitted, suppressed by abstol/reltol/snap, pending entries,
   last emission) and the wall time; `--stats=ports,devices` adds one row per output port and per device type,
-  `--stats-file` and `--print-stats` choose where it goes (stdout without a trace file). Off by default, no
-  change to the outputs (`doc/numerics.md`)
+  `--stats-file` and `--print-stats` choose where it goes (stdout without a trace file); also for the `-t`
+  testbenches. Off by default, no change to the outputs (`doc/numerics.md`)
+* Golden harness: `run_golden.py stats-record` / `stats-compare` record the event counters of every case for
+  two builds and compare them exactly (gate of the F-15 engine refactors)
 * `specs --progress[=seconds]`: a periodic progress line on stderr (wall time, simulated time, delta cycles),
   without effect on the simulation
 * Expert options for ablation studies (F-15, `doc/numerics.md`): no coalescing of the writes of a port for the
