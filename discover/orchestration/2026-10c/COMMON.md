@@ -16,7 +16,7 @@ Note its id in `<Pn>-progress.md`. Delete it right after committing your report.
 when nothing needs doing.
 
 ## Read first
-`CLAUDE.md`, `discover/SPRINT-2026-10c.md` (board), **`backlog/DECISIONS-2026-10-21.md` (the maintainer's
+`AGENTS.md` (agent instructions; `CLAUDE.md` imports it), `discover/SPRINT-2026-10c.md` (board), **`backlog/DECISIONS-2026-10-21.md` (the maintainer's
 decisions — they define what to build)**, the backlog files of your items (`backlog/B-NNN-*.md`), and for features the
 scout briefs (`discover/scout/F-NN-*.md`). `tests/golden/README.md` for the regression harness.
 
@@ -27,15 +27,14 @@ scout briefs (`discover/scout/F-NN-*.md`). `tests/golden/README.md` for the regr
 - Anything else you notice: add it to your report under "Found, not done". Don't fix it.
 
 ## Build and test
-- Prebuilt deps (SystemC 3.0.2, args 6.4.7): `meson setup <builddir> -Dcmake_prefix_path=$HOME/.local/opt/specs-deps-next`.
-  Do **not** set `CC`/`CXX` (Meson then uses ccache automatically). Build dirs under `/tmp/<phase>-*`.
-- A clang sanitizer build is part of every item's check:
-  `CC=clang CXX="ccache clang++" meson setup <b> -Dcmake_prefix_path=... -Dbuildtype=debug -Db_sanitize=address,undefined -Db_lundef=false -Dnative=false`;
-  `meson test` there applies `tests/sanitizers/lsan.supp` (leak detection on). Never widen that file without a
-  note in your report explaining which allocation it covers and why it is not a real leak.
-- Before and after each item: `meson compile`, `meson test`, and
-  `python3 -I tests/golden/run_golden.py check --specs <b>/specs --unit-tests <b>/src/test/unit_tests --baseline tests/golden/baseline -j 4 --atol 0`
-  (strict order and coverage are the default).
+- Build through pixi (`AGENTS.md`, "pixi route"; if `pixi` is not on your PATH, your launch prompt says where it
+  is): in your worktree, `pixi install --locked` if `.pixi/` does not exist, then
+  `pixi run test gcc` (configure + build + `meson test` in `build-pixi/gcc`). SystemC and args come from the wraps.
+- A clang sanitizer build is part of every item's check: `pixi run test asan-clang`; `meson test` there applies
+  `tests/sanitizers/lsan.supp` (leak detection on). Never widen that file without a note in your report explaining
+  which allocation it covers and why it is not a real leak.
+- Before and after each item: `pixi run test gcc` and `pixi run golden gcc -- --rtol 0 --atol 0 --print-slack 0`
+  (bit-identical to the baseline for non-native builds, B-183; strict order and coverage are the default).
 - Golden changes: a re-recorded case must be predicted by the decision for that item. Re-record only those cases
   (`record --only ... --note "B-NNN: why"`) in the same commit as the change. An unexpected output change means the
   change is wrong or out of scope: stop the item and report it.

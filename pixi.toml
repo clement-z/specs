@@ -3,7 +3,7 @@
 # stays supported; see README.md, "Development environment (pixi, optional)".
 #   pixi run test              # configure + build + meson test in build-pixi/gcc
 #   pixi run test clang        # same with clang, in build-pixi/clang (also: asan-gcc, asan-clang)
-#   pixi run golden            # the golden check of CLAUDE.md on build-pixi/gcc
+#   pixi run golden            # the golden check of AGENTS.md on build-pixi/gcc
 #   pixi shell                 # a shell with the environment (CC/CXX: ccache + gcc on Linux)
 # Binaries built here use the environment's libstdc++ (rpath into .pixi/envs/default/lib): they run
 # directly while the environment exists, not on a machine without it.
@@ -81,7 +81,7 @@ cmd = "meson test -C build-pixi/{{ toolchain }} --print-errorlogs"
 depends-on = [{ task = "build", args = ["{{ toolchain }}"] }]
 
 [tasks.golden]
-description = "Golden check of build-pixi/<toolchain> (the run_golden.py line of CLAUDE.md)"
+description = "Golden check of build-pixi/<toolchain> (the run_golden.py line of AGENTS.md)"
 args = [{ arg = "toolchain", default = "gcc" }]
 cmd = """python -I tests/golden/run_golden.py check --specs build-pixi/{{ toolchain }}/specs \
 --unit-tests build-pixi/{{ toolchain }}/src/test/unit_tests --baseline tests/golden/baseline -j 8"""
