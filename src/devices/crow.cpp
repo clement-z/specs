@@ -29,20 +29,16 @@ void CROW::connect_submodules()
         // double _wg_length = M_PI * 3.2544e-6 + 10e-6;
         //double _wg_length = 200*100.0*(1550e-9 + 0.1e-9 * i)/(2.0*neff);
         
-        //cout << _wg_length_variation << endl;
-        cout << wg_top.at(i)->name() << endl;
         wg_top.at(i)->m_length_cm = _wg_length * 100.0;
         wg_top.at(i)->m_neff = m_neff;
         wg_top.at(i)->m_ng = m_ng;
         wg_top.at(i)->m_attenuation_dB_cm = m_loss_db_cm;
 
-        cout << wg_bot.at(i)->name() << endl;
         wg_bot.at(i)->m_length_cm = _wg_length * 100.0;
         wg_bot.at(i)->m_neff = m_neff;
         wg_bot.at(i)->m_ng = m_ng;
         wg_bot.at(i)->m_attenuation_dB_cm = m_loss_db_cm;
 
-        cout << dc.at(i)->name() << endl;
         dc.at(i)->m_dc_through_coupling_power = m_coupling_through;
     }
     dc.at(N)->m_dc_through_coupling_power = m_coupling_through;
@@ -93,5 +89,4 @@ void CROW::connect_submodules()
     dc.at(N)->p_in2(p_add);
     dc.at(N)->p_out2(p_out_d);
 
-    dc.at(0)->m_out1_writer.m_converger = false;
 }

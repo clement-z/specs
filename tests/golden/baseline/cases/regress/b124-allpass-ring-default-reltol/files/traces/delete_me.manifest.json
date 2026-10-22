@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b124-allpass-ring-default-reltol.cir", "sha256": "d520d38b429ddaac636a78048bb017db62e0691a214455f624d082d6fcf1563b"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

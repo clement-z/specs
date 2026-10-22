@@ -88,7 +88,7 @@ void mesh_tb_run()
     mesh1.p_vphi[9]->bind(e_zero);
     mesh1.p_vtheta[9]->bind(e_zero);
                       
-    mesh1.init();
+    // No mesh1.init() here: prepareSimulation() initialises every spx_module (B-047)
 
     mesh_tb tb("tb");
     tb.IN(SIG);

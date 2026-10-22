@@ -1,0 +1,9 @@
+* A3 repro: two photodetectors keep each other's sampling loop alive
+* (Detector::on_time_tick: sc_pending_activity() sees the other detector's
+* 1 ps timeout), so an open-ended .tran never terminates.
+* With a single PDET the run ends right after the last source event (1 ns).
+vlsrc1 in values=[[1e-9,1e-3,1.55e-6]]
+pdet1 in v1
+pdet2 in v2
+.options traceall=0
+.tran

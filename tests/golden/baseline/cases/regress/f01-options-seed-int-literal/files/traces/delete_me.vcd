@@ -1,0 +1,61 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaaae  abstol       $end
+$var real    1  aaaaf  reltol       $end
+$var wire   32  aaaag  resolution_multiplier [31:0]  $end
+$var wire   32  aaaah  engine_timescale [31:0]  $end
+$var wire   32  aaaai  simulation_mode [31:0]  $end
+$var wire   32  aaaaj  analysis_type [31:0]  $end
+$var wire    1  aaaak  trace_all_optical_nets       $end
+$var wire    1  aaaal  verbose_component_initialization       $end
+$scope module ROOT/PDET1 $end
+$var real    1  aaaaa  readout       $end
+$var real    1  aaaab  readout_no_interference       $end
+$upscope $end
+$scope module ROOT/PDET2 $end
+$var real    1  aaaac  readout       $end
+$var real    1  aaaad  readout_no_interference       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.001000089265211595 aaaaa
+r0.001000663464424893 aaaab
+r0.001000272307582893 aaaac
+r0.0009994020631906094 aaaad
+r1e-08 aaaae
+r0.0001 aaaaf
+b1 aaaag
+b11111111111111111111111111110011 aaaah
+b1 aaaai
+b10 aaaaj
+0aaaak
+0aaaal
+$end
+
+#100
+r0.002000762730829983 aaaaa
+r0.001999716509455124 aaaab
+r0.001999871109913069 aaaac
+r0.002000796662638651 aaaad
+
+#200
+r0.0004993924331883018 aaaaa
+r0.0004994933785924795 aaaab
+r0.0005004157057023263 aaaac
+r0.0005003914226054178 aaaad
+
+#300
+r0.001499156831885236 aaaaa
+r0.001500141863365297 aaaab
+r0.001500256791162719 aaaac
+r0.00149931300829116 aaaad
+

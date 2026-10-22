@@ -6,15 +6,14 @@ using namespace std;
 void Merger::on_port_in1_changed()
 {
     const double transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
-    m_memory_in1[0] = 0; // initializing for nan wavelength
 
     if (specsGlobalConfig.verbose_component_initialization)
     {
         cout << name() << ":" << endl;
         cout << "transmission = " << pow(transmission, 2) << " W/W" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in1.get_interface()))->name() << endl;
-        cout << "\t --> \t" << (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name() << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in2.get_interface()))->name();
+        cout << port_channel_name(p_in1) << endl;
+        cout << "\t --> \t" << port_channel_name(p_out) << endl;
+        cout << port_channel_name(p_in2);
         cout << endl;
         cout << endl;
     }
@@ -44,7 +43,6 @@ void Merger::on_port_in1_changed()
 void Merger::on_port_in2_changed()
 {
     const double transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
-    m_memory_in2[0] = 0; // initializing for nan wavelength
 
     OpticalSignal p_in2_read;
 

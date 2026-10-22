@@ -1,0 +1,2 @@
+Error: .save P(v): 'v' is not an optical net (EANALOG)
+

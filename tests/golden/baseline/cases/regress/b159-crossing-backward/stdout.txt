@@ -1,0 +1,75 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+3 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/c {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/CWSRC2 (CW SOURCE) ROOT/b {} {power (DOUBLE) = 0.004, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/CROSSING1 (CROSSING (bidir)) ROOT/a ROOT/b ROOT/c ROOT/d {} {xtalk (DOUBLE) = -10, }
+-----------
+4 named nets
+ - ROOT/a: OANALOG<1>u (0|1)
+ - ROOT/b: OANALOG<1>u (1|1)
+ - ROOT/c: OANALOG<1>b (2|0)
+ - ROOT/d: OANALOG<1>u (1|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[OP] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Elaborating network of ROOT/c...
+Creating ROOT/CWSRC1 (reason: connection to bidir net)
+Done creating ROOT/CWSRC1
+Creating - ROOT/CROSSING1 (reason: bidir backlog)
+Done creating ROOT/CROSSING1
+Creating - ROOT/CWSRC2 (reason: bidir backlog)
+Done creating ROOT/CWSRC2
+Done (elaborating network of ROOT/c)
+Done with bidirectional nets
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven frequency-domain
+- analysis type: CW OPERATING POINT
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC2 emitted: [#2]  @ 1550 nm (0.063246 √W, 0.004000 W, 0.0000 rad)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/a:0 (OPTICAL) = [#3]  @ 1550 nm (0.030000 √W, 0.000900 W, 0.0000 rad)
+║ - ROOT/a:1 (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/b:0 (OPTICAL) = [#5]  @ 1550 nm (0.010000 √W, 0.000100 W, 1.5708 rad)
+║ - ROOT/b:1 (OPTICAL) = [#6]  @ 1550 nm (0.063246 √W, 0.004000 W, 0.0000 rad)
+║ - ROOT/c:0 (OPTICAL) = [#7]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/c:1 (OPTICAL) = [#8]  @ 1550 nm (0.020000 √W, 0.000400 W, 1.5708 rad)
+║ - ROOT/d:0 (OPTICAL) = [#9]  @ 1550 nm (0.060000 √W, 0.003600 W, 0.0000 rad)
+║ - ROOT/d:1 (OPTICAL) = [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

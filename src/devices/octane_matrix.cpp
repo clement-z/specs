@@ -1,9 +1,6 @@
 #include "devices/octane_matrix.h"
 
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
-
 #define __outname(SUFFIX, IDX, IDY) \
     ((""s + this->name() + "_" + SUFFIX + to_string(IDX) + "_" + to_string(IDY)).c_str())
 
@@ -24,10 +21,10 @@ void OctaneMatrix::init_ports()
     // cout << "Initializing input ports of " << name() << endl;
 
     for(size_t i = 0; i < m_rows; i++)
-        p_in_r.push_back(make_unique<port_in_type>(__modname("IN_R_", i)));
+        p_in_r.push_back(make_unique<port_in_type>(spx_child_name(this, "_IN_R_", i).c_str()));
     
     for(size_t i = 0; i < m_columns; i++)
-        p_in_c.push_back(make_unique<port_in_type>(__modname("IN_C_", i)));
+        p_in_c.push_back(make_unique<port_in_type>(spx_child_name(this, "_IN_C_", i).c_str()));
 
     // --------------------------------------------------------------------------//
     // --------------------------------------------------------------------------//
@@ -78,9 +75,9 @@ void OctaneMatrix::init()
     unsigned long num_of_nets_vertical = (m_rows-1)*m_columns;
 
     for(unsigned long i = 0; i < num_of_nets_horizontal; i++)
-        m_optical_connect_horizontal.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("wh_", i)));
+        m_optical_connect_horizontal.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_wh_", i).c_str()));
     for(unsigned long i = 0; i < num_of_nets_vertical; i++)
-        m_optical_connect_vertical.push_back(make_unique<sc_signal<OpticalSignal>>(__modname("wv_", i)));
+        m_optical_connect_vertical.push_back(make_unique<sc_signal<OpticalSignal>>(spx_child_name(this, "_wv_", i).c_str()));
 
     // Crossings
     for(unsigned long i = 0; i < m_rows; i++)
@@ -138,7 +135,7 @@ void OctaneMatrix::init()
                     __outname("SEG_", i, j),
                     term_row, term_col,
                     coupling_through_row, coupling_through_col,
-                    m_meltEnergy, m_nStates, m_isCompact
+                    m_meltEnergy, m_nStates, m_Tc, m_Ta, m_isCompact
                     );
             temp_segment->init(); // mandatory initialization
             m_segment.push_back(std::move(temp_segment));

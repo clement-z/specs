@@ -1,0 +1,4 @@
+* F-A1: bare .dc (no sweep order). Release build: "uncaught exception: vector::reserve" (UB at specs.cpp:149); Debug: assert abort.
+cwsrc1 a wl=1.55e-6 power=1
+wg1 a b length=1e-6
+.dc

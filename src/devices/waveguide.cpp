@@ -3,6 +3,14 @@
 
 using namespace std;
 
+void WaveguideUni::start_of_simulation()
+{
+    // B-014: check once how the group delay is rounded to the time step. With dispersion
+    // (m_D != 0) the delay depends on the wavelength: the nominal one (1.55 um) is checked.
+    // Rounding to 0 is an error only for a waveguide written in the netlist
+    m_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9, m_from_netlist);
+}
+
 void WaveguideUni::on_port_in_changed()
 {
     const double c = 299792458.0;
@@ -15,7 +23,7 @@ void WaveguideUni::on_port_in_changed()
 
     // vg = c/ng
     // => delay = L / vg = (L * ng) / c
-    const double group_delay_ns = 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    const double group_delay_ns = groupDelay_ns();
 
     // precalculate 2 * pi * L
     double phase_delay_factor = 2.0 * M_PI * m_length_cm * 1e-2;
@@ -36,14 +44,13 @@ void WaveguideUni::on_port_in_changed()
         cout << "ng = " << m_ng << "" << endl;
         cout << "transmission_power = " << pow(transmission, 2) << " W/W" << endl;
         cout << "group delay = " << group_delay_ns << " ns" << endl;
-        // cout << "dneff/dlambda = " << dneff_dlambda*1e-6 << " um^-1" << endl;
         cout << "phase delay = " << 1e9 * m_length_cm * 1e-2 / (c / m_neff) << " ns";
         cout << " ("
                 << fmod((2 * M_PI * m_neff / 1.55e-6) * m_length_cm * 1e-2, 2 * M_PI)
                 << "rad @1.55)" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name();
+        cout << port_channel_name(p_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name();
+        cout << port_channel_name(p_out);
         cout << endl;
         cout << endl;
     }
@@ -101,6 +108,12 @@ void WaveguideUni::on_port_in_changed()
 }
 
 
+void WaveguideBi::start_of_simulation()
+{
+    // B-014: as WaveguideUni. Same delay in both directions: checked (and reported) once
+    m_p1_out_writer.checkDelayRounding(name(), groupDelay_ns() * 1e-9, m_from_netlist);
+}
+
 void WaveguideBi::on_p0_in_changed()
 {
     const double c = 299792458.0;
@@ -113,7 +126,7 @@ void WaveguideBi::on_p0_in_changed()
 
     // vg = c/ng
     // => delay = L / vg = (L * ng) / c
-    const double group_delay_ns = 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    const double group_delay_ns = groupDelay_ns();
 
     // precalculate 2 * pi * L
     double phase_delay_factor = 2.0 * M_PI * m_length_cm * 1e-2;
@@ -134,18 +147,17 @@ void WaveguideBi::on_p0_in_changed()
         cout << "ng = " << m_ng << "" << endl;
         cout << "transmission_power = " << pow(transmission, 2) << " W/W" << endl;
         cout << "group delay = " << group_delay_ns << " ns" << endl;
-        // cout << "dneff/dlambda = " << dneff_dlambda*1e-6 << " um^-1" << endl;
         cout << "phase delay = " << 1e9 * m_length_cm * 1e-2 / (c / m_neff) << " ns";
         cout << " ("
                 << fmod((2 * M_PI * m_neff / 1.55e-6) * m_length_cm * 1e-2, 2 * M_PI)
                 << "rad @1.55)" << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_in.get_interface()))->name();
+        cout << port_channel_name(p0_in);
         cout << " --> ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_out.get_interface()))->name();
+        cout << port_channel_name(p1_out);
         cout << endl;
-        cout << (dynamic_cast<spx::oa_signal_type *>(p0_out.get_interface()))->name();
+        cout << port_channel_name(p0_out);
         cout << " <-- ";
-        cout << (dynamic_cast<spx::oa_signal_type *>(p1_in.get_interface()))->name();
+        cout << port_channel_name(p1_in);
         cout << endl;
         cout << endl;
     }
@@ -214,7 +226,7 @@ void WaveguideBi::on_p1_in_changed()
 
     // vg = c/ng
     // => delay = L / vg = (L * ng) / c
-    const double group_delay_ns = 1e9 * m_length_cm * 1e-2 / (c / m_ng);
+    const double group_delay_ns = groupDelay_ns();
 
     // precalculate 2 * pi * L
     double phase_delay_factor = 2.0 * M_PI * m_length_cm * 1e-2;

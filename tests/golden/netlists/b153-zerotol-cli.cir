@@ -1,0 +1,19 @@
+* B-153 / decision 2026-10-21: zero tolerances from the command line. Run with
+*   specs --abstol 0 --reltol 0 -f b153-zerotol-cli.cir
+* The CLI values are appended to the netlist as a .options footer, so they override the tolerances set
+* here (abstol=1e-6 reltol=1e-3). The configuration is then checked twice (at the start of the analysis
+* and in prepareSimulation()), and the zero-tolerance warning must be printed once.
+* Same circuit as b153-zerotol-open-loop.cir. Expected: exit 0, stderr exactly one line (the warning);
+* the same traces as b153-zerotol-open-loop.cir (probe1 out1 / probe2 out2: 2.5e-05 / 7.5e-05 W at 10 ps,
+* 2.5000025e-05 / 7.5000075e-05 W at 20 ps, 2.5e-22 / 7.5e-22 W at 30 ps, 0 / 0 at 40 ps);
+* "- abstol: 0" and "- default reltol: 0" in the configuration printout; "Simulated 50 ps".
+* With the tolerances of this netlist (no CLI), the 10 ps change would not be emitted and the 20 ps field
+* (1e-10 sqrt(W), below the snap 10 * 1e-6) would be emitted as 0.
+vlsrc1 in values=[[0, 1e-3, 1.55e-6], [10e-12, 1.000001e-3, 1.55e-6], [20e-12, 1e-20, 1.55e-6], [30e-12, 0, 1.55e-6]]
+wg1 in mid length=1e-3 att=100 neff=3 ng=3
+splitter1 mid out1 out2 ratio=0.25
+probe1 out1
+probe2 out2
+vlsrc2 unused values=[[50e-12, 1e-3, 1.55e-6]]
+.options abstol=1e-6 reltol=1e-3
+.tran

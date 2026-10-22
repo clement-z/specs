@@ -1,0 +1,7 @@
+* wavelength-only probe first (TD)
+cwsrc1 in wl=1.55e-6 power=1
+wg1 in out length=1e-3 neff=2 ng=2
+probe1 in power=0 mag=0 phase=0 wl=1
+probe2 out
+.options traceall=0
+.tran 1e-11

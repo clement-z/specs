@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-include/both.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 584,
+   "kind": "json",
+   "sha256": "6a90cfb8c3968910e676072d5fb9e2b411228c85d681dc8d31979794f86de5eb",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f12-include-both-differ"
+}

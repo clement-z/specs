@@ -1,0 +1,9 @@
+* F-A1: DC sweep point 1 is a dark fringe (|E|~0), but after oop->reset() the OOP never writes a
+* below-abstol value, so the net/probe keep sweep point 0 (P=1 at the old wavelength). VCD has no record at #1.
+* MZI lambda sweep: bright point followed by a dark point
+cwsrc1 in wl=1.55e-6 power=1
+splitter1 in a b
+wga a a2 length=100e-6 neff=2.5 ng=2.5 att=0
+wgb b b2 length=200e-6 neff=2.5 ng=2.5 att=0
+merger1 a2 b2 out
+.dc /cwsrc1/WL 1.5527950310559006e-06 1.569725817998878e-06 4.837367697993543e-09

@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-dc-p-alias.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 425,
+   "kind": "json",
+   "sha256": "285d76cd88b411ed1c7b9d2284578da3fbc46bd0d62f110e08d9f5558a065a76",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1206,
+   "kind": "vcd",
+   "sha256": "c010d0811c43294dd0fda45bee8f91434768cce92b12486f38378d37bd7d7cb0",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f12-dc-p-alias"
+}

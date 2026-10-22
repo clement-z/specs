@@ -54,15 +54,32 @@ struct NODESETDirective : public ParseDirective {
     { return "NODESET"; }
 };
 
-/* IC: specify initial conditions options */
-// Inherit from NODESETDirective as options are the same.
-struct ICDirective : public NODESETDirective {
+/* SAVE: trace the listed optical nets (F-05). ParseTree::build_circuit() creates the probes, one per
+   signal of each net (two on a bidirectional net), named and traced like the automatic probes
+   (PROBE{<signal>}); the targets on one net share its probe */
+struct SAVEDirective : public ParseDirective {
+    enum Quantity { ALL, POWER, MODULUS, PHASE, WAVELENGTH, UNKNOWN };
+
+    struct Target {
+        string net;         // full net name (with the prefix of the parse tree)
+        string net_written; // net name as written in the netlist
+        string written;     // target as written: net or QTY(net)
+        Quantity quantity;
+    };
+    vector<Target> targets;
+
     /* Import constructor from ParseDirective */
-    using NODESETDirective::NODESETDirective;
+    using ParseDirective::ParseDirective;
+
+    // Quantity of a QTY(net) target: the keywords of PROBE (case-insensitive), UNKNOWN otherwise
+    static Quantity quantity(string name);
+    // (QTY, net) as parsed (QTY empty for a net alone); prefix: name prefix of the parse tree
+    void add_target(const pair<string, string> &target, const string &prefix);
 
     virtual ParseDirective* clone() const
-    { return new ICDirective(*this); }
-    virtual void create() const;
+    { return new SAVEDirective(*this); }
+    // Nothing to do here: the probes need the elaborated nets (ParseTree::build_circuit())
+    virtual void create() const {}
     virtual string kind() const
-    { return "IC"; }
+    { return "SAVE"; }
 };

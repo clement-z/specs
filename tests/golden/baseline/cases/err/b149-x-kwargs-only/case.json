@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b149-x-kwargs-only.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b149-x-kwargs-only"
+}

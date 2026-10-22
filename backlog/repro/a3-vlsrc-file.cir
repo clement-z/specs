@@ -1,0 +1,12 @@
+* A3 repro: VLSRC values file, first line always discarded
+* (value_list_source.h:65). vlsrc1 reads a header-less file: its first row
+* (t=0.1 ns, 1 mW) is lost. vlsrc2 reads the same data with a "time,..." header:
+* fine, but only because the header is eaten unconditionally (the
+* "Skipping header line" branch at :93 never fires).
+* Run from the directory containing the two csv files.
+* cwsrc0 only registers 1550 nm so that the OP printout does not abort with
+* "Wavelength not found in global vector" (all nets would otherwise be id 0).
+cwsrc0 dummy wl=1.55e-6 power=0
+vlsrc1 in values="a3-vl-noheader.csv"
+vlsrc2 in2 values="a3-vl-header.csv"
+.tran 1e-9

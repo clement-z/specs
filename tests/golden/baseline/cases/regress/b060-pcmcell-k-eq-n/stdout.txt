@@ -1,0 +1,63 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+2 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/PCMCELL1 (PCM CELL) ROOT/in ROOT/out {} {emelt (DOUBLE) = 1e-12, k (INTEGER) = 4, n (INTEGER) = 4, ta (DOUBLE) = 0.8, tc (DOUBLE) = 0.2, }
+-----------
+2 named nets
+ - ROOT/in: OANALOG<1>u (1|1)
+ - ROOT/out: OANALOG<1>u (1|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[OP] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/in...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/PCMCELL1 (reason: unidir backlog)
+Done creating ROOT/PCMCELL1
+Done (elaborating network of ROOT/in)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven frequency-domain
+- analysis type: CW OPERATING POINT
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/in (OPTICAL) = [#2]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = [#3]  @ 1550 nm (0.028232 √W, 0.000797 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

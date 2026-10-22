@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b031-mzi-bidir.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b031-mzi-bidir.cir", "sha256": "bb1d0074960939665adea90dd0b5767d0d98487d1e5dadc55050d22f71af9d0a"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

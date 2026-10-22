@@ -5,8 +5,6 @@
 #include <cstdlib>
 #include <unistd.h>
 
-#include "devices/time_monitor.h"
-
 #include "utils/general_utils.h"
 
 /* ----------------------------------------------------------------------------- *
@@ -57,9 +55,6 @@ void freqsweep_tb::run_1()
 
 void freqsweep_tb::monitor()
 {
-    unsigned int event_counter = 0;
-    unsigned int success_counter = 0;
-    const unsigned int test_number = 3;
     while(true)
     {
         wait();
@@ -144,70 +139,3 @@ void freqsweep_tb_run_add_drop()
 
     sc_close_vcd_trace_file(specsGlobalConfig.default_trace_file);
 }
-
-// void freqsweep_tb_run_crow()
-// {
-//     if (specsGlobalConfig.oop_configs[0]->m_mode == OpticalOutputPortMode::FREQUENCY_DOMAIN)
-//         specsGlobalConfig.engine_timescale = SPECSConfig::ONE_FS;
-
-//     specsGlobalConfig.applyEngineResolution();
-
-//     sc_signal<OpticalSignal> IN("IN"), T_OUT("T_OUT"), X_OUT("X_OUT"), ADD("ADD");
-
-//     freqsweep_tb tb1("tb1");
-//     tb1.IN(IN);
-//     tb1.IN(IN);
-//     tb1.OUT(T_OUT);
-
-//     // pid_t pid = fork();
-//     CROW *pc;
-//     // if(pid)
-//     pc = new CROW("crow", nrings);
-//     // else
-//     //     pc = new CROW("crow", 5);
-//     pc->p_in(IN);
-//     pc->p_add(ADD);
-//     pc->p_out_t(T_OUT);
-//     pc->p_out_d(X_OUT);
-
-//     Probe pthrough("ptrough");
-//     pthrough.p_in(T_OUT);
-//     //
-//     Probe pcross("pcross");
-//     pcross.p_in(X_OUT);
-
-//     // shared_ptr<TimeMonitor> tm;
-//     // if (specsGlobalConfig.oop_configs[0]->m_mode == OpticalOutputPortMode::FREQUENCY_DOMAIN)
-//     //     tm = make_shared<TimeMonitor>("TM", 0, 0.01);
-//     // else
-//     //     tm = make_shared<TimeMonitor>("TM", 1e-14, 0.5);
-
-//     // // Open Trace file
-//     // sc_trace_file *Tf;
-//     // std::time_t now = std::time(nullptr);
-//     // char mbstr[100];
-//     // std::strftime(mbstr, sizeof(mbstr), "%F-%H-%M-%S-", std::localtime(&now));
-//     //
-//     // std::string trace_filename = "traces/";
-//     // //trace_filename += mbstr;
-//     // trace_filename += "freqsweep_tb";
-    
-//     // auto engineTime = std::pow(10, 15+specsGlobalConfig.engine_timescale);
-//     // Tf = sc_create_vcd_trace_file(trace_filename.c_str());
-//     // ((sc_trace_file *)Tf)->set_time_unit(engineTime, SC_FS);
-//     // sc_trace(Tf, IN, "IN");
-//     // sc_trace(Tf, X_OUT, "X_OUT");
-//     // sc_trace(Tf, T_OUT, "T_OUT");
-
-//     if (specsGlobalConfig.trace_filename.empty())
-//         specsGlobalConfig.trace_filename = "traces/crow_tb";
-
-//     // Start simulation
-//     specsGlobalConfig.prepareSimulation();
-//     sc_start(); // run until sc_stop()
-
-//     std::cout << std::endl << std::endl;
-//     std::cout << ".vcd trace file: " << specsGlobalConfig.trace_filename << std::endl;
-
-//     sc_close_vcd_trace_file(specsGlobalConfig.default_trace_file);
-// }

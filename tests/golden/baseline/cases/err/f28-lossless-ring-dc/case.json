@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f28-lossless-ring-dc.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "d9126c44fc90bb9ef7ca9a31a29c2125637c631eed5e32d7428b553745d7d107",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "err/f28-lossless-ring-dc"
+}

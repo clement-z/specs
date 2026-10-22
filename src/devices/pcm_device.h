@@ -44,6 +44,11 @@ public:
     // Member functions
     bool phase_change(const vector<pulse_sample_t> &vec, const bool &local);
     void update_transmission_local();
+    /** Exits with an error if n <= 0 or the initial state k is outside [0, n] (B-060). */
+    void check_parameters() const;
+
+    // Called once before the simulation starts, when all parameters are final
+    virtual void start_of_simulation();
 
     // Constructor
     PCMElement(sc_module_name name,
@@ -51,7 +56,7 @@ public:
                int nStates = 0,
                int state = 0,
                double Tc = 0,
-               double Ta = 0,
+               double Ta = 1,
                double influence_window_ns = 1,
                double speed = 3)
         : spx_module(name)

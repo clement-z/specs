@@ -1,0 +1,23 @@
+* B-033 regression, time domain: two overlapping pulses at different wavelengths.
+* in1: 1 W at 1550 nm from 1 ps to 5 ps; in2: 1 W at 1560 nm from 2 ps to 6 ps (VLSRC: values
+* that change after t = 0, because the probes don't sample the OP values at the start of a
+* .tran, B-048). att=0, xtalk=-10: x = 10^(-0.5), x^2 = 0.1; t^2 = 1 - x^2 = 0.9.
+* Expected:
+* - stderr empty (was 6x "Attempted to sum signals of different wavelengths ... (operator+=)");
+* - VCD, MLPROBE (power per wavelength; phase 0 for through, pi/2 = 1.5708 for cross):
+*     mlprobe1 (out1): power@1550 = t^2 = 0.9 from 1 to 5 ps, power@1560 = x^2 = 0.1 (pi/2)
+*                      from 2 to 6 ps
+*     mlprobe2 (out2): power@1550 = x^2 = 0.1 (pi/2) from 1 to 5 ps, power@1560 = t^2 = 0.9
+*                      from 2 to 6 ps
+* - probe1/probe2 show the last event of their net only: out1 = 0.9 W @1550 at 1 ps, 0.1 W
+*   @1560 at 2 ps, 0 @1550 at 5 ps, 0 @1560 at 6 ps; out2 = 0.1 W @1550 at 1 ps, 0.9 W @1560
+*   at 2 ps, 0 @1550 at 5 ps, 0 @1560 at 6 ps.
+* Before the fix, out2 stayed at 0 W @1550 nm (the 1560 nm light was dropped).
+vlsrc1 in1 values=[[1e-12, 1, 1.55e-6], [5e-12, 0, 1.55e-6]]
+vlsrc2 in2 values=[[2e-12, 1, 1.56e-6], [6e-12, 0, 1.56e-6]]
+crossing1 in1 in2 out1 out2 xtalk=-10
+probe1 out1
+probe2 out2
+mlprobe1 out1 wl=[1.55e-6, 1.56e-6]
+mlprobe2 out2 wl=[1.55e-6, 1.56e-6]
+.tran 10e-12

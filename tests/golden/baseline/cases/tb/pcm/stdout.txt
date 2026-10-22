@@ -1,0 +1,75 @@
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/pcm_device_tb.vcd)
+0 s:
+	IN:  [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+	OUT: [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 1
+0 s:
+	IN:  [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+	OUT: [#3]  @ 1550 nm (0.029155 √W, 0.000850 W, 0.0000 rad)
+	COUNT: 2
+10 ms:
+	IN:  [#4]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+	OUT: [#3]  @ 1550 nm (0.029155 √W, 0.000850 W, 0.0000 rad)
+	COUNT: 3
+10 ms:
+	IN:  [#4]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+	OUT: [#5]  @ 1550 nm (0.041231 √W, 0.001700 W, 0.0000 rad)
+	COUNT: 4
+20 ms:
+	IN:  [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#5]  @ 1550 nm (0.041231 √W, 0.001700 W, 0.0000 rad)
+	COUNT: 5
+20 ms:
+	IN:  [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 6
+30 ms:
+	IN:  [#8]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+	OUT: [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 7
+30 ms:
+	IN:  [#8]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+	OUT: [#9]  @ 1550 nm (0.029236 √W, 0.000855 W, 0.0000 rad)
+	COUNT: 8
+40 ms:
+	IN:  [#10]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+	OUT: [#9]  @ 1550 nm (0.029236 √W, 0.000855 W, 0.0000 rad)
+	COUNT: 9
+40 ms:
+	IN:  [#10]  @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+	OUT: [#11]  @ 1550 nm (0.041346 √W, 0.001710 W, 0.0000 rad)
+	COUNT: 10
+50 ms:
+	IN:  [#12]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#11]  @ 1550 nm (0.041346 √W, 0.001710 W, 0.0000 rad)
+	COUNT: 11
+50 ms:
+	IN:  [#12]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	OUT: [#13]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 12
+60 ms:
+	IN:  [#14]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+	OUT: [#13]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+	COUNT: 13
+60 ms:
+	IN:  [#14]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+	OUT: [#15]  @ 1550 nm (0.029317 √W, 0.000859 W, 0.0000 rad)
+	COUNT: 14
+-----------------/! \---------------
+Test finished!
+Success rate: 3/3
+-----------------/! \---------------
+
+
+.vcd trace file: traces/pcm_device_tb
+Total runtime: <DURATION> ms
+

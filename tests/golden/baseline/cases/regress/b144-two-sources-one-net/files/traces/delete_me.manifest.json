@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b144-two-sources-one-net.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b144-two-sources-one-net.cir", "sha256": "219aa46ef0ff783e9fe26bdc879f90ceaa1f24f158688792bada660eb07ad9f8"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

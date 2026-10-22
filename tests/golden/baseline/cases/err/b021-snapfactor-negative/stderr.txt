@@ -1,0 +1,2 @@
+Error: .options: SNAPFACTOR must be >= 0 (got -1)
+

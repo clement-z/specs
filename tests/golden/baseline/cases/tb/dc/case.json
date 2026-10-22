@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "dc"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/directional_coupler_tb.manifest.json": {
+   "bytes": 262,
+   "kind": "json",
+   "sha256": "886c24e0a2f91bc63fe76c6e43e6cebcf8d78b7c0a310e4504b4ec21a7fc28e5",
+   "stored": "files/traces/directional_coupler_tb.manifest.json"
+  },
+  "traces/directional_coupler_tb.vcd": {
+   "bytes": 1489,
+   "kind": "vcd",
+   "sha256": "a422a535c16d4ba086eb1b6ae04389d720b7566627a9212cc5734f3574229b28",
+   "stored": "files/traces/directional_coupler_tb.vcd"
+  }
+ },
+ "id": "tb/dc"
+}

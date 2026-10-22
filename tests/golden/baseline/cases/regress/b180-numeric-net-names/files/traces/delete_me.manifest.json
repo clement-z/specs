@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b180-numeric-net-names.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b180-numeric-net-names.cir", "sha256": "2eee204d6f4fafe4da8f84418f272ccb54321ca5bed514395a4cfb26325e50dd"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

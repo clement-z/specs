@@ -1,0 +1,322 @@
+      Introducing SPECS: Scalable Photonic Event-driven Circuit
+                             Simulator
+     Clement Zrounba, Raphael Cardoso, Mauricio Gomes de Queiroz, Paul Jimenez,
+    Mohab Abdalla, Alberto Bosio, Sébastien Le Beux, Fabio Pavanello, Ian O’Connor
+
+
+
+      To cite this version:
+     Clement Zrounba, Raphael Cardoso, Mauricio Gomes de Queiroz, Paul Jimenez, Mohab Abdalla, et al.. In-
+     troducing SPECS: Scalable Photonic Event-driven Circuit Simulator. 49th European Conference on Optical
+     Communications, Oct 2023, Glasgow, United Kingdom. ⟨hal-04302200⟩
+
+
+
+
+                                        HAL Id: hal-04302200
+                              https://hal.science/hal-04302200v1
+                                           Submitted on 23 Nov 2023
+
+
+
+
+    HAL is a multi-disciplinary open access archive             L’archive ouverte pluridisciplinaire HAL, est des-
+for the deposit and dissemination of scientific re-        tinée au dépôt et à la diffusion de documents scien-
+search documents, whether they are published or not.       tifiques de niveau recherche, publiés ou non, émanant
+The documents may come from teaching and research          des établissements d’enseignement et de recherche
+institutions in France or abroad, or from public or pri-   français ou étrangers, des laboratoires publics ou
+vate research centers.                                     privés.
+
+
+                                              HAL Authorization
+      Introducing SPECS: Scalable Photonic Event-driven Circuit
+                            Simulator
+       Clément Zrounba(1) , Raphael Cardoso(1) , Maurı́cio Gomes de Queiroz(1) , Paul Jimenez(1) ,
+      Mohab Abdalla(1,2) , Alberto Bosio(1) , Sébastien Le Beux(3) , Fabio Pavanello(1) , Ian O’Connor(1)
+
+(1)
+    Univ. Lyon - CNRS, Ecole Centrale de Lyon, INSA Lyon, Université Claude Bernard Lyon 1, CPE
+Lyon - INL, UMR5270 - Écully, F-69134, France, clement.zrounba@ec-lyon.fr
+(2)
+    School of Engineering, RMIT University, Melbourne, VIC 3000, Australia
+(3)
+    Department of Electrical and Computer Engineering, Concordia University - Montreal, Canada
+
+Abstract We present SPECS, a SystemC-based tool for fast, fs-accurate large-scale photonic circuit
+simulation. Through its event-driven nature, SPECS excels in sparse activity applications like neuromor-
+phic computing. Even in unfavorable scenarios, it is faster than other simulators by orders of magnitude.
+©2023 The Author(s)
+
+Introduction                                              costs and enabling more efficient analysis of
+As photonic technology takes on an increasingly           large-scale systems, without degrading tempo-
+significant role in various applications in telecom-      ral accuracy. This approach seems particularly
+munications, sensing, and computing[1],[2] , accu-        well-suited for optical systems, which often ex-
+rate and efficient simulation tools become essen-         hibit temporally and/or spatially sparse activity[15] ,
+tial for designing, verifying, and optimizing pho-        owing to the scale difference between the speed
+tonic components and systems[3] .                         of signals and the bandwidth of supporting elec-
+    Photonic simulations rely on a multi-level ab-        tronics. While there are priors for event-driven
+straction methodology similar to the one preva-           simulation of photonic circuits[16]–[18] , they focus
+lent in electronics[4] , and in fact re-purposes many     on the interconnect layer and abstracted system-
+tools from the electronic design automation (EDA)         level metrics.
+portfolio[5]–[7] . At the device level, 2D/3D electro-       In this contribution, we introduce SPECS (Scal-
+magnetic simulations provide detailed information         able Photonic Event-driven Circuit Simulator)[19] ,
+about the behavior of individual components. This         an open-source simulation tool that leverages the
+information, crossed with device measurements,            event-driven paradigm to overcome performance
+is used to create simplified device models for use        limitations of traditional time-driven simulation
+in circuit simulators such as LumericalTM Inter-          methods. We first present the rationale between
+connect[8] , Luceda Caphe (now part of the IPKISS         our approach and brief implementation details of
+framework)[9] , or Photontorch[10] . Finally, sys-        SPECS. We then demonstrate the effectiveness
+tem designers can simplify circuit behavior into          of SPECS by studying a Coupled-Resonator Op-
+system-level metrics (e.g., bandwidth, latency...)        tical Waveguide (CROW) circuit and compare it
+to perform very large-scale analyses[11] . These          with Interconnect and Photontorch (PT).
+methods have been proven useful, but result in
+prohibitive computational costs (at circuit level) or     Proposed Approach
+modelling efforts (at system level) when design-          SPECS is built upon the SystemC framework,
+ing large-scale photonic circuits, calling for an in-     a widely adopted hardware description language
+termediate abstraction level between circuit and          (HDL) and simulation library for system-level de-
+system, still inexistent in photonics[12] .               sign[20] . By utilizing SystemC, we facilitate the in-
+    In electronics, industry standards for hardware       tegration of SPECS with other system-level de-
+description languages (HDL)[13] were instrumen-           sign tools and enable efficient co-simulation of
+tal to enabling the design of large systems. These        photonic and electronic subsystems.
+standards were further improved with analog and              For circuit description, SPECS employs SPICE-
+mixed-signal (AMS) extensions to provide both             like netlists, standard in electronic circuit simula-
+continuous-time and event-driven modeling prim-           tors. This choice ensures ease of integration with
+itives in a single package[14] . In event-driven          a broad range of existing EDA tools and allows
+solvers, components are simulated only when               designers to leverage their knowledge and expe-
+necessary, significantly reducing computational           rience. Furthermore, this approach enables hier-
+a                                              b                                                  c
+                                                 * Netlist for add_drop.sch                                      1.0
+                                                 * Directives
+
+
+
+
+                                                                                                  P(out)/P(in)
+                                                 .param wl0=1.55e-6
+                                                                                                                 0.5
+                                                 .save P(out) P(drop)
+                                                 * Circuit definition
+                                                 dc1 in 1 out 2 k=0.15                                           0.0
+                                                 dc2 add 3 drop 4 k=0.15                                         1549.9                   1550               1550.1
+                                                 wg_ring_l 4 1 length=300e-6                                                         Wavelength (nm)
+                                                 wg_ring_r 2 3 length=300e-6
+
+                                                                                                                 1.0                                       P(out)
+                                                 * DC� Sweep on CW source parameters                                                                       P(drop)
+
+
+
+
+                                                                                                    Power (W)
+                                                 cwsrc1 in wl={wl0} power=1
+                                                 .dc WL(cwsrc1) 1549.9e-9 1550.1e-9 1e-12                        0.5
+
+                                                 *TRAN� Time�domain simulation
+                                                 vlsrc1 in values="pulse.txt"                                    0.0
+                                                 .tran 3e-9                                                        0.0       0.5     1.0      1.5 2.0      2.5   3.0
+                                                                                                                                           Time (ns)
+
+ Fig. 1: Example design and simulation flow: (a) schematic description of the circuit, (b) the corresponding SPECS netlist, (c)
+                                  frequency- and time-domain simulations of the circuit.
+
+archical descriptions of photonic circuits, simpli-                a            E1            b
+                                                                                     E2                                 t              t2     t1
+                                                                       0
+                                                                                                                               ...
+fying the design process and facilitating the co-                                                                      out     ...     E2     E1
+simulation of complex systems.                                                                                   f(E, ...)           @t1           emit?
+   While the current implementation of SPECS fo-                                     E2       EIN                                                                EOUT
+                                                                           E1                                          new EOUT
+cuses on event-driven simulation, the framework                                           t
+can be extended to support mixed-mode simula-                            Fig. 2: (a) Digital signals are inefficiently represented
+tions for cases where non-linear effects impose                        in time-driven (top) simulators compared to event-driven
+                                                                         (bottom) ones and (b) architecture of a unidirectional
+a more detailed analysis or, inversely, used to                                         2-port device in SPECS.
+extend existing time-driven frameworks. Mixed-
+mode simulations would enable a more compre-
+hensive coverage of various photonic circuit sce-                  nents can be added by modifying the C++ source
+narios while still benefiting from the efficiency ad-              code or using a generic Python module for fast
+vantages of event-driven simulations.                              prototyping.
+   A typical use of SPECS is shown in Figure 1.                       For purely feedforward circuits with digital in-
+Existing tools, here KiCAD[21] , can be adapted                    puts, SPECS approaches the optimal simulation
+to edit circuit schematics and generate a SPECS                    time by design. For circuits involving feedback, it
+netlist, which can be used to perform frequency-                   can still perform very well, provided that the bal-
+or time-domain simulations.                                        ance between accuracy and runtime is chosen
+                                                                   wisely. Several cursors are available for a user
+Implementation Details                                             to tune the accuracy of simulations:
+SPECS, like other photonic circuit simulators,                     • Temporal resolution — sets the precision with
+adopts a ”baseband” approach and represents                           which events are resolved. Decreasing resolu-
+optical signals by a complex field amplitude E(t)                     tion can greatly reduce simulation time, but will
+and a carrier wavelength λ0 . Waveforms are re-                       lower the precision of the final waveforms by
+duced to a sequence of square pulses which in                         masking what happens between events.
+turn are decomposed into at most two ”events”,                     • Absolute and Relative tolerance — relax preci-
+as shown in Figure 2a. It should be noted that                        sion constraints by specifying a threshold below
+event-driven simulation is naturally more suited to                   which small changes do not need to be emitted
+digital waveforms than continuously varying ones.                     by devices. Without them, events represent-
+When a circuit component receives an event, it                        ing infinitesimal changes in field values could
+calculates the corresponding outputs and sched-                       propagate indefinitely in circuits with feedback.
+ules their emission based on component-specific                       These should not be conflated with similarly
+delays as illustrated in Figure 2b.                                   named settings of time-driven simulators which,
+  SPECS defines many basic components, such                           even though they share similar goals, typically
+as waveguides, couplers, phase-shifters, generic                      control the time-step of the solver.
+S-matrix devices, as well as arbitrary sources and                 Lastly, both frequency-domain simulation and
+probes. The implementation of these compo-                         impulse-response calculation constitute special
+nents is straightforward and functionally equiva-                  use-cases of SPECS and can be performed eas-
+lent to other circuit simulators[10] . New compo-                  ily and efficiently without external software.
+ a                               b                             t (ps)                                        c
+     Pin          κ   Pthrough                       0   400            800   1200
+                                                                                                                                   100       Interconnect
+
+
+
+
+                                 Pthrough (mW)
+                                                 1                                   Interconnect (100 fs)                                   Photontorch
+             Li                                                                      Photontorch (100 fs)
+
+
+
+
+                                                                                                             Simulation time (s)
+                                                                                                                                             SPECS
+                                                                                     SPECS        (100 fs)                          10
+                                                 .5                                  Interconnect (1 fs)
+                                                                                     Photontorch (1 fs)                              1
+                                                                                     SPECS          (1 fs)
+                                                 0                                                                                 0.1
+                                                                                                                                   10m
+                                                                                                                                   1m
+
+     Pdrop                                                                                               10         100 512              1
+                                                                                                      Number of rings
+  Fig. 3: Benchmark results (a) architecture of the CROW circuit used for benchmarking, (b) time-domain results for the same
+            CROW (N = 3) on all simulators, at 100 fs and 1 fs (c) single-threaded CROW simulation times at 100 fs.
+
+Results and Discussion                                                          scenario for event-driven simulators, SPECS’ per-
+To evaluate the performance of SPECS, we stud-                                  formance remained order of magnitudes better
+ied a CROW circuit, shown in Figure 3a, made                                    than PT and Interconnect, in part because be-
+up of N chained ring resonators. This circuit                                   yond N ∼ 20, simulation time saturates around
+is composed of one source emitting 1 mW, 1 ns                                   40 ms due to losses preventing any meaningful
+pulses at 500 MHz, 2N waveguides with lengths                                   signal (according to SPECS’ tolerances) to propa-
+Li = (33.2 ± 5.0) µm sampled from a normal dis-                                 gate too far in the CROW. This native input depen-
+tribution, and N + 1 directional couplers with                                  dent optimization is precisely what sets it apart
+κ = 0.15 power cross-coupling ratio. Simulations                                from the state of the art.
+were run on a single thread using a modern                                         We were not able to independently run a GPU-
+laptop powered by an Intel i7-1165G7 2.8 GHz                                    accelerated version of PT, but reported perfor-
+CPU and 16 GB of RAM. Interconnect, PT and                                      mances for this use-case[10] are still an order of
+SPECS were all used as-is, with no platform-                                    magnitude slower than SPECS running on a sin-
+specific or circuit-specific tuning. SPECS’ abso-                               gle thread.
+lute and relative tolerances were respectively set
+                                                                                Conclusions
+to 10−8 V m−1 (0.1 fW) and 0.01 %.
+                                                                                Event-driven photonic simulation can be a pow-
+   We first verify our benchmarking environment
+                                                                                erful tool, and likely the next step for simulat-
+by comparing the through response for N = 3
+                                                                                ing large photonic circuits driven by digital wave-
+and very long delays (L ≈ 350 µm). Results, pre-
+                                                                                forms, or exhibiting sparse activity.
+sented in Fig. 3, show that Interconnect surpris-
+                                                                                   We showed that our implementation outper-
+ingly did not match the response yielded by both
+                                                                                forms off-the-shelf tools by a significant margin
+PT and SPECS at 100 fs resolution. At 1 fs reso-
+                                                                                in terms of simulation speed while offering func-
+lution, all simulations yielded nearly identical re-
+                                                                                tionally similar accuracy. In particular, its perfor-
+sults, with pair-wise root-mean-square errors be-
+                                                                                mances scale very well with circuit size due to its
+low ∼ 3 µW, although SPECS was 6290× (resp.
+                                                                                naturally frugal simulation approach.
+5090×) faster than PT (resp. Interconnect).
+                                                                                   It is important to note that different simulators
+   Finally, we turn to CROW circuits with up to
+                                                                                serve different purposes. For example, SPECS
+N = 512 rings. In PT and Lumerical, we simulate
+                                                                                cannot efficiently optimize circuits through back-
+for a duration of 3 ns (30000 timesteps at 100 fs). In
+                                                                                propagation like Photontorch does. Addition-
+SPECS, we instead simulate 10 equally-spaced
+                                                                                ally, mixed-mode simulations will be necessary to
+1 ns pulses (20 ns) and normalize the results to
+                                                                                cover more complex circuits.
+accurately capture the effect of events continu-
+                                                                                   Finally, through SystemC and a versatile netlist
+ing to propagate beyond the initial duration and
+                                                                                interface, SPECS can enable co-simulation of
+accumulating with subsequent pulses. Execution
+                                                                                computing cores and photonic accelerators, or be
+times for 3000 timesteps (300 ps), averaged over
+                                                                                integrated into other simulation platforms.
+100 runs for SPECS, are shown in Figure 3c.
+The whiskers in Figure 3c show the extrema                                      Acknowledgments
+measured for SPECS, due to the random sam-                                      This work was funded by ANR under grants ANR-
+pling of waveguide lengths, illustrating the circuit-                           18-CE24-0027 (OPTICALL2 ) and ANR-20-CE24-
+dependent variability in simulation times.                                      0019 (OCTANE).
+   Although CROWs constitute an unfavorable
+References                                                         [14]   E. Christen and K. Bakalar, “Vhdl-ams-a hardware de-
+ [1]   B. Jalali and S. Fathpour, “Silicon Photonics”, en, Jour-          scription language for analog and mixed-signal applica-
+       nal of Lightwave Technology, vol. 24, no. 12, pp. 4600–            tions”, IEEE Transactions on Circuits and Systems II:
+       4615, Dec. 2006, ISSN: 0733-8724. DOI: 10.1109/JLT.                Analog and Digital Signal Processing, vol. 46, no. 10,
+       2006.885782.                                                       pp. 1263–1272, 1999. DOI: 10.1109/82.799677.
+ [2]   D. Thomson, A. Zilkie, J. E. Bowers, et al., “Roadmap       [15]   B. J. Shastri, A. N. Tait, T. Ferreira De Lima, et al., “Pho-
+       on silicon photonics”, en, Journal of Optics, vol. 18,             tonics for artificial intelligence and neuromorphic com-
+       no. 7, p. 073 003, Jul. 2016, ISSN: 2040-8978, 2040-               puting”, en, Nature Photonics, vol. 15, no. 2, pp. 102–
+       8986. DOI: 10.1088/2040-8978/18/7/073003.                          114, Feb. 2021, ISSN: 1749-4885, 1749-4893. DOI: 10.
+ [3]   L. Chrostowski and M. Hochberg, Silicon Photonics                  1038/s41566-020-00754-y.
+       Design, en. Cambridge: Cambridge University Press,          [16]   S. Rumley, M. Bahadori, K. Wen, D. Nikolova, and K.
+       2015, ISBN: 978-1-316-08416-8. DOI: 10 . 1017 /                    Bergman, “PhoenixSim: Crosslayer Design and Model-
+       CBO9781316084168.                                                  ing of Silicon Photonic Interconnects”, en, in Proceed-
+ [4]   M. U. Khan, Y. Xing, Y. Ye, and W. Bogaerts, “Pho-                 ings of the 1st International Workshop on Advanced
+       tonic Integrated Circuit Design in a Foundry+Fabless               Interconnect Solutions and Technologies for Emerging
+       Ecosystem”, en, IEEE Journal of Selected Topics in                 Computing Systems - AISTECS ’16, Prague, Czech
+       Quantum Electronics, vol. 25, no. 5, pp. 1–14, Sep.                Republic: ACM Press, 2016, pp. 1–6, ISBN: 978-1-
+       2019, ISSN: 1077-260X, 1558-4542. DOI: 10 . 1109 /                 4503-4084-7. DOI: 10.1145/2857058.2857061.
+       JSTQE.2019.2918949.                                         [17]   J.-J. Crespo, F. J. Alfaro-Cortés, and J. L. Sánchez,
+ [5]   Y. Ye, T. Ullrick, W. Bogaerts, T. Dhaene, and D. Spina,           “PhotoNoCs: Design Simulation Tool for Silicon In-
+       “SPICE-Compatible Equivalent Circuit Models for Accu-              tegrated Photonics Towards Exascale Systems”, en,
+       rate Time-Domain Simulations of Passive Photonic In-               in Euro-Par 2017: Parallel Processing Workshops,
+       tegrated Circuits”, en, Journal of Lightwave Technology,           D. B. Heras, L. Bougé, G. Mencagli, et al., Eds.,
+       vol. 40, no. 24, pp. 7856–7868, Dec. 2022, ISSN: 0733-             vol. 10659, Series Title: Lecture Notes in Computer Sci-
+       8724, 1558-2213. DOI: 10.1109/JLT.2022.3206818.                    ence, Cham: Springer International Publishing, 2018,
+                                                                          pp. 715–724, ISBN: 978-3-319-75177-1 978-3-319-
+ [6]   P. Martin, F. Gays, E. Grellier, A. Myko, and S. Menezo,           75178-8. DOI: 10.1007/978-3-319-75178-8_57.
+       “Modeling of silicon photonics devices with Verilog-A”,
+       en, in 2014 29th International Conference on Micro-         [18]   M. Briere, E. Drouard, F. Mieyeville, D. Navarro, I.
+       electronics Proceedings - MIEL 2014, Belgrade, Serbia:             O’Connor, and F. Gaffiot, “Heterogeneous Modelling
+       IEEE, May 2014, pp. 209–212, ISBN: 978-1-4799-5296-                of an Optical Network-on-Chip with SystemC”, en, in
+       0 978-1-4799-5295-3 978-1-4799-5293-9. DOI: 10 .                   16th IEEE International Workshop on Rapid System
+       1109/MIEL.2014.6842123.                                            Prototyping (RSP’05), Montreal, Canada: IEEE, 2005,
+                                                                          pp. 10–16, ISBN: 978-0-7695-2361-3. DOI: 10 . 1109 /
+ [7]   L. Chrostowski, H. Shoman, M. Hammood, et al., “Sil-               RSP.2005.25.
+       icon Photonic Circuit Design Using Rapid Prototyping
+       Foundry Process Design Kits”, en, IEEE Journal of Se-       [19]   Specs repository, https : / / github . com / clement -
+       lected Topics in Quantum Electronics, vol. 25, no. 5,              z/specs.
+       pp. 1–26, Sep. 2019, ISSN: 1077-260X, 1558-4542.            [20]   SystemC standard. [Online]. Available: https : / /
+       DOI : 10.1109/JSTQE.2019.2917501.                                  systemc.org (visited on 05/04/2023).
+ [8]   Lumerical Interconnect. [Online]. Available: https : / /    [21]   KiCad. [Online]. Available: https://www.kicad.org/
+       www.ansys.com/products/photonics/interconnect                      (visited on 05/04/2023).
+       (visited on 05/04/2023).
+ [9]   IPKISS Design Suite. [Online]. Available: https : / /
+       www . lucedaphotonics . com / luceda - photonics -
+       design-platform (visited on 05/04/2023).
+[10]   F. Laporte et al., “Highly parallel simulation and opti-
+       mization of photonic circuits in time and frequency do-
+       main based on the deep-learning framework pytorch”,
+       Scientific reports, vol. 9, no. 1, pp. 1–9, 2019. DOI:
+       https://doi.org/10.1038/s41598-019-42408-2.
+[11]   J. Sepulveda, S. L. Beux, J. Luo, et al., “Communi-
+       cation Aware Design Method for Optical Network-on-
+       Chip”, en, in 2015 IEEE 9th International Symposium
+       on Embedded Multicore/Many-core Systems-on-Chip,
+       Turin, Italy: IEEE, Sep. 2015, pp. 243–250, ISBN: 978-
+       1-4799-8670-5. DOI: 10.1109/MCSoC.2015.33.
+[12]   T. Ferreira De Lima, A. N. Tait, A. Mehrabian, et
+       al., “Primer on silicon neuromorphic photonic proces-
+       sors: Architecture and compiler”, Nanophotonics, vol. 9,
+       no. 13, pp. 4055–4073, 2020. DOI: https://doi.org/
+       10.1515/nanoph-2020-0172.
+[13]   P. J. Ashenden, The designer’s guide to VHDL. Morgan
+       Kaufmann, 2008. DOI: https : / / doi . org / 10 . 1016 /
+       B978-0-12-088785-9.X0001-9.
+

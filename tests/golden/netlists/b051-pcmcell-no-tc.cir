@@ -1,0 +1,6 @@
+* B-051: PCMCELL requires tc and ta (no physical default; the C++ constructor
+* defaults made such a cell fully opaque). Here tc is missing (keywords only).
+* Expected: Error (ROOT/PCMCELL1): PCM Cell needs values for both Tc and Ta (missing: tc)
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=10 ta=0.95
+.op

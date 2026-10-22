@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b159-crossing-backward.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 441,
+   "kind": "json",
+   "sha256": "b6825c8682d595145be5dd08dd0bd7ee608c6e0772c18c056d7c6ae3b65c3947",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b159-crossing-backward"
+}

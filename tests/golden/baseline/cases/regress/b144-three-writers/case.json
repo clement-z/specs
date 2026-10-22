@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-three-writers.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 433,
+   "kind": "json",
+   "sha256": "f3ca476b9aef967863cf10591e8d8da2807885e72bd1655bc44de1496c9c8530",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b144-three-writers"
+}

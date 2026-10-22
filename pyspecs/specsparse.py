@@ -1,8 +1,6 @@
 from pyDigitalWaveTools.vcd.parser import VcdParser
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import json
 
 def parse_vcd_dataframe(filename):
     """Parses a SPECS VCD file and returns simulation data as a DataFrame.
@@ -19,9 +17,6 @@ def parse_vcd_dataframe(filename):
         vcd = VcdParser()
         vcd.parse(vcd_file)
         data = vcd.scope.toJson()
-
-    # print(json.dumps(data, indent=4, sort_keys=True))
-    simulation_data_df = pd.DataFrame() # initialize empty dataframe
 
     top_level_name = 'SystemC'
     top_scope = None
@@ -50,10 +45,6 @@ def parse_vcd_dataframe(filename):
                 pdets.append(child)
         else:
             values.append(child)
-
-    # print(f'top level values: {[x["name"] for x in values]}')
-    # print(f'top level scopes: {[x["name"] for x in scopes]}')
-    # print(f'top level probes: {[x["name"] for x in probes]}')
 
     is_wl_sweep = check_wl_sweep(top_scope)
     has_wl = False
@@ -101,7 +92,7 @@ def parse_vcd_dataframe(filename):
             df_probes = df_probes.drop(df_probes.loc[df_probes['wavelength']== 0].index.values)
             df_probes = df_probes.interpolate()
         else:
-            df_probes = df_probes.fillna(method='ffill')
+            df_probes = df_probes.ffill()
 
     # Same with pdetectors
     df_pdet = pd.DataFrame()
@@ -126,15 +117,6 @@ def parse_vcd_dataframe(filename):
 
         df_pdet = df_pdet.sort_values('tick')
         df_pdet = df_pdet.reset_index(drop=True)
-        if False:
-            # Add a point next to first value from photodetector
-            # to ensure 'step' appearance (as its more correct)
-            print(df_pdet.head())
-            df_pdet.loc[-1] = df_pdet.loc[0]
-            df_pdet.loc[0, 'tick'] = df_pdet.loc[1]['tick']
-            df_pdet = df_pdet.sort_values('tick')
-            df_pdet = df_pdet.reset_index(drop=True)
-            print(df_pdet.head())
 
         # making sure that time goes first
         df_pdet.insert(0, 'time', df_pdet['tick'] * vcd_get_multiplier(vcd))
@@ -143,7 +125,7 @@ def parse_vcd_dataframe(filename):
         df_pdet = df_pdet.drop(columns=['tick'])
 
         # getting rid of the NaNs: for time domain we repeat the last valid value,
-        df_pdet = df_pdet.fillna(method='ffill')
+        df_pdet = df_pdet.ffill()
 
 
     print('--- Contents of simulation ---')
@@ -259,10 +241,9 @@ def check_wl_sweep(top_scope):
     # Need to check that SystemC.analysis_type == 1 (CW sweep)
     for child in top_scope['children']:
         if child['name'] == 'analysis_type':
-            print(child)
+            # SystemC strips leading zeros from the vector: 'b1' = CW_SWEEP, 'b10' = TIME_DOMAIN (AnalysisType, src/specs.h)
             analysis_type = child['data'][0][1]
-            print(f'analysis_type:{analysis_type}')
-            return analysis_type == 'b01'
+            return int(analysis_type[1:], 2) == 1
     raise ValueError('Expected to find key "analysis_type" in VCD trace.')
 
 def vcd_get_data_vector(signal):

@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "pcm"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/pcm_device_tb.manifest.json": {
+   "bytes": 254,
+   "kind": "json",
+   "sha256": "e4bacb7bd8c6dd158852b938d3e4b06e7df2e516cb99031de0afa5f64625ef23",
+   "stored": "files/traces/pcm_device_tb.manifest.json"
+  },
+  "traces/pcm_device_tb.vcd": {
+   "bytes": 1778,
+   "kind": "vcd",
+   "sha256": "0b7aee062424447f4ae54e53d48908dc5fd977b102290b0eb76952db95861ace",
+   "stored": "files/traces/pcm_device_tb.vcd"
+  }
+ },
+ "id": "tb/pcm"
+}

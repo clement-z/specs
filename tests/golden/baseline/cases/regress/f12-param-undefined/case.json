@@ -1,0 +1,18 @@
+{
+ "args": [
+  "--param",
+  "pin=2e-3",
+  "-f",
+  "tests/golden/netlists/f12-param-undefined.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 458,
+   "kind": "json",
+   "sha256": "bd47b8ab7ea6625bb52ed5c5feca77069be1e93e6f33dc9281fdea7b3188a224",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f12-param-undefined"
+}

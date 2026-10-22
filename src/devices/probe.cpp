@@ -1,17 +1,25 @@
 #include <ios>
 #include "devices/probe.h"
-#include <cstdlib> // system()
+#include "trace_table.h"
 
-#define __modname(SUFFIX, IDX) \
-    ((""s + this->name() + "_" + SUFFIX + to_string(IDX)).c_str())
+namespace {
 
+// Value of a net that was never written: the default OpticalSignal (no field, wavelength id 0). Id 0
+// aliases the first registered wavelength (B-012), so isnan(getWavelength()) does not detect it, and
+// getWavelength() exits when no wavelength is registered yet.
+inline bool isDefaultSignal(const OpticalSignal &s)
+{
+    return s.m_field == OpticalSignal::field_type(0.0) && s.m_wavelength_id == 0;
+}
+
+}
 
 void Probe::on_port_in_changed()
 {
     if (specsGlobalConfig.verbose_component_initialization)
     {
         cout << name() << ":" << endl;
-        cout << "Signal: " << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name() << endl;
+        cout << "Signal: " << port_channel_name(p_in) << endl;
         cout << "trace power: " << m_trace_power << endl;
         cout << "trace modulus: " << m_trace_modulus << endl;
         cout << "trace phase: " << m_trace_phase << endl;
@@ -20,17 +28,23 @@ void Probe::on_port_in_changed()
     }
 
     while (true) {
-        // Wait for a new input signal
+        // Wait for a new input signal, or for the probe to be enabled
         wait();
 
-        // Check if enabled first
+        // While disabled (e.g. during the OP of a .tran), ignore the input events. Once enabled,
+        // sample the current value of the net, whether or not it changed in the meantime (B-048)
         if (!enable.read().to_bool())
         {
             wait(enable.posedge_event());
-            continue;
         }
 
         auto &s = p_in->read();
+
+        // Sampled because the probe was enabled (the net did not change in this delta) and the
+        // net was never written: nothing to trace (B-048)
+        if (!p_in->event() && isDefaultSignal(s))
+            continue;
+
         // cout << name() << ": " << s << endl;
         if (!isnan(s.getWavelength()))
         {
@@ -41,39 +55,27 @@ void Probe::on_port_in_changed()
             if (m_trace_phase)
                 m_trace_sig_phase.write(s.phase());
             if (m_trace_wavelength)
-                // m_trace_sig_wavelength.write(299792458.0 / s.m_wavelength);
                 m_trace_sig_wavelength.write(s.getWavelength());
+            if (m_table)
+                m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
         }
     }
 }
 
-void PowerProbe::on_port_in_changed()
+void Probe::setTraceTable(TraceTable *table)
 {
-    //m_trace_sig.write(0);
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-        auto &s = p_in->read();
-        if (!isnan(s.getWavelength()))
-            m_trace_sig_power.write(s.power());
-    }
+    m_table = table;
+    if (m_table)
+        m_table_signal = m_table->signal_index(name());
 }
 
-void PhaseProbe::on_port_in_changed()
+void MLambdaProbe::setTraceTable(TraceTable *table)
 {
-    //m_trace_sig.write(0);
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-        auto &s = p_in->read();
-        if (!isnan(s.getWavelength()))
-            m_trace_sig_phase.write(s.phase());
-    }
+    m_table = table;
+    if (m_table)
+        m_table_signal = m_table->signal_index(name());
 }
 
-//__modname(SUFFIX, IDX)
 void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
 {
     m_Tf = Tf;
@@ -90,9 +92,6 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
     for(const auto &wl : m_lambdas)
     {
         stringstream ss;
-        // int wl_nm = floor(wl*1e9);
-        // int wl_sub_nm = round((wl*1e9 - wl_nm) * 1e6);
-        // ss << wl_nm << "nm" << wl_sub_nm;
         ss << setprecision(6) << std::fixed << wl*1e9;
         string wl_str = ss.str();
         // Necessary because '.' is interpreted by traces as the hierarchical separator
@@ -100,20 +99,18 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
 
         temp_vector.clear();
 
-        temp_signal = make_unique<sc_signal<double>>(__modname("trace_pow", i*3));
+        temp_signal = make_unique<sc_signal<double>>(spx_child_name(this, "_trace_pow", i*3).c_str());
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".power@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
-        temp_signal = make_unique<sc_signal<double>>(__modname("trace_mod", i*3));
+        temp_signal = make_unique<sc_signal<double>>(spx_child_name(this, "_trace_mod", i*3).c_str());
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".abs@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
-        temp_signal = make_unique<sc_signal<double>>(__modname("trace_phase", i*3));
+        temp_signal = make_unique<sc_signal<double>>(spx_child_name(this, "_trace_phase", i*3).c_str());
         sc_trace(m_Tf, *temp_signal, (string(this->name()) + ".phase@" + wl_str).c_str());
         temp_vector.push_back(std::move(temp_signal));
 
-        //m_lambda_signals[m_lambdas[i]] = std::move(temp_vector);
-        //or
         m_lambda_signals.insert({wl, std::move(temp_vector)});
 
         ++i;
@@ -121,8 +118,6 @@ void MLambdaProbe::setTraceFile(sc_trace_file *Tf)
 }
 void MLambdaProbe::on_port_in_changed()
 {
-    // std::map< int, std::vector< unique_ptr<sc_signal<double> > > > wl_map;
-
     if (specsGlobalConfig.verbose_component_initialization)
     {
         cout << name() << " ready (";
@@ -131,31 +126,43 @@ void MLambdaProbe::on_port_in_changed()
             cout << p.first << ", ";
         }
         cout << "\b\b)" << endl;
-        cout << "Signal: " << (dynamic_cast<spx::oa_signal_type *>(p_in.get_interface()))->name() << endl;
+        cout << "Signal: " << port_channel_name(p_in) << endl;
         cout << endl;
     }
     //m_trace_sig.write(0);
 
     while (true) {
-        // Wait for a new input signal
+        // Wait for a new input signal, or for the probe to be enabled
         wait();
 
-        // Check if enabled first
+        // While disabled (e.g. during the OP of a .tran), ignore the input events. Once enabled,
+        // sample the current value of the net, whether or not it changed in the meantime (B-048)
         if (!enable.read().to_bool())
         {
             wait(enable.posedge_event());
-            continue;
         }
 
         auto &s = p_in->read();
-        auto search = m_lambda_signals.find(s.getWavelength());
 
-        if (search != m_lambda_signals.end())
+        // Sampled because the probe was enabled (the net did not change in this delta) and the
+        // net was never written: nothing to trace or to report (B-048)
+        if (!p_in->event() && isDefaultSignal(s))
+            continue;
+
+        // A listed wavelength (the VCD signals only exist with a trace file: without one, e.g. with
+        // --no-trace or --format csv, a listed wavelength is not "unsupported", F-05)
+        if (m_lambdas.count(s.getWavelength()))
         {
             //cout << name() << " received supported signal (lambda = " << s.getWavelength() << "m)" << endl;
-            m_lambda_signals[s.getWavelength()][0]->write(s.power());
-            m_lambda_signals[s.getWavelength()][1]->write(s.modulus());
-            m_lambda_signals[s.getWavelength()][2]->write(s.phase());
+            auto search = m_lambda_signals.find(s.getWavelength());
+            if (search != m_lambda_signals.end())
+            {
+                search->second[0]->write(s.power());
+                search->second[1]->write(s.modulus());
+                search->second[2]->write(s.phase());
+            }
+            if (m_table)
+                m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
         }
         else {
             cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;

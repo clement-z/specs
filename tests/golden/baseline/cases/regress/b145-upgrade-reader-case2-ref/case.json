@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b145-upgrade-reader-case2-ref.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 455,
+   "kind": "json",
+   "sha256": "052ccc9b90fcbc851c903a2f45e6266286ce71d349479c1151c05f3259794b8f",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1334,
+   "kind": "vcd",
+   "sha256": "45a3ee4cedcab3a2e61a5e76c85068eb5401d4d856648ba507e6d4b5229a050f",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b145-upgrade-reader-case2-ref"
+}

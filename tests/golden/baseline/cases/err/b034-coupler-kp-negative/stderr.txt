@@ -1,0 +1,2 @@
+Error (ROOT/COUPLER1): coupler through power 1.01 is outside [0, 1] (k and t must be in [-1, 1], kp in [0, 1])
+

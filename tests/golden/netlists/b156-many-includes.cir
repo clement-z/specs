@@ -1,0 +1,17 @@
+* B-156: files opened by .include must be closed at their end of file.
+* 10 includes of a file that itself includes a leaf file 10 times: 110 includes,
+* at most 2 of them open at the same time. The golden case runs with a low
+* open-files limit (rlimit_nofile), so leaked descriptors make an include fail.
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+.include tests/golden/netlists/b156-include-10x.cir
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.tran 1e-12

@@ -1,0 +1,18 @@
+* B-049 regression (repro: backlog/repro/a3-pdet-readout.cir). The PDET readout was only traced,
+* never written to its electrical output net (p_readout->write was commented out), so a phase
+* shifter driven by the photocurrent saw 0.
+* pdet1 sees 1 mW (R = 1 A/W): readout = 1 mA (0.0009999999999999998 = |sqrt(1e-3)|^2), written
+* at the start of the transient (the detector is enabled after the OP, with the CW input stored).
+* vout drives pshift1 with sensitivity 1000 rad/A, so the pulse that vlsrc2 sends through it at
+* 10 ps comes out with phase 1000 * 1e-3 = 1 rad.
+* Expected: PDET1.readout = readout_no_interference = 1 mA from t = 0 (one VCD record);
+*   out2 (PROBE1) = 1 mW, phase 1 rad from 10 ps (was 0 rad); "Simulated 50 ps".
+cwsrc1 in wl=1.55e-6 power=1e-3
+pdet1 in vout
+vlsrc2 in2 values=[[10e-12,1e-3,1.55e-6]]
+pshift1 in2 out2 vout sensitivity=1000
+probe1 out2
+* traceall=0: only the PDETs (and explicit probes) are traced, the case does not depend on the
+* automatic probes of the CW nets
+.options traceall=0
+.tran 50e-12

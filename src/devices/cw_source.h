@@ -1,7 +1,6 @@
 #pragma once
 
 #include <systemc.h>
-#include <fstream>
 
 #include "optical_output_port.h"
 #include "optical_signal.h"

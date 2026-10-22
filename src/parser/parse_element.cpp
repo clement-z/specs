@@ -3,6 +3,8 @@
 #include "specs.h"
 #include "utils/strutils.h"
 
+#include <cstdint>
+#include <limits>
 #include <string>
 
 /** ******************************************* **/
@@ -23,6 +25,20 @@ if (bidirectional)\
     obj = (element_type_base *)instantiate_and_connect_bi(pt_helper);\
 else\
     obj = (element_type_base *)instantiate_and_connect_uni(pt_helper);
+
+// Integer parameter stored as an int: a value beyond the int range is an error, not a wrapped value
+// (B-180). Values within it are checked by the device (min_valid is only for the message).
+static int int_parameter(const Variable &v, const string &elem_name, const string &what, int min_valid)
+{
+    const int64_t i = v.as_integer();
+    if (i < std::numeric_limits<int>::min() || i > std::numeric_limits<int>::max())
+    {
+        cerr << "Error (" << elem_name << "): " << what << " must be between " << min_valid << " and "
+             << std::numeric_limits<int>::max() << " (got " << i << ")" << endl;
+        exit(1);
+    }
+    return static_cast<int>(i);
+}
 
 /** ******************************************* **/
 /**               Waveguide                     **/
@@ -52,8 +68,9 @@ INSTANTIATE_AND_CONNECT_BI(WGElement, pt_helper)
         (*pt_helper.nets)[nets[1]].m_readers_count++;
 
     // Bidirectional waveguide needs all nets as bidir
-    for (const auto &net : nets)
-        pt_helper.upgrade_signal(net);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -89,6 +106,9 @@ sc_module *WGElement::create(ParseTreeCreationHelper &pt_helper) const
 
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, bidirectional);
+
+    // B-014: written in the netlist, so a delay that rounds to 0 time steps is an error
+    obj->m_from_netlist = true;
 
     // Parse positional arguments
     if(args.size() > 0)
@@ -225,6 +245,11 @@ sc_module *SplitterElement::create(ParseTreeCreationHelper &pt_helper) const
             exit(1);
         }
     }
+    if (!(obj->m_split_ratio >= 0 && obj->m_split_ratio <= 1))
+    {
+        cerr << "Error (" << name << "): splitter ratio " << obj->m_split_ratio << " is outside [0, 1]" << endl;
+        exit(1);
+    }
     return obj;
 }
 
@@ -262,8 +287,11 @@ INSTANTIATE_AND_CONNECT_BI(DCElement, pt_helper)
         (*pt_helper.nets)[nets[3]].m_readers_count++;
 
     // Bidirectional DC needs all nets as bidir
-    for (const auto &net : nets)
-        pt_helper.upgrade_signal(net);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_READER);
+    pt_helper.upgrade_signal(nets[2], AS_WRITER);
+    pt_helper.upgrade_signal(nets[3], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -277,9 +305,6 @@ INSTANTIATE_AND_CONNECT_BI(DCElement, pt_helper)
 
 sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
 {
-    // TODO: change from field to power?
-    cout << "Warning: coupling power for DC currently set to field." << endl;
-
     element_type_base *obj = nullptr;
 
     // Verify number of nets
@@ -292,7 +317,7 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
     bool bidirectional = false;
     for (const auto &net : nets)
     {
-        // for waveguide, if any net is bidir, module has to be bidir
+        // for coupler, if any net is bidir, module has to be bidir
         bidirectional |= pt_helper.nets->at(net).bidirectional();
     }
 
@@ -301,10 +326,10 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
 
     // Parse positional arguments
     if(args.size() > 0)
-        // convert from cross-coupling field coef
+        // k, cross-coupling field coef (P_cross = k^2): through power = 1 - k^2
         obj->m_dc_through_coupling_power = 1 - pow(args[0].as_double(), 2);
     if(args.size() > 1)
-        obj->m_dc_loss = args[1].as_double();
+        obj->m_dc_loss = args[1].as_double(); // insertion loss in dB
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -312,20 +337,26 @@ sc_module *DCElement::create(ParseTreeCreationHelper &pt_helper) const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "K" || kw == "KF" || kw == "KFIELD")
-            // convert from cross-coupling field coef
+            // k, cross-coupling field coef (P_cross = k^2): through power = 1 - k^2
             obj->m_dc_through_coupling_power = 1 - pow(p.second.as_double(), 2);
         else if (kw == "KP" || kw == "KPOW" || kw == "KPOWER")
-            // convert from cross-coupling field coef
+            // kp, cross-coupling power ratio (P_cross = kp): through power = 1 - kp
             obj->m_dc_through_coupling_power = 1 - p.second.as_double();
         else if (kw == "T")
-            // convert from cross-coupling field coef
+            // t, through field coef (P_through = t^2): through power = t^2
             obj->m_dc_through_coupling_power = pow(p.second.as_double(), 2);
         else if (kw == "LOSS")
-            obj->m_dc_loss = p.second.as_double();
+            obj->m_dc_loss = p.second.as_double(); // insertion loss in dB
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);
         }
+    }
+    if (!(obj->m_dc_through_coupling_power >= 0 && obj->m_dc_through_coupling_power <= 1))
+    {
+        cerr << "Error (" << name << "): coupler through power " << obj->m_dc_through_coupling_power
+             << " is outside [0, 1] (k and t must be in [-1, 1], kp in [0, 1])" << endl;
+        exit(1);
     }
     return obj;
 }
@@ -359,8 +390,9 @@ INSTANTIATE_AND_CONNECT_BI(PhaseShifterElement, pt_helper)
         (*pt_helper.nets)[nets[1]].m_readers_count++;
 
     // Bidirectional phase-shifter needs only optical nets as bidir
-    pt_helper.upgrade_signal(nets[0]);
-    pt_helper.upgrade_signal(nets[1]);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -374,8 +406,6 @@ INSTANTIATE_AND_CONNECT_BI(PhaseShifterElement, pt_helper)
 sc_module *PhaseShifterElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
-
-    cout << "Warning (" << name << "): default coupling power for DC currently set to field." << endl;
 
     // Verify number of nodes
     assert(nets.size() == n_nets);
@@ -393,7 +423,11 @@ sc_module *PhaseShifterElement::create(ParseTreeCreationHelper &pt_helper) const
     INSTANTIATE(pt_helper, bidirectional);
 
     // Verify number of args
-    assert(args.size() <= 2);
+    if (args.size() > 2)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 2)" << endl;
+        exit(1);
+    }
 
     // Parse positional arguments
     if(args.size() > 0)
@@ -453,10 +487,11 @@ INSTANTIATE_AND_CONNECT_BI(MZIElement, pt_helper)
         (*pt_helper.nets)[nets[3]].m_readers_count++;
 
     // Bidirectional phase-shifter needs only optical nets as bidir
-    pt_helper.upgrade_signal(nets[0]);
-    pt_helper.upgrade_signal(nets[1]);
-    pt_helper.upgrade_signal(nets[2]);
-    pt_helper.upgrade_signal(nets[3]);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_READER);
+    pt_helper.upgrade_signal(nets[2], AS_WRITER);
+    pt_helper.upgrade_signal(nets[3], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -471,8 +506,6 @@ INSTANTIATE_AND_CONNECT_BI(MZIElement, pt_helper)
 sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
-
-    cout << "Warning (" << name << "): default coupling power for DC currently set to field." << endl;
 
     // Verify number of nodes
     assert(nets.size() == n_nets);
@@ -489,10 +522,13 @@ sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, bidirectional);
 
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
     // Parse positional arguments
     if(args.size() > 0)
-        // convert from cross-coupling field coef
         obj->m_ps_sens_rad_v = args[0].as_double();
     // TODO: other positional args
 
@@ -502,7 +538,6 @@ sc_module *MZIElement::create(ParseTreeCreationHelper &pt_helper) const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "SENSITIVITY")
-            // convert from cross-coupling field coef
             obj->m_ps_sens_rad_v = p.second.as_double();
         else if (kw == "LENGTH")
             obj->m_length_cm = 100 * p.second.as_double();
@@ -536,8 +571,8 @@ INSTANTIATE_AND_CONNECT_UNI(CrossingElement, pt_helper)
     // connect ports
     pt_helper.connect_uni<spx::oa_signal_type>(obj->p_in1,  nets[0], AS_READER);
     pt_helper.connect_uni<spx::oa_signal_type>(obj->p_in2,  nets[1], AS_READER);
-    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out1, nets[2], AS_READER);
-    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out2, nets[3], AS_READER);
+    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out1, nets[2], AS_WRITER);
+    pt_helper.connect_uni<spx::oa_signal_type>(obj->p_out2, nets[3], AS_WRITER);
 
     // return the module
     return obj;
@@ -547,7 +582,7 @@ INSTANTIATE_AND_CONNECT_BI(CrossingElement, pt_helper)
 {
     element_type_bi *obj = new element_type_bi(name.c_str());
 
-    // Update unidirectional nets connected to the waveguide
+    // Update unidirectional nets connected to the crossing
     if (!pt_helper.nets->at(nets[0]).bidirectional())
         (*pt_helper.nets)[nets[0]].m_writers_count++;
     if (!pt_helper.nets->at(nets[1]).bidirectional())
@@ -558,10 +593,11 @@ INSTANTIATE_AND_CONNECT_BI(CrossingElement, pt_helper)
         (*pt_helper.nets)[nets[3]].m_readers_count++;
 
     // Bidirectional crossing needs all optical nets as bidir
-    pt_helper.upgrade_signal(nets[0]);
-    pt_helper.upgrade_signal(nets[1]);
-    pt_helper.upgrade_signal(nets[2]);
-    pt_helper.upgrade_signal(nets[3]);
+    // (role of the device on each net: as in the uni variant)
+    pt_helper.upgrade_signal(nets[0], AS_READER);
+    pt_helper.upgrade_signal(nets[1], AS_READER);
+    pt_helper.upgrade_signal(nets[2], AS_WRITER);
+    pt_helper.upgrade_signal(nets[3], AS_WRITER);
 
     // connect ports
     pt_helper.connect_bi<spx::oa_signal_type>(obj->p0_in, obj->p0_out, nets[0]);
@@ -581,15 +617,30 @@ sc_module *CrossingElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 2);
+    if (args.size() > 2)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 2)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
 
+    // Check if device has to be bidirectional (B-159)
+    bool bidirectional = false;
+    for (const auto &net : nets)
+    {
+        // for crossing, if any net is bidir, module has to be bidir
+        bidirectional |= pt_helper.nets->at(net).bidirectional();
+    }
+
     // Create the object and connect ports to signals
-    INSTANTIATE(pt_helper, false);
+    INSTANTIATE(pt_helper, bidirectional);
 
     // Parse positional arguments
+    // att: excess loss in dB, on top of the power lost to crosstalk
+    // xtalk: cross power ratio in dB; its sign is ignored, a positive value is read as
+    // an isolation (xtalk=20 and xtalk=-20 both give 1 % on the cross port, B-032)
     if(args.size() > 0)
         obj->m_attenuation_power_dB = args[0].as_double();
     if(args.size() > 1)
@@ -603,6 +654,7 @@ sc_module *CrossingElement::create(ParseTreeCreationHelper &pt_helper) const
         if (kw == "ATTENUATION" || kw == "ATT")
             obj->m_attenuation_power_dB = p.second.as_double();
         else if (kw == "CROSSTALK" || kw == "XTALK")
+            // sign ignored: xtalk=20 (isolation) is the same as xtalk=-20 (B-032)
             obj->m_crosstalk_power_dB = p.second.as_double();
         else {
             cerr << "Unknown keyword: " << p.first << endl;
@@ -634,7 +686,11 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == 1);
 
     // Verify number of positional args
-    assert(args.size() <= 3);
+    if (args.size() > 3)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 3)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -642,14 +698,13 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
-    // Parse positional arguments
+    // Parse positional arguments (wl power phi)
+    if(args.size() > 0)
+        obj->setWavelength(args[0].as_double());
     if(args.size() > 1)
-        // convert from cross-coupling field coef
-        obj->setWavelength(args[1].as_double());
+        obj->setPower(args[1].as_double());
     if(args.size() > 2)
-        obj->setPower(args[2].as_double());
-    if(args.size() > 3)
-        obj->setPhase(args[3].as_double());
+        obj->setPhase(args[2].as_double());
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -657,10 +712,8 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
         string kw = p.first;
         strutils::toupper(kw);
         if (kw == "WL" || kw == "WAVELENGTH")
-            // convert from cross-coupling field coef
             obj->setWavelength(p.second.as_double());
         else if (kw == "POWER")
-            // convert from cross-coupling field coef
             obj->setPower(p.second.as_double());
         else if (kw == "PHI")
             continue; // handle it after all power commands are executed
@@ -702,7 +755,11 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -710,8 +767,8 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
-    // Parse positional arguments
-    if(args.size() > 1)
+    // Parse positional arguments (file)
+    if(args.size() > 0)
         obj->setValues(args[0].as_string());
 
     // Parse keyword arguments
@@ -855,7 +912,11 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -863,8 +924,8 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
-    // Parse positional arguments
-    if(args.size() > 1)
+    // Parse positional arguments (file)
+    if(args.size() > 0)
         obj->setValues(args[0].as_string());
 
     // Parse keyword arguments
@@ -997,9 +1058,6 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
     // Verify number of nets
     assert(nets.size() == n_nets);
 
-    // Verify number of positional args
-    assert(args.size() <= 4);
-
     // Create signals if they don't exist
     pt_helper.create_signals(this);
 
@@ -1055,7 +1113,6 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
             exit(1);
         }
     }
-    cout<< "created " << obj->name() << endl;
     return obj;
 }
 
@@ -1081,7 +1138,11 @@ sc_module *MLProbeElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 1);
+    if (args.size() > 1)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 1)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -1154,7 +1215,11 @@ sc_module *PowerMeterElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() == 0);
+    if (args.size() > 0)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 0)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -1199,7 +1264,11 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 2);
+    if (args.size() > 4)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 4)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -1207,15 +1276,25 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
-    // Parse positional arguments
+    // Tc and Ta are required (B-051): no physical default
+    bool tc_given = false;
+    bool ta_given = false;
+
+    // Parse positional arguments (emelt n tc ta)
     if(args.size() > 0)
         obj->m_meltEnergy = args[0].as_double();
     if(args.size() > 1)
-        obj->m_nStates = args[1].as_integer();
+        obj->m_nStates = int_parameter(args[1], name, "the number of states n", 1);
     if(args.size() > 2)
+    {
         obj->m_Tc = args[2].as_double();
+        tc_given = true;
+    }
     if(args.size() > 3)
+    {
         obj->m_Ta = args[3].as_double();
+        ta_given = true;
+    }
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -1225,13 +1304,19 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         if (kw == "MELT_ENERGY" || kw == "EMELT" || kw == "E_MELT")
             obj->m_meltEnergy = p.second.as_double();
         else if (kw == "N" || kw == "NSTATES" || kw == "NLEVELS" || kw == "N_STATES" || kw == "N_LEVELS")
-            obj->m_nStates = p.second.as_integer();
+            obj->m_nStates = int_parameter(p.second, name, "the number of states n", 1);
         else if (kw == "K" || kw == "INITIAL_STATE")
-            obj->m_stateCurrent = p.second.as_integer();
+            obj->m_stateCurrent = int_parameter(p.second, name, "the initial state k", 0);
         else if (kw == "SP" || kw == "TC" || kw == "T_C")
+        {
             obj->m_Tc = p.second.as_double();
+            tc_given = true;
+        }
         else if (kw == "EP" || kw == "TA" || kw == "T_A")
+        {
             obj->m_Ta = p.second.as_double();
+            ta_given = true;
+        }
         else if (kw == "TANH_COEF")
             obj->m_speed = p.second.as_double();
         else {
@@ -1244,7 +1329,14 @@ sc_module *PCMCellElement::create(ParseTreeCreationHelper &pt_helper) const
         cerr << "PCM Cell needs values for both Emelt and Nstates" << endl;
         exit(1);
     }
-    cout << "-----" << endl;
+    if (!tc_given || !ta_given)
+    {
+        const char *missing = (!tc_given && !ta_given) ? "tc, ta" : (!tc_given ? "tc" : "ta");
+        cerr << "Error (" << name << "): PCM Cell needs values for both Tc and Ta (missing: " << missing << ")" << endl;
+        exit(1);
+    }
+    // Reject n <= 0 and an initial state k outside [0, n] (B-060)
+    obj->check_parameters();
     return obj;
 }
 
@@ -1272,7 +1364,11 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
     assert(nets.size() == n_nets);
 
     // Verify number of positional args
-    assert(args.size() <= 2);
+    if (args.size() > 2)
+    {
+        cerr << "Error (" << name << "): too many positional arguments (" << args.size() << ", expected at most 2)" << endl;
+        exit(1);
+    }
 
     // Create signals if they don't exist
     pt_helper.create_signals(this);
@@ -1299,6 +1395,8 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
             obj->m_noiseBypass = p.second.as_boolean();
         else if (kw == "FREQUENCY" || kw == "FOP")
             obj->m_opFreq_Hz = p.second.as_double();            
+        else if (kw == "DARKFIELD")
+            obj->m_dark_field_injection = p.second.as_boolean();
         else {
             cerr << "Unknown keyword: " << p.first << endl;
             exit(1);

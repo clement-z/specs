@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-uni-writer-second.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 441,
+   "kind": "json",
+   "sha256": "4c6ec24bd79c6bd05cbadd64633725b1957c2ee58481c73988b6a7aa1e0d7c09",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1029,
+   "kind": "vcd",
+   "sha256": "49a55be79d8b4d25390e1f0708b4274e75469db22625e77952f9ecc317f8d4c0",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b144-uni-writer-second"
+}

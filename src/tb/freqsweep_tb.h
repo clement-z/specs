@@ -29,5 +29,4 @@ public:
 
 //void freqsweep_tb_run();
 void freqsweep_tb_run_add_drop();
-void freqsweep_tb_run_crow();
 

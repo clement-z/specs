@@ -1,0 +1,15 @@
+* F-01 (B-055): photodetector noise (nb=0) is reproducible. Each PDET draws from its own stream,
+* rng_for(master seed, instance name); the master seed is specs --seed N, .options seed=N, or 0.
+* vlsrc1 sets the power on net a: 1 mW at 0, 2 mW at 10 ps, 0.5 mW at 20 ps, 1.5 mW at 30 ps.
+* pdet1 and pdet2 (R = 1 A/W) read the same input. Each input event gives one record of readout and
+* readout_no_interference = P * 1 A/W + noise (sd about 0.6 to 0.8 uA, a new draw for each), and the
+* noise of pdet1 and pdet2 differs (one stream per instance name).
+* Expected: regress/f01-pdet-noise-default-seed (seed 0) and regress/f01-pdet-noise-seed (--seed 12345)
+*   have the same record times and different noise values; regress/f01-options-seed
+*   (f01-pdet-noise-options-seed.cir, .options seed=12345) has exactly the --seed 12345 values.
+vlsrc1 a values=[[0,1e-3,1.55e-6],[10e-12,2e-3,1.55e-6],[20e-12,0.5e-3,1.55e-6],[30e-12,1.5e-3,1.55e-6]]
+pdet1 a v1 nb=0
+pdet2 a v2 nb=0
+* traceall=0: only the PDETs are traced
+.options traceall=0
+.tran 50e-12

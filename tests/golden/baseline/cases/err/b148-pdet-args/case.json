@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b148-pdet-args.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b148-pdet-args"
+}

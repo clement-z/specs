@@ -1,0 +1,70 @@
+# python3 -I backlog/cleanup/check_print_removal.py pre-c08-keep c08-new \
+#   --allow '\d+' --allow '.*(wg_top|wg_bot|dc)_\d+' --allow 'odd-even' --allow 'odd-odd' --allow 'created .*' \
+#   --allow=----- --allow 'Warning \(.*\): default coupling power for DC currently set to field\.' \
+#   --allow '	[^,]+,[^,]+' --allow 'uut2?' --allow '1e-05' --allow '\d+, \d+ is active'
+# old = check --keep of ws/cleanup@e1b7e9a binary; new = record of ab110fb binary (stdout of 28 cases lost only these lines)
+OK   cir-json/add_drop_pyspecs: stdout.txt -3 lines (pure deletion)
+OK   cir/add_drop_pyspecs: stdout.txt -3 lines (pure deletion)
+OK   err/b148-mzi-args: stdout.txt -1 lines (pure deletion)
+OK   err/b148-options-args: stdout.txt -1 lines (pure deletion)
+OK   err/b148-pshift-args: stdout.txt -1 lines (pure deletion)
+OK   err/b148-tran-args: stdout.txt -1 lines (pure deletion)
+OK   err/b153-abstol-negative: stdout.txt -1 lines (pure deletion)
+OK   err/b153-reltol-zero: stdout.txt -1 lines (pure deletion)
+OK   err/b153-resolution-below-one: stdout.txt -1 lines (pure deletion)
+OK   err/b153-resolution-negative: stdout.txt -1 lines (pure deletion)
+OK   err/b153-timescale-out-of-range: stdout.txt -1 lines (pure deletion)
+OK   err/b165-dc-stray-args: stdout.txt -1 lines (pure deletion)
+OK   err/b165-dc-stray-kwarg: stdout.txt -1 lines (pure deletion)
+OK   err/b165-op-stray-args: stdout.txt -1 lines (pure deletion)
+OK   err/b165-op-stray-kwarg: stdout.txt -1 lines (pure deletion)
+OK   opt/mode-sampled-time: stdout.txt -3 lines (pure deletion)
+OK   opt/tol-resolution-overrides: stdout.txt -1 lines (pure deletion)
+OK   opt/tracefile-o: stdout.txt -3 lines (pure deletion)
+OK   regress/b006-empty-output: stdout.txt -3 lines (pure deletion)
+OK   regress/b031-mzi-bidir: stdout.txt -12 lines (pure deletion)
+OK   regress/b036-vci-crow: stdout.txt -13 lines (pure deletion)
+OK   regress/b131-nrings-crow: stdout.txt -9 lines (pure deletion)
+OK   regress/b150-include-in-subckt: stdout.txt -2 lines (pure deletion)
+OK   regress/b156-many-includes: stdout.txt -1 lines (pure deletion)
+OK   tb/ac_crow: stdout.txt -13 lines (pure deletion)
+OK   tb/det: stdout.txt -2 lines (pure deletion)
+OK   tb/detector: stdout.txt -2 lines (pure deletion)
+OK   tb/mesh: stdout.txt -5 lines (pure deletion)
+
+28 cases lost only allowed lines; files and exit codes identical in all 80 cases
+changed: cir-json/add_drop_pyspecs cir/add_drop_pyspecs err/b148-mzi-args err/b148-options-args err/b148-pshift-args err/b148-tran-args err/b153-abstol-negative err/b153-reltol-zero err/b153-resolution-below-one err/b153-resolution-negative err/b153-timescale-out-of-range err/b165-dc-stray-args err/b165-dc-stray-kwarg err/b165-op-stray-args err/b165-op-stray-kwarg opt/mode-sampled-time opt/tol-resolution-overrides opt/tracefile-o regress/b006-empty-output regress/b031-mzi-bidir regress/b036-vci-crow regress/b131-nrings-crow regress/b150-include-in-subckt regress/b156-many-includes tb/ac_crow tb/det tb/detector tb/mesh
+
+# Part 2: stored baseline before vs after this commit (same --allow list). The 28 stdout.txt files were
+# rebuilt as "old baseline minus exactly the lines lost in part 1" (no re-recorded line order, no VCD churn).
+OK   cir-json/add_drop_pyspecs: stdout.txt -3 lines (pure deletion)
+OK   cir/add_drop_pyspecs: stdout.txt -3 lines (pure deletion)
+OK   err/b148-mzi-args: stdout.txt -1 lines (pure deletion)
+OK   err/b148-options-args: stdout.txt -1 lines (pure deletion)
+OK   err/b148-pshift-args: stdout.txt -1 lines (pure deletion)
+OK   err/b148-tran-args: stdout.txt -1 lines (pure deletion)
+OK   err/b153-abstol-negative: stdout.txt -1 lines (pure deletion)
+OK   err/b153-reltol-zero: stdout.txt -1 lines (pure deletion)
+OK   err/b153-resolution-below-one: stdout.txt -1 lines (pure deletion)
+OK   err/b153-resolution-negative: stdout.txt -1 lines (pure deletion)
+OK   err/b153-timescale-out-of-range: stdout.txt -1 lines (pure deletion)
+OK   err/b165-dc-stray-args: stdout.txt -1 lines (pure deletion)
+OK   err/b165-dc-stray-kwarg: stdout.txt -1 lines (pure deletion)
+OK   err/b165-op-stray-args: stdout.txt -1 lines (pure deletion)
+OK   err/b165-op-stray-kwarg: stdout.txt -1 lines (pure deletion)
+OK   opt/mode-sampled-time: stdout.txt -3 lines (pure deletion)
+OK   opt/tol-resolution-overrides: stdout.txt -1 lines (pure deletion)
+OK   opt/tracefile-o: stdout.txt -3 lines (pure deletion)
+OK   regress/b006-empty-output: stdout.txt -3 lines (pure deletion)
+OK   regress/b031-mzi-bidir: stdout.txt -12 lines (pure deletion)
+OK   regress/b036-vci-crow: stdout.txt -13 lines (pure deletion)
+OK   regress/b131-nrings-crow: stdout.txt -9 lines (pure deletion)
+OK   regress/b150-include-in-subckt: stdout.txt -2 lines (pure deletion)
+OK   regress/b156-many-includes: stdout.txt -1 lines (pure deletion)
+OK   tb/ac_crow: stdout.txt -13 lines (pure deletion)
+OK   tb/det: stdout.txt -2 lines (pure deletion)
+OK   tb/detector: stdout.txt -2 lines (pure deletion)
+OK   tb/mesh: stdout.txt -5 lines (pure deletion)
+
+28 cases lost only allowed lines; files and exit codes identical in all 80 cases
+changed: cir-json/add_drop_pyspecs cir/add_drop_pyspecs err/b148-mzi-args err/b148-options-args err/b148-pshift-args err/b148-tran-args err/b153-abstol-negative err/b153-reltol-zero err/b153-resolution-below-one err/b153-resolution-negative err/b153-timescale-out-of-range err/b165-dc-stray-args err/b165-dc-stray-kwarg err/b165-op-stray-args err/b165-op-stray-kwarg opt/mode-sampled-time opt/tol-resolution-overrides opt/tracefile-o regress/b006-empty-output regress/b031-mzi-bidir regress/b036-vci-crow regress/b131-nrings-crow regress/b150-include-in-subckt regress/b156-many-includes tb/ac_crow tb/det tb/detector tb/mesh

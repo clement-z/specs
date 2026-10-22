@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f01-options-seed-int-max.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 590,
+   "kind": "json",
+   "sha256": "6946709347124282178363bd072156c8d13ac971bcad92a7666d88e537831827",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1482,
+   "kind": "vcd",
+   "sha256": "2759b90875218d5d47987608f00e5e0ebcb59dd9b932eb8ae2bd6d1b29258618",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f01-options-seed-int-max"
+}

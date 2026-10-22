@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/f05-save-paper-fig1b.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 44674,
+   "kind": "text",
+   "sha256": "1470d9814e88bfea3b957108882ffd1f95fb07f2e8464cb407df1a1e5a337bc8",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 475,
+   "kind": "json",
+   "sha256": "1c8763f01841981b37d613492631433341a37416307494802cc3abe29e651255",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 12844,
+   "kind": "vcd",
+   "sha256": "604b4d51cc920a739d6b9f3ee3893c99c929a9ef36e589f7172cfff8eda900c9",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f05-format-vcd-csv-dc"
+}

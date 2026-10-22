@@ -56,7 +56,7 @@ public:
         std::ifstream file(filename);
 
         if (!file.is_open()) {
-            cerr << "Error: Cannot open the file." << endl;
+            cerr << "Error: Cannot open the file \"" << filename << "\"." << endl;
             exit(1);
         }
 

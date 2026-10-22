@@ -1,0 +1,5 @@
+* B-052: VLSRC with two positional arguments (at most 1: file). Neither file
+* exists: the count is checked before any file is opened.
+* Expected: Error (ROOT/VLSRC1): too many positional arguments (2, expected at most 1)
+vlsrc1 a "f1" "f2"
+.tran 1e-9

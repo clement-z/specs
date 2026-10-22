@@ -101,13 +101,6 @@ private:
             {group_delay_0, group_delay_1},
             {group_delay_0, group_delay_1},
             {0}};
-
-        // cout << "----------- " << name() << " -----------" << endl;
-        // cout << "- alpha:        " << TM.Malpha[1][0] << " (V/m)/(V/m)" << endl;
-        // cout << "- transmission: " << pow(TM.Malpha[1][0],2.0) << " W/W" << endl;
-        // cout << "- phi:          " << TM.Mphi[1][0] << " rad" << endl;
-        // cout << "- dphi/dlambda: " << TM.Mphi[1][1] << " rad/m" << endl;
-        // cout << "- group delay:  " << TM.Mtau[1][0] << " s" << endl;
     }
 
     double m_loss; // loss in dB/m

@@ -1,0 +1,5 @@
+* B-052: EVLSRC with two positional arguments (at most 1: file). Neither file
+* exists: the count is checked before any file is opened.
+* Expected: Error (ROOT/EVLSRC1): too many positional arguments (2, expected at most 1)
+evlsrc1 e "f1" "f2"
+.tran 1e-9

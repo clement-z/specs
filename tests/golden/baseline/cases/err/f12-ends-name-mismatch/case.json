@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-ends-name-mismatch.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f12-ends-name-mismatch"
+}

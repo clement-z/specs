@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-m",
+  "td",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 399,
+   "kind": "json",
+   "sha256": "bb573200c22af1feb9e1763611d749cb71998f9b1e48a5da5043af6937092bd5",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 27049,
+   "kind": "vcd",
+   "sha256": "f8938030fd58677d27b61321f69610365065cbc6ce6be5c20098c338e8d7daaa",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b004-mode-td-dc"
+}

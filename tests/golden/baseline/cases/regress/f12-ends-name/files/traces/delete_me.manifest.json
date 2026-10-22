@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f12-ends-name.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f12-ends-name.cir", "sha256": "392413918335ecb0035dbe0c0b0c6a990516e0d841d72caf42047700e7c79b27"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

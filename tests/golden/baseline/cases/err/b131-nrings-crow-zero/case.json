@@ -1,0 +1,11 @@
+{
+ "args": [
+  "-t",
+  "ac_crow",
+  "--nrings_crow",
+  "0"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b131-nrings-crow-zero"
+}

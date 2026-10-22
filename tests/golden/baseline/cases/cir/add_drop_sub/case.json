@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "circuits/add_drop_sub.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 395,
+   "kind": "json",
+   "sha256": "e6126d2382cf9e1b439f5ecf31897a686f7ea97dd60ecdcdfe3b3957191e7b4c",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "cir/add_drop_sub"
+}

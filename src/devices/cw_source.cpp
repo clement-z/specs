@@ -11,11 +11,9 @@ void CWSource::runner()
         cout << name() << ":" << endl;
         cout << "signal on: " << m_signal_on << endl;
         cout << "--> " <<
-            (dynamic_cast<spx::oa_signal_type *>(p_out.get_interface()))->name() << endl;
+            port_channel_name(p_out) << endl;
         cout << endl;
     }
-
-    bool first_run = true;
 
     while (true) {
         // Wait for enable signal
@@ -33,7 +31,7 @@ void CWSource::runner()
         cout << name() << " emitted: " << s << endl;
 
         // Wait for reset
-        if ( !first_run || !reset.read().to_bool())
+        if (!reset.read().to_bool())
         {
             // cout << name() << " waiting for reset" << endl;
             wait(reset.posedge_event());

@@ -1,0 +1,21 @@
+* B-146 regression (repro: backlog/repro/a4-x-shared-net.cir): two subcircuit instances
+* drive the same net mid. flatten() used to look the external net up in the pre-flatten
+* map (where X-element nets are never registered), so the second instance overwrote the
+* writer count of the first: mid stayed unidirectional with 2 drivers, SystemC E115, exit 1.
+* It now merges against nets_flat: mid has 2 writers, so it is bidirectional, exactly as in
+* the flat netlist b146-x-shared-net-flat (same stdout values and VCD, apart from the
+* instance names X1/WG1, X2/WG1 instead of WG1, WG2).
+* Expected (both waveguides: L = 1e-4 m, neff 2.2111, att 0: lossless,
+* phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped, 2*phi = 1.9052 rad):
+*   mid:0 = mid:1 = 1 mW at phi (one waveguide output each)
+*   in1:1 = in2:1 = 1 mW at 0 (sources, second writers of in1/in2)
+*   in1:0 = in2:0 = 1 mW at 2*phi (the other source, through both waveguides)
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+.subckt s a b
+wg1 a b length=1e-4
+.ends
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2 wl=1.55e-6 power=1e-3
+x1 in1 mid s
+x2 in2 mid s
+.tran 1e-11

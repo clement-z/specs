@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--format",
+  "hdf5",
+  "-f",
+  "tests/golden/netlists/f05-save-tran.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f05-format-invalid"
+}

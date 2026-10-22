@@ -1,0 +1,16 @@
+* B-144 regression (repro: backlog/repro/a4-uni-writer-first.cir): a CW source drives the
+* OUTPUT port of a waveguide (net a has 2 writers, so it is bidirectional); the source is
+* listed, and created, first. It used to take slot a:1 (uni writers always took slot :1),
+* which wg1 then wrote as well, and wg1 read a:0, which nobody writes: b:0 = 0 W.
+* Next-free-slot convention: cwsrc1 (first writer) writes a:0; wg1 (second writer) writes
+* a:1 and reads a:0.
+* Expected (wg1: L = 1e-4 m, default neff 2.2111, att 0 dB/cm: lossless):
+*   a:0 = 1 mW at 0 rad (cwsrc1); a:1 = 0 (wg1 forward output, nothing enters b)
+*   b:0 = 1 mW at phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped
+*         (wg1 backward output; read by probe1); b:1 = 0
+* Same values as b144-uni-writer-second (wg1 listed first), where the source is on a:1.
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 a wl=1.55e-6 power=1e-3
+wg1 b a length=1e-4
+probe1 b
+.tran 1e-11

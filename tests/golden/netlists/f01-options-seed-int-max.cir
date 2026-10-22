@@ -1,0 +1,7 @@
+* F-01, B-180: .options seed=2147483647 (the int maximum, to which the lexer clamped every larger integer
+* literal before B-180, so .options seed used to reject it) is an ordinary seed: integer literals are
+* 64-bit and taken exactly by .options seed.
+* Expected: regress/f01-options-seed-int-max gives exactly the VCD of specs --seed 2147483647 on
+*   f01-pdet-noise.cir.
+.include tests/golden/netlists/f01-pdet-noise.cir
+.options seed=2147483647

@@ -1,0 +1,14 @@
+# P3 — devices and physics (branch `ws/devices`)
+
+Follow `discover/orchestration/2026-10b/COMMON.md` (heartbeat first). Phase id: `P3`. You are an Opus 5.5 xhigh
+orchestrator: Opus implementer subagents for device/engine code, Sonnet for docs; review every diff. P1 and P2 are
+merged (read their reports in `backlog/sprint-2026-10b/`).
+
+Items, as decided in `backlog/DECISIONS-2026-10-21.md`:
+| Order | Item(s) | Expected golden impact (anything else = stop and report) |
+|---|---|---|
+| 1 | B-032 + B-033 + B-159 crossing: passive S-matrix (x = 10^(-\|xtalk\|/20) in quadrature, t = 10^(-att/20)·sqrt(1−x²), `att` = excess loss; decide and document positive-xtalk handling), per-λ memories with one thread per input, `CrossingBi` instantiated on bidirectional nets | only cases containing crossings (today: `err/b148-crossing-args` should be unchanged); add the `a2-crossing-*`, `a4-crossing-out-bidir` repros with hand-checked values (energy conservation, two-λ, backward light) |
+| 2 | B-049 + B-050 event-driven PDET: write `p_readout` on input events and on change beyond a tolerance; periodic Ts sampling only while ≥ 2 non-zero wavelengths beat; detectors enabled by default outside `.tran`; fix `detector_tb` enable | `tb/det`, `tb/detector` and any case with a PDET: fewer VCD records, same values at the sampled times (show it), self-checks now pass; an open-ended `.tran` with two PDETs terminates (new case) |
+| 3 | B-048 robust probe sampling: on enable, every PROBE, MLPROBE and auto-probe samples its net's current value, including probes that saw no OP event. **Maintainer condition**: it must work with initial conditions (`.ic`, `.nodeset`) and related flows, i.e. the sample happens after any IC/OP step at TRAN start. `.ic` is not implemented yet (B-161 makes it a clean error): structure the code so the IC step slots in before the sample, and add a test documenting that order | `.tran` VCDs where constant (CW) nets read 0 today now show their OP value from t = 0: re-record those cases and list them |
+| 4 | B-021 + B-014 + B-124 numerics docs and warnings: keep the emit rule max(abstol, reltol·\|last\|) and the snap (expose the snap factor as a documented option, default 10·abstol; no result change); make the \|last\| = 0 case explicit; remove the dead delay check; warn when a delay is rounded by more than a threshold (pick it from data) and error when a non-zero delay rounds to 0; document the feedback error bound ≈ reltol·r/(1−r) with the ring example and how to choose reltol; add a tight-reltol golden case | stderr gains a rounding warning only in cases whose delays are rounded beyond the threshold (list them); no value changes |
+Write the user documentation for tolerances and resolution (README or doc/) citing the paper's "Absolute and Relative tolerance" and "Temporal resolution" paragraphs.

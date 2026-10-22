@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "circuits/subckt_tests.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 516,
+   "kind": "json",
+   "sha256": "8f59bfce92674d2f2fbd2304d2854bb09a902fb8bf4a0d3cf2fd676861504b16",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 35146,
+   "kind": "vcd",
+   "sha256": "7a6f57a19663db87868dfcce9fba1a775e9f26ff435649f26e2f01d199cd0160",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "cir/subckt_tests"
+}

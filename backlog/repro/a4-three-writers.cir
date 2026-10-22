@@ -1,0 +1,6 @@
+* Three writers on one optical net
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 a wl=1.55e-6 power=2e-3
+cwsrc3 a wl=1.55e-6 power=3e-3
+probe1 a
+.tran 1e-11

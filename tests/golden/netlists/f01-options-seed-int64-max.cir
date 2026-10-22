@@ -1,0 +1,6 @@
+* F-01, B-180: the largest integer literal, .options seed=9223372036854775807 (2^63 - 1), is a valid seed,
+* taken exactly (no conversion through double).
+* Expected: regress/f01-options-seed-int64-max gives exactly the VCD of
+*   specs --seed 9223372036854775807 on f01-pdet-noise.cir.
+.include tests/golden/netlists/f01-pdet-noise.cir
+.options seed=9223372036854775807

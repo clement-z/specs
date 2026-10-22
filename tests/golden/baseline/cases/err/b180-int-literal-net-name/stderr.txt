@@ -1,0 +1,3 @@
+Parsing error (tests/golden/netlists/b180-int-literal-net-name.cir:6): integer literal 18446744073709551616 is out of range (the limit is 9223372036854775807)
+-- while parsing line: "cwsrc1 18446744073709551616 wl=1.55e-6 power=1e-3"
+

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "circuits/legacy/triple_ring.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "cir/triple_ring"
+}

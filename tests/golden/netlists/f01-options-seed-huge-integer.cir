@@ -1,0 +1,8 @@
+* F-01, B-180: .options seed=99999999999999999999 is a parse error. Integer literals are 64-bit: a
+* literal beyond 9223372036854775807 is rejected by the lexer (it was read as 2147483647, silently).
+* Expected: "Parsing error (tests/golden/netlists/f01-options-seed-huge-integer.cir:7): integer literal
+*   99999999999999999999 is out of range (the limit is 9223372036854775807)", then
+*   -- while parsing line: ".options seed=99999999999999999999", exit 1
+pdet1 a v1 nb=0
+.options seed=99999999999999999999
+.tran 10e-12

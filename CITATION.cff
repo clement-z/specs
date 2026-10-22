@@ -1,0 +1,69 @@
+cff-version: 1.2.0
+message: "If you use SPECS in your work, please cite the ECOC 2023 paper given as the preferred citation."
+type: software
+title: "SPECS: Scalable Photonic Event-driven Circuit Simulator"
+abstract: >-
+  SPECS is an event-driven photonic circuit simulator built on SystemC, with a SPICE-like netlist
+  language, for fast, femtosecond-accurate simulation of large photonic circuits.
+version: "0.2.0"
+date-released: "2026-10-21"
+license: LGPL-3.0-or-later
+repository-code: "https://github.com/clement-z/specs"
+url: "https://demo.zrounba.fr/specs"
+keywords:
+  - photonic circuit simulation
+  - event-driven simulation
+  - SystemC
+authors:
+  - given-names: Clément
+    family-names: Zrounba
+  - given-names: Raphael
+    family-names: Cardoso
+  - given-names: Maurício
+    family-names: Gomes de Queiroz
+  - given-names: Paul
+    family-names: Jimenez
+  - given-names: Mohab
+    family-names: Abdalla
+  - given-names: Alberto
+    family-names: Bosio
+  - given-names: Sébastien
+    family-names: Le Beux
+  - given-names: Fabio
+    family-names: Pavanello
+  - given-names: Ian
+    family-names: "O'Connor"
+preferred-citation:
+  type: conference-paper
+  title: "Introducing SPECS: Scalable Photonic Event-driven Circuit Simulator"
+  authors:
+    - given-names: Clément
+      family-names: Zrounba
+    - given-names: Raphael
+      family-names: Cardoso
+    - given-names: Maurício
+      family-names: Gomes de Queiroz
+    - given-names: Paul
+      family-names: Jimenez
+    - given-names: Mohab
+      family-names: Abdalla
+    - given-names: Alberto
+      family-names: Bosio
+    - given-names: Sébastien
+      family-names: Le Beux
+    - given-names: Fabio
+      family-names: Pavanello
+    - given-names: Ian
+      family-names: "O'Connor"
+  collection-title: "49th European Conference on Optical Communications (ECOC)"
+  conference:
+    name: "49th European Conference on Optical Communications (ECOC)"
+    city: Glasgow
+    country: GB
+  year: 2023
+  month: 10
+  url: "https://hal.science/hal-04302200"
+  identifiers:
+    - type: url
+      value: "https://hal.science/hal-04302200"
+      description: "HAL open archive, hal-04302200"

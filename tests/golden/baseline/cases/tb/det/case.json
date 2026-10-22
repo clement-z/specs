@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "det"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/detector_tb.manifest.json": {
+   "bytes": 252,
+   "kind": "json",
+   "sha256": "65c0fa109279e458e1382608d7850b71316f77399e76b0b402b800e0099f00d5",
+   "stored": "files/traces/detector_tb.manifest.json"
+  },
+  "traces/detector_tb.vcd": {
+   "bytes": 1615,
+   "kind": "vcd",
+   "sha256": "7c415bcac1db5a35a750c227ee6d6edf81b40c9627aa668dc224372ef81b866e",
+   "stored": "files/traces/detector_tb.vcd"
+  }
+ },
+ "id": "tb/det"
+}

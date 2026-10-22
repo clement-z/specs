@@ -1,0 +1,12 @@
+* F-05: a netlist with probes only traces them, also when the only probe is an MLPROBE inside a
+* subcircuit; every optical net is auto-probed (PROBE{<net>}) only when the netlist has no probe
+* (and no .save), or with an explicit .options traceall=1 (regress/b048-probe-cw-tran).
+* Expected: the VCD declares the SystemC config, trace_all_optical_nets = 0 and ROOT/X1/MLPROBE1 only,
+* no PROBE{ROOT/in}/PROBE{ROOT/out}; at t = 0 ROOT/X1/MLPROBE1.power@1550_000000 = 1e-3 W (lossless).
+.subckt tap a b
+wg1 a b length=10e-6 neff=2.35 ng=4.2
+mlprobe1 b wl=[1.55e-6]
+.ends tap
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in out tap
+.tran 1e-9

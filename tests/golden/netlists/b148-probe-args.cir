@@ -1,0 +1,4 @@
+* B-148: PROBE with five positional arguments (at most 4)
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a 1 1 1 1 1
+.tran 1e-11

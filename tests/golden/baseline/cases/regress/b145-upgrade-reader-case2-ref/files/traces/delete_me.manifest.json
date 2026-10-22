@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b145-upgrade-reader-case2-ref.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b145-upgrade-reader-case2-ref.cir", "sha256": "d4d86c351a7d977c141797e158e713ccf009d6e0bd826988b96183f2678d38af"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

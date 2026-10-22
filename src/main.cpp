@@ -1,14 +1,11 @@
-#include <ctime>
-#include <iomanip>
 #include <sstream>
 #include <chrono>
-#include <deque>
+#include <charconv>
 
 #include <systemc.h>
 #include <args.hxx>
 
 #include "optical_signal.h"
-#include "devices/time_monitor.h"
 #include "tb/alltestbenches.h"
 #include "utils/strutils.h"
 
@@ -17,13 +14,11 @@
 #include "optical_output_port.h"
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
+#include "run_manifest.h"
 #include <utils/version.h>
-
-class OpticalOutputPort;
 
 using namespace std;
 using namespace std::chrono;
-using namespace literals;
 
 #include "parser.h"
 #include "scanner.h"
@@ -63,88 +58,50 @@ int do_test(const string &testname)
     return 0;
 }
 
-int do_circuit(const string &filename, bool is_dry_run = false, const string& json_filename = "")
+// --param name (F-12): a letter or '_', then letters, digits or '_' (as a .param name)
+bool is_param_name(const string &name)
 {
-    // Check whether the file exists
-    FILE *f;
-    if (filename == "-"s) {
-        f = NULL;
-    } else if (!(f = fopen(filename.c_str(), "r"))) {
-        cerr << "Error: File not found \"" << filename << "\"" << endl;
-        return 1;
-    }
+    auto is_alpha_plus = [](char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; };
+    if (name.empty() || !is_alpha_plus(name[0]))
+        return false;
+    for (char c : name)
+        if (!is_alpha_plus(c) && !(c >= '0' && c <= '9'))
+            return false;
+    return true;
+}
 
-    cout << "╔═══════════════════╗" << endl;
-    cout << "║  PARSING CIRCUIT  ║" << endl;
-    cout << "╚═══════════════════╝" << endl;
-
+// Value of a --param override (F-12): the line ".param name=value" parsed with the netlist grammar
+// into a scratch tree, before the netlist (its parameters are not visible)
+Variable parse_param_value(const string &name, const string &value)
+{
+    ParseTree scratch;
+    ParserState parser_state;
+    parser_state.current_filename = "--param " + name;
     yyscan_t scanner;
-    ParserState *parser_state = new ParserState;
-    YY_BUFFER_STATE buf;
-
-    yylex_init_extra(parser_state, &scanner);
-    buf = yy_create_buffer(f, YY_BUF_SIZE, scanner);
+    yylex_init_extra(&parser_state, &scanner);
+    string line = ".param " + name + "=" + value + "\n";
+    YY_BUFFER_STATE buf = yy_scan_string(line.c_str(), scanner);
     yy_switch_to_buffer(buf, scanner);
-
-    ParseTree pt("ROOT");
-    int parsing_result = yyparse(scanner, &pt);
-
-    //yy_delete_buffer(buf, scanner);
+    yyset_lineno(1, scanner);
+    int parsing_result = yyparse(scanner, &scratch);
     yylex_destroy(scanner);
-    delete parser_state;
 
-    // Close the file
-    if (f)
-        fclose(f);
-
-    // Return if unsuccessful
-    if (parsing_result != 0) {
-        return parsing_result;
-    }
-
-    pt.print();
-
-    cout << "╔══════════════════════╗" << endl;
-    cout << "║   BUILDING CIRCUIT   ║" << endl;
-    cout << "╚══════════════════════╝" << endl;
-
-    pt.build_circuit();
-
-    if (!json_filename.empty())
+    // exactly one assignment (e.g. not "x=1 y=2")
+    if (parsing_result != 0 || scratch.local_assignments.size() != 1 || scratch.local_assignments.count(name) == 0)
     {
-        ofstream outfile;
-        outfile.open(json_filename, ios::out | ios::trunc);
-        outfile << pt.to_json();
-        outfile.close();
-        cout << "Exported flattened circuit as JSON > " << json_filename << endl;
+        cerr << "Invalid --param value: '" << name << "=" << value << "' (expected name=value)" << endl;
+        exit(1);
     }
-
-    if (!is_dry_run)
-    {
-        cout << "╔══════════════════════╗" << endl;
-        cout << "║      SIMULATION      ║" << endl;
-        cout << "╚══════════════════════╝" << endl;
-
-        specsGlobalConfig.runAnalysis();
-    }
-    else
-    {
-        cout << "╔══════════════════════╗" << endl;
-        cout << "║  SIMULATION SKIPPED  ║" << endl;
-        cout << "╚══════════════════════╝" << endl;
-    }
-
-    cout << "╔═══════════════════╗" << endl;
-    cout << "║        DONE       ║" << endl;
-    cout << "╚═══════════════════╝" << endl;
-
-    return 0;
+    return scratch.local_assignments.at(name);
 }
 
 int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer="")
 {
     yyscan_t scanner;
-    yylex_init_extra(new ParserState(), &scanner);
+    ParserState *parser_state = new ParserState();
+    // run manifest (F-01): every netlist file opened by the scanners goes to pt's list
+    parser_state->input_files = &pt.input_files;
+    yylex_init_extra(parser_state, &scanner);
 
     for(const auto &fname: filenames)
         yy_add_content_from_file(fname, scanner);
@@ -168,10 +125,17 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
 
     //yy_delete_buffer(buf, scanner);
     yylex_destroy(scanner);
+    delete parser_state;
 
     // Return if unsuccessful
     if (parsing_result != 0) {
         return parsing_result;
+    }
+
+    for (const auto &p : pt.param_overrides)
+    {
+        if (!p.second)
+            cerr << "Warning: --param " << p.first << ": the netlist has no .param " << p.first << endl;
     }
 
     pt.print();
@@ -184,10 +148,6 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
 
     return 0;
 }
-
-int raphael_main() { cout<< "Hello world" << endl; return 0; }
-
-int tests_module_registry_access();
 
 int sc_main(int argc, char *argv[])
 {
@@ -221,6 +181,17 @@ int sc_main(int argc, char *argv[])
                           "set_tracefile",
                           "Set the default trace file",
                           { 'o', "output" });
+    args::ValueFlagList<string> set_formats(parser,
+                          "format",
+                          "Output format of the traces: vcd (default), csv or npz (tables of the probed "
+                          "signals: time, signal, wavelength, power, complex field), written as "
+                          "<output>.vcd/.csv/.npz; repeat it to write several; netlists only",
+                          { "format" });
+    args::Flag set_no_trace(parser,
+                          "no_trace",
+                          "Write no trace file and no run manifest (the probes and .save targets are not "
+                          "traced); netlists only",
+                          { "no-trace" });
     args::ValueFlag<string> export_json(parser,
                           "export_json",
                           "Export json of completed circuit to file",
@@ -229,6 +200,12 @@ int sc_main(int argc, char *argv[])
                           "version",
                           "Output version information and exit",
                           { "version" });
+    args::Flag print_manifest(parser,
+                          "print_manifest",
+                          "Print the run manifest (version, seed, command line, netlist file hashes) "
+                          "to stdout. It is also written next to the default trace file, as "
+                          "<trace>.manifest.json",
+                          { "print-manifest" });
     args::Flag set_dry_run(parser,
                           "dry_run",
                           "Do not run simulation directives",
@@ -245,6 +222,23 @@ int sc_main(int argc, char *argv[])
                           "set_abstol",
                           "Set the value of the absolute tolerance parameter for field",
                           { "abstol" });
+    args::ValueFlag<string> set_seed(parser,
+                          "set_seed",
+                          "Set the master seed of the random streams (decimal integer, 0 to 2^64-1, "
+                          "default 0); overrides .options seed",
+                          { "seed" });
+    args::ValueFlagList<string> set_params(parser,
+                          "name=value",
+                          "Set the netlist parameter <name>, parsed as in .param name=value; "
+                          "overrides the netlist's .param/.assign of the same name (repeatable)",
+                          { "param" });
+
+    args::ValueFlag<string> set_maxiter(parser,
+                          "set_maxiter",
+                          "Set the maximum number of iterations (delta cycles) of the .op/.dc fixed point, "
+                          "per operating point or sweep point (decimal integer, default 1000000, 0: no "
+                          "limit); overrides .options maxiter",
+                          { "maxiter" });
 
     args::ValueFlag<size_t> set_nrings_crow(parser,
                           "set_nrings_crow",
@@ -260,10 +254,6 @@ int sc_main(int argc, char *argv[])
                           "list_tests",
                           "List available testbenches",
                           { 'p', "list-testbenches" });
-    args::Flag add_time_monitor(parser,
-                          "add_time_monitor",
-                          "Monitor simulation status",
-                          { "mon" });
     args::ValueFlag<string> test(
         parser,
         "test_name",
@@ -292,6 +282,10 @@ int sc_main(int argc, char *argv[])
 
     map<string,string> option_overrides;
 
+    // run manifest (F-01)
+    specsGlobalConfig.command_line.assign(argv, argv + argc);
+    specsGlobalConfig.print_run_manifest = print_manifest.Get();
+
     if (print_version) {
         std::cout << spx::version::full << std::endl;
         return 0;
@@ -305,8 +299,9 @@ int sc_main(int argc, char *argv[])
         }
         else if (strutils::iequals(s, "sampled-time"))
         {
-            cout << "Optical ports working in sampled-time mode by default" << endl;
-            specsGlobalConfig.simulation_mode = OpticalOutputPortMode::SAMPLED_TIME;
+            // B-002: OpticalOutputPort::delayedWriteSampledTime() is a TODO that drops every write
+            cerr << "Error: sampled-time mode is not implemented" << endl;
+            return 1;
         }
         else if (strutils::iequals(s, "frequency-domain") || strutils::iequals(s, "fd"))
         {
@@ -318,6 +313,8 @@ int sc_main(int argc, char *argv[])
             cerr << "Unknown mode: '" << s << "'" << endl;
             return 1;
         }
+        // B-004: an explicit -m takes priority over the default mode of the netlist's analysis
+        specsGlobalConfig.simulation_mode_explicit = true;
     }
 
     if (set_reltol) {
@@ -325,9 +322,9 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_reltol.Get();
         ss >> reltol_val;
-        cout << reltol_val << endl;
         //cout << ss.good() << " " << ss.eof() << " " << ss.fail() << " " << ss.bad() << endl;
-        if (!ss.eof() || ss.fail() || reltol_val <= 0) {
+        // 0 is allowed (B-153, decision 2026-10-21), negative values are not
+        if (!ss.eof() || ss.fail() || !(reltol_val >= 0)) {
             cerr << "Invalid reltol value" << endl;
             return 1;
         }
@@ -338,18 +335,62 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_abstol.Get();
         ss >> abstol_val;
-        if (!ss.eof() || ss.fail() || abstol_val <= 0) {
+        if (!ss.eof() || ss.fail() || !(abstol_val >= 0)) {
             cerr << "Invalid abs_tol value" << endl;
             return 1;
         }
         option_overrides["abstol"] = set_abstol.Get();
+    }
+    if (set_seed) {
+        // F-01: set directly (not as a footer .options line), so that it also applies to the
+        // testbenches (-t) and keeps the full 64-bit range (netlist numbers are doubles)
+        const string &s = set_seed.Get();
+        uint64_t seed_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), seed_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid seed value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.seed = seed_val;
+        // takes priority over the netlist's .options seed
+        specsGlobalConfig.seed_explicit = true;
+    }
+    if (set_maxiter) {
+        // F-28: set directly, like --seed (full 64-bit range); takes priority over .options maxiter
+        const string &s = set_maxiter.Get();
+        uint64_t maxiter_val = 0;
+        const auto res = std::from_chars(s.data(), s.data() + s.size(), maxiter_val, 10);
+        if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size()) {
+            cerr << "Invalid maxiter value: '" << s << "' (expected a decimal integer from 0 to 18446744073709551615)" << endl;
+            return 1;
+        }
+        specsGlobalConfig.max_iterations = maxiter_val;
+        specsGlobalConfig.max_iterations_explicit = true;
+    }
+    // F-12: validated here, applied to the netlist parse tree (ignored with -t, like --reltol)
+    vector<pair<string, string>> param_overrides;
+    for (const auto &s : set_params.Get()) {
+        const size_t i_eq = s.find('=');
+        const string name = s.substr(0, i_eq);
+        const string value = i_eq == string::npos ? "" : s.substr(i_eq + 1);
+        if (i_eq == string::npos || !is_param_name(name) || value.empty()
+            || value.find_first_of("\r\n") != string::npos) {
+            cerr << "Invalid --param value: '" << s << "' (expected name=value)" << endl;
+            return 1;
+        }
+        param_overrides.emplace_back(name, value);
     }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();
     }
     if (set_nrings_crow) {
         #if BUILD_TB == 1
-        //nrings_crow = set_nrings_crow.Get();
+        if (set_nrings_crow.Get() < 1 || set_nrings_crow.Get() > 1024)
+        {
+            cerr << "Invalid --nrings_crow value (expected 1..1024)" << endl;
+            return 1;
+        }
+        nrings_crow = set_nrings_crow.Get();
         #endif
     }
     if (set_timescale) {
@@ -357,7 +398,7 @@ int sc_main(int argc, char *argv[])
         stringstream ss;
         ss << set_timescale.Get();
         ss >> timescale_val;
-        if (!ss.eof() || ss.fail() || timescale_val > 0) {
+        if (!ss.eof() || ss.fail() || timescale_val > 0 || timescale_val < -15) {
             cerr << "Invalid resolution value" << endl;
             return 1;
         }
@@ -374,18 +415,35 @@ int sc_main(int argc, char *argv[])
     if (list_tests) {
         return do_list_tests();
     }
-    if (set_tracefile) {
+    if (set_formats) {
+        // F-05: exactly the listed formats (the VCD only if listed)
+        if (set_no_trace) {
+            cerr << "Error: --no-trace and --format cannot be combined" << endl;
+            return 1;
+        }
+        specsGlobalConfig.trace_vcd = false;
+        for (const auto &f : set_formats.Get()) {
+            if (strutils::iequals(f, "vcd"))
+                specsGlobalConfig.trace_vcd = true;
+            else if (strutils::iequals(f, "csv"))
+                specsGlobalConfig.trace_csv = true;
+            else if (strutils::iequals(f, "npz"))
+                specsGlobalConfig.trace_npz = true;
+            else {
+                cerr << "Invalid --format value: '" << f << "' (expected vcd, csv or npz)" << endl;
+                return 1;
+            }
+        }
+    }
+    if (set_no_trace) {
+        // F-05: as -o "" (no trace file, no run manifest file); wins over -o
+        cout << "Tracing disabled (--no-trace)" << endl;
+        specsGlobalConfig.trace_filename = "";
+    }
+    else if (set_tracefile) {
         cout << "Using trace file: " << set_tracefile.Get() << endl;
         // TODO: validate filename
         specsGlobalConfig.trace_filename = set_tracefile.Get();
-    }
-
-    shared_ptr<TimeMonitor> tm;
-    if (add_time_monitor) {
-        if (specsGlobalConfig.simulation_mode == OpticalOutputPortMode::FREQUENCY_DOMAIN)
-            tm = make_shared<TimeMonitor>("TM", 0, 0.5);
-        else
-            tm = make_shared<TimeMonitor>("TM", 1e-14, 0.5);
     }
 
     if (file) {
@@ -397,17 +455,33 @@ int sc_main(int argc, char *argv[])
         footer << endl;
         //cout << footer.str() << endl;
         ParseTree pt;
+        // the last one wins if a name is given twice
+        for (const auto &p : param_overrides)
+            pt.set_param_override(p.first, parse_param_value(p.first, p.second));
         int parse_result = build_circuit(pt, file.Get(), footer.str());
         if (parse_result)
         {
             cerr << "Parsing failed with code " << parse_result << endl;
             exit(parse_result);
         }
+        // after build_circuit(): the .include files of subcircuit bodies are opened while flattening (B-150)
+        specsGlobalConfig.netlist_files = pt.input_files;
+        if (set_dry_run.Get() && specsGlobalConfig.print_run_manifest)
+        {
+            // no prepareSimulation() in a dry run, and no trace file is written
+            cout << RunManifest(specsGlobalConfig, "").to_json() << flush;
+            specsGlobalConfig.print_run_manifest = false;
+        }
         string json_filename = export_json.Get();
         if (!json_filename.empty())
         {
             ofstream outfile;
             outfile.open(json_filename, ios::out | ios::trunc);
+            if (!outfile)
+            {
+                cerr << "Error: cannot open JSON output file \"" << json_filename << "\"" << endl;
+                return 1;
+            }
             outfile << pt.to_json();
             outfile.close();
             cout << "Exported flattened circuit as JSON > " << json_filename << endl;

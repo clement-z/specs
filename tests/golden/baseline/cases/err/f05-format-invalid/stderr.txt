@@ -1,0 +1,2 @@
+Invalid --format value: 'hdf5' (expected vcd, csv or npz)
+

@@ -1,0 +1,113 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+11 local assignments
+ - f_e (DOUBLE) = 1e+11
+ - f_g (DOUBLE) = 1e+11
+ - rel_M (DOUBLE) = 0
+ - rel_U (DOUBLE) = 0
+ - rel_f (DOUBLE) = 0
+ - rel_m (DOUBLE) = 0
+ - rel_n (DOUBLE) = 0
+ - rel_p (DOUBLE) = 0
+ - rel_t (DOUBLE) = 0
+ - rel_u (DOUBLE) = 0
+ - wl_u (DOUBLE) = 1.55e-06
+-----------
+14 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/a1 {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/CWSRC2 (CW SOURCE) ROOT/b1 {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/CWSRC3 (CW SOURCE) ROOT/a2 {1.55e-06 (DOUBLE), 0.001 (DOUBLE), 0.5 (DOUBLE), } {}
+ - ROOT/CWSRC4 (CW SOURCE) ROOT/b2 {1.55e-06 (DOUBLE), 0.001 (DOUBLE), 0.5 (DOUBLE), } {}
+ - ROOT/CWSRC5 (CW SOURCE) ROOT/a3 {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/CWSRC6 (CW SOURCE) ROOT/b3 {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/WG1 (WAVEGUIDE (bidir)) ROOT/a1 ROOT/c1 {} {att (DOUBLE) = 1000, length (DOUBLE) = 1e-05, neff (DOUBLE) = 2.35, ng (DOUBLE) = 4.2, }
+ - ROOT/WG2 (WAVEGUIDE (bidir)) ROOT/b1 ROOT/d1 {} {att (DOUBLE) = 1000, length (DOUBLE) = 1e-05, neff (DOUBLE) = 2.35, ng (DOUBLE) = 4.2, }
+ - ROOT/WG3 (WAVEGUIDE (bidir)) ROOT/c1 ROOT/c2 {} {att (DOUBLE) = 0.001, length (DOUBLE) = 1e+06, }
+ - ROOT/WG4 (WAVEGUIDE (bidir)) ROOT/d1 ROOT/d2 {} {att (DOUBLE) = 0.001, length (DOUBLE) = 1e+06, }
+ - ROOT/WG5 (WAVEGUIDE (bidir)) ROOT/c2 ROOT/c3 {} {att (DOUBLE) = 1.5e+06, length (DOUBLE) = 1e+06, }
+ - ROOT/WG6 (WAVEGUIDE (bidir)) ROOT/d2 ROOT/d3 {} {att (DOUBLE) = 1.5e+06, length (DOUBLE) = 1e+06, }
+ - ROOT/PDET1 (PHOTODETECTOR) ROOT/c3 ROOT/e1 {} {fop (DOUBLE) = 1.934e+14, r (DOUBLE) = 1e-15, ts (DOUBLE) = 1e-11, }
+ - ROOT/PDET2 (PHOTODETECTOR) ROOT/d3 ROOT/e2 {} {fop (DOUBLE) = 1.934e+14, r (DOUBLE) = 1e-15, ts (DOUBLE) = 1e-11, }
+-----------
+14 named nets
+ - ROOT/a1: OANALOG<1>u (1|1)
+ - ROOT/a2: OANALOG<1>u (1|0)
+ - ROOT/a3: OANALOG<1>u (1|0)
+ - ROOT/b1: OANALOG<1>u (1|1)
+ - ROOT/b2: OANALOG<1>u (1|0)
+ - ROOT/b3: OANALOG<1>u (1|0)
+ - ROOT/c1: OANALOG<1>u (1|1)
+ - ROOT/c2: OANALOG<1>u (1|1)
+ - ROOT/c3: OANALOG<1>u (1|1)
+ - ROOT/d1: OANALOG<1>u (1|1)
+ - ROOT/d2: OANALOG<1>u (1|1)
+ - ROOT/d3: OANALOG<1>u (1|1)
+ - ROOT/e1: EANALOG<1>u (0|0)
+ - ROOT/e2: EANALOG<1>u (0|0)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+0 analyses
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/a1...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/WG1 (reason: unidir backlog)
+Done creating ROOT/WG1
+Creating ROOT/WG3 (reason: unidir backlog)
+Done creating ROOT/WG3
+Creating ROOT/WG5 (reason: unidir backlog)
+Done creating ROOT/WG5
+Creating ROOT/PDET1 (reason: unidir backlog)
+Done creating ROOT/PDET1
+Done (elaborating network of ROOT/a1)
+Elaborating network of ROOT/a2...
+Creating ROOT/CWSRC3 (reason: connection to unidir net)
+Done creating ROOT/CWSRC3
+Done (elaborating network of ROOT/a2)
+Elaborating network of ROOT/a3...
+Creating ROOT/CWSRC5 (reason: connection to unidir net)
+Done creating ROOT/CWSRC5
+Done (elaborating network of ROOT/a3)
+Elaborating network of ROOT/b1...
+Creating ROOT/CWSRC2 (reason: connection to unidir net)
+Done creating ROOT/CWSRC2
+Creating ROOT/WG2 (reason: unidir backlog)
+Done creating ROOT/WG2
+Creating ROOT/WG4 (reason: unidir backlog)
+Done creating ROOT/WG4
+Creating ROOT/WG6 (reason: unidir backlog)
+Done creating ROOT/WG6
+Creating ROOT/PDET2 (reason: unidir backlog)
+Done creating ROOT/PDET2
+Done (elaborating network of ROOT/b1)
+Elaborating network of ROOT/b2...
+Creating ROOT/CWSRC4 (reason: connection to unidir net)
+Done creating ROOT/CWSRC4
+Done (elaborating network of ROOT/b2)
+Elaborating network of ROOT/b3...
+Creating ROOT/CWSRC6 (reason: connection to unidir net)
+Done creating ROOT/CWSRC6
+Done (elaborating network of ROOT/b3)
+Exported flattened circuit as JSON > flat.json
+╔══════════════════════╗
+║  SIMULATION SKIPPED  ║
+╚══════════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

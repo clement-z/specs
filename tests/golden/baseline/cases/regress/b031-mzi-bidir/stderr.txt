@@ -1,0 +1,19 @@
+Warning (ROOT/MZI_B1/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_B1/WG2): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_B1/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_B2/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_B2/WG2): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_B2/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_R1/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_R1/WG2): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_R1/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_R2/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_R2/WG2): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_R2/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_U1/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_U1/WG2): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_U1/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_U2/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_U2/WG2): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+Warning (ROOT/MZI_U2/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) at the time resolution 1e-13 s; use a finer time resolution, e.g. .options timescale=-14
+

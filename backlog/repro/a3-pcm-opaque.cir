@@ -1,0 +1,5 @@
+* A3 repro: PCMCELL without tc/ta is fully opaque (Tc = Ta = 0 constructor
+* defaults), although pcm_device.h documents Ta = 1 as the default.
+cwsrc1 in wl=1.55e-6 power=1e-3
+pcmcell1 in out emelt=1e-12 n=10
+.op

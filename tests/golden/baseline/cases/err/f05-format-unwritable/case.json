@@ -1,0 +1,13 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-o",
+  "no_such_dir/t",
+  "-f",
+  "tests/golden/netlists/f05-save-tran.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f05-format-unwritable"
+}

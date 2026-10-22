@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f01-options-seed-negative.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f01-options-seed-negative"
+}

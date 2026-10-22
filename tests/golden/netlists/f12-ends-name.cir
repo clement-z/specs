@@ -1,0 +1,23 @@
+* F-12 (B-169): .ends NAME closes a subcircuit; the name is compared with the
+* .subckt name case-insensitively (SPICE). Nested pair: the inner ".ends Delay_Line" is
+* captured with the body of ring_path and checked when that body is parsed for each instance.
+* A bare .ends (no name) still works. Expected: the same output as this netlist with bare
+* .ends lines: every net at 1550 nm, 0.001000 W (lossless waveguides).
+.subckt delay a b
+wg1 a b length=10e-6 neff=2.35 ng=4.2
+.ends DELAY
+.subckt ring_path p q
+.subckt delay_line a b
+wg1 a b length=20e-6 neff=2.35 ng=4.2
+.ends Delay_Line
+x1 p q delay_line
+.ends ring_path
+.subckt plain a b
+wg1 a b length=5e-6 neff=2.35 ng=4.2
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in m delay
+x2 m n ring_path
+x3 n out plain
+probe1 out
+.op

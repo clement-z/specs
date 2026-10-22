@@ -1,0 +1,14 @@
+* B-048: probes on a net that nothing drives, next to a CW path, in .tran. At TRAN start every probe
+* samples its net; an unwritten net (default signal, whose wavelength id 0 aliases the first
+* registered wavelength, 1550 nm: B-012) is skipped silently: MLPROBE2 (wl=[1.3e-6]) must not print
+* "received unsupported signal (lambda = 1.55e-06m)", and PROBE2 and PROBE{ROOT/nc} stay at 0
+* (wavelength included).
+* Expected: ROOT/PROBE2.* and PROBE{ROOT/nc}.* = 0 and ROOT/MLPROBE2.*@1300_000000 = 0 for the whole
+* transient; ROOT/PROBE1.* and PROBE{ROOT/a}.* = 1e-3 W, 0.031623 sqrt(W), phase 0, 1.55e-6 from t = 0;
+* no "unsupported signal" line on stdout.
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+probe2 nc
+mlprobe2 nc wl=[1.3e-6]
+.options traceall=1
+.tran 1e-9

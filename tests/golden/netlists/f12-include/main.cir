@@ -1,0 +1,12 @@
+* F-12 (B-143): .include relative to the including file, then to the working directory.
+* Run from the harness cwd with -f tests/golden/netlists/f12-include/main.cir:
+* - mid.cir is found next to main.cir (f12-include/mid.cir);
+* - mid.cir includes sub/leaf.cir relative to its own directory (f12-include/sub/leaf.cir), then,
+*   once sub/leaf.cir has ended, sub/probes.cir, relative to mid.cir again;
+* - sub/leaf.cir defines subcircuit SRC, whose body includes src_body.cir: when X1 is flattened,
+*   it is found next to sub/leaf.cir, the file that defines SRC (not next to main.cir).
+* Expected: ROOT/a = 0.001 W (CWSRC1 of mid.cir), ROOT/b = 0.002 W (X1/CWSRC1 of src_body.cir);
+* "Including file:" lines and the run manifest list the paths opened.
+.include mid.cir
+x1 b src
+.op

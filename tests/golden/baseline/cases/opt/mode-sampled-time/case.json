@@ -1,0 +1,11 @@
+{
+ "args": [
+  "-m",
+  "sampled-time",
+  "-f",
+  "circuits/add_drop_pyspecs.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "opt/mode-sampled-time"
+}

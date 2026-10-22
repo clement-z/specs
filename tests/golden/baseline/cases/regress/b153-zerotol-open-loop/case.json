@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-zerotol-open-loop.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 441,
+   "kind": "json",
+   "sha256": "40771c55f10d323ffa778fa9170bdde1da063dce09ace2b2ac7e5d3a172ee39b",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1698,
+   "kind": "vcd",
+   "sha256": "6e768eb06ea9c5f69c49900e898297a91044832555494a5ffa85c801686d27c0",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b153-zerotol-open-loop"
+}

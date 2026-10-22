@@ -1,5 +1,8 @@
+#include <cmath>
 #include <ctime>
 #include <iomanip>
+#include <sstream>
+#include <string>
 #include "tb/detector_tb.h"
 
 #include "utils/general_utils.h"
@@ -17,6 +20,17 @@ void Detector_tb::run_1()
     while (true) { wait(); }
 }
 
+// The readouts are noisy (random_device seeds): print them with 3 decimals, far above the
+// noise (sigma ~2e-5 A at 1 A, ~4e-7 A in the dark), so that the output is reproducible. The
+// self-checks use the raw values. Rounding then adding 0.0 turns a tiny negative value into
+// "0.000" instead of "-0.000".
+static std::string format_readout(double readout)
+{
+    std::ostringstream ss;
+    ss << std::fixed << std::setprecision(3) << (std::round(readout * 1000) / 1000 + 0.0);
+    return ss.str();
+}
+
 void Detector_tb::monitor()
 {
     unsigned int event_counter = 0;
@@ -28,8 +42,8 @@ void Detector_tb::monitor()
         event_counter++;
         std::cout << sc_time_stamp() << ":" << std::endl
             << "\tIN: " << IN->read() << std::endl
-            << "\tREADOUT:  " << READOUT.read() << std::endl
-            << "\tREADOUT2:  " << READOUT2.read() << std::endl
+            << "\tREADOUT:  " << format_readout(READOUT.read()) << std::endl
+            << "\tREADOUT2:  " << format_readout(READOUT2.read()) << std::endl
             << "\tCOUNT: " << event_counter << std::endl;
 
         if(event_counter == 2)
@@ -58,7 +72,11 @@ void Detector_tb::monitor()
         }
         if(event_counter == 6)
         {
-            if (!is_close(READOUT.read(), READOUT2.read(), 1e-7))
+            // Different seeds give different noise draws; noise off (or the same seed) gives
+            // bit-identical readouts. The difference of two draws has sigma ~2.5e-5 A at 1 A,
+            // so a 1e-7 A threshold failed in ~0.3 % of the runs; 1e-12 A keeps the check
+            // (identical readouts still fail) and makes a spurious failure negligible
+            if (!is_close(READOUT.read(), READOUT2.read(), 1e-12))
                 success_counter++;
             else
             {
@@ -86,6 +104,7 @@ void Detector_tb_run()
     spx::oa_signal_type IN;
     sc_signal<double> READOUT, READOUT2;
 
+    // Noise ON (noiseBypass = false), 100 pA dark current
     Detector uut("uut", 1, 100e-12, false);
     uut.p_in(IN);
     uut.p_readout(READOUT);
@@ -93,6 +112,10 @@ void Detector_tb_run()
     Detector uut2("uut2", 1, 100e-12, false);
     uut2.p_in(IN);
     uut2.p_readout(READOUT2);
+
+    // Detectors are enabled by default; made explicit here (only the .op/.dc/.tran flows toggle it)
+    uut.enable = sc_logic(1);
+    uut2.enable = sc_logic(1);
 
     Detector_tb tb("tb");
     tb.IN(IN);

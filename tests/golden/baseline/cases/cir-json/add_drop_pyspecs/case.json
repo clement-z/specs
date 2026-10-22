@@ -1,0 +1,19 @@
+{
+ "args": [
+  "-n",
+  "--json",
+  "flat.json",
+  "-f",
+  "circuits/add_drop_pyspecs.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "flat.json": {
+   "bytes": 2770,
+   "kind": "json",
+   "sha256": "cd282e41db1392b1e50a944a53bc1461bb730f67be818cdd40a0e497af29bc2d",
+   "stored": "files/flat.json"
+  }
+ },
+ "id": "cir-json/add_drop_pyspecs"
+}

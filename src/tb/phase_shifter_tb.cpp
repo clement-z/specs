@@ -41,7 +41,7 @@ void ps_tb::monitor()
             {
                 std::cout << "-----------------/! \\---------------" << std::endl;
                 std::cout << "Failure!" << std::endl;
-                std::cout << "Expected 0.630210W as output field!" << std::endl;
+                std::cout << "Expected 0.630210 √W as output field!" << std::endl;
                 std::cout << "-----------------/! \\---------------" << std::endl;
             }
         }
@@ -65,7 +65,7 @@ void ps_tb::monitor()
             {
                 std::cout << "-----------------/! \\---------------" << std::endl;
                 std::cout << "Failure!" << std::endl;
-                std::cout << "Expected 2 as output phase!" << std::endl;
+                std::cout << "Expected 2 rad as output phase!" << std::endl;
                 std::cout << "-----------------/! \\---------------" << std::endl;
             }
 

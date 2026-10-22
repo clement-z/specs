@@ -55,6 +55,8 @@ public:
     // For internal octane_cell
     double m_meltEnergy;
     int m_nStates;
+    double m_Tc; /* PCM power transmission in the crystalline state */
+    double m_Ta; /* PCM power transmission in the amorphous state */
 
 
     // Wires
@@ -78,10 +80,12 @@ public:
      * @param name name of the module
      * @param meltEnergy energy needed to amorphize by one step
      * @param nStates number of internal states supported by the PCM
+     * @param Tc power transmission (W/W) of the PCM in the crystalline state (required, no default)
+     * @param Ta power transmission (W/W) of the PCM in the amorphous state (required, no default)
      * */
     OctaneSegment(sc_module_name name, bool term_row, bool term_col,
                     double coupling_through_row, double coupling_through_col,
-                    double meltEnergy, int nStates, bool isCompact = false)
+                    double meltEnergy, int nStates, double Tc, double Ta, bool isCompact = false)
         : sc_module(name)
         , m_term_row(term_row)
         , m_term_col(term_col)
@@ -90,6 +94,8 @@ public:
         , m_coupling_through_col(coupling_through_col)
         , m_meltEnergy(meltEnergy)
         , m_nStates(nStates)
+        , m_Tc(Tc)
+        , m_Ta(Ta)
     {
         init_ports(); // At least the ports should always be
         // in the constructor

@@ -1,0 +1,16 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f12-include/main.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f12-include/main.cir", "sha256": "8232db645aa6336aa5380ce647afd330f60906e87795325d5585e3b2aa3108f6"},
+    {"path": "tests/golden/netlists/f12-include/mid.cir", "sha256": "33485a69f14647f91d3a4b78966353ebc0458f9f940bf4b26eebad5cdea0551f"},
+    {"path": "tests/golden/netlists/f12-include/sub/leaf.cir", "sha256": "eb585b87962dee38e035d9fd6803600d26504303077eea94b81585e20c83c09a"},
+    {"path": "tests/golden/netlists/f12-include/sub/probes.cir", "sha256": "26d0d7731aa9b1f81b4e61977011ccba1860d2bae1d9c68b0071e85cc96e0ddc"},
+    {"path": "tests/golden/netlists/f12-include/sub/src_body.cir", "sha256": "336b5a124eabf1335f04721b736b8a0fda3b5b036ea697b81cfa237209e00384"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

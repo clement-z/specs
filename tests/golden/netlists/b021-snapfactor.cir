@@ -1,0 +1,18 @@
+* B-021: .options snapfactor=4: an emitted field with |E| < snapfactor * abstol is replaced by 0.
+* With a user abstol of 1e-2 sqrt(W), fields below 0.04 sqrt(W) (0.0016 W) are emitted as 0, although
+* they pass the abstol test. Same circuit in b021-snapfactor-default.cir (default snapfactor = 10) and
+* b021-snapfactor-zero.cir (snapfactor=0, no snap).
+* Three CW sources into 1 cm waveguides with 20 dB/cm loss (field x 0.1):
+*   in_a 0.3 sqrt(W) (0.09 W) -> out_a 0.03 sqrt(W) = 0.0009 W
+*   in_b 0.6 sqrt(W) (0.36 W) -> out_b 0.06 sqrt(W) = 0.0036 W
+*   in_c 2 sqrt(W)   (4 W)    -> out_c 0.2 sqrt(W)  = 0.04 W
+* Expected (snap below 4 * 1e-2 = 0.04 sqrt(W)): out_a = 0, out_b = 0.060000 sqrt(W) = 0.003600 W, out_c = 0.200000 sqrt(W) = 0.040000 W;
+* the inputs (>= 0.3 sqrt(W)) are not snapped.
+cwsrc_a in_a wl=1.55e-6 power=0.09
+cwsrc_b in_b wl=1.55e-6 power=0.36
+cwsrc_c in_c wl=1.55e-6 power=4
+wg_a in_a out_a length=1e-2 att=20
+wg_b in_b out_b length=1e-2 att=20
+wg_c in_c out_c length=1e-2 att=20
+.options abstol=1e-2 snapfactor=4
+.op

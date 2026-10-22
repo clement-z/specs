@@ -1,0 +1,8 @@
+* line 1
+* line 2
+.subckt s a b
+* body line 1
+wg1 a b length=1e-4 ,
+.ends
+x1 in out s
+.tran 1e-11

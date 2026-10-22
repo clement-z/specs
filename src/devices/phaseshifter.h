@@ -44,7 +44,7 @@ public:
     // Timed ports writers
     /** Timed writer to the output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_out_writer;
 
@@ -111,7 +111,7 @@ public:
     // Timed ports writers
     /** Timed writer to the output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_p0_writer;
     OpticalOutputPort m_p1_writer;

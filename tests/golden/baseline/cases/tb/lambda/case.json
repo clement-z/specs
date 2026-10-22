@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "lambda"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/lambda_tb.manifest.json": {
+   "bytes": 253,
+   "kind": "json",
+   "sha256": "c5a1c6ed31719d4dc8a2a9b43bad739f2184ebbaffe39d8153359f4c2677f819",
+   "stored": "files/traces/lambda_tb.manifest.json"
+  },
+  "traces/lambda_tb.vcd": {
+   "bytes": 5407,
+   "kind": "vcd",
+   "sha256": "4a9b0ccbaabd74d52a5e736fb259aafb41e7307c4940d6b44887ff9f14ccb2b7",
+   "stored": "files/traces/lambda_tb.vcd"
+  }
+ },
+ "id": "tb/lambda"
+}

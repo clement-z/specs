@@ -23,7 +23,7 @@ private:
     static unsigned int nextId;
 
 public:
-    field_type m_field; // complex field of the signal (V/m)
+    field_type m_field; // complex field of the signal (sqrt(W))
     uint32_t m_wavelength_id; // accesses the global vector of wavelengths
     unsigned int m_id;
 
@@ -101,15 +101,9 @@ public:
     // we might need to review this as well
     bool operator==(const OpticalSignal &rhs) const
     {
-#if 0
-        // Work with ID
-        return rhs.m_id == m_id
-            || (isnan(rhs.m_wavelength) && isnan(m_wavelength));
-#else
         // Work with field value
         return rhs.m_field == m_field
             && rhs.m_wavelength_id == m_wavelength_id;
-#endif
     }
 
     bool operator!=(const OpticalSignal &rhs) const
@@ -135,10 +129,6 @@ public:
 
         advancePhaseByPhase(phase_rad);
     }
-
-    static OpticalSignal sumSignals(
-        OpticalSignal s0,
-        OpticalSignal s1);
 
     operator field_type() const {
         return m_field;
@@ -231,7 +221,7 @@ inline std::ostream &operator<<(std::ostream &os, const OpticalSignal &s)
     oss << "[" << setw(4) << setfill('0') << s.m_id << setfill(' ') << "] ";
     oss << " @ " << setw(4) << setprecision(8) << s.getWavelength() * 1e9 << setw(2)
         << (isnan(s.getWavelength()) ? "" : " nm");
-    oss << " (" << setprecision(6) << fixed << s.modulus() << " V.m⁻¹";
+    oss << " (" << setprecision(6) << fixed << s.modulus() << " √W";
     oss << ", " << setprecision(6) << fixed << s.power() << " W";
     oss << ", " << setprecision(4) << fixed << s.phase() << " rad";
     oss << ")";

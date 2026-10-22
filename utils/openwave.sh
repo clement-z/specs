@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 trace_file=$1
 config_dir=$2
@@ -31,7 +31,7 @@ if [[ -d $config_dir && ! -z "$(ls $config_dir)" ]]; then
         read choice
         let "i_config = choice - 1"
 
-        while [[ $choice -lt 0 || $i_config -ge ${#configs} ]]; do
+        while [[ $choice -lt 0 || $i_config -ge ${#configs[@]} ]]; do
             echo -n "Out of bounds. Your choice ? [0]: "
             read choice
             let "i_config = choice - 1"

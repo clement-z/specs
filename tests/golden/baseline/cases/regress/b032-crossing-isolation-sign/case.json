@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b032-crossing-isolation-sign.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 453,
+   "kind": "json",
+   "sha256": "b4e5d4139b4b712d5be743e51adbd00fbe5c3cb47d0bf44a256f169eb8ee3afc",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b032-crossing-isolation-sign"
+}

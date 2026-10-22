@@ -1,0 +1,14 @@
+* B-150: .include inside a .subckt body
+* The .include line must be stored in the body and executed when the body is
+* re-parsed for each instance (it used to be executed at definition time and
+* broke the body capture: syntax error). Two instances: each re-reads the file.
+.subckt t a b c d
+.include circuits/add_drop_sub.cir
+x1 a b c d add_drop_filter
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+x1 in drop out add t
+x2 drop drop2 out2 add2 t
+probe1 out
+probe2 out2
+.tran 1e-11

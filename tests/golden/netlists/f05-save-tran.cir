@@ -1,0 +1,14 @@
+* F-05: .save in a transient: a net alone traces every quantity (power, abs, phase, wavelength, like
+* PROBE), QTY(net) only that one; several targets on one net share its probe. Keywords as the PROBE
+* keywords, case-insensitive: P/POW/POWER, E/MOD/MODULUS/MAG/MAGNITUDE, PHI/PHASE, WL/WAVELENGTH.
+* Expected: the VCD declares PROBE{ROOT/out} (power, abs, phase, wavelength) and PROBE{ROOT/ring_in}
+* (abs, phase) only, with the same values as the automatic probes of these nets without .save:
+* a 100 ps 1 mW pulse at 1550 nm enters an all-pass ring (k = 0.3, 50 um, 100 dB/cm) and leaves through
+* out with decaying echoes every ring round trip (50e-6 m * 4.2 / c = 0.70 ps).
+vlsrc1 in values=[[0,1e-3,1.55e-6],[1e-10,0,1.55e-6]]
+wg1 in a length=10e-6 neff=2.2 ng=4.2
+coupler1 a ring_in out ring_out k=0.3
+wg_ring ring_out ring_in length=50e-6 neff=2.2 ng=4.2 att=100
+.save out e(ring_in) PHASE(ring_in)
+.options timescale=-14
+.tran 1e-9

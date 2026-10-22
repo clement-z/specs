@@ -1,0 +1,5 @@
+* F-A1: range() float accumulation. Parser says "(10points)", engine runs 11 points and the last
+* point is P=0.9999999999999999 (stop included by rounding); with step 0.25 the stop is excluded.
+cwsrc1 a wl=1.55e-6 power=1
+wg1 a b length=1e-6 neff=2 ng=4
+.dc /cwsrc1/P 0 1 0.1

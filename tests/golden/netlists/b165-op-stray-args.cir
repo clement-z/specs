@@ -1,0 +1,4 @@
+* B-165: .op with stray positional and keyword arguments
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.op 5 foo=1

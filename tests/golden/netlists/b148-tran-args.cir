@@ -1,0 +1,4 @@
+* B-148: .tran with two positional arguments (at most 1)
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.tran 1e-9 2e-9

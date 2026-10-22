@@ -1,0 +1,77 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Recorded sweep order for WL(CWSRC1) (31points)
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+7 local assignments
+ - dlambda (DOUBLE) = 1e-09
+ - k (DOUBLE) = 0.85
+ - lambda0 (DOUBLE) = 1.55e-06
+ - lambda_max (DOUBLE) = 1.565e-06
+ - lambda_min (DOUBLE) = 1.535e-06
+ - length_2pi (DOUBLE) = 6.73913e-07
+ - neff (DOUBLE) = 2.3
+-----------
+6 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in_ {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/X1 (SUBCIRCUIT) {in_ (STRING), in (STRING), test (STRING), } {att (INTEGER) = 0, length (DOUBLE) = 0.001, neff (INTEGER) = 1, ng (INTEGER) = 4, }
+ - ROOT/COUPLER1 (DIRECTIONAL COUPLER (bidir)) ROOT/in ROOT/ring_bl ROOT/out ROOT/ring_br {} {k (DOUBLE) = 0.85, }
+ - ROOT/COUPLER2 (DIRECTIONAL COUPLER (bidir)) ROOT/add ROOT/ring_tr ROOT/drop ROOT/ring_tl {} {k (DOUBLE) = 0.85, }
+ - ROOT/WG_RING_L (WAVEGUIDE (bidir)) ROOT/ring_tl ROOT/ring_bl {} {att (INTEGER) = 2, length (DOUBLE) = 6.80652e-05, neff (DOUBLE) = 2.3, ng (DOUBLE) = 4.3, }
+ - ROOT/WG_RING_R (WAVEGUIDE (bidir)) ROOT/ring_br ROOT/ring_tr {} {att (INTEGER) = 2, length (DOUBLE) = 6.80652e-05, neff (DOUBLE) = 2.3, ng (DOUBLE) = 4.3, }
+-----------
+9 named nets
+ - ROOT/add: OANALOG<1>u (0|1)
+ - ROOT/drop: OANALOG<1>u (1|0)
+ - ROOT/in: OANALOG<1>u (0|1)
+ - ROOT/in_: OANALOG<1>u (1|0)
+ - ROOT/out: OANALOG<1>u (1|0)
+ - ROOT/ring_bl: OANALOG<1>u (1|1)
+ - ROOT/ring_br: OANALOG<1>u (1|1)
+ - ROOT/ring_tl: OANALOG<1>u (1|1)
+ - ROOT/ring_tr: OANALOG<1>u (1|1)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-12, reltol (DOUBLE) = 1e-06, timescale (DOUBLE) = -15, }
+-----------
+1 subcircuits
+ - TEST (SUBCIRCUIT DEFINITION) p1 p2 {att (INTEGER) = 1, length (DOUBLE) = 0.0001, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+-----------
+1 analyses
+ - ANALYSIS[DC] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/X1
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/X1/N00000...
+Creating ROOT/X1/WG1 (reason: connection to unidir net)
+Done creating ROOT/X1/WG1
+Creating ROOT/CWSRC1 (reason: unidir backlog)
+Done creating ROOT/CWSRC1
+Creating ROOT/X1/WG2 (reason: unidir backlog)
+Done creating ROOT/X1/WG2
+Creating ROOT/COUPLER1 (reason: unidir backlog)
+Done creating ROOT/COUPLER1
+Creating ROOT/WG_RING_L (reason: unidir backlog)
+Done creating ROOT/WG_RING_L
+Creating ROOT/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/COUPLER2
+Creating ROOT/WG_RING_R (reason: unidir backlog)
+Done creating ROOT/WG_RING_R
+Done (elaborating network of ROOT/X1/N00000)
+Exported flattened circuit as JSON > flat.json
+╔══════════════════════╗
+║  SIMULATION SKIPPED  ║
+╚══════════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

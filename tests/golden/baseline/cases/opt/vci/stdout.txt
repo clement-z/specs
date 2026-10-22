@@ -1,0 +1,249 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Including file: circuits/add_drop_sub.cir
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+7 local assignments
+ - dlambda (DOUBLE) = 1e-10
+ - k (DOUBLE) = 0.85
+ - lambda0 (DOUBLE) = 1.55e-06
+ - lambda_max (DOUBLE) = 1.565e-06
+ - lambda_min (DOUBLE) = 1.535e-06
+ - length_2pi (DOUBLE) = 6.73913e-07
+ - neff (DOUBLE) = 2.3
+-----------
+3 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/in {} {values (LIST) = [{"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.550000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"INTEGER","value":2}, {"type":"NONE","value":null}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"DOUBLE","value":-2.000000e+00}, {"type":"NONE","value":null}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":4.000000e-09}, {"type":"INTEGER","value":0}, {"type":"NONE","value":null}]}], }
+ - ROOT/X1 (SUBCIRCUIT) {in (STRING), drop (STRING), out (STRING), add (STRING), add_drop_filter (STRING), } {radius_ring (DOUBLE) = 7.37935e-05, }
+ - ROOT/X2 (SUBCIRCUIT) {out (STRING), out_ (STRING), test (STRING), } {}
+-----------
+1 named nets
+ - ROOT/in: OANALOG<1>u (1|0)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-12, reltol (DOUBLE) = 1e-06, timescale (DOUBLE) = -15, }
+-----------
+2 subcircuits
+ - ADD_DROP_FILTER (SUBCIRCUIT DEFINITION) in drop out add {att_wg (INTEGER) = 2, k1 (DOUBLE) = 0.85, k2 (DOUBLE) = 0.85, neff_wg (DOUBLE) = 2.2, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 5e-05, }
+ - TEST (SUBCIRCUIT DEFINITION) p1 p2 {}
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/X1
+Flattening ROOT/X2
+Flattening ROOT/X2/X1
+Flattening ROOT/X2/X2
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/X1/ring_bl...
+Creating ROOT/X1/COUPLER1 (reason: connection to unidir net)
+Done creating ROOT/X1/COUPLER1
+Creating ROOT/VLSRC1 (reason: unidir backlog)
+Done creating ROOT/VLSRC1
+Creating ROOT/X1/WG_RING_L (reason: unidir backlog)
+Done creating ROOT/X1/WG_RING_L
+Creating ROOT/X1/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/X1/COUPLER2
+Creating ROOT/X1/WG_RING_R (reason: unidir backlog)
+Done creating ROOT/X1/WG_RING_R
+Creating ROOT/X2/X1/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/X1/WG1
+Creating ROOT/X2/X2/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/X2/WG1
+Creating ROOT/X2/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/WG1
+Done (elaborating network of ROOT/X1/ring_bl)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -15
+- abstol: 1e-12
+- default reltol: 1e-06
+- resolution multiplier: 1
+- trace all optical nets: 1
+
+Info: (I703) tracing timescale unit set: 1 fs (traces/delete_me.vcd)
+ROOT/X1/COUPLER1:
+through_power = 0.2775 W/W
+cross_power = 0.7225 W/W
+through_field = 0.526783
+cross_field = 0.85
+insertion loss = 0dB
+ROOT/in --,__,-> ROOT/out
+ROOT/X1/ring_bl --'  '-> ROOT/X1/ring_br
+
+ROOT/VLSRC1:
+value list (4 values)
+--> ROOT/in
+
+ROOT/X1/WG_RING_L:
+length = 0.000231829 m
+neff = 2.2
+ng = 4.3
+transmission_power = 0.989381 W/W
+group delay = 0.00332518 ns
+phase delay = 0.00170126 ns (0.299599rad @1.55)
+ROOT/X1/ring_tl --> ROOT/X1/ring_bl
+
+ROOT/X1/COUPLER2:
+through_power = 0.2775 W/W
+cross_power = 0.7225 W/W
+through_field = 0.526783
+cross_field = 0.85
+insertion loss = 0dB
+ROOT/add --,__,-> ROOT/drop
+ROOT/X1/ring_tr --'  '-> ROOT/X1/ring_tl
+
+ROOT/X1/WG_RING_R:
+length = 0.000231829 m
+neff = 2.2
+ng = 4.3
+transmission_power = 0.989381 W/W
+group delay = 0.00332518 ns
+phase delay = 0.00170126 ns (0.299599rad @1.55)
+ROOT/X1/ring_br --> ROOT/X1/ring_tr
+
+ROOT/X2/X1/WG1:
+length = 0.003 m
+neff = 2.2111
+ng = 2.2637
+transmission_power = 1 W/W
+group delay = 0.0226527 ns
+phase delay = 0.0221263 ns (3.44562rad @1.55)
+ROOT/out --> ROOT/X2/N00001
+
+ROOT/X2/X2/WG1:
+length = 0 m
+neff = 2.2111
+ng = 2.2637
+transmission_power = 1 W/W
+group delay = 0 ns
+phase delay = 0 ns (0rad @1.55)
+ROOT/X2/N00001 --> ROOT/X2/N00002
+
+ROOT/X2/WG1:
+length = 0.001 m
+neff = 2.2111
+ng = 2.2637
+transmission_power = 1 W/W
+group delay = 0.00755089 ns
+phase delay = 0.00737544 ns (3.24293rad @1.55)
+ROOT/X2/N00002 --> ROOT/out_
+
+PROBE{ROOT/X1/ring_bl}:
+Signal: ROOT/X1/ring_bl
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/X1/ring_br}:
+Signal: ROOT/X1/ring_br
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/X1/ring_tl}:
+Signal: ROOT/X1/ring_tl
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/X1/ring_tr}:
+Signal: ROOT/X1/ring_tr
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/X2/N00001}:
+Signal: ROOT/X2/N00001
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/X2/N00002}:
+Signal: ROOT/X2/N00002
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/add}:
+Signal: ROOT/add
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/drop}:
+Signal: ROOT/drop
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/in}:
+Signal: ROOT/in
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/out}:
+Signal: ROOT/out
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+PROBE{ROOT/out_}:
+Signal: ROOT/out_
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/X1/ring_bl (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_br (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tl (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X1/ring_tr (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X2/N00001 (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/X2/N00002 (OPTICAL) = [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/add (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out_ (OPTICAL) = [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+ROOT/VLSRC1 was enabled
+@0 s, ROOT/VLSRC1 emitted: [#12]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@1 ns, ROOT/VLSRC1 emitted: [#13]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@2 ns, ROOT/VLSRC1 emitted: [#14]  @ 1550 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
+@3 ns, ROOT/VLSRC1 emitted: [#15]  @ 1550 nm (nan √W, nan W, nan rad)
+@4 ns, ROOT/VLSRC1 emitted: [#16]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+Simulated 4163204 fs
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

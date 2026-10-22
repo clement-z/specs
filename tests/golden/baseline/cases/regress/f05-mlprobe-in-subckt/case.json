@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f05-mlprobe-in-subckt.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 439,
+   "kind": "json",
+   "sha256": "19f2da243e67c85d1d0a4deaf1eaef12671d8230acffcf5bf7fc16a4b44d8a66",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1008,
+   "kind": "vcd",
+   "sha256": "800e06df0cd9a1f7edc8002cf6fa1a724972345175a39c3b2b34e13facb68e56",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f05-mlprobe-in-subckt"
+}

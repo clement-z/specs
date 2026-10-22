@@ -1,0 +1,99 @@
+Using trace file:
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+2 local assignments
+ - dlambda (DOUBLE) = 1e-12
+ - lambda0 (DOUBLE) = 1.55e-06
+-----------
+8 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/in {} {values (LIST) = [{"type":"LIST","value":[{"type":"DOUBLE","value":5.000000e-10}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.550000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.550000e-06}]}], }
+ - ROOT/COUPLER1 (DIRECTIONAL COUPLER (bidir)) ROOT/in ROOT/N00001 ROOT/out ROOT/N00002 {} {k (DOUBLE) = 0.15, }
+ - ROOT/COUPLER2 (DIRECTIONAL COUPLER (bidir)) ROOT/add ROOT/N00003 ROOT/drop ROOT/N00004 {} {k (DOUBLE) = 0.15, }
+ - ROOT/WG_RING_L (WAVEGUIDE (bidir)) ROOT/N00004 ROOT/N00001 {} {length (DOUBLE) = 0.0003, neff (DOUBLE) = 3.999, }
+ - ROOT/WG_RING_R (WAVEGUIDE (bidir)) ROOT/N00002 ROOT/N00003 {} {length (DOUBLE) = 0.0003, neff (DOUBLE) = 3.999, }
+ - ROOT/PROBE1 (PROBE) ROOT/out {} {}
+ - ROOT/PROBE2 (PROBE) ROOT/drop {} {}
+ - ROOT/PROBE3 (PROBE) ROOT/in {} {}
+-----------
+8 named nets
+ - ROOT/N00001: OANALOG<1>u (1|1)
+ - ROOT/N00002: OANALOG<1>u (1|1)
+ - ROOT/N00003: OANALOG<1>u (1|1)
+ - ROOT/N00004: OANALOG<1>u (1|1)
+ - ROOT/add: OANALOG<1>u (0|1)
+ - ROOT/drop: OANALOG<1>u (1|1)
+ - ROOT/in: OANALOG<1>u (1|2)
+ - ROOT/out: OANALOG<1>u (1|1)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-06, reltol (DOUBLE) = 1e-08, timescale (DOUBLE) = -12, traceall (INTEGER) = 1, }
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {3e-09 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/N00001...
+Creating ROOT/COUPLER1 (reason: connection to unidir net)
+Done creating ROOT/COUPLER1
+Creating ROOT/VLSRC1 (reason: unidir backlog)
+Done creating ROOT/VLSRC1
+Creating ROOT/WG_RING_L (reason: unidir backlog)
+Done creating ROOT/WG_RING_L
+Creating ROOT/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/COUPLER2
+Creating ROOT/WG_RING_R (reason: unidir backlog)
+Done creating ROOT/WG_RING_R
+Creating ROOT/PROBE1 (reason: unidir backlog)
+Done creating ROOT/PROBE1
+Creating ROOT/PROBE2 (reason: unidir backlog)
+Done creating ROOT/PROBE2
+Creating ROOT/PROBE3 (reason: unidir backlog)
+Done creating ROOT/PROBE3
+Done (elaborating network of ROOT/N00001)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -12
+- abstol: 1e-06
+- default reltol: 1e-08
+- resolution multiplier: 1
+- trace all optical nets: 1
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/N00001 (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/N00002 (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/N00003 (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/N00004 (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/add (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = [#7]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = [#8]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+ROOT/VLSRC1 was enabled
+@0 s, ROOT/VLSRC1 emitted: [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@500 ps, ROOT/VLSRC1 emitted: [#10]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@2 ns, ROOT/VLSRC1 emitted: [#11]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+Simulated 3 ns
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

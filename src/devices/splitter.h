@@ -26,12 +26,12 @@ private:
     // Timed ports writers
     /** Timed writer to the first output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_out1_writer;
     /** Timed writer to the second output port.
      *
-     * @sa DelayedWriter
+     * @sa OpticalOutputPort
      * */
     OpticalOutputPort m_out2_writer;
 
@@ -43,11 +43,6 @@ public:
      * */
     double m_split_ratio;
 
-    /** The delay for an output to propagate to the outputs in ns.
-     *
-     * The delay is the same for both outputs.
-     * */
-    // static double m_delay_ns;
     /** The attenuation of the signal in dB.
      *
      * The attenuation is applied before the split (although it does not really make a

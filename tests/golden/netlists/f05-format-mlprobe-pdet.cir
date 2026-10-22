@@ -1,0 +1,12 @@
+* F-05: --format npz with an MLPROBE and a PDET. The table holds the probes only: the MLPROBE rows at
+* its listed wavelength, no PDET readout, and a warning on stderr: "Warning: photodetector and power
+* meter readouts are only traced in the VCD (add --format vcd)". No VCD is written.
+* Expected: one row (the MLPROBE samples its net at TRAN start, B-048; nothing changes afterwards):
+* t = 0, ROOT/MLPROBE1, 1.55e-6 m, power 0.5 mW (the merger passes half the power of each input),
+* field sqrt(5e-4)*exp(0.5i) = (0.019623, 0.010720).
+cwsrc1 a wl=1.55e-6 power=1e-3 phi=0.5
+cwsrc2 b wl=1.31e-6 power=2e-3
+merger1 a b c
+mlprobe1 c wl=[1.55e-6]
+pdet1 c v
+.tran 1e-11

@@ -1,0 +1,6 @@
+* F-01, B-180: a large netlist seed written as an integer literal (.options seed=3000000000, beyond the
+* int range): integer literals are 64-bit and .options seed takes them exactly.
+* Expected: regress/f01-options-seed-int-literal gives exactly the VCD of specs --seed 3000000000 on
+*   f01-pdet-noise.cir (regress/f01-seed-large), as seed=3e9 does (regress/f01-options-seed-large).
+.include tests/golden/netlists/f01-pdet-noise.cir
+.options seed=3000000000

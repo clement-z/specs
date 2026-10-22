@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b008-dc-bare.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b008-dc-bare"
+}

@@ -1,0 +1,26 @@
+* B-145 regression, counter-case (repro: backlog/repro/v7-upgrade-reader-case2.cir).
+* Net c = uni writer cwsrc3 + uni reader merger1 (created first, from the bidirectional net
+* a) + bidirectional wg1 that READS c. wg1 is listed before cwsrc3, so it upgrades c before
+* cwsrc3 is created. Here upgrade_signal() must still swap the two signals: merger1 moves to
+* the signal that the next writer (cwsrc3) writes, which wg1 reads too, and wg1 writes its
+* backward output on the other one. This case worked before the fix and must keep working
+* (removing the swap unconditionally gave out = 0.5 mW).
+* Expected (fields in sqrt(mW); waveguides: L = 1e-4 m, neff 2.2111, att 0: lossless,
+* phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped, 2*phi = 1.9052 rad):
+*   a:0 = a:1 = 1 mW at phi; s1:0 = s2:0 = 1 mW at 2*phi; s1:1 = s2:1 = 1 mW at 0
+*   c = 4 mW at 0 (cwsrc3, read by merger1 and wg1); c:1 = 0 (wg1 backward output)
+*   e:0 = 4 mW at phi (wg1 output); e:1 = 0
+*   out = |2 + e^(i phi)|^2 / 2 = (4 + 1 + 4 cos(phi)) / 2 = 1.3409 mW,
+*         phase arg(2 + e^(i phi)) = -0.5209 rad
+* Same values as b145-upgrade-reader-case2-ref (no '&').
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 s1 wl=1.55e-6 power=1e-3
+wga s1 a length=1e-4
+cwsrc2 s2 wl=1.55e-6 power=1e-3
+wgb s2 a length=1e-4
+merger1 c a out
+wg1 c e& length=1e-4
+cwsrc3 c wl=1.55e-6 power=4e-3
+probe1 out
+probe2 e
+.tran 1e-11

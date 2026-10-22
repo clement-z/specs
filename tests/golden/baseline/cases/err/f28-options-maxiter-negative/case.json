@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f28-options-maxiter-negative.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f28-options-maxiter-negative"
+}

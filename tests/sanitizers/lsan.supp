@@ -1,0 +1,15 @@
+# LeakSanitizer suppressions for sanitizer builds (-Db_sanitize=address,...), registered for `meson test`
+# in meson.build. Maintainer decision 2026-10-21 (option a): suppress exactly these two kinds of reports and
+# keep leak detection on for everything else. Anything not listed here fails the sanitizer CI job.
+
+# (1) Allocations still live when a parse error ends the process with exit(1) from inside the scanner or
+#     parser: the flex buffers of the netlist sources (every one is created through
+#     yy_add_content_from_string). On success they are freed (B-170), so this only matters on error exits.
+leak:yy_add_content_from_string
+
+# (2) Allocations owned by SystemC thread stacks: SystemC never unwinds SC_THREAD coroutines at the end of
+#     the simulation, so the locals of a thread's endless loop (e.g. the std::vector in
+#     PCMElement::on_input_changed) are reported although nothing is lost. LeakSanitizer cannot tell such
+#     stack-owned allocations from a real leak inside a thread, so all allocations made under a SystemC
+#     thread are suppressed; leaks in elaboration, the parser's success path, analyses and main stay detected.
+leak:sc_core::sc_thread_cor_fn

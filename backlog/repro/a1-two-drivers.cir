@@ -1,0 +1,9 @@
+* F-A1: two outputs drive net m in different delta cycles: rc=0, no error, last writer wins
+* (m:1 shows merger2 0.125 W, merger1 0.5 W is lost). Same delta -> E115.
+cwsrc1 a wl=1.55e-6 power=1
+cwsrc2 c0 wl=1.55e-6 power=0.25
+wg0 c0 c length=1e-6 neff=2 ng=4
+merger1 a b m
+merger2 c d m
+probe1 m
+.op

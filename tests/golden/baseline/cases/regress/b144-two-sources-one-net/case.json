@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b144-two-sources-one-net.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 445,
+   "kind": "json",
+   "sha256": "d0b627f8e9fed4d2cfa20ed8f20fdbf1f5a5669226acde24e41e5cfcecd7b68e",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 996,
+   "kind": "vcd",
+   "sha256": "ab87499e924a54e35efe9c93f8cf2ae5e33268f2414e3a2c36e13e7cb9c9eba8",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b144-two-sources-one-net"
+}

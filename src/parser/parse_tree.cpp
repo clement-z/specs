@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 using std::ostringstream;
 
@@ -53,7 +54,7 @@ shared_ptr<sc_object> ParseNet::create_uni(const string &name) const
     return { nullptr };
 }
 
-string ParseNet::name_from_id(int id)
+string ParseNet::name_from_id(int64_t id)
 {
     assert(id >= 0);
     ostringstream ss;
@@ -125,7 +126,7 @@ vector<ParseElement *>::iterator ParseTreeCreationHelper::next_fresh_element_bou
             continue;
 
         // Check if element is part of backlog set
-        if (elements_backlog.find(elem) != elements_backlog.cend())
+        if (elements_backlog.count(it - pt->elements.begin()))
             continue;
 
         // Check if net_name is in element nets
@@ -167,14 +168,14 @@ void ParseTreeCreationHelper::create_signals(const ParseElement *elem)
             auto it = next_fresh_element_bound_to(net, {elem});
             while (it != pt->elements.end())
             {
-                elements_backlog.insert(*it);
+                elements_backlog.insert(it - pt->elements.begin());
                 it = next_fresh_element_bound_to(net, {elem});
             }
         }
     }
 }
 
-void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
+void ParseTreeCreationHelper::upgrade_signal(const string &net_name, bool device_writes_net)
 {
     // Upgrade even if: net.bidirectional() is false
 
@@ -206,32 +207,41 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
             // instead, we add a second signal to the vector to make it bidirectional
             circuit_signals[net_name].push_back(pt->nets[net_name].create_uni(net_name + ":1"));
 
-            // For bidirectional signals, first port to connect binds to signal:0
-            // for writing and signal:1 for reading
-            // Therefore we have to "re-create" this scenario, as if the first device
-            // connected to a bidirectional net. But for this we need to know which
-            // if the first device was a writer or a reader.
+            // On a bidirectional net, every writer takes the next free slot
+            // (the first one writes signal:0) and a bidir device reads the
+            // other slot (see the slot convention in parse_tree.h).
+            // The ports already bound are all on signal:0, so we have to
+            // "re-create" this scenario. For this we need to know whether they
+            // write or read the signal, and whether the upgrading device writes
+            // or reads the net (device_writes_net). The next port to connect
+            // is the upgrading device, through connect_bi().
 
             // first determine if the connected port was writing or reading the signal
             bool has_writer = pt->nets[net_name].m_connect_writer_count;
-            bool has_reader = pt->nets[net_name].m_connect_reader_count;
+            [[maybe_unused]] bool has_reader = pt->nets[net_name].m_connect_reader_count;
 
             // only one should be true since the net was unidirectional
             assert(has_writer ^ has_reader);
 
-            // if a writer, then it's as expected
             if (has_writer)
             {
-                // if a writer, then it's as expected:
-                // the next port will connect to signal:1 for writing
+                // if a writer, then it's as expected, whatever the role of the
+                // device: the writer holds signal:0 (first writer), the device
+                // will write signal:1 and read signal:0
                 // we just need to update the number of "readers" connected to the net
                 pt->nets[net_name].m_readers_count++;
             }
             else
             {
-                // if a writer, then the next port needs to reverse its order.
-                // for this we swap signal:0 and signal:1
-                swap(circuit_signals[net_name][0], circuit_signals[net_name][1]);
+                // if a reader, it reads signal:0, which the device will write.
+                // If the device writes the net (an output of its unidirectional
+                // variant), that is its forward output: keep the order.
+                // If the device reads the net (an input), the reader must read
+                // what the device reads (the net's other writer, connected later
+                // on signal:1), not the device's backward output: for this we
+                // swap signal:0 and signal:1
+                if (!device_writes_net)
+                    swap(circuit_signals[net_name][0], circuit_signals[net_name][1]);
                 // then we need to update the number of "writers" connected to the net
                 pt->nets[net_name].m_writers_count++;
             }
@@ -242,7 +252,6 @@ void ParseTreeCreationHelper::upgrade_signal(const string &net_name)
             circuit_signals[net_name].clear(); // will delete the net through the destructor
             circuit_signals[net_name] = pt->nets.at(net_name).create(net_name);
         }
-        cout << "\t" << circuit_signals[net_name][0]->name() << "," << circuit_signals[net_name][1]->name() << endl;
     }
 }
 
@@ -321,6 +330,10 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
 
     yyscan_t scanner;
     ParserState *parser_state = new ParserState;
+    // .include lines of the body are opened by this scanner (B-150): record them in the root's list
+    parser_state->input_files = root_input_files();
+    // and resolved relative to the file that defines the subcircuit first (B-143)
+    parser_state->include_dirs.assign(1, subcircuit.include_dir);
     YY_BUFFER_STATE buf;
 
     yylex_init_extra(parser_state, &scanner);
@@ -342,12 +355,16 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     if (directives.size() > 0)
     {
         cerr << name << ": found a directive in subcircuit, ignoring." << endl;
+        for (const auto &x : directives)
+            delete x;
         directives.clear();
     }
 
     if (analyses.size() > 0)
     {
         cerr << name << ": found an analysis in subcircuit, ignoring." << endl;
+        for (const auto &x : analyses)
+            delete x;
         analyses.clear();
     }
     // print();
@@ -570,7 +587,7 @@ string ParseNet::to_json() const
     ss << ',';
     ss << "\"readers\":" << m_readers_count;
     ss << ',';
-    ss << "\"writers\":" << m_readers_count;
+    ss << "\"writers\":" << m_writers_count;
     ss << '}';
     return ss.str();
 }
@@ -724,21 +741,21 @@ void ParseTree::build_circuit()
             while ( !elements_backlog.empty() )
             {
                 auto it = elements_backlog.begin();
-                auto &backlog_elem = *it;
+                const ParseElement *backlog_elem = elements.at(*it);
                 cout << "Creating - " << backlog_elem->name << " (reason: bidir backlog)" << endl;
                 auto mod = backlog_elem->create(pt_helper);
                 cout << "Done creating " << backlog_elem->name << endl;
 
-                if (mod->name() != (*it)->name)
+                if (mod->name() != backlog_elem->name)
                 {
-                    cerr << "Error: a module with name '" << (*it)->name << "' already exists or";
+                    cerr << "Error: a module with name '" << backlog_elem->name << "' already exists or";
                     cerr << " it was renamed due to a bad naming." << endl;
                     cerr << "Make sure there is no naming conflict in the netlist" << endl;
                     exit(1);
                 }
 
                 circuit_modules.emplace(mod->name(), mod);
-                elements_backlog.erase(*it);
+                elements_backlog.erase(it);
             }
             elem = pt_helper.next_fresh_element_bound_to(next_net->first);
         }
@@ -777,21 +794,21 @@ void ParseTree::build_circuit()
             while ( !elements_backlog.empty() )
             {
                 auto it = elements_backlog.begin();
-                auto &backlog_elem = *it;
+                const ParseElement *backlog_elem = elements.at(*it);
                 cout << "Creating " << backlog_elem->name << " (reason: unidir backlog)" << endl;
                 auto mod = backlog_elem->create(pt_helper);
                 cout << "Done creating " << backlog_elem->name << endl;
 
-                if (mod->name() != (*it)->name)
+                if (mod->name() != backlog_elem->name)
                 {
-                    cerr << "Error: a module with name '" << (*it)->name << "' already exists or";
+                    cerr << "Error: a module with name '" << backlog_elem->name << "' already exists or";
                     cerr << " it was renamed due to a bad naming." << endl;
                     cerr << "Make sure there is no naming conflict in the netlist" << endl;
                     exit(1);
                 }
 
                 circuit_modules.emplace(mod->name(), mod);
-                elements_backlog.erase(*it);
+                elements_backlog.erase(it);
             }
             elem = pt_helper.next_fresh_element_bound_to(next_net->first);
         }
@@ -802,8 +819,63 @@ void ParseTree::build_circuit()
         // move on to the next one
         next_net = pt_helper.next_fresh_net();
     }
+    // .save (F-05): one probe per signal of each listed net (two on a bidirectional net), named and
+    // traced like the automatic probes (PROBE{<signal>}); the targets on one net share its probe
+    bool has_save = false;
+    for (const auto &x : directives)
+    {
+        const auto *save = dynamic_cast<const SAVEDirective *>(x);
+        if (!save)
+            continue;
+        has_save = true;
+        for (const auto &target : save->targets)
+        {
+            const auto net = nets.find(target.net);
+            if (net == nets.end())
+            {
+                cerr << "Error: .save " << target.written << ": no net named '" << target.net_written
+                     << "' in the netlist" << endl;
+                exit(1);
+            }
+            if (net->second.type() != ParseNet::OANALOG)
+            {
+                cerr << "Error: .save " << target.written << ": '" << target.net_written
+                     << "' is not an optical net (" << net->second.type_str() << ")" << endl;
+                exit(1);
+            }
+            for (const auto &sig : circuit_signals.at(target.net))
+            {
+                const string probe_name = string("PROBE{") + sig->name() + "}";
+                auto &mod = circuit_modules[probe_name];
+                if (!mod)
+                {
+                    auto probe = make_shared<Probe>(probe_name.c_str(), false, false, false, false);
+                    probe->p_in(*dynamic_cast<spx::oa_signal_type *>(sig.get()));
+                    mod = probe;
+                }
+                Probe *probe = static_cast<Probe *>(mod.get());
+                const auto q = target.quantity;
+                probe->m_trace_power |= (q == SAVEDirective::ALL || q == SAVEDirective::POWER);
+                probe->m_trace_modulus |= (q == SAVEDirective::ALL || q == SAVEDirective::MODULUS);
+                probe->m_trace_phase |= (q == SAVEDirective::ALL || q == SAVEDirective::PHASE);
+                probe->m_trace_wavelength |= (q == SAVEDirective::ALL || q == SAVEDirective::WAVELENGTH);
+            }
+        }
+    }
+
     for (const auto &x : directives)
         x->create();
+
+    // F-05: a netlist with probes or .save targets only traces them; every optical net is traced only
+    // as a fallback, when it has neither (or when .options traceall says so)
+    if (!specsGlobalConfig.trace_all_optical_nets_explicit)
+    {
+        const bool has_probes = std::any_of(elements.begin(), elements.end(), [](const ParseElement *elem) {
+            return dynamic_cast<const ProbeElement *>(elem) || dynamic_cast<const MLProbeElement *>(elem);
+        });
+        if (has_probes || has_save)
+            specsGlobalConfig.trace_all_optical_nets = false;
+    }
 
     if (! analyses.empty())
         analyses.at(0)->create();
@@ -838,6 +910,11 @@ void ParseTree::flatten()
         }
 
         // get subcircuit name
+        if (xelem->args.empty())
+        {
+            cerr << "Error: subcircuit instance " << xelem->name << " has no subcircuit name" << endl;
+            exit(1);
+        }
         string subcircuit_name = xelem->args.back().as_string();
         strutils::toupper(subcircuit_name);
 
@@ -895,11 +972,13 @@ void ParseTree::flatten()
             // add current prefix
             external_net_name = name_prefix() + net_base;
 
-            // see if the net was already defined (was used by another device)
-            if (nets.find(external_net_name) != nets.end())
+            // see if the net was already defined (was used by another device,
+            // or by a subcircuit instance flattened before this one: look it up
+            // in nets_flat, so that the result is the same as the flat netlist)
+            if (nets_flat.find(external_net_name) != nets_flat.end())
             {
                 // if so, combined the previously defined net with the internal one
-                bool ok = sub_pt.nets[internal_net_name].combine_with(nets.at(external_net_name));
+                bool ok = sub_pt.nets[internal_net_name].combine_with(nets_flat.at(external_net_name));
                 if (!ok)
                 {
                     cerr << "Could not reconcile nets: " << internal_net_name;
@@ -917,11 +996,6 @@ void ParseTree::flatten()
             // Erase the internal net_name (replaced by the global net name)
             sub_pt.nets.erase(internal_net_name);
         } // for (size_t i = 0; i < subcircuit->ports.size(); ++i)
-
-        // show result of translation
-        if (false)
-            for (const auto &p : net_names_translations)
-                cout << p.first << " <==> " << p.second << endl;
 
         // translate internal net names by modifying the elements within the
         // subcircuit which are bound to them
@@ -948,27 +1022,6 @@ void ParseTree::flatten()
         delete elem;
         elem = nullptr;
     } // for (auto elem : elements)
-
-    // Print new list of elements and nets
-    if (false)
-    {
-        cout << "-----------" << endl;
-        cout << elements_flat.size() << " elements" << endl;
-        for (const auto &x : elements_flat)
-        {
-            cout << " - ";
-            x->print();
-        }
-
-        cout << "-----------" << endl;
-        cout << nets_flat.size() << " named nets" << endl;
-        for (const auto &x : nets_flat)
-            cout << " - " << x.first << ": " << x.second.type_str()
-            << "<" << x.second.size() << ">"
-            << (x.second.bidirectional() ? "b" : "u")
-            << " (" << x.second.m_writers_count << "|" << x.second.m_readers_count << ")"
-            << endl;
-    }
 
     // move to flattened nets and elements
     nets = nets_flat;

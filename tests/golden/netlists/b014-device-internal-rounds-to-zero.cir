@@ -1,0 +1,24 @@
+* B-014 (option b): waveguides that a device creates internally (here the arms of an MZI,
+* MZIActiveUni::init()) only warn when their delay rounds to 0 time steps; the run goes on.
+* The MZI arms are feed-forward, so the rounding only removes their (sub-step) delay.
+* Arms: WG1 = WG2 = length/2 = 5 um, WG3 = length_ref = 10.2 um, ng 2.6 (MZI default):
+*   5e-6 * 2.6 / c = 43.36 fs -> 0 at 100 fs (warning "rounds to 0"),
+*   10.2e-6 * 2.6 / c = 88.46 fs -> 100 fs (+13 %, warning "rounded to").
+* The netlist waveguide wg1 (100 um, ng 2.2637: 755.09 fs -> 800 fs, +5.95 %) gives no message.
+* Expected: stderr, in this order (name order, F-01):
+*   Warning (ROOT/MZI1/WG1): delay 4.33633e-14 s rounds to 0 at the time resolution 1e-13 s (the
+*     delayed events happen in the same time step); use a finer time resolution, e.g. .options timescale=-14
+*   Warning (ROOT/MZI1/WG2): the same
+*   Warning (ROOT/MZI1/WG3): delay 8.84612e-14 s rounded to 1e-13 s (+13 %) ...
+* exit 0, and the MZI works as without rounding (the arm delays only shift the arrival times): at V = 0
+* the arm phase difference is 2 pi * 2.2 * 0.2e-6 / 1.55e-6 = 1.7836 rad, so with the arm loss
+* (att 1 dB/cm over 10 um: 10^(-1e-3/10) = 0.99977):
+*   out1 = sin^2(1.7836/2) * 0.99977 mW = 0.6055 mW, out2 = cos^2(1.7836/2) * 0.99977 mW = 0.3942 mW
+*   (OP listing: out1 = o1 = 0.000605 W, out2 = 0.000394 W; wg1 is lossless).
+cwsrc1 in wl=1.55e-6 power=1e-3
+evlsrc1 v values=[[0, 0]]
+mzi1 in nc out1 out2 v length=10e-6 length_ref=10.2e-6 att=1 sensitivity=0.7
+wg1 out1 o1 length=1e-4
+probe1 o1
+probe2 out2
+.tran 5e-12

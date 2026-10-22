@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-t",
+  "ring"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/ring_tb.manifest.json": {
+   "bytes": 249,
+   "kind": "json",
+   "sha256": "845b0741be027e7a63c0bb9f7c5ec2ba8d3227e8a9db7dd629156e5db3106a6b",
+   "stored": "files/traces/ring_tb.manifest.json"
+  },
+  "traces/ring_tb.vcd": {
+   "bytes": 52832,
+   "kind": "vcd",
+   "sha256": "8968e14332939d1d4f665ce2c9ebaec733efeff1fafe582becadfc16769aaefc",
+   "stored": "files/traces/ring_tb.vcd"
+  }
+ },
+ "id": "tb/ring"
+}

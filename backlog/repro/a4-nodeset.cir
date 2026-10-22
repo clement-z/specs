@@ -1,0 +1,5 @@
+* .nodeset
+cwsrc1 a wl=1.55e-6 power=1e-3
+probe1 a
+.nodeset /a/P=1
+.op

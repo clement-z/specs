@@ -1,0 +1,13 @@
+* F-01 (B-056): dark photodetectors: net dark carries a 0 W CW field (cwsrc1), so the total field is
+* exactly 0. Both PDETs are enabled at the start of the transient and compute their readout once.
+* pdet_off (darkfield=0): no dark-field injection, reads exactly R * 0 + dark current = 0.
+* pdet_on (darkfield=1, the default): a 1e-20 * N(0,1) sqrt(W) field is injected when the total field
+*   is exactly 0, so it reads about 1e-40 A; seeded (seed 0 here), so the value is reproducible.
+* Expected: ROOT/PDET_OFF.readout = readout_no_interference = 0 for the whole transient;
+*   ROOT/PDET_ON.readout = one value of about 1e-40 from t = 0, identical in every run;
+*   ROOT/PDET_ON.readout_no_interference = 0.
+cwsrc1 dark wl=1.55e-6 power=0
+pdet_off dark v1 darkfield=0
+pdet_on dark v2 darkfield=1
+.options traceall=0
+.tran 10e-12

@@ -1,0 +1,19 @@
+{
+ "args": [
+  "-n",
+  "--json",
+  "flat.json",
+  "-f",
+  "circuits/add_drop_sub.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "flat.json": {
+   "bytes": 272,
+   "kind": "json",
+   "sha256": "fb82f261f698254cdc9494e55acb97a9c98262c5455d8fc0238614b90e3713c1",
+   "stored": "files/flat.json"
+  }
+ },
+ "id": "cir-json/add_drop_sub"
+}

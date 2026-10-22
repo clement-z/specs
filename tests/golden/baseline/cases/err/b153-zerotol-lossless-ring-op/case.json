@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b153-zerotol-lossless-ring-op.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 455,
+   "kind": "json",
+   "sha256": "8613ba14a36e9a7e0ee3343963503c4ca3aa7bb8585971f0ad9a9f1599a73bc4",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "err/b153-zerotol-lossless-ring-op"
+}

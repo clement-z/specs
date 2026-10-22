@@ -1,0 +1,7 @@
+* V7: flat equivalent of v7-x-shared-delayed.cir
+cwsrc1 in1 wl=1.55e-6 power=1e-3
+cwsrc2 in2_ wl=1.55e-6 power=2e-3
+wgd in2_ in2 length=1e-2
+wg1 in1 mid length=1e-4
+wg2 in2 mid length=1e-4
+.tran 1e-9

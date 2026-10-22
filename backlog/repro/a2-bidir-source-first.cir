@@ -1,0 +1,8 @@
+* A2 (cross-area, parser owner A4): a uni source created before a bidirectional device on an
+* explicit '&' net writes the same signal as the device, so no light reaches the device.
+* Observed (.op): ROOT/in:1 = 1 W, ROOT/out:0 = ROOT/out:1 = 0 W.
+* Moving the '&' to the output net (wg1 in out&) gives out:0 = 1 W.
+cwsrc1 in wl=1.55e-6 power=1
+wg1 in& out
+probe1 out
+.op

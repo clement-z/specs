@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f12-ends-name.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 423,
+   "kind": "json",
+   "sha256": "530f7a5851c003c0e11c391d661badaefb455a83ed894aa649eb9a8a698798ef",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/f12-ends-name"
+}

@@ -1,0 +1,13 @@
+{
+ "args": [
+  "--no-trace",
+  "-o",
+  "traces/ignored",
+  "--print-manifest",
+  "-f",
+  "tests/golden/netlists/f05-save-tran.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/f05-no-trace"
+}

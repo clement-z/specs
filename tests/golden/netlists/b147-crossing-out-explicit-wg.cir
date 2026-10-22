@@ -1,0 +1,22 @@
+* B-147 regression (repro: backlog/repro/v7-xing-v3.cir): crossing output c explicitly
+* bidirectional, read by a waveguide (bidirectional because c is). Broken before the fix
+* (e = z1 = z2 = 0), and also with B-147 alone (needs B-144).
+* Slots: crossing1 is created first (elaborating c) and is the first writer of c: c:0;
+* wg1 writes c:1 (backward) and reads c:0, and is the first writer of e: e:0.
+* Since B-159 the crossing is a CrossingBi (c is bidirectional) and a, b, d become
+* bidirectional: crossing1 writes a:0, b:0, d:0 (it reads a:1, b:1, d:1); cwsrc1 and cwsrc2
+* (second writers) write a:1 and b:1.
+* Expected, crossing model of B-032 with the defaults: t = 1, x = 0 (out1 = in1, out2 = in2,
+* and backwards); wg1: L = 1e-4 m, neff 2.2111, att 0: lossless,
+* phi = 2*pi*2.2111*1e-4/1.55e-6 = 896.3065 rad = -2.1890 rad wrapped:
+*   a:1 = b:1 = 1 mW at 0 (sources); a:0 = b:0 = 0 (from c:1 = d:1 = 0)
+*   c:0 = 1 mW at 0; c:1 = 0 (wg1's backward output: nothing comes back from e)
+*   d:0 = 1 mW at 0; d:1 = 0
+*   e:0 = 1 mW at phi; e:1 = 0
+*   z1 = z2 = 0.5 mW at phi (splitter: ratio 0.5, field factor sqrt(0.5), no phase)
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=1e-3
+crossing1 a b c& d
+wg1 c e length=1e-4
+splitter1 e z1 z2
+.op

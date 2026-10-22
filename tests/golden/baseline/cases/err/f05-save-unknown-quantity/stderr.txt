@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/f05-save-unknown-quantity.cir:4): .save: unknown quantity I(out) (expected P, E, PHI or WL, or a net name alone for all of them)
+-- offending token: ")"
+-- while parsing line: ".save I(out)"
+

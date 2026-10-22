@@ -1,0 +1,72 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Including file: circuits/add_drop_sub.cir
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+7 local assignments
+ - dlambda (DOUBLE) = 1e-10
+ - k (DOUBLE) = 0.85
+ - lambda0 (DOUBLE) = 1.55e-06
+ - lambda_max (DOUBLE) = 1.565e-06
+ - lambda_min (DOUBLE) = 1.535e-06
+ - length_2pi (DOUBLE) = 6.73913e-07
+ - neff (DOUBLE) = 2.3
+-----------
+3 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/in {} {values (LIST) = [{"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.550000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"INTEGER","value":2}, {"type":"NONE","value":null}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"DOUBLE","value":-2.000000e+00}, {"type":"NONE","value":null}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":4.000000e-09}, {"type":"INTEGER","value":0}, {"type":"NONE","value":null}]}], }
+ - ROOT/X1 (SUBCIRCUIT) {in (STRING), drop (STRING), out (STRING), add (STRING), add_drop_filter (STRING), } {radius_ring (DOUBLE) = 7.37935e-05, }
+ - ROOT/X2 (SUBCIRCUIT) {out (STRING), out_ (STRING), test (STRING), } {}
+-----------
+1 named nets
+ - ROOT/in: OANALOG<1>u (1|0)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-12, reltol (DOUBLE) = 1e-06, timescale (DOUBLE) = -15, }
+-----------
+2 subcircuits
+ - ADD_DROP_FILTER (SUBCIRCUIT DEFINITION) in drop out add {att_wg (INTEGER) = 2, k1 (DOUBLE) = 0.85, k2 (DOUBLE) = 0.85, neff_wg (DOUBLE) = 2.2, ng_wg (DOUBLE) = 4.3, radius_ring (DOUBLE) = 5e-05, }
+ - TEST (SUBCIRCUIT DEFINITION) p1 p2 {}
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/X1
+Flattening ROOT/X2
+Flattening ROOT/X2/X1
+Flattening ROOT/X2/X2
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/X1/ring_bl...
+Creating ROOT/X1/COUPLER1 (reason: connection to unidir net)
+Done creating ROOT/X1/COUPLER1
+Creating ROOT/VLSRC1 (reason: unidir backlog)
+Done creating ROOT/VLSRC1
+Creating ROOT/X1/WG_RING_L (reason: unidir backlog)
+Done creating ROOT/X1/WG_RING_L
+Creating ROOT/X1/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/X1/COUPLER2
+Creating ROOT/X1/WG_RING_R (reason: unidir backlog)
+Done creating ROOT/X1/WG_RING_R
+Creating ROOT/X2/X1/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/X1/WG1
+Creating ROOT/X2/X2/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/X2/WG1
+Creating ROOT/X2/WG1 (reason: unidir backlog)
+Done creating ROOT/X2/WG1
+Done (elaborating network of ROOT/X1/ring_bl)
+Exported flattened circuit as JSON > flat.json
+╔══════════════════════╗
+║  SIMULATION SKIPPED  ║
+╚══════════════════════╝
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

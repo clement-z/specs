@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-o",
+  "traces/custom",
+  "-f",
+  "circuits/add_drop_pyspecs.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/custom.manifest.json": {
+   "bytes": 423,
+   "kind": "json",
+   "sha256": "c69de2ba13f6235f2582184b9ab04ff5b37738f53ecd339f2bee5c266bec927e",
+   "stored": "files/traces/custom.manifest.json"
+  },
+  "traces/custom.vcd": {
+   "bytes": 403588,
+   "kind": "vcd",
+   "sha256": "96acdaa0b72c46fe3f55d5bd03218bd1390de82613769dcb881ead1a1ba9dd14",
+   "stored": "files/traces/custom.vcd"
+  }
+ },
+ "id": "opt/tracefile-o"
+}

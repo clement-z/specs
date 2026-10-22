@@ -44,7 +44,6 @@ using std::unique_ptr;
         instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;         \
                                                                                        \
         virtual string kind() const { return ELEM_NAME_LONG; }                         \
-        virtual bool bidir_capable() const { return false; }                           \
     };
 
 /*************************************************/
@@ -71,7 +70,6 @@ using std::unique_ptr;
         instantiate_and_connect_bi(ParseTreeCreationHelper &pt_helper) const;          \
                                                                                        \
         virtual string kind() const { return string(ELEM_NAME_LONG) + " (bidir)"; }    \
-        virtual bool bidir_capable() const { return true; }                            \
     };
 
 /** ******************************************* **/

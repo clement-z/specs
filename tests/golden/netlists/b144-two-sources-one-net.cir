@@ -1,0 +1,13 @@
+* B-144 regression (repro: backlog/repro/a4-two-sources-one-net.cir): two sources on one
+* net (2 writers, so the net is bidirectional). Both used to take slot a:1: SystemC E115
+* (two drivers on ROOT/a:1), exit 1.
+* Next-free-slot convention: each writer takes its own slot, exit 0.
+* Expected: a:0 = 1 mW at 0 rad (cwsrc1, created first), a:1 = 2 mW at 0 rad (cwsrc2).
+* probe1 is a uni reader on a net with 2 writers: which source it reads depends on the
+* creation order (known limitation of the convention). Two optical drivers on one net are
+* not validated either (B-164).
+* VCD: the probes stay at 0 during .tran (B-048); the OP listing on stdout is the check.
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 a wl=1.55e-6 power=2e-3
+probe1 a
+.tran 1e-11

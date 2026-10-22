@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b124-allpass-ring-tight-reltol.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 457,
+   "kind": "json",
+   "sha256": "137bbe6c1f6fee7d493b194cfde145097c94abf393a6684468a7cc58b55aa004",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b124-allpass-ring-tight-reltol"
+}
