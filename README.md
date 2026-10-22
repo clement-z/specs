@@ -49,6 +49,25 @@ is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs
 `meson install` installs `specs` and, when SystemC is built from its wrap, `libsystemc.so` into `<prefix>/<libdir>`
 (the installed `specs` finds it through its rpath).
 
+### Development environment (pixi, optional)
+
+[pixi](https://pixi.sh) (one command, per-user install) provides the compilers (gcc 15, clang 21), Meson, Ninja,
+CMake, flex and bison from `pixi.lock`, so nothing needs to be installed system-wide. The plain route above is
+unchanged and remains the reference.
+
+```sh
+pixi run test                      # configure, build and meson test in build-pixi/gcc (gcc 15)
+pixi run test clang                # same with clang 21 in build-pixi/clang; also asan-gcc, asan-clang
+pixi run golden                    # golden-output check only; setup and build tasks exist too
+pixi shell                         # shell with the environment (CC/CXX set to its gcc)
+pixi run -e py jupyter lab         # Python environment for pyspecs and the notebooks
+pixi run -e docs docs              # Doxygen HTML in build-pixi/doc/html
+```
+
+The pixi tasks only use `build-pixi/<toolchain>`, never `build/`. Extra Meson options go after `--`
+(`pixi run setup gcc -- -Dspx=true`). Binaries built there link the environment's libstdc++ through an rpath, so
+they run only while `.pixi/` exists; use the plain route for portable binaries. Only Linux is tested.
+
 If you want to contribute with the project, check the `todo.txt` file for some inspiration on points to work on. We are also open for new ideas, so feel free to open an issue and discuss.
 
 ## Reference
