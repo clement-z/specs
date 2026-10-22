@@ -14,6 +14,10 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
     `libspx.so`: `meson compile -C build spx`. Docs: `ninja -C build doc`. Decisions: `discover/meson/DECISIONS.md`.
   - Asserts are on by default (`b_ndebug=false`). The golden baseline was recorded with `-DNDEBUG`; both pass.
   - **Don't run `ninja clang-format`** (Meson's automatic target): it reformats every file.
+- Optional pixi route (when pixi is on the PATH; the plain route stays the reference): `pixi run test [gcc|clang|asan-gcc|asan-clang]`
+  (configure + build + `meson test`), `pixi run golden [toolchain]`, or any command prefixed with `pixi run`
+  (e.g. `pixi run meson test -C build-pixi/gcc`). Build dirs are `build-pixi/<toolchain>`; never mix them with `build/`.
+  Details: README "Development environment".
 - Run: `build/specs -f circuits/add_drop.cir -o traces/out` (needs a `traces/` dir in the cwd;
   `.include` paths resolve relative to the including file, then the cwd). Legacy testbenches: `build/specs -t wg` (list them with `specs -p`).
 
@@ -29,6 +33,9 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   parse-error-exit flex buffers and SystemC-thread-stack allocations; any other leak fails (CI job is blocking).
   Running `run_golden.py` directly on a sanitizer build needs the same suppressions
   (`LSAN_OPTIONS=suppressions=$PWD/tests/sanitizers/lsan.supp:print_suppressions=0`), else error cases fail on leak reports.
+- Bit-identical outputs (`--rtol 0 --atol 0 --print-slack 0`) only hold for builds like the baseline's (gcc,
+  `-march=native` on an FMA CPU); clang, `-Dnative=false` and pixi's gcc 15 differ in the last bits and pass at the
+  default tolerances and `--atol 0` (backlog B-183).
 - If a change **intentionally** alters outputs (a bug fix), re-record with
   `run_golden.py record ... --out tests/golden/baseline --only '<ids>' --note "<why, backlog ID>"`, inspect the diff
   (`compare`), and commit the new baseline **in the same commit** as the fix.

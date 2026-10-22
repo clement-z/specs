@@ -2,6 +2,12 @@
 
 ## [unreleased]
 
+### New
+
+* Optional pixi development environment (`pixi.toml`, `pixi.lock`): gcc 15 and clang 21 toolchains with `setup`,
+  `build`, `test` and `golden` tasks in `build-pixi/<toolchain>` (also ASan+UBSan), a `py` and a `docs`
+  environment. CI: pixi job on Ubuntu (blocking) and macOS (non-blocking), next to the apt jobs
+
 ## [0.2.0] - 2026-10-21
 
 ### New

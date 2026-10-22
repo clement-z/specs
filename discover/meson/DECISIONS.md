@@ -219,3 +219,24 @@ Maintainer decision in `backlog/DECISIONS-2026-10-21.md` ("third round"); implem
     `meson test`'s `halt_on_error`, 11/12 tests and 123/212 golden cases failed (gcc). With the override, the
     SPECS objects are sanitized as before and SystemC's are not (checked in `compile_commands.json`, Meson
     1.3.0 and 1.11.2).
+
+## pixi development environment (2026-10-22, after v0.2.0)
+
+Maintainer decisions of 2026-10-22 in `backlog/DECISIONS-2026-10-21.md`; implemented in phase PF.
+
+39. **Plain compiler packages** (`gcc`, `gxx`, `clang`, `clangxx`), not `cxx-compiler` and the like, whose
+    activation exports `CFLAGS`/`LDFLAGS`. Majors follow the conda-forge pinning of 2026-10-21. Their own
+    configuration adds the sysroot, `-isystem <env>/include` and `-L`/`-rpath <env>/lib`, nothing else, and none
+    of it shows in `compile_commands.json`.
+40. **No rpath added by SPECS.** gcc's specs file and clang's config file already link with an rpath to the
+    environment's `lib/` (`DT_RPATH`), so the binaries find its libstdc++ without help.
+41. **`CC`/`CXX` are set in the activation** (`ccache gcc`, `ccache g++` on Linux): the environment's `c++` is
+    clang while its `cc` is gcc, so a plain `meson setup` inside `pixi shell` would mix the two.
+42. **`build-pixi/<toolchain>`** is the only build directory of the pixi tasks, never `build/`. A script
+    (`utils/pixi-setup.sh`) refuses a directory configured with other compilers.
+43. **Shared caches across worktrees:** ccache (`CCACHE_BASEDIR` = worktree root, `CCACHE_NOHASHDIR=1`) and the
+    Meson wrap download cache (`MESON_PACKAGE_CACHE_DIR`, honoured from Meson 1.3.0; checked in the 1.2.3 and
+    1.3.0 sources).
+44. **`py` and `docs` environments do not include the default feature**, so they carry no second toolchain.
+45. **CI: a pixi job next to the apt jobs** (setup-pixi v0.11.2, pixi 0.82.1, locked, `-Dnative=false` like the
+    apt jobs).
