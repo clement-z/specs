@@ -24,13 +24,18 @@
  * in time order. S(lambda) and the delays are computed once per wavelength (cache). The S-matrix is the
  * one of the carrier wavelength: no dispersion within a pulse's bandwidth.
  *
+ * delay_per="output" (m_per_path_delays false; F-03 phase 1, before PF03b): one delay per output and
+ * wavelength, the one of the path with the largest |S| into that output; an input event sets the copies
+ * of its paths at once (m_ji = a_i) and writes each output it reaches, b_j = sum_i S(j, i) m_ji, after
+ * that output's delay.
+ *
  * Nets are numbered 0..N-1 in the order of the netlist element; net k is port m_port_map[k] of the data.
  * Unidirectional variant: nets 0..N/2-1 are inputs, N/2..N-1 outputs, and only the paths from an
  * input to an output are used. Bidirectional variant: every net is an input and an output. */
 class SParamDeviceBase : public spx_module {
 public:
     enum DelayMode {
-        DELAY_AUTO,  // per path and wavelength: the group delay of the path (0 where negative)
+        DELAY_AUTO,  // per path (or output) and wavelength: the group delay of the path (0 where negative)
         DELAY_NONE,  // 0
         DELAY_FIXED, // m_delay_s on every path
     };
@@ -40,6 +45,8 @@ public:
     /** Data port of each net */
     std::vector<size_t> m_port_map;
     DelayMode m_delay_mode = DELAY_AUTO;
+    /** delay_per="path" (default): a delay per path, delayed copies; "output": a delay per output */
+    bool m_per_path_delays = true;
     /** DELAY_FIXED: the delay (s) */
     double m_delay_s = 0;
     /** passivity=enforce: scale S(lambda) where it is not passive */
@@ -78,7 +85,8 @@ protected:
     std::vector<std::vector<size_t>> m_sources;
 
     /** Per wavelength: S(output k, input i) and the delay of that path, at [k * inputs + i] (the path index);
-     * the group delay of the data where it was negative (0 was used), else 0 */
+     * the group delay of the data where it was negative (0 was used), else 0. delay_per="output": every
+     * path into output k has the delay of the output, and only the path it comes from has a negative delay */
     struct WavelengthEntry {
         std::vector<OpticalSignal::field_type> S;
         std::vector<sc_time> delay;
@@ -115,11 +123,13 @@ protected:
     void onInput(size_t input, const OpticalSignal &s);
     /** Copies the arrivals due now and writes the outputs they change */
     void processArrivals();
-    /** Writes output k at a wavelength, from the copies of its paths, without delay */
-    void writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e);
+    /** Writes output k at a wavelength, from the copies of its paths, after a delay (delay_per="output";
+     * without delay for the delayed copies) */
+    void writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e, const sc_time &delay = SC_ZERO_TIME);
     WavelengthEntry computeEntry(const OpticalSignal &s);
     sc_time autoDelay(double tau_s);
-    /** .tran: reports a negative group delay of a path (0 used) once per path, when the path is first used */
+    /** .tran: reports a negative group delay of a path (0 used) once per path, when the path is first used
+     * (delay_per="output": the path that gives the output its delay, when the output is first written) */
     void reportNegativeDelay(size_t k, size_t i, double wavelength_m, double tau_s);
 };
 

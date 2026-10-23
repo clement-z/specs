@@ -258,6 +258,7 @@
   "regress/spar-grid-warning",
   "regress/spar-passivity",
   "regress/spar-ring-tran",
+  "regress/spar-ring-tran-output",
   "regress/spar-uni-reflection",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
@@ -510,6 +511,12 @@
    "only": "^cir/spar-siepic-bdc$",
    "gtest": false,
    "note": "PF03b item 6: SiEPIC BDC fixture (new case)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T17:50:21Z",
+   "only": "^regress/spar-ring-tran-output$",
+   "gtest": false,
+   "note": "PF03c item 1: new case, SPAR delay_per=\"output\" (per-output delays, F-03 phase 1)"
   }
  ]
 }

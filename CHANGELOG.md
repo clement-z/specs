@@ -29,7 +29,7 @@
   Magnitude and unwrapped phase are interpolated in frequency (`interp=linear|pchip`), real and imaginary
   parts near transmission nulls; in `.tran` the S-matrix of the carrier wavelength applies with a group delay
   per path (each path a delayed copy of its input; no dispersion within a pulse; negative delays become 0,
-  reported per path). A grid too coarse for the device is reported when the file is loaded (leave-one-out
+  reported per path), or with `delay_per="output"` one delay per output (that of its largest path). A grid too coarse for the device is reported when the file is loaded (leave-one-out
   check). Unidirectional or bidirectional like `COUPLER`; a wavelength outside the data range is an error;
   `passivity=check|ignore|enforce`, `delay=auto|none|<s>`, `ports=`, `convention=`. Test data: the SiEPIC
   EBeam broadband directional coupler (MIT, `tests/sparam/data/siepic/NOTICE`)

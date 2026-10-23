@@ -13,8 +13,10 @@ Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
   (group delay L*ng/c, rounded to the time step like the waveguide's);
 - bidirectional: two sources on both sides of SPAR (nets with two writers) as on both sides of a WG;
 - per-path delays, .tran: two lit inputs whose paths into each output have different delays (two waveguides
-  into a coupler) give the transient of the explicit circuit;
-- negative group delays: reported once per path, when the path is first lit;
+  into a coupler) give the transient of the explicit circuit; with delay_per="output", every write to an
+  output has the delay of its largest path (the device before PF03b);
+- negative group delays: reported once per path, when the path is first lit (delay_per="output": the
+  largest path into an output, when the output is first written);
 - SiEPIC BDC: the third-party 4-port file splits 50/50 (+-0.02) near 1.55 um, passive, without warnings;
 - port order: the asymmetric Touchstone 1 and 2 fixtures give S21 and, with ports= reversed, S12;
 - passivity: check warns, ignore does not, enforce scales the matrix;
@@ -261,6 +263,18 @@ def test_per_path_tran(t):
         d = max_diff(sorted(r.signal(name)), sorted(ref.signal(name)))
         t.check('per-path-tran/%s' % probe.lower(), ref.status == 0 and r.status == 0 and d <= 1e-9,
                 'same times, max |E_SPAR - E_explicit| = %.3g over %d samples' % (d, len(ref.signal(name))))
+    # delay_per="output": the largest path into o1 is a's (1.40 ps), into o2 b's (4.20 ps); every write to an
+    # output leaves after that output's delay, the other input's light too
+    r = t.run(netlist_with('spar1 a b o1 o2 file="%s" delay_per="output"' % path), 'skew_spar_output')
+    events = {0.0, 1e-12, 3e-12, 8e-12, 14e-12, 16e-12, 21e-12, 2e-12, 2.5e-12, 6e-12, 13e-12, 15e-12, 19e-12}
+    for probe, delay in (('MLPROBE1', 1.4e-12), ('MLPROBE2', 4.2e-12)):
+        name = 'ROOT/' + probe
+        times = sorted(set(tt for tt, _, _ in r.signal(name)))
+        shifted = all(any(abs(tt - delay - te) < 1e-18 for te in events) for tt in times)
+        d = max_diff(sorted(r.signal(name)), sorted(ref.signal(name)))
+        t.check('per-output-tran/%s' % probe.lower(), r.status == 0 and len(times) >= 8 and shifted and d == math.inf,
+                '%d sample times, all input events + %.2f ps: %s; differs from the explicit circuit: %s'
+                % (len(times), delay * 1e12, shifted, d == math.inf))
     # CW sources: the operating point before the transient (no delays) gives the steady state at t = 0
     def cw_netlist(device):
         return '\n'.join(['* per-path delays, .tran from an operating point',
@@ -294,6 +308,27 @@ def test_negative_delay_warning(t):
             'once per path' in line and 'without delay' in line and 'artefact' not in line for line in found)
         t.check('negative-delay/%s' % ('in-and-add' if add_lit else 'in-only'), ok,
                 '%d warning(s): %s' % (len(found), '; '.join(line[:110] for line in found)))
+    # delay_per="output": the delay of an output is the one of its largest path, here the drop path (add->out,
+    # in->drop) whose delay is positive: no warning
+    r = t.run(netlist(True).replace('.sparam"', '.sparam" delay_per="output"'), 'negative_delay_output')
+    found = [line for line in r.stderr.splitlines() if 'negative group delay' in line]
+    t.check('negative-delay/per-output-positive', r.status == 0 and not found,
+            '%d warning(s) (0 expected)' % len(found))
+    # the 11-point 1 nm ring of the golden case regress/spar-grid-warning at 1.551 um: the largest paths into
+    # out and drop are in->out and add->drop (0.7096 vs 0.7027), whose finite-difference delays are negative
+    # (-14 fs, grid artefacts); with delay_per="output" they are the delays of out and drop, so both are
+    # reported when the outputs are first written, here from in alone (add is not lit)
+    ring_1nm = os.path.join(ROOT, 'tests', 'golden', 'netlists', 'spar-ring-1nm.sparam')
+    text = '\n'.join(['* negative group delay of an output, .tran',
+                      'vlsrc1 in values=[[0, 0, 1.551e-6], [1e-12, 1, 1.551e-6], [9e-12, 0, 1.551e-6]]',
+                      'spar1 in add out drop file="%s" delay_per="output"' % ring_1nm, '.options timescale=-15',
+                      '.save out drop', '.tran 20e-12', '']) + '\n'
+    r = t.run(text, 'negative_delay_output_1nm')
+    found = [line for line in r.stderr.splitlines() if 'negative group delay' in line]
+    ok = r.status == 0 and len(found) == 2 and "'in' to port 'out'" in found[0] and "'add' to port 'drop'" in found[1] \
+        and "every path into port 'out'" in found[0] and "every path into port 'drop'" in found[1] \
+        and all('output acts' in line and 'artefact of the grid' in line for line in found)
+    t.check('negative-delay/per-output', ok, '%d warning(s): %s' % (len(found), '; '.join(line[:160] for line in found)))
 
 
 def test_siepic_bdc(t):
