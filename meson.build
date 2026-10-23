@@ -220,6 +220,7 @@ endif
 
 if get_option('golden')
   subdir('tests/golden')
+  subdir('tests/tools')
 endif
 
 # Accuracy suite (oracles) and benchmark ratios (F-06)
