@@ -140,6 +140,7 @@
   "regress/b052-pcmcell-positional",
   "regress/b052-vlsrc-positional",
   "regress/b060-pcmcell-k-eq-n",
+  "regress/b062-mlprobe-unlisted-wavelength",
   "regress/b124-allpass-ring-default-reltol",
   "regress/b124-allpass-ring-tight-reltol",
   "regress/b131-nrings-crow",
@@ -344,6 +345,12 @@
    "only": "^(regress/b153-zerotol-lossy-ring-tran|regress/probe-latch-tran|regress/probe-wl-ignored|gtest/unit_tests)$",
    "gtest": true,
    "note": "PD6 (maintainer 2026-10-23: a PROBE always traces its wavelength): regress/b153-zerotol-lossy-ring-tran (false 4th argument) and regress/probe-latch-tran (wl=0) gain the probe's wavelength signal and the PD6 warning line, netlist comments updated (manifest netlist hash); new case regress/probe-wl-ignored; gtest list (Probe.NetlistProbeAlwaysTracesTheWavelength)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T09:05:34Z",
+   "only": "regress/b062-mlprobe-unlisted-wavelength|gtest/unit_tests",
+   "gtest": true,
+   "note": "B-062: new case, MLPROBE ignored wavelengths reported once per probe on stderr (PG item 2); gtest list: MLambdaProbe.ReportsIgnoredWavelengthsOnce"
   }
  ]
 }

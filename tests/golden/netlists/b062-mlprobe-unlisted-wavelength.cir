@@ -1,0 +1,14 @@
+* B-062 regression (repro: backlog/repro/a3-mlprobe-exact.cir): an MLPROBE matches wavelengths exactly and
+* ignores the others. It used to print "received unsupported signal" on stdout for every such event; it now
+* prints one warning per probe on stderr at the end of the run, in name order, with every digit needed:
+* {lambda0}+1.5e-9 = 1.5514999999999999e-06 is not the listed 1.5515e-06.
+* MLPROBE2 is declared first, MLPROBE1 warns first. MLPROBE3 lists every wavelength of its net: no warning.
+.assign lambda0 = 1.55e-6
+vlsrc1 a values=[[1e-12,1e-3,{lambda0}+1.5e-9],[2e-12,2e-3,]]
+cwsrc1 b wl=1.56e-6 power=1
+merger1 a b m
+mlprobe2 m wl=[1.56e-6]
+mlprobe1 a wl=[1.5515e-6]
+mlprobe3 b wl=[1.56e-6]
+.options traceall=0
+.tran 5e-12

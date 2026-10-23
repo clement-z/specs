@@ -84,6 +84,10 @@ void SPECSConfig::runAnalysis()
     if (progress)
         progress->stop();
 
+    // B-062: the wavelengths each MLPROBE ignored, one warning per probe, in name order
+    for (auto mlprobe : sc_get_all_module_by_type<MLambdaProbe>())
+        mlprobe->reportIgnoredWavelengths();
+
     // F-05: write the .npz table, close the CSV
     if (default_trace_table && !default_trace_table->close())
         exit(1);

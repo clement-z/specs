@@ -1,5 +1,8 @@
+#include <cstdlib>
+#include <iomanip>
 #include <ios>
 #include <iterator>
+#include <sstream>
 #include "devices/probe.h"
 #include "trace_table.h"
 
@@ -11,6 +14,21 @@ namespace {
 inline bool isDefaultSignal(const OpticalSignal &s)
 {
     return s.m_field == OpticalSignal::field_type(0.0) && s.m_wavelength_id == 0;
+}
+
+// Shortest decimal form that reads back as the same double: a wavelength that misses a listed one by
+// its last bits does not print like it (B-062)
+std::string exactString(double x)
+{
+    std::ostringstream ss;
+    for (int precision = 6; precision <= 17; ++precision)
+    {
+        ss.str("");
+        ss << std::setprecision(precision) << x;
+        if (std::strtod(ss.str().c_str(), nullptr) == x)
+            break;
+    }
+    return ss.str();
 }
 
 }
@@ -253,7 +271,7 @@ void MLambdaProbe::on_port_in_changed()
                 traceSample(p.second);
             m_disabled_samples.clear();
             if (sampled && !m_lambdas.count(s.getWavelength()))
-                cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;
+                m_ignored_wavelengths_m.insert(s.getWavelength());
             continue;
         }
 
@@ -267,9 +285,8 @@ void MLambdaProbe::on_port_in_changed()
             //cout << name() << " received supported signal (lambda = " << s.getWavelength() << "m)" << endl;
             traceSample(s);
         }
-        else {
-            cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;
-        }
+        else
+            m_ignored_wavelengths_m.insert(s.getWavelength());
     }
 }
 
@@ -284,4 +301,19 @@ void MLambdaProbe::traceSample(const OpticalSignal &s)
     }
     if (m_table)
         m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
+}
+
+void MLambdaProbe::reportIgnoredWavelengths()
+{
+    if (m_ignored_wavelengths_m.empty())
+        return;
+    cerr << "Warning: " << name() << " ignored the wavelengths of its net " << port_channel_name(p_in)
+         << " that it does not list (";
+    for (auto it = m_ignored_wavelengths_m.begin(); it != m_ignored_wavelengths_m.end(); ++it)
+        cerr << (it == m_ignored_wavelengths_m.begin() ? "" : ", ") << exactString(*it) << " m";
+    cerr << "; listed: ";
+    for (auto it = m_lambdas.begin(); it != m_lambdas.end(); ++it)
+        cerr << (it == m_lambdas.begin() ? "" : ", ") << exactString(*it) << " m";
+    cerr << ")" << endl;
+    m_ignored_wavelengths_m.clear();
 }

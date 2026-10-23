@@ -149,11 +149,18 @@ public:
     // While disabled (the OP of a .tran), the last value of each listed wavelength, traced when the
     // probe is enabled: the net only holds the last value written to it, of any wavelength (B-184)
     std::map<double, OpticalSignal> m_disabled_samples;
+    // The wavelengths of the events received while enabled that the probe does not list (exact match,
+    // B-062): reported once, at the end of the run, instead of a line per event
+    std::set<double> m_ignored_wavelengths_m;
 
     void setTraceFile(sc_trace_file *Tf);
     void setTraceTable(TraceTable *table);
     // Traces s, of a listed wavelength
     void traceSample(const OpticalSignal &s);
+    // One warning on stderr if the probe ignored wavelengths, then forgets them. Called for every
+    // MLPROBE in name order at the end of a netlist run (SPECSConfig::runAnalysis()), and by the
+    // destructor for the probes of testbenches and C++ users
+    void reportIgnoredWavelengths();
 
     // Constructor
     MLambdaProbe(sc_module_name name, set<double> lambdas = {})
@@ -168,6 +175,8 @@ public:
         // Also woken when the probe is enabled, to sample the current value of its net (B-048)
         sensitive << p_in << enable.posedge_event();
     }
+
+    ~MLambdaProbe() { reportIgnoredWavelengths(); }
 
     // TODO: overload the constructor for the case of not informing lambdas, need to check all components
 };

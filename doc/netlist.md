@@ -491,7 +491,10 @@ value changes nothing, and a false one (`wl=0`, `probe1 out 1 1 1 0`) is ignored
 all such probes (`Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th
 argument) ignored for ROOT/PROBE1, ROOT/PROBE5`). The automatic probes `PROBE{<net>}` also trace it (all four
 quantities). `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
-phase per listed wavelength (the wavelength must match exactly). A netlist without any probe or `.save` traces every optical net through
+phase per listed wavelength (the wavelength must match exactly: `{lambda0}+1.5e-9` is 1.5514999999999999e-06,
+not 1.5515e-06). It ignores the other wavelengths of its net, with one warning per MLPROBE on stderr at the end
+of the run, in name order (`Warning: ROOT/MLPROBE1 ignored the wavelengths of its net ROOT/a that it does not
+list (1.5514999999999999e-06 m; listed: 1.5515e-06 m)`; before, one line on stdout per event, B-062). A netlist without any probe or `.save` traces every optical net through
 automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
 name starts with `_` get no automatic probe.

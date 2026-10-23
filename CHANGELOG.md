@@ -2,6 +2,12 @@
 
 ## [unreleased]
 
+### Changed
+
+* MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
+  the run, in name order and with every digit needed to tell them from the listed ones, instead of one
+  "received unsupported signal" line on stdout per event (B-062; matching stays exact)
+
 ## [0.3.0] - 2026-10-23
 
 ### New
