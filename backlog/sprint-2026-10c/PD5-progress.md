@@ -8,7 +8,7 @@ used only for the prediction below).
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 0 | references (base e5d6c21): gcc test + strict golden, clang/asan-gcc recordings, counters, asan-clang; prediction | done | | gcc `meson test` 12/12, strict golden 229/229; recordings `/tmp/pd5/rec/base-{clang,asan-gcc}`; counters `/tmp/pd5/stats/base`; asan-clang 12/12 |
-| 1 | B-184: MLPROBE keeps listening while disabled, traces its per-wavelength memory when enabled; repro as a golden case | todo | | |
+| 1 | B-184: MLPROBE keeps listening while disabled, traces its per-wavelength memory when enabled; repro as a golden case | done | 5f62e0a | option (a); gcc strict 229/229 + new case `regress/b184-mlprobe-tran-start-multilambda` (0.5 W at both wavelengths from t = 0, VCD + CSV), gtest list re-recorded; counters 228 same + 1 new; clang and asan-gcc 228/228 identical to base, new case strict on both; asan-clang 12/12, no sanitizer message |
 | 2 | PROBE wavelength latch (`wl=`, per analysis point, warnings) | todo | | |
 | 3 | docs (netlist.md, cheatsheet, CHANGELOG, B-184, backlog.md) | todo | | |
 | 4 | checks (B-184 repro, 4-λ CROW PROBE vs MLPROBE, add_drop, bench), report | todo | | |
