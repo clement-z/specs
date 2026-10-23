@@ -134,6 +134,16 @@ threshold first (by order of magnitude, then by name; at most 10 are listed)
       ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 0.0001 > 1.38425e-08 (7224.15 x)
     A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss
 
+**A `.dc` point** (B-003, B-185). Before each point the output ports drop their pending entries and forget the
+values they emitted; the devices keep theirs (the input values of each wavelength), so the iterations of a point
+start from the state the previous one left. At each point, the first value of each wavelength that a port
+receives is written whatever the emission gate says, and the snap applies to it (a value below `snapfactor` *
+`abstol` is written as 0); it is written with a value-change event even if the net already holds that value
+(an unchanged source, an unchanged wavelength next to a swept one), so it reaches every device and probe after
+it. The later values of the point go through the gate as above. Without this, a point whose value falls below
+`abstol` kept the previous point's value and wavelength, and an unchanged value was not propagated again. In
+`.op` and `.tran` nothing is forced: the first value of a wavelength is compared with 0.
+
 Each net is shown with the device that writes it. In a `.dc` the first line names the sweep point
 (`.dc: sweep point 1 of 3 (WL(ROOT/CWSRC1) = 1.55e-06) did not converge ...`), before a `.tran` it says
 `.tran: the operating point before the transient`. A circuit that converges is not affected: same results,
@@ -283,7 +293,7 @@ Counters (per port, summed in `totals` and per device type):
 | `scheduled` | values written to the port by its device (`delayedWrite()`), at a time and wavelength |
 | `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one) |
 | `processed` | pending entries taken at their time |
-| `emitted` | of which written to the net with a new value (the gate passed) |
+| `emitted` | of which written to the net with a new value (the gate passed), or the first value of a wavelength at a `.dc` point (written whatever the gate says) |
 | `suppressed.abstol` | not written: \|E - E_last\| <= abstol |
 | `suppressed.reltol` | not written: above abstol, \|E - E_last\| <= reltol·\|E_last\| |
 | `suppressed.snap` | the gate passed, but the value was snapped to 0 and 0 was already the last value emitted at that wavelength: written again, no change |

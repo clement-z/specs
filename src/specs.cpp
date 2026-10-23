@@ -297,9 +297,12 @@ void SPECSConfig::runDCAnalysis()
         mlprobe->enable = sc_logic(0);
     }
 
-    // Set all ports mode to NO_DELAY
+    // Set all ports mode to NO_DELAY. Each sweep point is a fresh steady state (B-003, B-185): after
+    // the reset of the ports at each point, each port writes the first value of each of its
+    // wavelengths, with an event, also below abstol or unchanged since the previous point
     for (auto oop: all_oop) {
         oop->m_mode = OpticalOutputPortMode::NO_DELAY;
+        oop->m_emit_each_wavelength = true;
     }
 
     // Activate CW sources

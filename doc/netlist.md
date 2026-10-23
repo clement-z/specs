@@ -188,6 +188,14 @@ without duration. `-n` skips the analysis.
   The values are accumulated, so the last digits can differ from start + i*step (the last point above is
   1.5650000000000022e-06, backlog B-009). Needs start < stop, step > 0 and at least 2 points
   (`Invalid range parameters`, `Sweep order must contain at least 2 point.`). One sweep per `.dc`.
+
+  Each point is a fresh steady state (B-003, B-185): at each point every output port writes each of its
+  wavelengths at least once, also a value below `abstol` (written as 0, see `snapfactor`) and a value that did
+  not change since the previous point. A null of the transmission therefore reads 0 at its point (before, the
+  net kept the previous point's value and wavelength), and the wavelength of a source that is not swept reaches
+  the nets and probes after it at every point (before, at the first point only). The devices keep their state
+  between points: each point iterates from the previous point's values ("Convergence of `.op` and `.dc`" in
+  [numerics.md](numerics.md)).
 - `.tran [duration]`: transient (time domain), after an operating point. The duration is in s (number, `{name}`
   or `{expression}`; `.tran 2*5n` is a syntax error). Without it the run goes on until no event is left.
 
@@ -512,9 +520,9 @@ or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to sel
   - in `.tran`, the smallest wavelength its net carried when the probe is enabled (the operating-point values),
     or, if none, the smallest one arriving in the first time step that brings any. It keeps that one until the
     end of the transient.
-- In a `.dc`, a net whose value does not change from one point to the next is not written again: a CW source
-  that is not swept writes its net at the first point only, and its wavelength reaches the probes at that point
-  only (B-185).
+- In a `.dc`, every wavelength of a net is written again at every point, also when its value does not change
+  (B-185): the wavelength of a CW source that is not swept is a candidate at every point. Before, such a net was
+  written at the first point only.
 - When a probe ignores another wavelength, a warning on stderr says so once, at the end of the analysis (the
   probe, its net, the wavelength traced and the first one ignored); the automatic and `.save` probes share one
   summary line.

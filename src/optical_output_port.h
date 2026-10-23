@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 
+#include "optical_net.h"
 #include "optical_signal.h"
 #include "utils/pqueue.h"
 
@@ -124,6 +125,15 @@ public:
     double m_abstol;
     double m_snap_factor;
     bool m_skip_next_convergence_check = false;
+    // .dc (B-003, B-185): each point is a fresh steady state. After a reset(), the first entry of
+    // each wavelength is written whatever the emission gate says (the gate compares it with 0) and
+    // with a value-change event, also when the net already holds that value (OpticalNet), so that
+    // every wavelength of the port reaches the devices and probes downstream at every point. Set by
+    // SPECSConfig::runDCAnalysis() only
+    bool m_emit_each_wavelength = false;
+    // The net written, when it is an OpticalNet (start_of_simulation()); else the forced emissions
+    // above are plain writes
+    OpticalNet *m_net = nullptr;
     bool m_collect_stats = false;
     OpticalOutputPortEventCap *m_event_cap = nullptr; // owned by m_config
 

@@ -117,6 +117,7 @@
   "opt/tracefile-o",
   "opt/vci",
   "regress/b001-fd-multilambda-stale",
+  "regress/b003-dc-dark-point",
   "regress/b004-mode-fd-tran",
   "regress/b004-mode-td-dc",
   "regress/b004-mode-td-op",
@@ -367,6 +368,12 @@
    "only": "^err/b182-nested-subckt-body-error$",
    "gtest": false,
    "note": "B-182: the nested-body case uses a syntax error (exit 1, like every err case) instead of an unexpected character (exit 3, B-172) (PG item 5)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T11:25:11Z",
+   "only": "^regress/(probe-latch-dc|probe-latch-dc-swept-wl|b003-dc-dark-point)$",
+   "gtest": false,
+   "note": "B-003, B-185: each .dc point is a fresh steady state (every port writes each of its wavelengths, with an event): probe2 of probe-latch-dc-swept-wl samples its fixed-wavelength net at every point (CSV rows), new case b003-dc-dark-point (null point written as 0 W); probe-latch-dc: netlist comment only (manifest sha256)"
   }
  ]
 }

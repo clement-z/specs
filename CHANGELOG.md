@@ -7,9 +7,16 @@
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
   the run, in name order and with every digit needed to tell them from the listed ones, instead of one
   "received unsupported signal" line on stdout per event (B-062; matching stays exact)
+* `.dc`: each sweep point is a fresh steady state: every output port writes each of its wavelengths at least
+  once per point, also when its value did not change since the previous point, so the wavelength of a source
+  that is not swept reaches the nets and probes after it at every point (before, at the first point only); a
+  PROBE on such a net now has a sample at every point. More events per point in such circuits (`--stats`);
+  `.op` and `.tran` are unchanged (B-185)
 
 ### Fixed
 
+* `.dc`: a sweep point whose output falls below `abstol` (e.g. a null of an MZI) is written (0 after the snap)
+  instead of keeping the previous point's value and wavelength (B-003)
 * Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line
   in it, as for top-level lines, instead of an empty file name and an uninitialised line number (B-182)
 

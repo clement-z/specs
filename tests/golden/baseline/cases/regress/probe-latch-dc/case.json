@@ -18,7 +18,7 @@
   "traces/delete_me.manifest.json": {
    "bytes": 463,
    "kind": "json",
-   "sha256": "af98b7d75ee7daec11811111698aaae97fccf6ffae2cfcb06264269381dd9039",
+   "sha256": "fe85ea574e4026c72763c9214796d3ede9a5bc1ee2a224e9e9366542f9191227",
    "stored": "files/traces/delete_me.manifest.json"
   },
   "traces/delete_me.vcd": {
