@@ -34,7 +34,8 @@
   methods instead of threads. CROW benchmark (30 rings, no tracing): about 2.5x less CPU time than v0.2.0.
   Results are the same bit for bit, except that on a net that carries several wavelengths, a plain `PROBE` (the
   last write of each time step) can show another of the wavelengths written in a step; the per-wavelength
-  values (`MLPROBE`) were unchanged in every circuit checked
+  values (`MLPROBE`) were unchanged in every circuit checked. PROBE is for single-wavelength nets; use MLPROBE
+  on multi-wavelength nets (`doc/netlist.md`)
 
 ### Removed
 
