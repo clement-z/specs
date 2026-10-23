@@ -55,8 +55,6 @@ public:
                              // kept while it was disabled), else of the first time step that brings any
     };
     LatchMode m_latch_mode = LATCH_OFF;
-    // wl=<wavelength> of the netlist: the only wavelength traced (exact match, as MLPROBE); NaN: latched
-    double m_wavelength_m = std::numeric_limits<double>::quiet_NaN();
     // PROBE{<net>} probes (traceall, .save): their warnings are summarised in one line
     bool m_automatic = false;
 

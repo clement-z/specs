@@ -99,24 +99,13 @@ void Probe::noteIgnored(double wavelength_m, double traced_m)
     }
 }
 
-// The probe was just enabled: with wl=, trace that wavelength if the net carried it; else latch the
-// smallest wavelength the net carried while the probe was disabled (none: the first time step that
-// brings any decides, accept())
+// The probe was just enabled: latch the smallest wavelength the net carried while the probe was
+// disabled (none: the first time step that brings any decides, accept())
 void Probe::latchAtEnable()
 {
     m_latched_wavelength_m = std::numeric_limits<double>::quiet_NaN();
     m_latch_final = false;
-    if (!isnan(m_wavelength_m))
-    {
-        for (const auto &p : m_disabled_samples)
-        {
-            if (p.first == m_wavelength_m)
-                traceSample(p.second);
-            else
-                noteIgnored(p.first, m_wavelength_m);
-        }
-    }
-    else if (!m_disabled_samples.empty())
+    if (!m_disabled_samples.empty())
     {
         const auto first = m_disabled_samples.begin();
         latch(first->second);
@@ -131,14 +120,6 @@ void Probe::latchAtEnable()
 bool Probe::accept(const OpticalSignal &s)
 {
     const double wl = s.getWavelength();
-    // wl=: that wavelength only
-    if (!isnan(m_wavelength_m))
-    {
-        if (wl == m_wavelength_m)
-            return true;
-        noteIgnored(wl, m_wavelength_m);
-        return false;
-    }
     if (m_latch_mode == LATCH_OFF)
         return true;
 

@@ -8,14 +8,13 @@
 -----------
 0 local assignments
 -----------
-13 elements
+12 elements
  - ROOT/CWSRC1 (CW SOURCE) ROOT/a {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.56e-06, }
  - ROOT/CWSRC2 (CW SOURCE) ROOT/b {} {power (DOUBLE) = 0.004, wl (DOUBLE) = 1.55e-06, }
  - ROOT/MERGER1 (MERGER) ROOT/a ROOT/b ROOT/m {} {}
  - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/c {} {values (LIST) = [{"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-12}, {"type":"DOUBLE","value":2.000000e-03}, {"type":"DOUBLE","value":1.540000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":6.000000e-12}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.540000e-06}]}], }
  - ROOT/MERGER2 (MERGER) ROOT/m ROOT/c ROOT/m2 {} {}
  - ROOT/PROBE1 (PROBE) ROOT/m {} {}
- - ROOT/PROBE2 (PROBE) ROOT/m {} {wl (DOUBLE) = 1.56e-06, }
  - ROOT/PROBE3 (PROBE) ROOT/m2 {} {}
  - ROOT/PROBE4 (PROBE) ROOT/c {} {}
  - ROOT/PROBE5 (PROBE) ROOT/c {} {wl (INTEGER) = 0, }
@@ -27,7 +26,7 @@
  - ROOT/a: OANALOG<1>u (1|1)
  - ROOT/b: OANALOG<1>u (1|1)
  - ROOT/c: OANALOG<1>u (1|4)
- - ROOT/m: OANALOG<1>u (1|4)
+ - ROOT/m: OANALOG<1>u (1|3)
  - ROOT/m2: OANALOG<1>u (1|2)
 -----------
 1 directives
@@ -57,8 +56,6 @@ Creating ROOT/VLSRC1 (reason: unidir backlog)
 Done creating ROOT/VLSRC1
 Creating ROOT/PROBE1 (reason: unidir backlog)
 Done creating ROOT/PROBE1
-Creating ROOT/PROBE2 (reason: unidir backlog)
-Done creating ROOT/PROBE2
 Creating ROOT/PROBE3 (reason: unidir backlog)
 Done creating ROOT/PROBE3
 Creating ROOT/PROBE4 (reason: unidir backlog)

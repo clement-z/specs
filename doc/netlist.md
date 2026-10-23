@@ -55,7 +55,7 @@ Nets come first, in the order of the table, then the positional arguments, then 
 | `EVLSRC` | electrical out | [EVLSRC](#evlsrc) |
 | `PCMCELL` | in, out | [PCMCELL](#pcmcell) |
 | `PDET` | in, electrical out | [PDET](#pdet) |
-| `PROBE`, `MLPROBE` | net | PROBE: `[power [abs [phase [wl]]]]`, `wl=<wavelength>`; MLPROBE: `wl=[wl1, ...]`; [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
+| `PROBE`, `MLPROBE` | net | PROBE: `[power [abs [phase [wl]]]]`; MLPROBE: `wl=[wl1, ...]`; [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
 | `PWR` | in (power meter) | no arguments |
 | `X` | one net per subcircuit port, then the subcircuit name | [Subcircuits](#subcircuits) |
 
@@ -480,9 +480,9 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
 
 ## PROBE, MLPROBE and traced nets in `.tran`
 
-`PROBE<name> <net> [power [abs [phase [wl]]]] [wl=<wavelength>]` traces the events of its net at one
-wavelength (power, field modulus, phase, wavelength; the positional arguments, or the keywords `power`, `mod`,
-`phase`, `wl` set to 0 or 1, choose which); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
+`PROBE<name> <net> [power [abs [phase [wl]]]]` traces the events of its net at one wavelength (power, field
+modulus, phase, wavelength; the positional arguments, or the keywords `power`, `mod`, `phase`, `wl` set to 0 or
+1, choose which); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
 phase per listed wavelength (the wavelength must match exactly). A netlist without any probe or `.save` traces every optical net through
 automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
@@ -490,16 +490,15 @@ name starts with `_` get no automatic probe.
 
 **A PROBE traces one wavelength.** A net holds one value, the last one written to it, of any wavelength, so on a
 net that carries several wavelengths a probe sees each of them as a separate event. A PROBE (also an automatic
-`PROBE{<net>}` and a `.save` target) traces one of them and ignores the others:
-- `wl=<wavelength>` (in m, e.g. `wl=1.55e-6`, `wl=1.55u`) selects it; the wavelength must match exactly, as for
-  MLPROBE. `wl=0` and `wl=1` (also `true`, `false`) keep their meaning: whether the wavelength is traced.
-- Without `wl=`, the probe latches one per analysis point: in `.op` and at each `.dc` point, the smallest
+`PROBE{<net>}` and a `.save` target) traces one of them and ignores the others. To trace a given wavelength,
+or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to select one.
+- The probe latches one wavelength per analysis point: in `.op` and at each `.dc` point, the smallest
   wavelength written to its net at that point; in `.tran`, the smallest wavelength its net carried when the
   probe is enabled (the operating-point values), or, if none, the smallest one arriving in the first time step
   that brings any. It keeps that one until the end of the transient. In a `.dc` wavelength sweep, each point
   has its own wavelength. In a `.dc`, a net whose value does not change from one point to the next is not
   written again: a CW source that is not swept writes its net at the first point only, and its wavelength
-  reaches the probes at that point only.
+  reaches the probes at that point only (B-185).
 - When a probe ignores another wavelength, a warning on stderr says so once, at the end of the analysis (the
   probe, its net, the wavelength traced and the first one ignored); the automatic and `.save` probes share one
   summary line.

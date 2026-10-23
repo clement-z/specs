@@ -4,7 +4,7 @@
 // test/tran_start.cpp.
 // B-184: an MLPROBE also traces, when it is enabled, the last value of every listed wavelength its
 // net carried while it was disabled.
-// PD5: the wavelength latch of a PROBE run by a netlist analysis (Probe::LatchMode, wl=).
+// PD5: the wavelength latch of a PROBE run by a netlist analysis (Probe::LatchMode).
 #include <gtest/gtest.h>
 #include <systemc.h>
 
@@ -453,43 +453,6 @@ TEST(Probe, LatchPerTimeStepTakesTheSmallestWavelengthOfEachPoint)
         net.write(sig(0, 1, 1.56e-6));
         sc_start(1, SC_PS);
         expectProbeTraces(probe, 1, M_PI / 2, 1.56e-6);
-    }
-    SPECS_TEST_FOOTER();
-}
-
-TEST(Probe, SelectedWavelengthIsTheOnlyOneTraced)
-{
-    SPECS_TEST_HEADER()
-    {
-        setupConfig();
-
-        spx::oa_signal_type net{"net"};
-        Probe probe("probe");
-        probe.p_in(net);
-        probe.m_latch_mode = Probe::LATCH_ONCE; // .tran
-        probe.m_wavelength_m = 1.56e-6;         // wl=1.56e-6
-
-        sc_start(); // initialise the threads
-        probe.enable = sc_logic(0);
-        sc_start();
-        net.write(OpticalSignal(std::polar(std::sqrt(4e-3), 0.25), 1.56e-6));
-        sc_start();
-        net.write(OpticalSignal(std::polar(std::sqrt(1e-3), 0.5), 1.55e-6));
-        sc_start();
-
-        // Enabled: the selected wavelength's value from the OP, although 1550 nm is smaller and current
-        probe.enable = sc_logic(1);
-        sc_start();
-        expectProbeTraces(probe, 4e-3, 0.25, 1.56e-6);
-        EXPECT_EQ(probe.m_ignored_wavelength_m, 1.55e-6);
-        EXPECT_EQ(probe.m_traced_when_ignored_m, 1.56e-6);
-
-        net.write(OpticalSignal(std::polar(std::sqrt(2e-3), 0.0), 1.55e-6));
-        sc_start();
-        expectProbeTraces(probe, 4e-3, 0.25, 1.56e-6);
-        net.write(OpticalSignal(std::polar(std::sqrt(5e-3), -1.0), 1.56e-6));
-        sc_start();
-        expectProbeTraces(probe, 5e-3, -1.0, 1.56e-6);
     }
     SPECS_TEST_FOOTER();
 }

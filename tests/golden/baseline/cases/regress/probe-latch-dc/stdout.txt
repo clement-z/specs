@@ -9,17 +9,16 @@ Recorded sweep order for WL(CWSRC2) (4points)
 -----------
 0 local assignments
 -----------
-5 elements
+4 elements
  - ROOT/CWSRC1 (CW SOURCE) ROOT/a {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.55e-06, }
  - ROOT/CWSRC2 (CW SOURCE) ROOT/b {} {power (DOUBLE) = 0.002, wl (DOUBLE) = 1.541e-06, }
  - ROOT/MERGER1 (MERGER) ROOT/a ROOT/b ROOT/m {} {}
  - ROOT/PROBE1 (PROBE) ROOT/m {} {}
- - ROOT/PROBE2 (PROBE) ROOT/m {} {wl (DOUBLE) = 1.55e-06, }
 -----------
 3 named nets
  - ROOT/a: OANALOG<1>u (1|1)
  - ROOT/b: OANALOG<1>u (1|1)
- - ROOT/m: OANALOG<1>u (1|2)
+ - ROOT/m: OANALOG<1>u (1|1)
 -----------
 0 directives
 -----------
@@ -43,8 +42,6 @@ Creating ROOT/CWSRC2 (reason: unidir backlog)
 Done creating ROOT/CWSRC2
 Creating ROOT/PROBE1 (reason: unidir backlog)
 Done creating ROOT/PROBE1
-Creating ROOT/PROBE2 (reason: unidir backlog)
-Done creating ROOT/PROBE2
 Done (elaborating network of ROOT/a)
 ╔══════════════════════╗
 ║      SIMULATION      ║

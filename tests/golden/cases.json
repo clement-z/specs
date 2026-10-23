@@ -3780,7 +3780,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-tran.cir"
    ],
-   "note": "PD5: PROBE wavelength latch in a .tran: the smallest wavelength at the enable (OP values), wl= selection, a smaller wavelength arriving later ignored, a VL-only net latched in its first time step, wl=0 keeps its old meaning; warnings (one per probe, one line for the automatic probes); each PROBE trace equals an MLPROBE trace of the same run"
+   "note": "PD5: PROBE wavelength latch in a .tran: the smallest wavelength at the enable (OP values), a smaller wavelength arriving later ignored, a VL-only net latched in its first time step, wl=0 keeps its meaning (wavelength not traced); warnings (one per probe, one line for the automatic probes); each PROBE trace equals an MLPROBE trace of the same run"
   },
   {
    "id": "regress/probe-latch-dc",
@@ -3801,25 +3801,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-dc.cir"
    ],
-   "note": "PD5: PROBE wavelength latch in a .dc: per point, the smallest wavelength present (the swept source below 1550 nm, the fixed one above); wl=1.55e-6 traces the fixed source only"
-  },
-  {
-   "id": "err/probe-wl-invalid",
-   "setup": {
-    "copy": [
-     "circuits",
-     "tests/golden/netlists"
-    ],
-    "mkdir": [
-     "traces"
-    ]
-   },
-   "args": [
-    "-f",
-    "tests/golden/netlists/probe-wl-invalid.cir"
-   ],
-   "expect": "fail",
-   "note": "PD5: PROBE wl=-1.55e-6 is not a wavelength: error, exit 1"
+   "note": "PD5: PROBE wavelength latch in a .dc: per point, the smallest wavelength written to the net at that point (both sources at the first point, then the swept one only: B-185)"
   }
  ]
 }

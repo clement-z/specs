@@ -6,7 +6,7 @@
   "seed": 0,
   "command_line": ["specs", "--format", "vcd", "--format", "csv", "-f", "tests/golden/netlists/probe-latch-tran.cir"],
   "netlist_files": [
-    {"path": "tests/golden/netlists/probe-latch-tran.cir", "sha256": "e869cdb3d6d6f365a04e95d7bb10316e5f1a904141d18ab2a8138ac906c32d30"}
+    {"path": "tests/golden/netlists/probe-latch-tran.cir", "sha256": "3a0da388f2118bd82736cea8b45f34813d6979a7521575982b633ac8bdfee66d"}
   ],
   "trace_file": "traces/delete_me.vcd"
 }

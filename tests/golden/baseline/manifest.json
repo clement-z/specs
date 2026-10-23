@@ -106,7 +106,6 @@
   "err/f28-maxiter-small",
   "err/f28-options-maxiter-fraction",
   "err/f28-options-maxiter-negative",
-  "err/probe-wl-invalid",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -324,6 +323,12 @@
    "only": "^(regress/probe-latch-tran|regress/probe-latch-dc|err/probe-wl-invalid|gtest/unit_tests)$",
    "gtest": true,
    "note": "PD5 PROBE wavelength latch: new cases regress/probe-latch-tran, regress/probe-latch-dc, err/probe-wl-invalid; gtest list (Probe.Latch*, Probe.SelectedWavelengthIsTheOnlyOneTraced, Probe.TestbenchProbeTracesEveryWavelength, TraceTable.DiscardDropsTheRowOfTheCurrentTimeStep)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T02:19:17Z",
+   "only": "^(regress/probe-latch-tran|regress/probe-latch-dc|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD5 follow-up (maintainer: no PROBE wavelength selection in v0.3.0): probe2 (wl=<wavelength>) removed from regress/probe-latch-tran and regress/probe-latch-dc (outputs = previous ones minus PROBE2); err/probe-wl-invalid removed; gtest list (Probe.SelectedWavelengthIsTheOnlyOneTraced removed)"
   }
  ]
 }

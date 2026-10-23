@@ -1,4 +1,0 @@
-* PD5: PROBE wl= takes a positive wavelength in m (or 0|1|true|false: whether the wavelength is traced)
-cwsrc1 a wl=1.55e-6 power=1e-3
-probe1 a wl=-1.55e-6
-.tran 1e-12

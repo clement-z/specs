@@ -71,7 +71,6 @@
   "Probe.LatchPerTimeStepTakesTheSmallestWavelengthOfEachPoint": "PASS",
   "Probe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "Probe.SamplesUnchangedNetWhenEnabled": "PASS",
-  "Probe.SelectedWavelengthIsTheOnlyOneTraced": "PASS",
   "Probe.TestbenchProbeTracesEveryWavelength": "PASS",
   "Probe.UndrivenNetTracesNothingWhenEnabled": "PASS",
   "ProcessStyle.ReactionsAndOutputPortsAreMethods": "PASS",
