@@ -2,6 +2,26 @@
 
 ## [unreleased]
 
+### New
+
+* Accuracy suite (`tests/bench/`, F-06): SPECS's `.dc` and `.tran` results against closed forms, as the Meson
+  suite `oracle`: the add-drop ring (Yariv, Bogaerts) on `circuits/add_drop.cir`, and CROWs with random ring
+  lengths (Poon transfer matrices), complex through/drop responses within 1e-5; each check also proves that
+  three injected physics errors (k read as a power ratio, no dispersion slope, a real cross coupling) would
+  fail it. The CROW generator (`crow_gen.py`, from the feature scout) gains CW and `.dc` forms and a
+  `crow_tb` preset that reproduces `specs -t ac_crow` (same event times, powers within 1e-12 W, checked by
+  the suite)
+* Benchmark (`tests/bench/bench.py`): the CROW case matrix with per-run user time, peak RSS, VCD size and
+  `--stats` counters, appended to a local `tests/bench/history.jsonl` (not versioned); the Meson suite
+  `bench` checks only ratios (event plateau from 30 to 300 rings, WDM linearity, and the user-time plateau on
+  optimised builds without sanitizers)
+* Activity map (`utils/activity_map.py`, F-31): the circuit of a run drawn with Graphviz's layout, each device
+  coloured by its processed events (linear scale) over a background field that interpolates between devices
+  and is zero far from them, subcircuit instances as clusters, optional suppression-ratio discs, a legend and
+  the run totals; reads `--json` and `--stats=ports,devices`, writes DOT (standard library only), SVG and
+  PNG (numpy, matplotlib, Graphviz; pixi's `py` environment now includes Graphviz). See
+  `doc/activity_map.md`
+
 ### Changed
 
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
