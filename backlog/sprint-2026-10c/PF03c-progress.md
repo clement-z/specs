@@ -13,7 +13,7 @@ strict golden 275 passed.
 | 1 | Per-path delays as an option | done | 7e044eb | `delay_per="path"|"output"`; vs 48e510f: same timing (below); stress cost below; asan-clang clean |
 | 2 | B-190: validate, then fix | done | 4f323e4 | variant Es (below); 4 ring cases ~1e-12 + gtest; asan-clang clean |
 | 3 | Stale comments in two golden netlists | done | 842d0fe | manifests: netlist hash only |
-| 4 | Docs | done | (this commit) | item docs landed with items 1 and 2; this commit: F-03 brief, netlist.md interp row, B-190 sha |
+| 4 | Docs | done | e9c3d85 | item docs landed with items 1 and 2; this commit: F-03 brief, netlist.md interp row, B-190 sha |
 
 ## Predictions (written before each re-record)
 
@@ -86,3 +86,5 @@ strict golden 276 passed; asan-clang 16 OK 1 skipped, no sanitizer message; stat
 Grid check from the C++ (a small program on `SParamData::gridCheck`, /tmp/PF03c-loo), before -> after, linear / PCHIP:
 ring 0.05 nm 0.00385 -> 0.00215 / 0.00374 -> 0.00185; BDC 0.00238 / 0.00225 (same); MZI 0.114 -> 0.0064 / 0.109 ->
 0.043; ring k=0.4 0.429 / 0.395 (same); ring 1 nm and the golden 11-point file 0.7075 / 0.7074 (same); wg 3.9e-13.
+
+Final: report `PF03c-REPORT.md` committed; heartbeat 2aab3687 deleted after it.
