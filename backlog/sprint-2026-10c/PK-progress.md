@@ -9,9 +9,9 @@ Decision: "Before v0.4.0 (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`.
 | 1. B-189 negative/non-finite CWSRC power | done | 634c886 | new case `err/b189-cwsrc-negative-power` as predicted; strict 276/276; asan-clang 17/17 OK, no sanitizer message |
 | 2. B-193 run-table test in CI and pixi | done | a8b4721 | numpy+pandas in the pixi default env (lock: additions only) and pip in CI; run-table OK in gcc and asan-clang; golden unchanged |
 | 3. B-191 long netlist lines | done | 8fc95cb | REJECT removed (twin start conditions); new case `regress/b191-long-line-vlsrc`; strict 277/277; 35-netlist differential check identical; asan-clang 17/17 OK, no sanitizer message |
-| 4. B-192 value files resolved like `.include` | done | dd822d7 | new case `regress/b192-value-files-next-to-netlist` + gtest (gtest case re-recorded); strict 278/278; asan-clang: pending |
-| 5. Remove legacy CROW testbench | todo | | |
-| Gate: clang, asan-gcc before/after; stats-compare | todo | | |
+| 4. B-192 value files resolved like `.include` | done | dd822d7 | new case `regress/b192-value-files-next-to-netlist` + gtest (gtest case re-recorded); strict 278/278; asan-clang 17/17 OK, no sanitizer message |
+| 5. Remove legacy CROW testbench | done | 3337f4c | 5 cases deleted, 4 re-recorded (one line each), 3 new, as predicted; strict 276/276; asan-clang: pending |
+| Gate: clang, asan-gcc before/after; stats-compare | running | | |
 | Report | todo | | |
 
 ## Predictions
