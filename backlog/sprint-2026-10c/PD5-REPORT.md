@@ -225,3 +225,36 @@ probe sees a non-swept wavelength only at the first point. Evidence `regress/pro
 ### Found, not done (updated)
 - The "`wl` keyword overload" item above is resolved by F1.
 - The `.dc` limit is now B-185.
+
+## Follow-up 2 (maintainer decision: `.dc` latch on the swept wavelength, option a)
+
+Commit 3152794; prediction written first in `PD5-progress.md` (17b9959).
+
+- **Rule.** In a `.dc` that sweeps a source's wavelength or frequency (`WL(src)`, `F(src)`, `/src/WL`, `/src/F`),
+  each plain PROBE latches, at each point, the swept wavelength when its net carries it at that point. Otherwise
+  the smallest wavelength present (unchanged). Power sweeps, `.op` and `.tran` are unchanged.
+- **Explicit API, no global:**
+  - the `.dc` sweep order is a struct (`CWSweepOrder`: setter, values, the swept `CWSource`, `sweeps_wavelength`
+    for WL/F) instead of a pair, filled by `DCAnalysis::create()`;
+  - before each point, `runDCAnalysis()` reads the swept source's wavelength (after applying the value, the exact
+    double the source emits) and calls `Probe::setSweptWavelength()` on every probe (NaN for other sweeps);
+  - in `Probe::accept()`, within the point's time step, the swept wavelength replaces any other latched one (its
+    table row is dropped) and is then kept for the point.
+- **Golden impact, as predicted:**
+  - no existing case changes, `regress/probe-latch-dc` included: its first point already latched the swept
+    1541 nm, the smallest there next to the fixed 1550 nm. The coordinator expected its first point to change; it
+    cannot, since swept and smallest coincide there;
+  - the other `.dc` cases have a single source;
+  - new cases: `regress/probe-latch-dc-swept-wl` (fixed 1530 nm next to a WL sweep from 1541 to 1559 nm) and
+    `regress/probe-latch-dc-swept-f` (the same with `/cwsrc2/F`). At the first point the probe now shows the
+    swept wavelength (1541 nm, resp. c/f = 1558.98 nm) where 1f44df4 showed the fixed 1530 nm; the later points
+    are the same. A net with two fixed wavelengths (`probe2` of the WL case) keeps the smallest (1520 nm);
+  - gtest `Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint` added; gtest list re-recorded.
+- **Docs:** `doc/netlist.md` (latch rule in `.dc`), CHANGELOG `[unreleased]`; B-185 updated (first-point part
+  solved, unchanged-net part still open) and its `backlog.md` row.
+- **Results** (tip 3152794, snapshot `/tmp/pd5-wt/fu2`):
+  - gcc: `meson test` 12/12; strict golden 234/234;
+  - counters: 231 same vs 1f44df4 (+2 new), 228 same vs e5d6c21;
+  - clang and asan-gcc, strict recordings vs 1f44df4: 231/231 identical (+2 new). The 7 new or re-recorded PD5
+    cases pass strict against the gcc baseline on both;
+  - `pixi run test asan-clang`: 12/12, no sanitizer message.

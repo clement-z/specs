@@ -76,7 +76,7 @@ Heartbeat: `d7cfbcde` (PD5F2-heartbeat). Marker: `PD5-FOLLOWUP2.md`.
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| G1 | `.dc` WL/F sweep: each plain PROBE latches the swept wavelength when its net carries it at that point (else the smallest); explicit per-point API from the `.dc` runner | todo | | |
+| G1 | `.dc` WL/F sweep: each plain PROBE latches the swept wavelength when its net carries it at that point (else the smallest); explicit per-point API from the `.dc` runner | done | 3152794 | as predicted: no existing case changed (probe-latch-dc included); 2 new cases; strict 234/234; counters 231 same vs 1f44df4; clang/asan-gcc 231/231 identical vs 1f44df4; asan-clang 12/12 |
 
 Predicted golden impact (written before the change):
 - `regress/probe-latch-dc`: **no change**. At its first point the swept source is at 1541 nm and the fixed one at
