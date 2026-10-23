@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/probe-wl-ignored.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 429,
+   "kind": "json",
+   "sha256": "25c1e6eb7fe3aee825957018896e95ab392841b13a1fb760e81f89117180b19c",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 2273,
+   "kind": "vcd",
+   "sha256": "0bb984ea8af91462406df2d22ad99bb3ce8a5bc7af3ea2baed5d49aabb8fca72",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/probe-wl-ignored"
+}

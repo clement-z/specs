@@ -74,7 +74,9 @@ public:
     sc_time m_ignored_time;
     double m_traced_when_ignored_m = std::numeric_limits<double>::quiet_NaN();
 
-    // Constructor
+    // Constructor. trace_wavelength is kept for the C++ API (testbenches, user code): the netlist sets it
+    // for every PROBE element and automatic PROBE{<net>} probe (PD6: wl=0 is ignored); only .save QTY(net)
+    // traces exactly the quantities it lists
     Probe(sc_module_name name, const bool &trace_power = true, const bool &trace_modulus = true
     , const bool &trace_phase = true, const bool &trace_wavelength = true)
         : spx_module(name)

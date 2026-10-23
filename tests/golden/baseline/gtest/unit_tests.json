@@ -70,6 +70,7 @@
   "Probe.LatchOnceKeepsTheSmallestWavelengthOfTheFirstTimeStep": "PASS",
   "Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint": "PASS",
   "Probe.LatchPerTimeStepTakesTheSmallestWavelengthOfEachPoint": "PASS",
+  "Probe.NetlistProbeAlwaysTracesTheWavelength": "PASS",
   "Probe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "Probe.SamplesUnchangedNetWhenEnabled": "PASS",
   "Probe.TestbenchProbeTracesEveryWavelength": "PASS",

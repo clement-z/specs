@@ -1073,6 +1073,10 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
         obj->m_trace_wavelength = true;
     }
 
+    // The wavelength is always traced (PD6): a false 4th argument or wl=0 is still accepted, and
+    // ignored with a warning (build_circuit())
+    bool trace_wavelength = true;
+
     // Parse positional args
     for (size_t i = 0; i < args.size(); ++i)
     {
@@ -1087,7 +1091,7 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
                 obj->m_trace_phase = args[i].as_boolean();
                 break;
             case 3:
-                obj->m_trace_wavelength = args[i].as_boolean();
+                trace_wavelength = args[i].as_boolean();
                 break;
             default:
                 cerr << "Too many input arguments for " << name << endl;
@@ -1107,12 +1111,15 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
         else if (kw == "PHASE" || kw == "PHI")
             obj->m_trace_phase = p.second.as_boolean();
         else if (kw == "WAVELENGTH" || kw == "WL")
-            obj->m_trace_wavelength = p.second.as_boolean();
+            trace_wavelength = p.second.as_boolean();
         else {
             cerr << name << ": unknown keyword: " << p.first << endl;
             exit(1);
         }
     }
+    obj->m_trace_wavelength = true;
+    if (!trace_wavelength)
+        pt_helper.probes_ignoring_wavelength_off.insert(name);
     return obj;
 }
 

@@ -5,6 +5,7 @@
 // B-184: an MLPROBE also traces, when it is enabled, the last value of every listed wavelength its
 // net carried while it was disabled.
 // PD5: the wavelength latch of a PROBE run by a netlist analysis (Probe::LatchMode).
+// PD6: a netlist PROBE always traces its wavelength; wl=0 is ignored, with one warning.
 #include <gtest/gtest.h>
 #include <systemc.h>
 
@@ -18,9 +19,14 @@
 
 #include "devices/probe.h"
 #include "optical_output_port.h"
+#include "parser/parse_tree.h"
+#include "parser/parser_state.h"
 #include "specs.h"
 #include "test/utils.h"
 #include "trace_table.h"
+
+#include "parser.h"
+#include "scanner.h"
 
 namespace {
 
@@ -532,6 +538,63 @@ TEST(Probe, TestbenchProbeTracesEveryWavelength)
         sc_start(1, SC_PS);
         expectProbeTraces(probe, 4, 0, 1.56e-6);
         EXPECT_TRUE(std::isnan(probe.m_ignored_wavelength_m));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, NetlistProbeAlwaysTracesTheWavelength)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        // PROBE1..3 ask not to trace the wavelength (keyword, keyword alias, 4th argument): ignored, one
+        // warning for all, in name order. PROBE6's keyword overrides its false 4th argument (no warning).
+        // .save P(a) traces exactly the power
+        const std::string netlist =
+            "cwsrc1 a wl=1.55e-6 power=1e-3\n"
+            "probe3 a 1 1 1 0\n"
+            "probe1 a wl=0\n"
+            "probe2 a wavelength=0.0\n"
+            "probe4 a wl=1\n"
+            "probe5 a 0 0 0 1\n"
+            "probe6 a 1 1 1 0 wl=1\n"
+            ".save P(a)\n";
+        ParseTree tree;
+        ParserState state;
+        state.current_filename = "test.cir";
+        yyscan_t scanner;
+        yylex_init_extra(&state, &scanner);
+        YY_BUFFER_STATE buf = yy_scan_string(netlist.c_str(), scanner);
+        yy_switch_to_buffer(buf, scanner);
+        yyset_lineno(1, scanner);
+        ASSERT_EQ(yyparse(scanner, &tree), 0);
+        yylex_destroy(scanner);
+
+        testing::internal::CaptureStderr();
+        tree.build_circuit();
+        EXPECT_EQ(testing::internal::GetCapturedStderr(),
+                  "Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th argument) "
+                  "ignored for ROOT/PROBE1, ROOT/PROBE2, ROOT/PROBE3\n");
+
+        for (const char *name : {"ROOT/PROBE1", "ROOT/PROBE2", "ROOT/PROBE3", "ROOT/PROBE4", "ROOT/PROBE5",
+                                 "ROOT/PROBE6"})
+        {
+            const auto *probe = dynamic_cast<const Probe *>(sc_find_object(name));
+            ASSERT_NE(probe, nullptr) << name;
+            EXPECT_TRUE(probe->m_trace_wavelength) << name;
+        }
+        const auto *probe5 = dynamic_cast<const Probe *>(sc_find_object("ROOT/PROBE5"));
+        EXPECT_FALSE(probe5->m_trace_power);
+        EXPECT_FALSE(probe5->m_trace_modulus);
+        EXPECT_FALSE(probe5->m_trace_phase);
+
+        const auto *saved = dynamic_cast<const Probe *>(sc_find_object("PROBE{ROOT/a}"));
+        ASSERT_NE(saved, nullptr);
+        EXPECT_TRUE(saved->m_trace_power);
+        EXPECT_FALSE(saved->m_trace_modulus);
+        EXPECT_FALSE(saved->m_trace_phase);
+        EXPECT_FALSE(saved->m_trace_wavelength);
     }
     SPECS_TEST_FOOTER();
 }
