@@ -365,8 +365,8 @@ TEST(SParamFile, DelayRemovedInterpolationOfARotatingPathWithNulls)
     // B-190: S(2 <- 1) = 0.5 exp(j w tau1) + 0.48 exp(j w tau2), an unbalanced MZI (arm delays 4.3 and 5.74 ps,
     // free spectral range 694 GHz) sampled every 25 GHz (28 points per FSR): its phase turns by 0.8 rad per point
     // and it has nulls (|S| = 0.02). Magnitude/phase cuts the nulls short and real/imaginary parts cut the
-    // rotation with chords (PF03b: 0.023 between grid points for an exported MZI); with the median group delay
-    // (5.02 ps) taken out before the real and imaginary parts are interpolated, S~ crosses each null along an
+    // rotation with chords (PF03b: 0.023 between grid points for an exported MZI); with the entry's delay
+    // (pulse-pair estimate, 4.99 ps) taken out before the real and imaginary parts are interpolated, S~ crosses each null along an
     // almost straight line. S(1 <- 2) = 0.9 exp(j w 1.4 ps), a delay line: exact (magnitude and phase)
     const double f0 = 1.9e14, df = 2.5e10, tau1 = 4.3e-12, tau2 = 5.74e-12;
     auto mzi = [&](double f) { return std::polar(0.5, 2 * M_PI * f * tau1) + std::polar(0.48, 2 * M_PI * f * tau2); };

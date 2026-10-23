@@ -39,12 +39,15 @@ public:
     // when it would turn S by less than this (rad) over the largest grid step (a nearly flat phase:
     // nothing to gain, and the re/im interpolation of S linear in frequency stays exact)
     static constexpr double DELAY_REMOVAL_MIN_ROTATION = 1e-3;
+    // B-190: the intervals whose step exceeds this times the median step of the entry's grid are left out
+    // of its delay estimate (across a gap wider than half a cycle of the delay, S(k+1) conj S(k) aliases)
+    static constexpr double DELAY_REMOVAL_MAX_STEP_RATIO = 3;
     // Grid-adequacy check (doc/sparam.md): a grid point is flagged when S interpolated there from its
     // neighbours alone (leave-one-out, the device's own interpolant, real/imaginary parts when the device
     // uses them on either of the two grid intervals around the point) differs from the file's value by
     // more than this (field). Leaving a point out doubles the spacing, so the error is about 4 times the
     // one between the points of the actual grid: 0.02 stands for about 0.005 between points. A delay
-    // line gives 1e-12; the SiEPIC BDC 0.0024, the add-drop ring on a 0.05 nm grid 0.0021, an MZI with
+    // line gives 1e-12; the SiEPIC BDC 0.0024, the add-drop ring on a 0.05 nm grid 0.0022, an MZI with
     // 28 points per FSR 0.0064 (linear; 0.0059 with PCHIP) (pass); the ring on a 1 nm grid 0.71 (warns)
     static constexpr double GRID_CHECK_THRESHOLD = 0.02;
 
@@ -116,8 +119,9 @@ private:
         std::vector<double> phase; // unwrapped, SPECS convention
         std::vector<double> re, im; // the same values as real and imaginary parts
         std::vector<double> tau_s; // group delay at the grid points
-        // B-190: S~ = S exp(-j 2 pi (f - f_ref) tau0), the entry with a delay tau0 taken out (the median of
-        // tau_s; 0 below DELAY_REMOVAL_MIN_ROTATION), f_ref its first grid point: real and imaginary parts
+        // B-190: S~ = S exp(-j 2 pi (f - f_ref) tau0), the entry with a delay tau0 taken out (the pulse-pair
+        // estimate, removeDelay(); 0 below DELAY_REMOVAL_MIN_ROTATION), f_ref its first grid point: real and
+        // imaginary parts
         double tau0_s = 0;
         double f_ref_Hz = 0;
         std::vector<double> re_d, im_d;

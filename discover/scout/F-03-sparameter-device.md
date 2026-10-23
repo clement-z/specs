@@ -29,8 +29,9 @@ prerequisites: none (the generic device it was to refactor is removed, decision 
 > second SPAR discussion (`backlog/sprint-2026-10c/SPAR-discussion-2.md`).** `delay_per` removed
 > (`delay="auto"|"none"|<s>`, one delay per path); the grid check decides real/imaginary interpolation on the two
 > actual intervals around a point; with `interp=pchip` the magnitude/phase slopes are taken per run between the
-> real/imaginary intervals (the MZI 0.0165 -> 9.2e-4). The pulse-pair estimate of the removed delay is prepared on
-> `PF03d-wip/item4` but not merged (a golden change beyond the prediction: see the report).
+> real/imaginary intervals (the MZI 0.0165 -> 9.2e-4); B-190: the removed delay is the pulse-pair estimate (it was the
+> median of the finite-difference group delays; prepared on `PF03d-wip/item4`, merged after the maintainer
+> accepted its golden change, see the PF03d report).
 
 > **Update 2026-10-23 (maintainer decision, phase D2b).** `GenericTransmissionDevice`, `Generic2x2Coupler`,
 > `GenericWaveguide` and the output ports' delta-write mode (`m_use_deltas`) are removed (54b15dc). F-03 is to be

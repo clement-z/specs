@@ -488,16 +488,60 @@ double SParamData::evalTable(const vector<double> &x, const vector<double> &y, c
 
 void SParamData::removeDelay(Table &t)
 {
-    // B-190: the delay of the entry, the median of its group delays at the grid points (immune to the
-    // pi steps of the unwrapped phase at nulls, which bias a fit of the phase or its end-to-end slope)
+    // B-190: the delay of the entry, the pulse-pair estimate (SPAR-discussion-2.md, topic 1): the tau that
+    // minimises the variation sum_k |S~(k+1) - S~(k)|^2 of the delay-removed entry, about the
+    // |S|^2-weighted mean of its group delay. It needs no unwrapping, and the products next to a null are
+    // small vectors that barely turn the sum (the pi steps of the unwrapped phase at nulls bias a fit of
+    // the phase; the median of the finite-difference delays failed with 3 to 5 points around a null)
     const size_t m = t.f_Hz.size();
     t.tau0_s = 0;
     t.f_ref_Hz = m > 0 ? t.f_Hz[0] : 0;
     if (m >= 2)
     {
-        vector<double> sorted = t.tau_s;
+        vector<double> steps(m - 1);
+        for (size_t k = 0; k + 1 < m; ++k)
+            steps[k] = t.f_Hz[k + 1] - t.f_Hz[k];
+        vector<double> sorted = steps;
         std::sort(sorted.begin(), sorted.end());
-        t.tau0_s = m % 2 ? sorted[m / 2] : 0.5 * (sorted[m / 2 - 1] + sorted[m / 2]);
+        const size_t n = sorted.size();
+        const double median_step = n % 2 ? sorted[n / 2] : 0.5 * (sorted[n / 2 - 1] + sorted[n / 2]);
+        // z_k = S(k+1) conj S(k) of the intervals used (a gap much wider than the usual step can turn by
+        // more than pi: its product would alias)
+        vector<size_t> used;
+        vector<complex_type> z;
+        complex_type sum = 0;
+        double step_sum = 0;
+        for (size_t k = 0; k + 1 < m; ++k)
+            if (steps[k] <= DELAY_REMOVAL_MAX_STEP_RATIO * median_step)
+            {
+                used.push_back(k);
+                z.push_back(complex_type(t.re[k + 1], t.im[k + 1]) * std::conj(complex_type(t.re[k], t.im[k])));
+                sum += z.back();
+                step_sum += steps[k];
+            }
+        if (sum != complex_type(0))
+        {
+            // the minimum on a uniform grid (with the mean step), then Newton steps on
+            // g(tau) = sum_k |z_k| sin(arg z_k - 2 pi h_k tau) h_k, the derivative of the variation up to a
+            // factor, for non-uniform grids
+            double tau = std::arg(sum) / (2 * M_PI * (step_sum / used.size()));
+            for (int iteration = 0; iteration < 2; ++iteration)
+            {
+                double g = 0, dg = 0;
+                for (size_t u = 0; u < used.size(); ++u)
+                {
+                    const double h = steps[used[u]];
+                    const double x = std::arg(z[u]) - 2 * M_PI * h * tau;
+                    g += std::abs(z[u]) * std::sin(x) * h;
+                    dg -= 2 * M_PI * std::abs(z[u]) * std::cos(x) * h * h;
+                }
+                const double next = tau - g / dg;
+                if (!(dg < 0) || !std::isfinite(next))
+                    break;
+                tau = next;
+            }
+            t.tau0_s = tau;
+        }
         double max_step = 0;
         for (size_t k = 0; k + 1 < m; ++k)
             max_step = std::max(max_step, t.f_Hz[k + 1] - t.f_Hz[k]);
