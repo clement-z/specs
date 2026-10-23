@@ -4,8 +4,8 @@ Heartbeat: `a034057d` (PL-heartbeat, every 5 min, expires in 48 h).
 
 | Step | Status | Commit | Notes |
 | --- | --- | --- | --- |
-| Baseline builds (gcc, clang, asan-gcc, asan-clang) | in progress | | before binaries copied to /tmp/PL-before/{gcc,clang} |
-| B-186 implementation + golden cases + docs | todo | | |
+| Baseline builds (gcc, clang, asan-gcc, asan-clang) | done | 57fffc3 | all 16 OK; before binaries in /tmp/PL-before/{gcc,clang,asan-gcc}, asan-clang in the worktree /tmp/PL-wt/before (the first asan-clang build ran while the source was being edited) |
+| B-186 implementation + golden cases + docs | done, checks running | 314727a | repro output as predicted (CSV and VCD); gcc golden strict: 275 pass, 2 new |
 | Report | todo | | |
 
 ## Findings before the change
