@@ -11,9 +11,9 @@ strict golden 275 passed.
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | Per-path delays as an option | done | 7e044eb | `delay_per="path"|"output"`; vs 48e510f: same timing (below); stress cost below; asan-clang clean |
-| 2 | B-190: validate, then fix | done | (this commit) | variant Es (below); 4 ring cases ~1e-12 + gtest; asan-clang clean |
+| 2 | B-190: validate, then fix | done | 4f323e4 | variant Es (below); 4 ring cases ~1e-12 + gtest; asan-clang clean |
 | 3 | Stale comments in two golden netlists | done | 842d0fe | manifests: netlist hash only |
-| 4 | Docs | todo | | |
+| 4 | Docs | done | (this commit) | item docs landed with items 1 and 2; this commit: F-03 brief, netlist.md interp row, B-190 sha |
 
 ## Predictions (written before each re-record)
 

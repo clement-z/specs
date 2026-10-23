@@ -72,10 +72,10 @@ convention and what the device does with the data.
   gives 1e-12, the SiEPIC broadband coupler (`tests/sparam/data/siepic`) 0.0024, the add-drop ring on a
   0.05 nm grid 0.0021 and an unbalanced MZI sampled 28 times per free spectral range 0.0064 (no warning;
   0.043 with `interp=pchip`, a warning); the ring on a 1 nm grid gives 0.71 (a warning). Before the delay
-  removal (B-190) the MZI gave 0.11 and the ring 0.0039. The check tests S, not the group delay: the ring's through-port
-  null, whose phase turns within about 4 pm, passes on the 0.05 nm grid (S between the points is within
-  1e-3 there) while its group delay is not resolved (-37 ps instead of -621 ps). Not applicable to the
-  Taylor form.
+  removal (B-190) the MZI gave 0.11 and the ring 0.0039. The check tests S, not the group delay: the ring's
+  through-port null, whose phase turns within about 4 pm, passes on the 0.05 nm grid (S between the points
+  is within 6e-4 there) while its group delay is not resolved (-37 ps instead of -621 ps); so do the MZI's
+  nulls. Not applicable to the Taylor form.
 - **Passivity.** For each input `i`, the power leaving the device, `sum_j |S[j][i]|^2`, is checked at every
   grid point of the file (the Taylor form: 201 points over its range). `passivity=check` (default) warns
   once per device when it exceeds 1.03 (INTERCONNECT's threshold), with the worst input and wavelength;

@@ -1,5 +1,5 @@
 # B-190: SPAR interpolation is poor on paths whose phase rotates fast and that have nulls
-severity: low | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in PF03c (linear; PCHIP partly, see Fix)
+severity: low | category: physics | effort: S | fix-class: needs-human | verdict: CONFIRMED | status: fixed in 4f323e4 (PF03c; PCHIP partly, see Fix)
 location: src/io/sparam_file.cpp (interpolation of the tabulated entries)
 
 ## Problem
