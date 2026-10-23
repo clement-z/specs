@@ -75,8 +75,9 @@ bool is_param_name(const string &name)
 }
 
 // Value of a --param override (F-12): the line ".param name=value" parsed with the netlist grammar
-// into a scratch tree, before the netlist (its parameters are not visible)
-Variable parse_param_value(const string &name, const string &value)
+// into a scratch tree, before the netlist (its parameters are not visible). Its random draws (F-02)
+// are recorded in pt, as the draws of the root netlist (same stream names)
+Variable parse_param_value(const string &name, const string &value, ParseTree &pt)
 {
     ParseTree scratch;
     ParserState parser_state;
@@ -95,6 +96,14 @@ Variable parse_param_value(const string &name, const string &value)
     {
         cerr << "Invalid --param value: '" << name << "=" << value << "' (expected name=value)" << endl;
         exit(1);
+    }
+    for (const auto &d : scratch.draws)
+        pt.draws.push_back(d);
+    if (scratch.has_drawn && !pt.has_drawn)
+    {
+        pt.has_drawn = true;
+        pt.drawn_seed = scratch.drawn_seed;
+        pt.first_draw_where = scratch.first_draw_where;
     }
     return scratch.local_assignments.at(name);
 }
@@ -140,6 +149,13 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
     {
         if (!p.second)
             cerr << "Warning: --param " << p.first << ": the netlist has no .param " << p.first << endl;
+    }
+    // F-02: the random functions must draw with the final seed
+    if (!pt.draw_seed_conflict.empty())
+    {
+        cerr << "Error: " << pt.draw_seed_conflict << "; put .options seed before the first random "
+             << "function, or give the seed with --seed" << endl;
+        exit(1);
     }
 
     pt.print();
@@ -531,7 +547,7 @@ int sc_main(int argc, char *argv[])
         ParseTree pt;
         // the last one wins if a name is given twice
         for (const auto &p : param_overrides)
-            pt.set_param_override(p.first, parse_param_value(p.first, p.second));
+            pt.set_param_override(p.first, parse_param_value(p.first, p.second, pt));
         int parse_result = build_circuit(pt, file.Get(), footer.str());
         if (parse_result)
         {

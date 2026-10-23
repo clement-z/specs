@@ -21,6 +21,10 @@ using std::endl;
 using std::pair;
 using std::unique_ptr;
 
+// Value of an .options keyword stored as an unsigned 64-bit integer (seed, maxiter, maxevents): false if
+// val is not one (OPTIONSDirective::create() reports it)
+bool options_unsigned_integer(const Variable &val, uint64_t &result);
+
 /* OPTIONS: specify simulator options */
 struct OPTIONSDirective : public ParseDirective {
     /* Import constructor from ParseDirective */

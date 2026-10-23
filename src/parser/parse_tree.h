@@ -594,6 +594,32 @@ struct ParseTree {
     // Set before the netlist is parsed; a .param/.assign of the same name does not replace them.
     map<string, bool> param_overrides;
 
+    // Random draws of expressions (F-02, parser/parse_functions.h). Each draw has its own stream,
+    // spx::rng_for(seed, "<scope><owner>/<key>#<n>"): scope = name_prefix() (the instance path),
+    // owner = what the line being parsed defines (element name, ".param", ".OPTIONS", ...), key = the
+    // name being assigned ("" in a positional argument), n = the draws of the same
+    // "<scope><owner>/<key>" before it in this tree. Set by the register_*() functions and the grammar.
+    string draw_owner;
+    string draw_key;
+    map<string, uint64_t> draw_counts;
+    // Set while a .subckt line is parsed: its parameter defaults are evaluated once for every
+    // instance, so they cannot draw
+    bool draws_forbidden = false;
+    // Subcircuit trees: name of the subcircuit definition (streams of shared=1 draws)
+    string subckt_name;
+    // Root tree only: every draw (stream name, value; NaN for a non-number), in draw order (subcircuit
+    // trees, parsed while flattening, record theirs here); the top-level .param names assigned a value
+    // that drew; and the seed of the draws, to detect an .options seed parsed after a draw
+    mutable vector<pair<string, double>> draws;
+    vector<string> drawn_params;
+    mutable bool has_drawn = false;
+    mutable uint64_t drawn_seed = 0;
+    mutable string first_draw_where;
+    // Non-empty: an .options seed changed the seed after a draw (the error message)
+    mutable string draw_seed_conflict;
+    // Draws recorded (root's list) when the assignment being parsed started
+    size_t draws_at_assignment = 0;
+
     ParseTree(const string &name = "ROOT")
     : name(name)
     {}
@@ -604,6 +630,33 @@ struct ParseTree {
         while (root->parent)
             root = root->parent;
         return &root->input_files;
+    }
+
+    const ParseTree *root_tree() const
+    {
+        const ParseTree *tree = this;
+        while (tree->parent)
+            tree = tree->parent;
+        return tree;
+    }
+
+    // F-02: stream name of the next draw in this tree (counts it), see draw_owner. shared: 0 = this
+    // instance, 1 = every instance of the same subcircuit, 2 = the named stream "SHARED/<shared_name>"
+    string next_draw_stream(int shared, const string &shared_name);
+    // F-02: records a draw (root's list) made with the seed `seed` at `where` (file:line)
+    void record_draw(const string &stream, double value, uint64_t seed, const string &where) const;
+    // F-02: an .options seed of the root netlist, applied when its line is parsed (so that the draws
+    // after it use it) unless the seed was given with --seed
+    void apply_options_seed(uint64_t seed, const string &where);
+    // F-02: called after a .param/.assign of `name`: in the root netlist, `name` goes to drawn_params
+    // if its value drew and is not overridden (--param, .step)
+    void note_assigned_param(const string &name)
+    {
+        if (parent || is_subcircuit || root_tree()->draws.size() == draws_at_assignment
+            || param_overrides.count(name))
+            return;
+        if (find(drawn_params.begin(), drawn_params.end(), name) == drawn_params.end())
+            drawn_params.push_back(name);
     }
 
     ParseTree(const string &name, const ParseSubcircuit &subcircuit, const map<string, Variable> &kwargs);

@@ -314,6 +314,7 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
 {
     parent = subcircuit.parent;
     is_subcircuit = true;
+    subckt_name = subcircuit.name;
 
     // take kwargs as local assignments
     local_assignments = subcircuit.kwargs;
@@ -376,6 +377,7 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
 
 int ParseTree::register_directive(ParseDirective *directive)
 {
+    draw_owner = "." + directive->kind();
     directive->parent = this;
     directives.push_back(directive);
     // cout << "Created directive " << directive->kind() << endl;
@@ -386,6 +388,8 @@ int ParseTree::register_directive(ParseDirective *directive)
 
 int ParseTree::register_element(ParseElement *element)
 {
+    draw_owner = element->name;
+    strutils::toupper(draw_owner);
     element->name = name_prefix() + element->name;
     strutils::toupper(element->name);
     element->parent = this;
@@ -403,6 +407,7 @@ int ParseTree::register_analysis(ParseAnalysis *analysis)
         cerr << "But another one was already specified (" << analyses[0]->kind() << ")" << endl;
         exit(1);
     }
+    draw_owner = "." + analysis->kind();
     analysis->parent = this;
     analyses.push_back(analysis);
     // cout << "Created analysis " << analysis->kind() << endl;
@@ -413,6 +418,9 @@ int ParseTree::register_analysis(ParseAnalysis *analysis)
 int ParseTree::register_subcircuit(string name)
 {
     strutils::toupper(name);
+    // F-02: the parameter defaults of the .subckt line are evaluated once for every instance
+    draw_owner = ".SUBCKT " + name;
+    draws_forbidden = true;
     //name = name_prefix() + name;
 
     auto it = find_if(subcircuits.cbegin(), subcircuits.cend(),
@@ -433,6 +441,48 @@ int ParseTree::register_subcircuit(string name)
     // cout << "(current number of subcircuits: " << subcircuits.size() << ")" << endl;
 
     return i;
+}
+
+string ParseTree::next_draw_stream(int shared, const string &shared_name)
+{
+    if (shared == 2)
+        return "SHARED/" + shared_name;
+    // shared=1: the same streams in every instance of the subcircuit (no instance path)
+    const string scope = shared == 1 && is_subcircuit ? "SUBCKT:" + subckt_name + "/" : name_prefix();
+    const string base = scope + draw_owner + "/" + draw_key;
+    return base + "#" + to_string(draw_counts[base]++);
+}
+
+void ParseTree::record_draw(const string &stream, double value, uint64_t seed, const string &where) const
+{
+    const ParseTree *root = root_tree();
+    if (!root->has_drawn)
+    {
+        root->has_drawn = true;
+        root->drawn_seed = seed;
+        root->first_draw_where = where;
+    }
+    else if (seed != root->drawn_seed && root->draw_seed_conflict.empty())
+    {
+        root->draw_seed_conflict = "a random function at " + where + " draws with seed " + to_string(seed)
+                                   + ", one at " + root->first_draw_where + " drew with seed "
+                                   + to_string(root->drawn_seed);
+    }
+    root->draws.emplace_back(stream, value);
+}
+
+void ParseTree::apply_options_seed(uint64_t seed, const string &where)
+{
+    // specs --seed takes priority over the netlist (also applied by OPTIONSDirective::create())
+    if (specsGlobalConfig.seed_explicit)
+        return;
+    if (has_drawn && seed != drawn_seed && draw_seed_conflict.empty())
+    {
+        draw_seed_conflict = ".options seed=" + to_string(seed) + " at " + where
+                             + " comes after a random function that drew with seed " + to_string(drawn_seed)
+                             + " at " + first_draw_where;
+    }
+    specsGlobalConfig.seed = seed;
 }
 
 const ParseSubcircuit *ParseTree::find_subcircuit(const string &name) const

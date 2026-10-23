@@ -4280,6 +4280,97 @@
     "tests/golden/netlists/spar-missing-file.cir"
    ],
    "note": "F-03: the S-parameter file cannot be opened"
+  },
+  {
+   "id": "regress/f02-functions",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--json",
+    "traces/flat.json",
+    "-f",
+    "tests/golden/netlists/f02-functions.cir"
+   ],
+   "note": "F-02: math functions (exact values) and random functions (default seed 0) in expressions; the flattened JSON shows a different length per MZIARM instance (.param Lr in the body), the same shared=1 loss in both, and w = w2 (shared=\"wafer\"); the .op listing depends on the drawn lengths"
+  },
+  {
+   "id": "regress/f02-functions-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "1",
+    "--json",
+    "traces/flat.json",
+    "-f",
+    "tests/golden/netlists/f02-functions.cir"
+   ],
+   "note": "F-02: regress/f02-functions with --seed 1: the math values are the same, every drawn value differs"
+  },
+  {
+   "id": "err/f02-options-seed-after-draw",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-options-seed-after-draw.cir"
+   ],
+   "note": "F-02: .options seed=5 after a gauss() that drew with seed 0: error naming both lines, exit 1"
+  },
+  {
+   "id": "err/f02-subckt-default-draw",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-subckt-default-draw.cir"
+   ],
+   "note": "F-02: gauss() in a .subckt parameter default (drawn once for every instance): parse error, exit 1"
+  },
+  {
+   "id": "err/f02-unknown-function",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-unknown-function.cir"
+   ],
+   "note": "F-02: unknown function gaussian(): parse error with file:line, exit 1"
   }
  ]
 }

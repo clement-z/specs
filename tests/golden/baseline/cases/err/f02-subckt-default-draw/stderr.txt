@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/f02-subckt-default-draw.cir:3): gauss(0.0001, 1e-06): random functions cannot be used in the parameter defaults of a .subckt line (they would be drawn once for every instance); draw in the body (.param) or on the instance line
+-- offending token: ")"
+-- while parsing line: ".subckt ARM a b L=gauss(100e-6, 1e-6)"
+

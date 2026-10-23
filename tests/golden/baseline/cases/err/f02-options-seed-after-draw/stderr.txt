@@ -1,0 +1,2 @@
+Error: .options seed=5 at tests/golden/netlists/f02-options-seed-after-draw.cir:6 comes after a random function that drew with seed 0 at tests/golden/netlists/f02-options-seed-after-draw.cir:3; put .options seed before the first random function, or give the seed with --seed
+

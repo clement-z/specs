@@ -89,6 +89,9 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f02-options-seed-after-draw",
+  "err/f02-subckt-default-draw",
+  "err/f02-unknown-function",
   "err/f05-format-invalid",
   "err/f05-format-no-trace",
   "err/f05-format-unwritable",
@@ -201,6 +204,8 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f02-functions",
+  "regress/f02-functions-seed",
   "regress/f05-format-csv-npz",
   "regress/f05-format-npz-mlprobe-pdet",
   "regress/f05-format-vcd-csv-dc",
@@ -413,6 +418,12 @@
    "only": "^(cir|regress|err)/spar-|^gtest/unit_tests$",
    "gtest": true,
    "note": "F-03: new cases of the S-parameter device SPAR (11) and the 13 loader unit tests (gtest)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T13:29:21Z",
+   "only": "^(regress/f02-functions(-seed)?|err/f02-.*)$",
+   "gtest": false,
+   "note": "F-02: new cases (functions in expressions: math, gauss/uniform/lognormal/choice, shared=, .options seed after a draw)"
   }
  ]
 }

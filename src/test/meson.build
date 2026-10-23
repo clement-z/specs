@@ -17,6 +17,7 @@ if gtest_dep.found()
       'devices/process_style.cpp',
       'devices/value_list_source.cpp',
       'devices/waveguide.cpp',
+      'expression_functions.cpp',
       'fixed_point.cpp',
       'general_utils.cpp',
       'integer_literals.cpp',
