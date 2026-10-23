@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/b004-mode-td-op.cir", "sha256": "e4aa63501b6cea471991bc8056543801f865d129a91d947db4b1e80bf2173225"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

@@ -173,6 +173,9 @@ public:
     // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
     vector<string> command_line; // argv as received by sc_main
     vector<string> netlist_files; // files opened by the parser (-f, .include), in first-open order
+    // data files read by the devices (SPAR S-parameter files, VLSRC/EVLSRC value files), as the paths
+    // used to open them, in first-open order (record_data_file())
+    vector<string> data_files;
     bool print_run_manifest = false; // also print the run manifest to stdout, once (--print-manifest)
 
     // Run statistics (F-15, src/run_stats.h): RunStats::Section flags, 0: off (specs --stats).
@@ -194,6 +197,9 @@ public:
     SPECSConfig(sc_module_name name);
 
     ~SPECSConfig();
+
+    // Record a data file (run manifest, F-01): path as used to open it, unless already recorded
+    void record_data_file(const string &path);
 
     void runAnalysis();
     void runOPAnalysis();

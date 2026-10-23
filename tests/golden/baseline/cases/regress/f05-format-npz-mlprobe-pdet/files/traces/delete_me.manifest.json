@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/f05-format-mlprobe-pdet.cir", "sha256": "b9350e495e27e29996c4f389c33a49dc84464e4dfdee7b6f4a4a65af1b32d425"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.npz"
 }

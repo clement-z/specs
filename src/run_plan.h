@@ -60,8 +60,8 @@ struct RunnerOutcome {
 RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs);
 
 // Manifest of a run table (RunTable): the fields of the run manifest m (versions, master seed, command
-// line, netlist files with their SHA-256; no trace file), then the plan: the stepped values, the number
-// of Monte-Carlo runs, the number of runs and the drawn parameters
+// line, netlist and data files with their SHA-256; no trace file), then the plan: the stepped values,
+// the number of Monte-Carlo runs, the number of runs and the drawn parameters
 struct RunManifest;
 std::string table_manifest_json(const RunManifest &m, const RunPlan &plan, const std::vector<std::string> &drawn);
 

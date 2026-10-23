@@ -8,9 +8,9 @@
  "exit": 0,
  "files": {
   "traces/freqsweep_tb.manifest.json": {
-   "bytes": 273,
+   "bytes": 293,
    "kind": "json",
-   "sha256": "1e626fe0d98530332da00d730f4f37773455004adcae20636a233f3724240290",
+   "sha256": "eee3398037d5a3c6512b3b117208e45806354d5ea77f0adc29d2e30620d56fd6",
    "stored": "files/traces/freqsweep_tb.manifest.json"
   },
   "traces/freqsweep_tb.vcd": {

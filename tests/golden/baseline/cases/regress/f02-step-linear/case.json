@@ -96,9 +96,9 @@
    "stored": "files/traces/lin.runs/signal_names.txt"
   },
   "traces/lin.runs/table.manifest.json": {
-   "bytes": 536,
+   "bytes": 556,
    "kind": "json",
-   "sha256": "82e613222853f8266d6062dbe74e4628b5cae724da8197ff1be1d32edfa10570",
+   "sha256": "3fa25168acd78c4af5b0fb7967c231c2255cd3c5b6de9f7616554175f30e2182",
    "stored": "files/traces/lin.runs/table.manifest.json"
   },
   "traces/lin.runs/time_s.npy": {

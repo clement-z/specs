@@ -1,12 +1,15 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
   "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-passivity.cir"],
   "netlist_files": [
     {"path": "tests/golden/netlists/spar-passivity.cir", "sha256": "7d4ea3dff1568ce02de26b54c13ff113a8deb55abad57d48a3929b96976a6085"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/../../sparam/fixtures/gain.s2p", "sha256": "71dddecddefffe33e6f35f093c7fd882e909511c1f627f80930398ed7302856a"}
   ],
   "trace_file": "traces/delete_me.csv"
 }

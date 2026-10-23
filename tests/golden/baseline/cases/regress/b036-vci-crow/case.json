@@ -7,9 +7,9 @@
  "exit": 0,
  "files": {
   "traces/crow_tb.manifest.json": {
-   "bytes": 261,
+   "bytes": 281,
    "kind": "json",
-   "sha256": "36f2197076e3bb7512f2ecc0ced158890c811498763c0d0fa2ad363544ac76e6",
+   "sha256": "0b0b377aa09c4320b799bfd7c228c824fec0c09aee73140126e3cae0f1f6a8c2",
    "stored": "files/traces/crow_tb.manifest.json"
   }
  },

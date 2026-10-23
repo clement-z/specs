@@ -50,6 +50,12 @@ SPECSConfig::SPECSConfig(sc_module_name name)
 
 SPECSConfig::~SPECSConfig() {}
 
+void SPECSConfig::record_data_file(const string &path)
+{
+    if (std::find(data_files.begin(), data_files.end(), path) == data_files.end())
+        data_files.push_back(path);
+}
+
 void SPECSConfig::runAnalysis()
 {
     run_start = std::chrono::steady_clock::now();

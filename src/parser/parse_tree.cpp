@@ -1083,6 +1083,20 @@ void ParseTree::build_circuit()
             specsGlobalConfig.register_object(sig);
 }
 
+vector<string> ParseTree::data_files() const
+{
+    vector<string> files;
+    for (const auto *e : elements)
+    {
+        for (const auto &f : e->data_files())
+        {
+            if (std::find(files.begin(), files.end(), f) == files.end())
+                files.push_back(f);
+        }
+    }
+    return files;
+}
+
 void ParseTree::flatten()
 {
     cout << "Flattening " << name << endl;

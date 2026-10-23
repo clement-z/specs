@@ -15,7 +15,6 @@
 
 #include "run_manifest.h"
 #include "utils/rng.h"
-#include "utils/sha256.h"
 
 using std::string;
 using std::vector;
@@ -114,7 +113,7 @@ string table_manifest_json(const RunManifest &m, const RunPlan &plan, const vect
     std::ostringstream ss;
     ss << "{\n";
     ss << "  \"format\": \"specs-run-table\",\n";
-    ss << "  \"format_version\": 1,\n";
+    ss << "  \"format_version\": 2,\n";
     ss << "  \"specs_version\": " << RunManifest::json_quote(m.specs_version) << ",\n";
     ss << "  \"systemc_version\": " << RunManifest::json_quote(m.systemc_version) << ",\n";
     ss << "  \"seed\": " << m.seed << ",\n";
@@ -122,18 +121,8 @@ string table_manifest_json(const RunManifest &m, const RunPlan &plan, const vect
     for (size_t i = 0; i < m.command_line.size(); ++i)
         ss << (i ? ", " : "") << RunManifest::json_quote(m.command_line[i]);
     ss << "],\n";
-    ss << "  \"netlist_files\": [";
-    for (size_t i = 0; i < m.netlist_files.size(); ++i)
-    {
-        string hex;
-        ss << (i ? "," : "") << "\n    {\"path\": " << RunManifest::json_quote(m.netlist_files[i]) << ", \"sha256\": ";
-        if (spx::sha256_file_hex(m.netlist_files[i], hex))
-            ss << RunManifest::json_quote(hex);
-        else
-            ss << "null";
-        ss << "}";
-    }
-    ss << (m.netlist_files.empty() ? "" : "\n  ") << "],\n";
+    ss << "  \"netlist_files\": " << RunManifest::json_file_list(m.netlist_files) << ",\n";
+    ss << "  \"data_files\": " << RunManifest::json_file_list(m.data_files) << ",\n";
     ss << "  \"steps\": [";
     for (size_t i = 0; i < plan.plan().steps.size(); ++i)
     {

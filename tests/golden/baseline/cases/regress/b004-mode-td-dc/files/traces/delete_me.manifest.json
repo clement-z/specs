@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "circuits/add_drop.cir", "sha256": "4d044eb2227bf27ed3a806c038148f0ca15725ba0684d4791c80fff1a14aca06"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

@@ -8,7 +8,7 @@
 #include <vector>
 
 // Run table of a .step/.mc plan (F-02): one table for all the runs, in the directory <trace>.runs/.
-//   table.manifest.json  what produced it (version, netlist files, command line, seed, plan); a resumed
+//   table.manifest.json  what produced it (version, netlist and data files, command line, seed, plan); a resumed
 //                        plan must have the same manifest
 //   runs.csv             the run index, one line per finished run, appended: run, status (ok, failed,
 //                        crashed), exit_code, seed, mc_run, the stepped parameters, the drawn top-level

@@ -587,6 +587,11 @@ struct ParseElement {
 
     virtual string kind() const { return "UNDEFINED"; }
 
+    // Data files that create() reads (S-parameter, value list files), as the paths it opens them with,
+    // without creating the element: for the run table manifest of a .step/.mc plan, whose process
+    // does not build the circuit (F-01)
+    virtual vector<string> data_files() const { return {}; }
+
     virtual ~ParseElement() {}
 
     virtual string to_json() const;
@@ -817,6 +822,9 @@ struct ParseTree {
 
     void build_circuit();
     void flatten();
+    // Data files of the elements (ParseElement::data_files()), each once, in element order (call after
+    // flatten() for those of the subcircuit instances)
+    vector<string> data_files() const;
 
     ~ParseTree()
     {

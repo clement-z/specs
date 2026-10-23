@@ -9,9 +9,9 @@
  "exit": 0,
  "files": {
   "traces/ad.manifest.json": {
-   "bytes": 410,
+   "bytes": 430,
    "kind": "json",
-   "sha256": "bd44f66c2ef3ab0ba753a12b5ede2d9a26004a34f1788e1ac84e82116b44b47b",
+   "sha256": "3f851c527fd82c70f606a909ccc9ec1fda57520f4c2473d378d5e3e3327a1e6c",
    "stored": "files/traces/ad.manifest.json"
   },
   "traces/ad.stats.json": {

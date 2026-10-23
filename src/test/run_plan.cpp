@@ -11,10 +11,12 @@
 
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
+#include "run_manifest.h"
 #include "run_plan.h"
 #include "run_table.h"
 #include "test/utils.h"
 #include "utils/rng.h"
+#include "utils/sha256.h"
 
 #include "parser.h"
 #include "scanner.h"
@@ -293,6 +295,69 @@ TEST(RunTableDeathTest, OtherManifestOrDirectory)
         std::ofstream(fs::path(not_table) / "keep.txt") << "data";
         EXPECT_EXIT(RunTable(not_table, "{}\n", {}, {}, true), failed, "is not a run table");
         EXPECT_TRUE(fs::exists(fs::path(not_table) / "keep.txt"));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// The table manifest lists the data files of the plan with their SHA-256: ParseTree::data_files() of
+// the flattened netlist (the process of the plan does not build the circuit), resolved as create()
+// does. A resumed plan must have the same manifest, so a changed data file is refused, as a changed
+// netlist file is (F-01)
+TEST(RunTableDeathTest, ResumeRefusesAChangedDataFile)
+{
+    SPECS_TEST_HEADER()
+    {
+        const auto failed = testing::ExitedWithCode(1);
+        const fs::path files = fs::path(table_dir("data_files_inputs"));
+        fs::create_directories(files);
+        const std::string values = (files / "values.csv").string();
+        const std::string spar = (files / "wg.taylor").string();
+        std::ofstream(values, std::ios::binary) << "first line\n1e-12,1e-3,1.55e-6\n";
+        std::ofstream(spar, std::ios::binary) << "specs-taylor 1\nports in out\ncenter 1.55e-6\nS out in amp 0.9\n";
+
+        // the value file through a subcircuit instance (after flatten()), and twice
+        ParseTree tree;
+        ASSERT_EQ(parse_netlist(tree, ".param L=1\n"
+                                      ".step param L list 1 2\n"
+                                      ".subckt src out\n"
+                                      "vlsrc1 out \"" + values + "\"\n"
+                                      ".ends\n"
+                                      "x1 a src\n"
+                                      "vlsrc2 b values=\"" + values + "\"\n"
+                                      "spar1 a c file=\"" + spar + "\"\n"), 0);
+        tree.flatten();
+        RunManifest m;
+        m.netlist_files = tree.input_files;
+        m.data_files = tree.data_files();
+        EXPECT_EQ(m.data_files.size(), 2u);
+        EXPECT_EQ(std::count(m.data_files.begin(), m.data_files.end(), values), 1);
+        EXPECT_EQ(std::count(m.data_files.begin(), m.data_files.end(), spar), 1);
+
+        const RunPlan plan(tree.plan, 0);
+        const std::string manifest = table_manifest_json(m, plan, {});
+        std::string hex;
+        ASSERT_TRUE(spx::sha256_file_hex(values, hex));
+        EXPECT_NE(manifest.find("\"format_version\": 2,"), std::string::npos) << manifest;
+        EXPECT_NE(manifest.find("\n  \"data_files\": [\n"), std::string::npos) << manifest;
+        EXPECT_NE(manifest.find("{\"path\": " + RunManifest::json_quote(values) + ", \"sha256\": \"" + hex + "\"}"),
+                  std::string::npos) << manifest;
+
+        const std::string dir = table_dir("data_files");
+        {
+            RunTable t(dir, manifest, plan.param_names(), {}, false);
+            RunChunk c = small_chunk(1, "ROOT/P1");
+            ASSERT_TRUE(t.commit({ 0, "ok", 0, 0, "", { "1" }, "" }, &c));
+        }
+        // same data files: the plan resumes
+        {
+            RunTable t(dir, table_manifest_json(m, plan, {}), plan.param_names(), {}, false);
+            EXPECT_EQ(t.completed(), (std::set<uint64_t>{ 0 }));
+        }
+        // a changed data file: refused
+        std::ofstream(values, std::ios::binary | std::ios::app) << "2e-12,2e-3,1.55e-6\n";
+        EXPECT_EXIT(RunTable(dir, table_manifest_json(m, plan, {}), plan.param_names(), {}, false), failed,
+                    "was made by another netlist, data file");
+        fs::remove_all(files);
     }
     SPECS_TEST_FOOTER();
 }

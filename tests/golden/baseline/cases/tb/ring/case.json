@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/ring_tb.manifest.json": {
-   "bytes": 249,
+   "bytes": 269,
    "kind": "json",
-   "sha256": "845b0741be027e7a63c0bb9f7c5ec2ba8d3227e8a9db7dd629156e5db3106a6b",
+   "sha256": "86d7570cc1d3a8fc5bd3292cbe3680fff3b665bf2b6a50c9bdc195489dfd55d8",
    "stored": "files/traces/ring_tb.manifest.json"
   },
   "traces/ring_tb.vcd": {
