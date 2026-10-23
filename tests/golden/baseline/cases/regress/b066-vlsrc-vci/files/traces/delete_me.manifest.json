@@ -1,12 +1,16 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
   "command_line": ["specs", "--vci", "-f", "tests/golden/netlists/b066-vlsrc-vci.cir"],
   "netlist_files": [
     {"path": "tests/golden/netlists/b066-vlsrc-vci.cir", "sha256": "803a7e2ed4a27b42c74013226ad182dd6160769bf5ff9f6a5047fe964c5804f4"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/b066-vlsrc-values.csv", "sha256": "e08fb0f65468f74b5b6aff0f191ee4f1ce73c81431cdc57012aa11c6399f20e0"},
+    {"path": "tests/golden/netlists/b052-evlsrc-values.csv", "sha256": "7cde5e5428dc07661af18d6566249efcaa25faefecdf0c6e3aabca23823700f6"}
   ],
   "trace_file": "traces/delete_me.vcd"
 }

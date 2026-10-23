@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/f12-param-override.cir", "sha256": "8b1e2e7398dc45f2b881a831e007a9a01b9acc08e754099c94afcc330596a2fa"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

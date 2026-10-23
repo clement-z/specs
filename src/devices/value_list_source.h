@@ -61,6 +61,7 @@ public:
             cerr << "Error: Cannot open the file \"" << filename << "\"." << endl;
             exit(1);
         }
+        specsGlobalConfig.record_data_file(filename); // run manifest (F-01)
 
         string line;
 

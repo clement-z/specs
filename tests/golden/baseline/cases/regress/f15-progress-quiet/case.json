@@ -9,9 +9,9 @@
  "exit": 0,
  "files": {
   "traces/x.manifest.json": {
-   "bytes": 432,
+   "bytes": 452,
    "kind": "json",
-   "sha256": "5959a8dd1e42f68ef714e2e76fb520fe383f47cd22c2e3e98d644b75e61e890f",
+   "sha256": "059610cb036969baa075fad3cc20382ac9846a9b34c6eb0d3d60ad53ed4c28a6",
    "stored": "files/traces/x.manifest.json"
   },
   "traces/x.vcd": {

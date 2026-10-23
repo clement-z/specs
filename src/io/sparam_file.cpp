@@ -301,6 +301,9 @@ void SParamData::buildTables(vector<vector<Sample>> &raw, bool conjugate)
             t.f_Hz.push_back(samples[s].f_Hz);
             t.mag.push_back(std::abs(v));
             t.phase.push_back(std::arg(v));
+            t.re.push_back(v.real());
+            t.im.push_back(v.imag());
+            t.max_mag = std::max(t.max_mag, t.mag.back());
             nonzero |= std::abs(v) != 0;
         }
         unwrap(t.phase);
@@ -327,7 +330,10 @@ void SParamData::buildTables(vector<vector<Sample>> &raw, bool conjugate)
         {
             t.dmag = pchipSlopes(t.f_Hz, t.mag);
             t.dphase = pchipSlopes(t.f_Hz, t.phase);
+            t.dre = pchipSlopes(t.f_Hz, t.re);
+            t.dim = pchipSlopes(t.f_Hz, t.im);
         }
+        t.loo_error = leaveOneOutErrors(t);
         m_active[k] = nonzero;
     }
 }
@@ -414,18 +420,19 @@ vector<double> SParamData::pchipSlopes(const vector<double> &x, const vector<dou
     return d;
 }
 
-double SParamData::evalTable(const vector<double> &x, const vector<double> &y, const vector<double> *slopes, double xi)
+size_t SParamData::segment(const vector<double> &x, double xi)
 {
     const size_t n = x.size();
-    if (n == 1)
-        return y[0];
-    // segment [x[k], x[k+1]] containing xi (xi is within [x.front(), x.back()])
     size_t k = std::upper_bound(x.begin(), x.end(), xi) - x.begin();
     if (k == 0)
         k = 1;
     if (k >= n)
         k = n - 1;
-    --k;
+    return k - 1;
+}
+
+double SParamData::evalSegment(const vector<double> &x, const vector<double> &y, const vector<double> *slopes, size_t k, double xi)
+{
     if (xi == x[k])
         return y[k];
     if (xi == x[k + 1])
@@ -438,6 +445,102 @@ double SParamData::evalTable(const vector<double> &x, const vector<double> &y, c
     const double t2 = t * t, t3 = t2 * t;
     return (2 * t3 - 3 * t2 + 1) * y[k] + (t3 - 2 * t2 + t) * h * (*slopes)[k]
          + (-2 * t3 + 3 * t2) * y[k + 1] + (t3 - t2) * h * (*slopes)[k + 1];
+}
+
+double SParamData::evalTable(const vector<double> &x, const vector<double> &y, const vector<double> *slopes, double xi)
+{
+    // xi is within [x.front(), x.back()]
+    if (x.size() == 1)
+        return y[0];
+    return evalSegment(x, y, slopes, segment(x, xi), xi);
+}
+
+SParamData::complex_type SParamData::interpolate(const Table &t, double f_Hz) const
+{
+    const bool pchip = m_interp == INTERP_PCHIP;
+    if (t.f_Hz.size() == 1)
+        return std::polar(t.mag[0], t.phase[0]);
+    const size_t k = segment(t.f_Hz, f_Hz);
+    // at a grid point (and wherever |S| is not small) from magnitude and phase, as the file's value
+    if (f_Hz != t.f_Hz[k] && f_Hz != t.f_Hz[k + 1]
+            && std::min(t.mag[k], t.mag[k + 1]) < MIXED_INTERP_THRESHOLD * t.max_mag)
+    {
+        // near a null: real and imaginary parts (S is continuous at the grid points either way)
+        return complex_type(evalSegment(t.f_Hz, t.re, pchip ? &t.dre : nullptr, k, f_Hz),
+                            evalSegment(t.f_Hz, t.im, pchip ? &t.dim : nullptr, k, f_Hz));
+    }
+    return std::polar(evalSegment(t.f_Hz, t.mag, pchip ? &t.dmag : nullptr, k, f_Hz),
+                      evalSegment(t.f_Hz, t.phase, pchip ? &t.dphase : nullptr, k, f_Hz));
+}
+
+vector<double> SParamData::leaveOneOutErrors(const Table &t) const
+{
+    const size_t m = t.f_Hz.size();
+    vector<double> errors(m, 0);
+    const bool pchip = m_interp == INTERP_PCHIP;
+    for (size_t j = 1; j + 1 < m; ++j)
+    {
+        // the grid without point j: interval [j - 1, j + 1]; PCHIP slopes from the points around it
+        // (j - 2 .. j + 2 without j), as the whole grid without j would give them
+        vector<double> x;
+        vector<size_t> idx;
+        for (size_t i = (j >= 2 ? j - 2 : 0); i <= std::min(m - 1, j + 2); ++i)
+            if (i != j)
+            {
+                idx.push_back(i);
+                x.push_back(t.f_Hz[i]);
+            }
+        const size_t a = std::find(idx.begin(), idx.end(), j - 1) - idx.begin();
+        auto eval = [&](const vector<double> &y_full) {
+            vector<double> y;
+            for (size_t i : idx)
+                y.push_back(y_full[i]);
+            if (!pchip)
+                return evalSegment(x, y, nullptr, a, t.f_Hz[j]);
+            const vector<double> slopes = pchipSlopes(x, y);
+            return evalSegment(x, y, &slopes, a, t.f_Hz[j]);
+        };
+        complex_type s;
+        if (std::min(t.mag[j - 1], t.mag[j + 1]) < MIXED_INTERP_THRESHOLD * t.max_mag)
+            s = complex_type(eval(t.re), eval(t.im));
+        else
+            s = std::polar(eval(t.mag), eval(t.phase));
+        errors[j] = std::abs(s - complex_type(t.re[j], t.im[j]));
+    }
+    return errors;
+}
+
+SParamData::GridReport SParamData::gridCheck(size_t out, size_t in) const
+{
+    GridReport report;
+    const size_t k = out * m_nports + in;
+    if (m_is_taylor || !m_active[k])
+        return report;
+    const Table &t = m_tables[k];
+    for (size_t j = 0; j < t.loo_error.size(); ++j)
+        if (t.loo_error[j] > report.error)
+        {
+            report.error = t.loo_error[j];
+            report.wavelength_m = c / t.f_Hz[j];
+        }
+    return report;
+}
+
+bool SParamData::nearFlaggedGridPoint(size_t out, size_t in, double wavelength_m) const
+{
+    const size_t k = out * m_nports + in;
+    if (m_is_taylor || !m_active[k])
+        return false;
+    const Table &t = m_tables[k];
+    const size_t m = t.f_Hz.size();
+    if (m < 2)
+        return false;
+    // the delay between grid points k and k + 1 comes from points k - 1 .. k + 2
+    const size_t seg = segment(t.f_Hz, clampFrequency(c / wavelength_m));
+    for (size_t j = (seg >= 1 ? seg - 1 : 0); j <= std::min(m - 1, seg + 2); ++j)
+        if (t.loo_error[j] > GRID_CHECK_THRESHOLD)
+            return true;
+    return false;
 }
 
 double SParamData::polyval(const vector<double> &coeffs, double d)
@@ -467,12 +570,7 @@ SParamData::complex_type SParamData::S(size_t out, size_t in, double wavelength_
         const double d = wavelength_m - m_lambda0_m;
         return std::polar(polyval(t.amp, d), polyval(t.phase, d));
     }
-    const Table &t = m_tables[k];
-    const double f = clampFrequency(c / wavelength_m);
-    const bool pchip = m_interp == INTERP_PCHIP;
-    const double mag = evalTable(t.f_Hz, t.mag, pchip ? &t.dmag : nullptr, f);
-    const double phase = evalTable(t.f_Hz, t.phase, pchip ? &t.dphase : nullptr, f);
-    return std::polar(mag, phase);
+    return interpolate(m_tables[k], clampFrequency(c / wavelength_m));
 }
 
 double SParamData::groupDelay(size_t out, size_t in, double wavelength_m) const

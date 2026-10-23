@@ -391,8 +391,8 @@ void RunTable::open_or_create(const string &manifest_json, bool overwrite)
         if (old == manifest_json && !overwrite)
             resume = true;
         else if (!overwrite)
-            fail("the run table \"" + m_dir + "\" was made by another netlist, plan, build or command line "
-                 "(see its " + MANIFEST_FILE + "); use --overwrite to replace it, or another -o");
+            fail("the run table \"" + m_dir + "\" was made by another netlist, data file, plan, build or "
+                 "command line (see its " + MANIFEST_FILE + "); use --overwrite to replace it, or another -o");
     }
     else
     {

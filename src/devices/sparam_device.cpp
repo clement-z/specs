@@ -2,6 +2,7 @@
 #include "devices/sparam_device.h"
 #include "utils/sysc_utils.h"
 
+#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -34,11 +35,12 @@ SParamDeviceBase::SParamDeviceBase(sc_module_name name, size_t nports, bool bidi
         p_out.push_back(make_unique<spx::oa_port_out_type>(("p" + to_string(net) + "_out").c_str()));
         m_out_writers.push_back(make_unique<OpticalOutputPort>(("p" + to_string(net) + "_out_delayed_writer").c_str(), *p_out.back()));
     }
-    m_memory.resize(p_in.size());
+    m_copy.resize(p_out.size() * p_in.size());
 
     SC_METHOD(on_inputs_changed);
     for (auto &p : p_in)
         sensitive << *p;
+    sensitive << m_arrival_event;
     dont_initialize();
     if (specsGlobalConfig.verbose_component_initialization)
         SC_THREAD(print_initialization);
@@ -67,6 +69,7 @@ void SParamDeviceBase::start_of_simulation()
     if (m_delay_mode == DELAY_FIXED && !m_out_writers.empty())
         m_out_writers[0]->checkDelayRounding(name(), m_delay_s, m_from_netlist);
     m_fixed_delay = sc_time(m_delay_mode == DELAY_FIXED ? m_delay_s * 1e9 : 0, SC_NS);
+    m_negative_delay_reported.assign(p_out.size() * p_in.size(), 0);
 }
 
 void SParamDeviceBase::print_initialization()
@@ -98,19 +101,8 @@ sc_time SParamDeviceBase::autoDelay(double tau_s)
     const bool timed = config && config->m_mode == OpticalOutputPortMode::EVENT_DRIVEN
                        && specsGlobalConfig.analysis_type == SPECSConfig::TIME_DOMAIN;
     const double resolution_s = sc_get_time_resolution().to_seconds() * (config ? config->m_timestep_value : 1);
-    if (tau_s < 0)
-    {
-        // a causal delay is >= 0: 0 is used. Reported once per device when it matters, i.e. when the
-        // negative delay is at least half a time step (smaller ones, e.g. the finite-difference noise of a
-        // constant phase, round to 0 anyway)
-        if (timed && !m_negative_delay_reported && -tau_s >= resolution_s / 2)
-        {
-            cerr << "Warning (" << name() << "): negative group delay " << tau_s
-                 << " s in the S-parameters, 0 used (reported once)" << endl;
-            m_negative_delay_reported = true;
-        }
-        tau_s = 0;
-    }
+    // a causal delay is >= 0: 0 is used (reportNegativeDelay())
+    tau_s = std::max(tau_s, 0.0);
     if (timed && !m_delay_rounding_reported
             && classifyDelayRounding(tau_s, resolution_s, OpticalOutputPort::DELAY_ROUNDING_WARN_THRESHOLD) != DELAY_ROUNDING_OK)
     {
@@ -120,6 +112,29 @@ sc_time SParamDeviceBase::autoDelay(double tau_s)
     }
     // the same rounding as a waveguide's (sc_time from ns)
     return sc_time(tau_s * 1e9, SC_NS);
+}
+
+void SParamDeviceBase::reportNegativeDelay(size_t k, size_t i, double wavelength_m, double tau_s)
+{
+    const size_t path = k * p_in.size() + i;
+    const auto &config = m_out_writers.empty() ? nullptr : m_out_writers[0]->getConfig();
+    const bool timed = config && config->m_mode == OpticalOutputPortMode::EVENT_DRIVEN
+                       && specsGlobalConfig.analysis_type == SPECSConfig::TIME_DOMAIN;
+    const double resolution_s = sc_get_time_resolution().to_seconds() * (config ? config->m_timestep_value : 1);
+    // only when it matters, i.e. when the negative delay is at least half a time step (smaller ones, e.g.
+    // the finite-difference noise of a constant phase, round to 0 anyway)
+    if (!timed || m_negative_delay_reported[path] || -tau_s < resolution_s / 2)
+        return;
+    m_negative_delay_reported[path] = 1;
+    const size_t out = m_port_map[m_output_nets[k]], in = m_port_map[m_input_nets[i]];
+    cerr << "Warning (" << name() << "): negative group delay " << tau_s << " s from port '"
+         << m_data->portNames()[in] << "' to port '" << m_data->portNames()[out] << "' at " << wavelength_m
+         << " m in the S-parameters, 0 used (reported once per path)";
+    if (m_data->nearFlaggedGridPoint(out, in, wavelength_m))
+        cerr << "; it comes from grid points where the grid is too coarse (see the grid warning): "
+             << "probably an artefact of the grid";
+    cerr << ". The path acts as a connection without delay, also inside a feedback loop (nothing else "
+         << "reports a loop without delay)" << endl;
 }
 
 SParamDeviceBase::WavelengthEntry SParamDeviceBase::computeEntry(const OpticalSignal &s)
@@ -157,48 +172,95 @@ SParamDeviceBase::WavelengthEntry SParamDeviceBase::computeEntry(const OpticalSi
         }
     }
 
-    e.delay.assign(no, SC_ZERO_TIME);
+    // the delay of each path (only honoured by event-driven ports in a time-domain analysis)
+    e.delay.assign(no * ni, SC_ZERO_TIME);
+    e.negative_delay_s.assign(no * ni, 0);
     for (size_t k = 0; k < no; ++k)
-    {
-        if (m_delay_mode == DELAY_FIXED)
-            e.delay[k] = m_fixed_delay;
-        else if (m_delay_mode == DELAY_AUTO && !m_sources[k].empty())
+        for (size_t i : m_sources[k])
         {
-            // the largest path into the output (the first one if several are equal)
-            size_t best = m_sources[k][0];
-            for (size_t i : m_sources[k])
-                if (abs(e.S[k * ni + i]) > abs(e.S[k * ni + best]))
-                    best = i;
-            const double tau = m_data->groupDelay(m_port_map[m_output_nets[k]], m_port_map[m_input_nets[best]], wl);
-            e.delay[k] = autoDelay(tau);
+            if (m_delay_mode == DELAY_FIXED)
+                e.delay[k * ni + i] = m_fixed_delay;
+            else if (m_delay_mode == DELAY_AUTO)
+            {
+                const double tau = m_data->groupDelay(m_port_map[m_output_nets[k]], m_port_map[m_input_nets[i]], wl);
+                e.delay[k * ni + i] = autoDelay(tau);
+                if (tau < 0)
+                    e.negative_delay_s[k * ni + i] = tau;
+            }
         }
-    }
     return e;
+}
+
+void SParamDeviceBase::writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e)
+{
+    const size_t ni = p_in.size();
+    OpticalSignal::field_type out = 0;
+    for (size_t i : m_sources[k])
+        out += e.S[k * ni + i] * m_copy[k * ni + i][wavelength_id];
+    m_out_writers[k]->delayedWrite(OpticalSignal(out, wavelength_id), SC_ZERO_TIME);
 }
 
 void SParamDeviceBase::onInput(size_t input, const OpticalSignal &s)
 {
     const uint32_t wl_id = s.m_wavelength_id;
-    for (auto &memory : m_memory)
-        if (memory.size() <= wl_id)
-            memory.resize(wl_id + 1, 0);
-    m_memory[input][wl_id] = s.m_field;
+    for (auto &copy : m_copy)
+        if (copy.size() <= wl_id)
+            copy.resize(wl_id + 1, 0);
 
     const WavelengthEntry &e = m_cache.get(wl_id, [&]() { return computeEntry(s); });
+    // the delays are only honoured by event-driven ports (not during an operating point, .op, .dc and
+    // the one before a transient, where the ports are in NO_DELAY mode): else every path is copied at
+    // once, as the ports would write at once anyway
+    const bool timed = !m_out_writers.empty() && m_out_writers[0]->m_mode == OpticalOutputPortMode::EVENT_DRIVEN;
     const size_t ni = p_in.size();
-    // full recomputation of the outputs this input reaches, from the memories (absolute writes)
     for (size_t k : m_reach[input])
     {
-        OpticalSignal::field_type out = 0;
-        for (size_t i : m_sources[k])
-            out += e.S[k * ni + i] * m_memory[i][wl_id];
-        m_out_writers[k]->delayedWrite(OpticalSignal(out, wl_id), e.delay[k]);
+        const size_t path = k * ni + input;
+        if (e.negative_delay_s[path] < 0)
+            reportNegativeDelay(k, input, s.getWavelength(), e.negative_delay_s[path]);
+        if (!timed || e.delay[path] == SC_ZERO_TIME)
+        {
+            // no delay: the copy is the input, the output is recomputed now (absolute write)
+            m_copy[path][wl_id] = s.m_field;
+            writeOutput(k, wl_id, e);
+        }
+        else
+        {
+            m_arrivals.push({sc_time_stamp() + e.delay[path], m_arrival_seq++, static_cast<uint32_t>(path), wl_id, s.m_field});
+            m_arrival_event.notify(e.delay[path]); // the earliest pending notification is kept
+        }
     }
+}
+
+void SParamDeviceBase::processArrivals()
+{
+    const sc_time now = sc_time_stamp();
+    // (output, wavelength id) changed by the arrivals, in the order of their first arrival
+    std::vector<std::pair<size_t, uint32_t>> changed;
+    const size_t ni = p_in.size();
+    while (!m_arrivals.empty() && m_arrivals.top().t <= now)
+    {
+        const Arrival a = m_arrivals.top();
+        m_arrivals.pop();
+        m_copy[a.path][a.wavelength_id] = a.field;
+        const std::pair<size_t, uint32_t> key(a.path / ni, a.wavelength_id);
+        if (std::find(changed.begin(), changed.end(), key) == changed.end())
+            changed.push_back(key);
+    }
+    for (const auto &key : changed)
+    {
+        // computed when the input event was handled
+        const WavelengthEntry &e = m_cache.get(key.second, [&]() { return computeEntry(OpticalSignal(0, key.second)); });
+        writeOutput(key.first, key.second, e);
+    }
+    if (!m_arrivals.empty())
+        m_arrival_event.notify(m_arrivals.top().t - now);
 }
 
 void SParamDeviceBase::on_inputs_changed()
 {
-    // every input with a new value in this delta cycle, in net order
+    // the delayed copies due now, then every input with a new value in this delta cycle, in net order
+    processArrivals();
     for (size_t i = 0; i < p_in.size(); ++i)
         if ((*p_in[i])->event())
             onInput(i, (*p_in[i])->read());

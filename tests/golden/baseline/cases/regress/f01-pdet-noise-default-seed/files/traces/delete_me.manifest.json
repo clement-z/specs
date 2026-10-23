@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/f01-pdet-noise.cir", "sha256": "e87f5a7b5e9886959b227702f636dbc7c67b0ca52dbc7b3f358cd411f57711fc"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

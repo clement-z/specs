@@ -891,6 +891,26 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     return obj;
 }
 
+// Value files of a VLSRC/EVLSRC line, as create() opens them: the positional argument, then
+// values="<file>" (a path relative to the working directory)
+static vector<string> value_list_files(const ParseElement &e)
+{
+    vector<string> files;
+    if (!e.args.empty() && e.args[0].type == Variable::STRING)
+        files.push_back(e.args[0].str);
+    for (const auto &p : e.kwargs)
+    {
+        if (strutils::iequals(p.first, "VALUES") && p.second.type == Variable::STRING)
+            files.push_back(p.second.str);
+    }
+    return files;
+}
+
+vector<string> VLSourceElement::data_files() const
+{
+    return value_list_files(*this);
+}
+
 /** ******************************************* **/
 /**                 EVL Source                  **/
 /** ******************************************* **/
@@ -1032,6 +1052,11 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
     }
     return obj;
+}
+
+vector<string> EVLSourceElement::data_files() const
+{
+    return value_list_files(*this);
 }
 
 /** ******************************************* **/
@@ -1474,6 +1499,28 @@ INSTANTIATE_AND_CONNECT_BI(SPARElement, pt_helper)
     return obj;
 }
 
+string SPARElement::resolve_file(const string &file) const
+{
+    // Relative path: next to the netlist file first, then in the working directory (as .include)
+    ParserState state;
+    state.include_dirs.push_back(include_dir);
+    return state.resolve_include(file);
+}
+
+vector<string> SPARElement::data_files() const
+{
+    // the file= that create() keeps (the last one)
+    string file;
+    for (const auto &p : kwargs)
+    {
+        if (strutils::iequals(p.first, "FILE") && p.second.type == Variable::STRING)
+            file = p.second.str;
+    }
+    if (file.empty())
+        return {};
+    return { resolve_file(file) };
+}
+
 sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
 {
     element_type_base *obj = nullptr;
@@ -1584,11 +1631,9 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
         exit(1);
     }
 
-    // Relative path: next to the netlist file first, then in the working directory (as .include)
-    ParserState state;
-    state.include_dirs.push_back(include_dir);
-    const string path = state.resolve_include(file);
+    const string path = resolve_file(file);
     std::shared_ptr<const SParamData> data = SParamData::load(path, format, convention, interp);
+    specsGlobalConfig.record_data_file(path); // run manifest (F-01)
 
     // Ports of the data, in net order
     vector<size_t> port_map;
@@ -1683,6 +1728,35 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
             cerr << "Warning (" << name << "): unidirectional, the paths from an input (first half of the nets) to an "
                  << "input are not used; the largest, from " << nets[largest_in] << " to " << nets[largest_out]
                  << ", reaches " << 20 * log10(largest) << " dB (make a net bidirectional with & to use them)" << endl;
+        }
+    }
+
+    // Grid adequacy (doc/sparam.md): the worst leave-one-out error of the paths the device uses (unidirectional:
+    // from an input to an output), one warning per device
+    {
+        SParamData::GridReport worst;
+        size_t worst_out = 0, worst_in = 0;
+        for (size_t o = 0; o < nets.size(); ++o)
+            for (size_t i = 0; i < nets.size(); ++i)
+            {
+                if (!bidirectional && (!writes_net(o) || writes_net(i)))
+                    continue;
+                const auto r = data->gridCheck(port_map[o], port_map[i]);
+                if (r.error > worst.error)
+                {
+                    worst = r;
+                    worst_out = o;
+                    worst_in = i;
+                }
+            }
+        if (worst.error > SParamData::GRID_CHECK_THRESHOLD)
+        {
+            cerr << "Warning (" << name << "): the frequency grid of " << path << " may be too coarse: at "
+                 << worst.wavelength_m << " m, S from port '" << data->portNames()[port_map[worst_in]] << "' to port '"
+                 << data->portNames()[port_map[worst_out]] << "' interpolated from the neighbouring grid points differs "
+                 << "from the file by " << worst.error << " (field; more than " << SParamData::GRID_CHECK_THRESHOLD
+                 << "): features narrower than the grid spacing are not resolved, and the interpolated values and "
+                 << "group delays near there are unreliable" << endl;
         }
     }
 

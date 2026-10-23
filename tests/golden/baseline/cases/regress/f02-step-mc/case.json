@@ -96,9 +96,9 @@
    "stored": "files/traces/delete_me.runs/signal_names.txt"
   },
   "traces/delete_me.runs/table.manifest.json": {
-   "bytes": 497,
+   "bytes": 517,
    "kind": "json",
-   "sha256": "7e2ba12db9b1cdc2cce24e40ab1e97890dd51fc8e0f9757c6214efe652085900",
+   "sha256": "49313dbc2a90cdfe7af07d29d119b412984bd71182d6036dfb1d51f53aff0693",
    "stored": "files/traces/delete_me.runs/table.manifest.json"
   },
   "traces/delete_me.runs/time_s.npy": {

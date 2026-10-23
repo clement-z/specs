@@ -18,9 +18,9 @@
    "stored": "files/traces/custom.stats.json"
   },
   "traces/x.manifest.json": {
-   "bytes": 537,
+   "bytes": 557,
    "kind": "json",
-   "sha256": "0ef2bb5c7c574de3f542466db87765be4885c5c4970b529e8a0534f7c6ee9738",
+   "sha256": "610117550dcb56a00b17c60eb73c34615fd9b5c5912ae588efce4cc410f4ef0e",
    "stored": "files/traces/x.manifest.json"
   }
  },

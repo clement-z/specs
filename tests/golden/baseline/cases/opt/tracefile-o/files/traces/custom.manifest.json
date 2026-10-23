@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "circuits/add_drop_pyspecs.cir", "sha256": "ebb6b3304be16f61b8a3bc16ac0771f1c3a9fefa08fbc83f83e0b5361e315bef"}
   ],
+  "data_files": [],
   "trace_file": "traces/custom.vcd"
 }

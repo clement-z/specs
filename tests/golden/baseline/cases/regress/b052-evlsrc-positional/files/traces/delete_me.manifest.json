@@ -1,12 +1,15 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
   "command_line": ["specs", "-f", "tests/golden/netlists/b052-evlsrc-positional.cir"],
   "netlist_files": [
     {"path": "tests/golden/netlists/b052-evlsrc-positional.cir", "sha256": "3c8b14c249a2ebd746d9286dba35c427c65c29a3d4a8ade686eb905a88eea81e"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/b052-evlsrc-values.csv", "sha256": "7cde5e5428dc07661af18d6566249efcaa25faefecdf0c6e3aabca23823700f6"}
   ],
   "trace_file": "traces/delete_me.vcd"
 }

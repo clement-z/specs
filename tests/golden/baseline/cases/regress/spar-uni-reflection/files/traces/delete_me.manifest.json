@@ -1,12 +1,16 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
   "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-uni-reflection.cir"],
   "netlist_files": [
     {"path": "tests/golden/netlists/spar-uni-reflection.cir", "sha256": "a8e4312219268b612b01b9b241cbf286de22f2216c13a3678438f7a909c1219c"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/../../sparam/fixtures/asym.s2p", "sha256": "96966b649f235351a565cda64ea4f7b317795daef8dce660a64048e3cfc3b03f"},
+    {"path": "tests/golden/netlists/../../sparam/fixtures/asym_v2.ts", "sha256": "17a314e34e9298f84c948d1677ebfdec56723590e9132279c6f8fcadd2dcd380"}
   ],
   "trace_file": "traces/delete_me.csv"
 }

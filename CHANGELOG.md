@@ -26,10 +26,13 @@
   Lumerical/SiEPIC `.sparam`, Touchstone 1.x/2.x, a CSV form and a Taylor-coefficient form. Phases are
   converted to SPECS's convention on import (Touchstone, written in the RF convention, is conjugated; a test
   shows that a waveguide written in each format gives the phase and delay of a `WG` of the same length).
-  Magnitude and unwrapped phase are interpolated in frequency (`interp=linear|pchip`); in `.tran` the
-  S-matrix of the carrier wavelength applies with a group delay per output (no dispersion within a pulse).
-  Unidirectional or bidirectional like `COUPLER`; a wavelength outside the data range is an error;
-  `passivity=check|ignore|enforce`, `delay=auto|none|<s>`, `ports=`, `convention=`
+  Magnitude and unwrapped phase are interpolated in frequency (`interp=linear|pchip`), real and imaginary
+  parts near transmission nulls; in `.tran` the S-matrix of the carrier wavelength applies with a group delay
+  per path (each path a delayed copy of its input; no dispersion within a pulse; negative delays become 0,
+  reported per path). A grid too coarse for the device is reported when the file is loaded (leave-one-out
+  check). Unidirectional or bidirectional like `COUPLER`; a wavelength outside the data range is an error;
+  `passivity=check|ignore|enforce`, `delay=auto|none|<s>`, `ports=`, `convention=`. Test data: the SiEPIC
+  EBeam broadband directional coupler (MIT, `tests/sparam/data/siepic/NOTICE`)
 * `utils/sparam_export.py`: writes the S-matrix of a subcircuit, from one `.dc` sweep per port, as
   `.sparam`, Touchstone or CSV (F-03)
 * KiCad symbols `SPAR_2PORT` and `SPAR_4PORT` (`utils/specs.kicad_sym`)
@@ -50,6 +53,9 @@
 
 ### Changed
 
+* Run manifest (`<trace>.manifest.json`, `--print-manifest`) and run table manifest (`table.manifest.json`):
+  `format_version` 2, with a `data_files` list (path and SHA-256 of each `SPAR` S-parameter file and
+  `VLSRC`/`EVLSRC` value file read), so a `.step`/`.mc` plan is not resumed against a changed data file (F-01)
 * `.options seed` is applied when its line is read (so that the random functions after it use it); a seed that
   changes after a random function drew is an error (F-02)
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of

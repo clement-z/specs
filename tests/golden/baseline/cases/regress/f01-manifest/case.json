@@ -8,9 +8,9 @@
  "exit": 0,
  "files": {
   "traces/m.manifest.json": {
-   "bytes": 708,
+   "bytes": 728,
    "kind": "json",
-   "sha256": "6e875b47bb56db0149031791e04f60e5f619b3f0597ee73814b0ac61ebc26ff6",
+   "sha256": "64717a6211082a1f9a9a077f5768df9a16d277dcb1a8eb97b48ff905527d95c4",
    "stored": "files/traces/m.manifest.json"
   },
   "traces/m.vcd": {

@@ -302,7 +302,7 @@ reproducible on its own, and the run table holds the same values bit for bit.
 | `run.npy`, `time_s.npy`, `signal.npy`, `wavelength_m.npy`, `power_W.npy`, `field_re.npy`, `field_im.npy` | the probe tables of all runs (the columns of `--format npz`, see "Tracing and output files", plus `run`): the rows of a run are `row_start` to `row_start + row_count - 1`, runs in run order |
 | `signal_names.txt` | the probe names, one per line (`signal` indexes them) |
 | `draw_run.npy`, `draw_name.npy`, `draw_value.npy`, `draw_names.txt` | every random draw of every run: its stream name (e.g. `ROOT/X3/.param/L#0`, the instance X3) and value |
-| `table.manifest.json` | the run manifest (version, master seed, command line, netlist files and their SHA-256) and the plan |
+| `table.manifest.json` | the run manifest (version, master seed, command line, netlist and data files and their SHA-256) and the plan |
 | `logs/run<k>.log` | stderr of run k, if it wrote anything (stdout of the runs is discarded: use `--run K`) |
 
 The `.npy` files are NumPy arrays: `np.load(path, mmap_mode="r")` reads only what is used, and
@@ -311,8 +311,8 @@ holds what `--format npz` holds: the probes (no PDET or power meter: specs warns
 point is the stdout listing, see `--run K`); use `.tran` or `.dc` to have rows.
 
 **Resuming.** Running the same command again resumes the table: the runs recorded `ok` are skipped, the others
-run again (their new line replaces the old one). A table made by another netlist, plan, build or command line
-(another `table.manifest.json`; `-j` does not count) is an error unless `--overwrite` replaces it. A directory
+run again (their new line replaces the old one). A table made by another netlist, data file, plan, build or
+command line (another `table.manifest.json`; `-j` does not count) is an error unless `--overwrite` replaces it. A directory
 that is not a run table is never overwritten (one whose creation was cut short, holding only table files, is
 created again). The table does not depend on `-j`. The files are not synced to disk after each run: a resume
 repairs the table after a crash or a kill of specs, not after a power loss.
@@ -612,12 +612,15 @@ and the export of a SPECS subcircuit to a file: [doc/sparam.md](sparam.md).
 | `format` | `"auto"`, `"sparam"` (or `"lumerical"`), `"touchstone"`, `"csv"`, `"taylor"` | `"auto"` | file format; `auto`: from the extension (`.sparam`/`.dat`, `.sNp`/`.ts`, `.csv`, `.taylor`) |
 | `ports` | `"a,b,..."` | the file's order | file ports (names or 1-based indices) of the nets, in net order; as many as nets |
 | `convention` | `"auto"`, `"physics"`, `"engineering"` | `"auto"` | time convention of the file's phases: Touchstone files are conjugated (engineering), the others are not; see [doc/sparam.md](sparam.md) |
-| `interp` | `"linear"`, `"pchip"` | `"linear"` | interpolation in frequency of magnitude and unwrapped phase, between grid points |
+| `interp` | `"linear"`, `"pchip"` | `"linear"` | interpolation in frequency between grid points: magnitude and unwrapped phase, or real and imaginary parts near a transmission null ([doc/sparam.md](sparam.md)) |
 | `passivity` | `"check"`, `"ignore"`, `"enforce"` | `"check"` | warn when an input gives more than 1.03 times its power at the outputs; `enforce` also scales the matrix where it exceeds 1 |
-| `delay` | `"auto"`, `"none"`, a number (s) | `"auto"` | `.tran` delay of the outputs: `auto`, per output and wavelength the group delay of the largest path into it; `none`, 0; a number, that delay on every path (rounding to 0 time steps is an error, as for `WG`) |
+| `delay` | `"auto"`, `"none"`, a number (s) | `"auto"` | `.tran` delay of each path (input to output): `auto`, per path and wavelength the group delay of the data (0 where it is negative, with a warning per path); `none`, 0; a number, that delay on every path (rounding to 0 time steps is an error, as for `WG`) |
 
 - `.op`, `.dc`: the outputs are `S(lambda)` times the inputs at each wavelength. `.tran`: S of the carrier
-  wavelength and a group delay per output; **dispersion within a pulse's bandwidth is ignored**.
+  wavelength and a group delay per path, each input's light reaching each output after its own path's delay;
+  **dispersion within a pulse's bandwidth is ignored**.
+- Warnings when the file is loaded: passivity (above), unused reflections (unidirectional), and a grid too
+  coarse for the device (a leave-one-out interpolation check, [doc/sparam.md](sparam.md) "Grid check").
 - A wavelength outside the range of the data is an error (the message gives the range).
 - The number of nets must equal the number of ports of the file (or of `ports=`).
 
@@ -625,7 +628,7 @@ Example: the add-drop ring of `circuits/add_drop.cir` exported to a file, then u
 `in`, `add`; outputs `out`, `drop`):
 
     python3 -I utils/sparam_export.py --specs build/specs --netlist tests/sparam/add_drop_ring.cir \
-        --subckt ring --wl 1.535e-6 1.565e-6 1e-9 -o ring.sparam
+        --subckt ring --wl 1.535e-6 1.565e-6 0.05e-9 -o ring.sparam -j 8
 
     spar1 in add out drop file="ring.sparam"
 

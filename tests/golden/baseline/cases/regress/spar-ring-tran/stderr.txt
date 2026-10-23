@@ -1,1 +1,2 @@
+Warning (ROOT/SPAR1): negative group delay -3.73047e-11 s from port 'in' to port 'out' at 1.55e-06 m in the S-parameters, 0 used (reported once per path). The path acts as a connection without delay, also inside a feedback loop (nothing else reports a loop without delay)
 

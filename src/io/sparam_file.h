@@ -26,6 +26,20 @@ public:
     static constexpr double c = 299792458.0;
     // The data range is extended by this relative tolerance at both ends, as wavelength matching (B-010)
     static constexpr double RANGE_RELATIVE_TOLERANCE = 1e-12;
+    // Interpolation between two grid points of a tabulated entry (doc/sparam.md): real and imaginary parts
+    // where |S| at either point is below this fraction of the entry's largest |S| (near a transmission
+    // null, where the phase turns quickly), magnitude and unwrapped phase elsewhere. Chosen from the
+    // error between grid points of three exported devices (PF03b report): 0.06 to 0.08 is best for both
+    // linear and PCHIP; lower leaves the nulls to magnitude/phase, higher cuts the phase rotation of
+    // delayed paths with chords
+    static constexpr double MIXED_INTERP_THRESHOLD = 0.07;
+    // Grid-adequacy check (doc/sparam.md): a grid point is flagged when S interpolated there from its
+    // neighbours alone (leave-one-out, the device's own interpolant) differs from the file's value by
+    // more than this (field). Leaving a point out doubles the spacing, so the error is about 4 times the
+    // one between the points of the actual grid: 0.02 stands for about 0.005 between points. A delay
+    // line gives 1e-12; the SiEPIC BDC 0.0026, the add-drop ring on a 0.05 nm grid 0.0039 (both pass);
+    // the ring on a 1 nm grid 0.71, an MZI with 28 points per FSR 0.11 (both warn)
+    static constexpr double GRID_CHECK_THRESHOLD = 0.02;
 
     // Reads a file (format AUTO: from its extension)
     static std::shared_ptr<SParamData> load(const std::string &path, Format format = FORMAT_AUTO,
@@ -68,6 +82,17 @@ public:
         double wavelength_m = 0;
     };
     PassivityReport passivity() const;
+    // Grid-adequacy check of entry (out, in) (tabulated formats; zero for the Taylor form and inactive
+    // entries): the largest leave-one-out error over its interior grid points, and where
+    struct GridReport {
+        double error = 0;
+        double wavelength_m = 0;
+    };
+    GridReport gridCheck(size_t out, size_t in) const;
+    // The group delay of (out, in) at this wavelength depends on a grid point flagged by the check (the
+    // points of the finite differences of the two grid points around it)
+    bool nearFlaggedGridPoint(size_t out, size_t in, double wavelength_m) const;
+
     // Largest |S(out, in)| over the same wavelengths as passivity()
     double maxMagnitude(size_t out, size_t in) const;
     // max over inputs of sum_out |S(out, in)|^2 of a full matrix (row-major, S[out * N + in])
@@ -82,8 +107,11 @@ private:
         std::vector<double> f_Hz; // ascending
         std::vector<double> mag;
         std::vector<double> phase; // unwrapped, SPECS convention
+        std::vector<double> re, im; // the same values as real and imaginary parts
         std::vector<double> tau_s; // group delay at the grid points
-        std::vector<double> dmag, dphase; // PCHIP slopes (INTERP_PCHIP)
+        std::vector<double> dmag, dphase, dre, dim; // PCHIP slopes (INTERP_PCHIP)
+        double max_mag = 0; // largest |S| over the grid
+        std::vector<double> loo_error; // leave-one-out error at each grid point (0 at the ends)
     };
     // One entry S(out, in) of the Taylor form: polynomials in d = lambda - lambda0
     struct Taylor {
@@ -130,6 +158,14 @@ private:
     // Wavelengths of passivity() and maxMagnitude()
     std::vector<double> checkWavelengths() const;
     static double evalTable(const std::vector<double> &x, const std::vector<double> &y, const std::vector<double> *slopes, double xi);
+    // Segment [x[k], x[k+1]] containing xi (n >= 2), and the linear or cubic Hermite interpolant on it
+    static size_t segment(const std::vector<double> &x, double xi);
+    static double evalSegment(const std::vector<double> &x, const std::vector<double> &y, const std::vector<double> *slopes,
+            size_t k, double xi);
+    // S of a tabulated entry at a frequency in its grid (mixed interpolation, MIXED_INTERP_THRESHOLD)
+    complex_type interpolate(const Table &t, double f_Hz) const;
+    // Leave-one-out errors of a table (GRID_CHECK_THRESHOLD), with the same interpolant
+    std::vector<double> leaveOneOutErrors(const Table &t) const;
     static std::vector<double> pchipSlopes(const std::vector<double> &x, const std::vector<double> &y);
     static double polyval(const std::vector<double> &coeffs, double d);
     static double polyder(const std::vector<double> &coeffs, double d);

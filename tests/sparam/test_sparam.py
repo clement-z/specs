@@ -5,18 +5,22 @@
 
 Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 - fixtures: tests/sparam/gen_fixtures.py rewrites tests/sparam/fixtures byte for byte, and exporting the
-  ring again gives tests/sparam/data/add_drop_ring.sparam (1e-12);
+  ring again (0.05 nm grid) gives tests/sparam/data/add_drop_ring.sparam (1e-12);
 - phase convention, .dc: each wg.* fixture (a 100 um waveguide written in each format's own convention)
   through SPAR gives the field of a WG of the same length, at the grid points and between them; read
   with the opposite convention, the Touchstone fixtures do not;
 - phase convention, .tran: the same pulses leave SPAR and WG at the same times with the same fields
   (group delay L*ng/c, rounded to the time step like the waveguide's);
 - bidirectional: two sources on both sides of SPAR (nets with two writers) as on both sides of a WG;
+- per-path delays, .tran: two lit inputs whose paths into each output have different delays (two waveguides
+  into a coupler) give the transient of the explicit circuit;
+- negative group delays: reported once per path, when the path is first lit;
+- SiEPIC BDC: the third-party 4-port file splits 50/50 (+-0.02) near 1.55 um, passive, without warnings;
 - port order: the asymmetric Touchstone 1 and 2 fixtures give S21 and, with ports= reversed, S12;
 - passivity: check warns, ignore does not, enforce scales the matrix;
 - range: a wavelength outside the data is an error with the range;
 - round trip: circuits/add_drop.cir's ring exported with utils/sparam_export.py, loaded as one SPAR, swept
-  again: the same fields at the grid points (1e-6), and between the points of a finer export.
+  again: the same fields at the grid points (1e-6), and between the points of the committed export.
 """
 
 import argparse
@@ -39,6 +43,8 @@ import sparam_export  # noqa: E402
 import sparam_io  # noqa: E402
 
 C0 = 299792458.0
+# Wavelength grid of tests/sparam/data/add_drop_ring.sparam (m): 1.535 to 1.565 um by 0.05 nm, 601 points
+RING_GRID = (1.535e-6, 1.565e-6, 0.05e-9)
 WG_LINE = 'wg1 {a} {b} length=100e-6 neff=2.2 ng=4.2 att=10'
 WG_FIXTURES = ['wg.sparam', 'wg.s2p', 'wg_v2.ts', 'wg.csv', 'wg.taylor']
 
@@ -122,12 +128,11 @@ def test_fixtures(t):
 
 
 def test_ring_data(t):
-    # tests/sparam/data/add_drop_ring.sparam (golden case cir/spar-add-drop-ring) is the export of the ring
-    # with the command of tests/sparam/README.md: exporting again gives the same values
+    # tests/sparam/data/add_drop_ring.sparam (golden cases cir/spar-add-drop-ring, regress/spar-ring-tran) is
+    # the export of the ring with the command of tests/sparam/README.md: exporting again gives the same values
     committed = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
     again = os.path.join(t.work, 'add_drop_ring.sparam')
-    sparam_export.export(t.specs, os.path.join(HERE, 'add_drop_ring.cir'), 'ring', (1.535e-6, 1.565e-6, 1e-9), again,
-                         'sparam')
+    sparam_export.export(t.specs, os.path.join(HERE, 'add_drop_ring.cir'), 'ring', RING_GRID, again, 'sparam', jobs=4)
     pa, a = sparam_io.read_sparam(committed)
     pb, b = sparam_io.read_sparam(again)
     worst = 0.0
@@ -218,6 +223,95 @@ def test_bidirectional(t):
                 '%d samples, fields %s' % (len(got), 'equal' if got == exp else 'differ: %s vs %s' % (got, exp)))
 
 
+SKEW_SUBCKT = '\n'.join([
+    '* two waveguides of different lengths into a coupler: every path has its own delay',
+    '.subckt skew a b o1 o2',
+    'wg1 a x length=100e-6 neff=2.2 ng=4.2 att=10',
+    'wg2 b y length=300e-6 neff=2.2 ng=4.2 att=10',
+    'coupler1 x y o1 o2 k=0.5',
+    '.ends skew',
+    '']) + '\n'
+
+
+def test_per_path_tran(t):
+    # Each output receives a through 1.40 ps and b through 4.20 ps: with one delay per output, b's light
+    # would leave with a's delay. Steps on both inputs at the same wavelength (on the grid, then between grid
+    # points), while earlier values are still on their way: the outputs are coherent sums of both
+    netlist = os.path.join(t.work, 'skew.cir')
+    with open(netlist, 'w') as f:
+        f.write(SKEW_SUBCKT)
+    path = os.path.join(t.work, 'skew.sparam')
+    sparam_export.export(t.specs, netlist, 'skew', (1.54e-6, 1.56e-6, 0.5e-9), path, 'sparam')
+    def netlist_with(device):
+        return '\n'.join([
+            '* per-path delays, .tran',
+            'vlsrc1 a values=[[0, 0, 1.55e-6], [1e-12, 1, 1.55e-6], [3e-12, 0.4, 1.55e-6], [8e-12, 0, 1.55e-6], '
+            '[14e-12, 1, 1.5503e-6], [16e-12, 0.3, 1.5503e-6], [21e-12, 0, 1.5503e-6]]',
+            'vlsrc2 b values=[[0, 0, 1.55e-6], [2e-12, 0.5, 1.55e-6], [2.5e-12, 0.2, 1.55e-6], [6e-12, 0, 1.55e-6], '
+            '[13e-12, 0.6, 1.5503e-6], [15e-12, 0.1, 1.5503e-6], [19e-12, 0, 1.5503e-6]]',
+            device,
+            'mlprobe1 o1 wl=[1.55e-6, 1.5503e-6]',
+            'mlprobe2 o2 wl=[1.55e-6, 1.5503e-6]',
+            '.tran 40e-12',
+            '']) + '\n'
+    ref = t.run(SKEW_SUBCKT + netlist_with('x1 a b o1 o2 skew'), 'skew_explicit')
+    r = t.run(netlist_with('spar1 a b o1 o2 file="%s"' % path), 'skew_spar')
+    for probe in ('MLPROBE1', 'MLPROBE2'):
+        name = 'ROOT/' + probe
+        d = max_diff(sorted(r.signal(name)), sorted(ref.signal(name)))
+        t.check('per-path-tran/%s' % probe.lower(), ref.status == 0 and r.status == 0 and d <= 1e-9,
+                'same times, max |E_SPAR - E_explicit| = %.3g over %d samples' % (d, len(ref.signal(name))))
+    # CW sources: the operating point before the transient (no delays) gives the steady state at t = 0
+    def cw_netlist(device):
+        return '\n'.join(['* per-path delays, .tran from an operating point',
+                          'cwsrc1 a wl=1.55e-6 power=1', 'cwsrc2 b wl=1.55e-6 power=0.5 phi=1', device,
+                          '.save o1 o2', '.tran 10e-12', '']) + '\n'
+    ref = t.run(SKEW_SUBCKT + cw_netlist('x1 a b o1 o2 skew'), 'skew_cw_explicit')
+    r = t.run(cw_netlist('spar1 a b o1 o2 file="%s"' % path), 'skew_cw_spar')
+    d = max(max_diff(r.signal('PROBE{ROOT/%s}' % s), ref.signal('PROBE{ROOT/%s}' % s)) for s in ('o1', 'o2'))
+    t0 = sorted(set(tt for tt, _, _, _ in r.rows))
+    t.check('per-path-tran/operating-point', ref.status == 0 and r.status == 0 and d <= 1e-9 and t0 == [0.0],
+            'max |E_SPAR - E_explicit| = %.3g, sample times %s (only 0)' % (d, t0))
+
+
+def test_negative_delay_warning(t):
+    # the ring at its through-port null (1.55 um): the through paths in->out and add->drop have a negative
+    # group delay. Each is reported once, when its input is first lit; an unlit input's paths are not
+    ring = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
+    def netlist(add_lit):
+        lines = ['* negative group delays, .tran',
+                 'vlsrc1 in values=[[0, 0, 1.55e-6], [1e-12, 1, 1.55e-6], [5e-12, 0.5, 1.55e-6], [9e-12, 0, 1.55e-6]]']
+        if add_lit:
+            lines.append('vlsrc2 add values=[[0, 0, 1.55e-6], [3e-12, 1, 1.55e-6], [7e-12, 0, 1.55e-6]]')
+        lines += ['spar1 in add out drop file="%s"' % ring, '.options timescale=-15', '.save out drop',
+                  '.tran 20e-12', '']
+        return '\n'.join(lines) + '\n'
+    for add_lit, expected in [(False, ["'in' to port 'out'"]), (True, ["'in' to port 'out'", "'add' to port 'drop'"])]:
+        r = t.run(netlist(add_lit), 'negative_delay')
+        found = [line for line in r.stderr.splitlines() if 'negative group delay' in line]
+        ok = r.status == 0 and len(found) == len(expected) and all(
+            any(e in line for line in found) for e in expected) and all(
+            'once per path' in line and 'without delay' in line and 'artefact' not in line for line in found)
+        t.check('negative-delay/%s' % ('in-and-add' if add_lit else 'in-only'), ok,
+                '%d warning(s): %s' % (len(found), '; '.join(line[:110] for line in found)))
+
+
+def test_siepic_bdc(t):
+    # the SiEPIC EBeam PDK broadband directional coupler (tests/sparam/data/siepic, MIT, see its NOTICE):
+    # a 50/50 splitter over its band, passive
+    bdc = os.path.join(HERE, 'data', 'siepic', 'EBeam_1550_TE_BDC.sparam')
+    r = t.run('\n'.join(['* SiEPIC BDC', 'cwsrc1 in wl=1.55e-6 power=1', 'spar1 in in2 out1 out2 file="%s"' % bdc,
+                         '.save out1 out2', '.dc /cwsrc1/WL 1.5e-6 1.6e-6 2e-9', '']) + '\n', 'siepic_bdc')
+    p1 = {round(wl * 1e12): abs(e) ** 2 for _, wl, e in r.signal('PROBE{ROOT/out1}')}
+    p2 = {round(wl * 1e12): abs(e) ** 2 for _, wl, e in r.signal('PROBE{ROOT/out2}')}
+    near = [k for k in p1 if 1540000 <= k <= 1560000]
+    split = max(max(abs(p1[k] - 0.5), abs(p2[k] - 0.5)) for k in near) if near and set(p1) == set(p2) else math.inf
+    total = max(p1[k] + p2[k] for k in p1) if set(p1) == set(p2) and p1 else math.inf
+    t.check('siepic-bdc/split', r.status == 0 and len(p1) == 51 and split <= 0.02 and total <= 1 and not r.stderr.strip(),
+            'max |P - 0.5| = %.3g over 1.54-1.56 um (<= 0.02), max P1 + P2 = %.4g (<= 1), %d points, stderr %r'
+            % (split, total, len(p1), r.stderr.strip()[:80]))
+
+
 def test_port_order(t):
     for fx in ['asym.s2p', 'asym_v2.ts']:
         for ports, expected in [('', 0.8j), (' ports="right,left"', 0.3)]:
@@ -266,23 +360,23 @@ def test_round_trip(t):
     netlist = os.path.join(HERE, 'add_drop_ring.cir')
     original = t.run(add_drop_with_spar(False), 'add_drop')
     ref = {s: original.signal('PROBE{ROOT/%s}' % s) for s in ('out', 'drop')}
-    # same grid as the sweep of add_drop.cir (1.535 to 1.565 um by 1 nm)
+    # the grid of the committed file (1.535 to 1.565 um by 0.05 nm): the sweep of add_drop.cir (by 1 nm) is on
+    # grid points, up to the last bits of the sweeps' wavelengths (4e-14 relative)
     for fmt, ext in [('sparam', 'sparam'), ('touchstone', 's4p'), ('csv', 'csv')]:
         path = os.path.join(t.work, 'ring.' + ext)
-        sparam_export.export(t.specs, netlist, 'ring', (1.535e-6, 1.565e-6, 1e-9), path, fmt)
+        sparam_export.export(t.specs, netlist, 'ring', RING_GRID, path, fmt, jobs=4)
         r = t.run(add_drop_with_spar('spar1 in add out drop file="%s"' % path), 'add_drop_spar')
         d = max(max_diff(r.signal('PROBE{ROOT/%s}' % s), ref[s]) for s in ('out', 'drop'))
         # add_drop.cir converges to its reltol 1e-6; the export used tighter tolerances
         t.check('round-trip/same-grid/%s' % fmt, r.status == 0 and d <= 1e-6,
                 'max |E_SPAR - E_add_drop| = %.3g at out and drop (<= 1e-6, the netlist reltol)' % d)
-    # interpolation: export on a 0.05 nm grid, compare at the 1 nm points shifted by 0.025 nm, against
-    # add_drop.cir swept at the same points
+    # interpolation: the committed file (0.05 nm grid), compared at the 1 nm points shifted by 0.025 nm,
+    # against add_drop.cir swept at the same points
     shifted = (1.535025e-6, 1.564025e-6, 1e-9)
-    path = os.path.join(t.work, 'ring_fine.sparam')
-    sparam_export.export(t.specs, netlist, 'ring', (1.535e-6, 1.565e-6, 0.05e-9), path, 'sparam', jobs=4)
-    # Magnitude and phase are interpolated separately (doc/sparam.md): near the through-port null at
-    # 1.55 um (|S| = 0.03) the phase turns by almost pi between two grid points and the error is large;
-    # away from it (|E| >= 0.1) it is the interpolation error of a smooth function
+    path = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
+    # Magnitude and phase are interpolated where |S| is large, real and imaginary parts near a null
+    # (doc/sparam.md): at the through-port null at 1.55 um the phase turns by almost pi between two grid
+    # points, and magnitude/phase gave 0.020 (linear) and 0.015 (pchip) there; now <= 2e-3 everywhere
     for interp, tol in [('linear', 1e-3), ('pchip', 2e-4)]:
         orig = t.run(add_drop_with_spar(False).replace('.dc /cwsrc1/WL {lambda_min} {lambda_max} {dlambda}',
                                                        '.dc /cwsrc1/WL %r %r %r' % shifted), 'add_drop_shift')
@@ -299,12 +393,12 @@ def test_round_trip(t):
                 anywhere = max(anywhere, abs(ea - eb))
                 if abs(eb) >= 0.1:
                     smooth = max(smooth, abs(ea - eb))
-        t.check('round-trip/between-points/%s' % interp, r.status == 0 and n == 30 and smooth <= tol and anywhere <= 0.03,
+        t.check('round-trip/between-points/%s' % interp, r.status == 0 and n == 30 and smooth <= tol and anywhere <= 2e-3,
                 'max |E_SPAR - E_add_drop| over %d points between grid points: %.3g where |E| >= 0.1 (<= %g), '
-                '%.3g anywhere (<= 0.03)' % (n, smooth, tol, anywhere))
+                '%.3g anywhere (<= 2e-3)' % (n, smooth, tol, anywhere))
 
 
-TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_port_order, test_passivity,
+TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_negative_delay_warning, test_siepic_bdc, test_port_order, test_passivity,
          test_range, test_round_trip]
 
 

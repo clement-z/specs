@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/waveguide_tb.manifest.json": {
-   "bytes": 252,
+   "bytes": 272,
    "kind": "json",
-   "sha256": "097a3e841def56afb3bec2b75d9ac72ed59f005ca0321ea2a8ed0b64431c5cd7",
+   "sha256": "d32b6daf684821d216529847828f55c5136640ef3e30116617d0cfa4771d6a5f",
    "stored": "files/traces/waveguide_tb.manifest.json"
   },
   "traces/waveguide_tb.vcd": {

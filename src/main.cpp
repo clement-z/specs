@@ -856,6 +856,8 @@ int sc_main(int argc, char *argv[])
         manifest.seed = master_seed;
         manifest.command_line = table_command_line(argc, argv);
         manifest.netlist_files = pt.input_files;
+        // the data files of the runs, from the flattened elements: this process does not build the circuit
+        manifest.data_files = pt.data_files();
         vector<string> drawn_names;
         for (const auto &name : pt.drawn_params)
         {

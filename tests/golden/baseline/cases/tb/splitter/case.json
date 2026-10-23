@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/splitter_tb.manifest.json": {
-   "bytes": 257,
+   "bytes": 277,
    "kind": "json",
-   "sha256": "149a676c8bd4ca6a022e4629ece885aa22a06454642c7e8729c461ee30c20895",
+   "sha256": "1fe2a3512f0503e315f01f00aa55fc2de7b737551655b8281dcd0294736c1952",
    "stored": "files/traces/splitter_tb.manifest.json"
   },
   "traces/splitter_tb.vcd": {

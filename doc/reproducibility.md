@@ -54,7 +54,8 @@ same values as run K of the plan, and so does `specs --seed s_k` with the steppe
 netlist without its `.step`/`.mc` lines. `s_k` does not depend on the `.step` values: every step point sees the
 same Monte-Carlo draws. Without `.mc`, every run of a `.step` plan uses the master seed. The seed of each run
 is in the run table (`runs.csv`), with every value drawn (`draw_*.npy`) and the table manifest
-`table.manifest.json` (version, master seed, command line, netlist hashes, plan).
+`table.manifest.json` (version, master seed, command line, netlist and data file hashes, plan). A plan resumed
+against a table whose manifest differs (e.g. a changed netlist or data file) stops with an error.
 
 ## Order of outputs
 
@@ -79,7 +80,7 @@ writes `<trace>.manifest.json` next to it, before the simulation starts. With th
 ```json
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "v0.1-215.g4e3e87d",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -87,6 +88,9 @@ writes `<trace>.manifest.json` next to it, before the simulation starts. With th
   "netlist_files": [
     {"path": "circuit.cir", "sha256": "4ee4ad07d39c258bf8f70f910989f026d179931a90f649e1a557dd30aae607ae"},
     {"path": "sub.cir", "sha256": "4ff4ac4d7351edd5cb44e5b7ca78ba64f46dbde7128b80a19cf563bc92a861fc"}
+  ],
+  "data_files": [
+    {"path": "ring.s4p", "sha256": "0b3c1e1ba54b7f0bfa1ed5f6e0b5d0d2fc5e8d07fda4bd3dbcd5a0d34cb42c4f"}
   ],
   "trace_file": "traces/m.vcd"
 }
@@ -99,13 +103,17 @@ writes `<trace>.manifest.json` next to it, before the simulation starts. With th
 - `netlist_files` lists every file the parser opened, once, in the order it first opened them: the `-f` files
   and every `.include` (also those inside subcircuit bodies), as the path used to open them (relative to the
   working directory), with the SHA-256 of their content when the manifest was written (`sha256sum` gives the
-  same value; `null` if the file could not be read). Data files read by sources (VLSRC values files) are not
-  listed.
+  same value; `null` if the file could not be read).
+- `data_files` lists, in the same form, every data file the devices read while the circuit was built, once, in
+  the order they were first opened: the S-parameter files of `SPAR` (`file=`, resolved as `.include`: relative
+  to the netlist file first) and the value files of `VLSRC`/`EVLSRC` (relative to the working directory). It is
+  `[]` when there is none.
+- `format_version` 2 added `data_files`: a version 1 manifest did not record the data files.
 - `trace_file` is the VCD SPECS opened. SystemC creates the file at the first traced time step, so a run that
   never advances time (a `.op` alone) has a manifest but no VCD.
 - The manifest has no date, host or absolute path: two runs with the same build, inputs and command line give
   the same bytes.
 
-To reproduce a run: check out and build `specs_version`, check the files against `netlist_files`, and run
-`command_line` again in the same working directory. If the manifest cannot be written, SPECS stops with
-`Error: cannot open run manifest file "..."` (exit 1), before the simulation.
+To reproduce a run: check out and build `specs_version`, check the files against `netlist_files` and
+`data_files`, and run `command_line` again in the same working directory. If the manifest cannot be written,
+SPECS stops with `Error: cannot open run manifest file "..."` (exit 1), before the simulation.

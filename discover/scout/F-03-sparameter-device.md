@@ -12,6 +12,14 @@ prerequisites: none (the generic device it was to refactor is removed, decision 
 > range is an error. Not done: phase 2 (broadband time-domain realisation, needs-human), `.npz` export, the
 > SiEPIC BDC fixture (licence of the Simphony data unclear, not committed), reciprocity fill.
 
+> **Update 2026-10-23, phase PF03b (branch `ws/spar2`, report `backlog/sprint-2026-10c/PF03b-REPORT.md`),
+> after the SPAR discussion (`backlog/sprint-2026-10c/SPAR-discussion.md`).** `.tran` uses one delay per path
+> (delayed copies, replacing one delay per output); negative group delays are still clamped to 0, reported
+> per path; a grid-adequacy warning at load time (leave-one-out); real/imaginary interpolation near nulls;
+> data files (S-parameter, VLSRC) in the run manifest; the SiEPIC BDC fixture is committed
+> (`tests/sparam/data/siepic`, MIT) with the brief's `.dc` case (`cir/spar-siepic-bdc`); the ring test file
+> re-exported on a 0.05 nm grid. Still not done: phase 2, `.npz` export, reciprocity fill.
+
 > **Update 2026-10-23 (maintainer decision, phase D2b).** `GenericTransmissionDevice`, `Generic2x2Coupler`,
 > `GenericWaveguide` and the output ports' delta-write mode (`m_use_deltas`) are removed (54b15dc). F-03 is to be
 > written **from scratch** as a state-holding, per-wavelength device: one memory per input port and wavelength,

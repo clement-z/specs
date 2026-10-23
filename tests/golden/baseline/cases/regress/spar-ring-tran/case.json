@@ -9,15 +9,15 @@
  "exit": 0,
  "files": {
   "traces/delete_me.csv": {
-   "bytes": 362,
+   "bytes": 370,
    "kind": "text",
-   "sha256": "f909972eb4887f1481eaef593ede84f20517a78065b853b77b173f1cbb4335a3",
+   "sha256": "a139a4e1005a4f6547e3aa6fd8f80353de91e70dda088070008988d25d9b66d5",
    "stored": "files/traces/delete_me.csv"
   },
   "traces/delete_me.manifest.json": {
-   "bytes": 453,
+   "bytes": 631,
    "kind": "json",
-   "sha256": "521a45ee009e5d4c069c4015bc786cae258ae4e0227215ffd0f1ba38162f0231",
+   "sha256": "dafd3448f107f19a6e0f796864e34c80944f6d093d68571825f6c51ff64df603",
    "stored": "files/traces/delete_me.manifest.json"
   }
  },
