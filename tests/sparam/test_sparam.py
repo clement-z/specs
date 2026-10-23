@@ -5,7 +5,7 @@
 
 Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 - fixtures: tests/sparam/gen_fixtures.py rewrites tests/sparam/fixtures byte for byte, and exporting the
-  ring again gives tests/sparam/data/add_drop_ring.sparam (1e-12);
+  ring again (0.05 nm grid) gives tests/sparam/data/add_drop_ring.sparam (1e-12);
 - phase convention, .dc: each wg.* fixture (a 100 um waveguide written in each format's own convention)
   through SPAR gives the field of a WG of the same length, at the grid points and between them; read
   with the opposite convention, the Touchstone fixtures do not;
@@ -18,7 +18,7 @@ Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 - passivity: check warns, ignore does not, enforce scales the matrix;
 - range: a wavelength outside the data is an error with the range;
 - round trip: circuits/add_drop.cir's ring exported with utils/sparam_export.py, loaded as one SPAR, swept
-  again: the same fields at the grid points (1e-6), and between the points of a finer export.
+  again: the same fields at the grid points (1e-6), and between the points of the committed export.
 """
 
 import argparse
@@ -41,6 +41,8 @@ import sparam_export  # noqa: E402
 import sparam_io  # noqa: E402
 
 C0 = 299792458.0
+# Wavelength grid of tests/sparam/data/add_drop_ring.sparam (m): 1.535 to 1.565 um by 0.05 nm, 601 points
+RING_GRID = (1.535e-6, 1.565e-6, 0.05e-9)
 WG_LINE = 'wg1 {a} {b} length=100e-6 neff=2.2 ng=4.2 att=10'
 WG_FIXTURES = ['wg.sparam', 'wg.s2p', 'wg_v2.ts', 'wg.csv', 'wg.taylor']
 
@@ -124,12 +126,11 @@ def test_fixtures(t):
 
 
 def test_ring_data(t):
-    # tests/sparam/data/add_drop_ring.sparam (golden case cir/spar-add-drop-ring) is the export of the ring
-    # with the command of tests/sparam/README.md: exporting again gives the same values
+    # tests/sparam/data/add_drop_ring.sparam (golden cases cir/spar-add-drop-ring, regress/spar-ring-tran) is
+    # the export of the ring with the command of tests/sparam/README.md: exporting again gives the same values
     committed = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
     again = os.path.join(t.work, 'add_drop_ring.sparam')
-    sparam_export.export(t.specs, os.path.join(HERE, 'add_drop_ring.cir'), 'ring', (1.535e-6, 1.565e-6, 1e-9), again,
-                         'sparam')
+    sparam_export.export(t.specs, os.path.join(HERE, 'add_drop_ring.cir'), 'ring', RING_GRID, again, 'sparam', jobs=4)
     pa, a = sparam_io.read_sparam(committed)
     pb, b = sparam_io.read_sparam(again)
     worst = 0.0
@@ -319,20 +320,20 @@ def test_round_trip(t):
     netlist = os.path.join(HERE, 'add_drop_ring.cir')
     original = t.run(add_drop_with_spar(False), 'add_drop')
     ref = {s: original.signal('PROBE{ROOT/%s}' % s) for s in ('out', 'drop')}
-    # same grid as the sweep of add_drop.cir (1.535 to 1.565 um by 1 nm)
+    # the grid of the committed file (1.535 to 1.565 um by 0.05 nm): the sweep of add_drop.cir (by 1 nm) is on
+    # grid points, up to the last bits of the sweeps' wavelengths (4e-14 relative)
     for fmt, ext in [('sparam', 'sparam'), ('touchstone', 's4p'), ('csv', 'csv')]:
         path = os.path.join(t.work, 'ring.' + ext)
-        sparam_export.export(t.specs, netlist, 'ring', (1.535e-6, 1.565e-6, 1e-9), path, fmt)
+        sparam_export.export(t.specs, netlist, 'ring', RING_GRID, path, fmt, jobs=4)
         r = t.run(add_drop_with_spar('spar1 in add out drop file="%s"' % path), 'add_drop_spar')
         d = max(max_diff(r.signal('PROBE{ROOT/%s}' % s), ref[s]) for s in ('out', 'drop'))
         # add_drop.cir converges to its reltol 1e-6; the export used tighter tolerances
         t.check('round-trip/same-grid/%s' % fmt, r.status == 0 and d <= 1e-6,
                 'max |E_SPAR - E_add_drop| = %.3g at out and drop (<= 1e-6, the netlist reltol)' % d)
-    # interpolation: export on a 0.05 nm grid, compare at the 1 nm points shifted by 0.025 nm, against
-    # add_drop.cir swept at the same points
+    # interpolation: the committed file (0.05 nm grid), compared at the 1 nm points shifted by 0.025 nm,
+    # against add_drop.cir swept at the same points
     shifted = (1.535025e-6, 1.564025e-6, 1e-9)
-    path = os.path.join(t.work, 'ring_fine.sparam')
-    sparam_export.export(t.specs, netlist, 'ring', (1.535e-6, 1.565e-6, 0.05e-9), path, 'sparam', jobs=4)
+    path = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
     # Magnitude and phase are interpolated separately (doc/sparam.md): near the through-port null at
     # 1.55 um (|S| = 0.03) the phase turns by almost pi between two grid points and the error is large;
     # away from it (|E| >= 0.1) it is the interpolation error of a smooth function

@@ -466,6 +466,12 @@
    "only": "^(regress/spar-ring-tran|cir/spar-touchstone-tran)$",
    "gtest": false,
    "note": "F-03/PF03b item 1: per-path delayed copies replace the one delay per output (SPAR-discussion.md, decision 2026-10-23)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:27:54Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
+   "gtest": false,
+   "note": "PF03b item 8: tests/sparam/data/add_drop_ring.sparam re-exported on a 0.05 nm grid (maintainer decision 2026-10-23)"
   }
  ]
 }

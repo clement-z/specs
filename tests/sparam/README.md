@@ -49,6 +49,22 @@ Their ports are named `left` and `right`.
 and `eval_taylor`), written from doc/sparam.md independently of the writers: it returns the port names and
 `{(out, in): [(f_Hz, S), ...]}` (1-based ports, S in the SPECS convention), and serves as the test oracle.
 
+## Ring data (`data/add_drop_ring.sparam`)
+
+The S-matrix of `add_drop_ring.cir` (below), used by the golden cases `cir/spar-add-drop-ring` and
+`regress/spar-ring-tran` and by `test_sparam.py`, exported with the tool's default settings
+(`abstol=1e-12 reltol=1e-9`) on a 0.05 nm grid, 601 points from 1.535 to 1.565 um:
+
+    python3 -I utils/sparam_export.py --specs build/specs --netlist tests/sparam/add_drop_ring.cir --subckt ring \
+        --wl 1.535e-6 1.565e-6 0.05e-9 --format sparam -o tests/sparam/data/add_drop_ring.sparam -j 8
+
+`test_sparam.py` (`data/add-drop-ring-reproduced`) exports it again and compares. Until PF03b (2026-10-23) the file
+had a 1 nm grid (31 points), which resolves neither the drop resonance's group delay (23 % low at resonance) nor
+the through port near its null (SPAR-discussion.md in backlog/sprint-2026-10c). On the 0.05 nm grid the finite-difference
+delays of the drop path match the exact ones within 0.01 ps, those of the through path from 0.5 nm off the null
+(1.35 instead of 1.44 ps at 0.1 nm); the through-port null itself (its phase turns within about 4 pm) stays
+unresolved (-37 ps instead of -621 ps), see doc/sparam.md.
+
 `check_ring_export.py --specs build/specs` checks `utils/sparam_export.py` on `add_drop_ring.cir` (the ring of
 `circuits/add_drop.cir` as a subcircuit `ring in add out drop`): the export in every format reads back to the
 same matrix (2e-16), and S[out][in], S[drop][in] match `circuits/add_drop.cir` without its access subcircuit
