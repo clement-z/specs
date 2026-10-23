@@ -1,5 +1,5 @@
 # B-191: A netlist line longer than about 16 KB fails to parse
-severity: low | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: open
+severity: low | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 8fc95cb (sprint 2026-10c PK): REJECT removed, no line length limit
 location: src/parser/parser.l (rules using REJECT)
 
 ## Problem
