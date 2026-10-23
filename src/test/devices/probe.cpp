@@ -12,6 +12,7 @@
 #include <complex>
 #include <cstdio>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -453,6 +454,61 @@ TEST(Probe, LatchPerTimeStepTakesTheSmallestWavelengthOfEachPoint)
         net.write(sig(0, 1, 1.56e-6));
         sc_start(1, SC_PS);
         expectProbeTraces(probe, 1, M_PI / 2, 1.56e-6);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        spx::oa_signal_type net{"net"};
+        Probe probe("probe");
+        probe.p_in(net);
+        probe.m_latch_mode = Probe::LATCH_PER_TIME_STEP; // .dc
+
+        sc_start(); // initialise the threads
+
+        // Point 1 of a wavelength sweep at 1550 nm: a smaller fixed wavelength comes first, then the
+        // swept one, which replaces it
+        probe.setSweptWavelength(1.55e-6);
+        net.write(sig(2, 0, 1.53e-6));
+        settle();
+        net.write(sig(1, 0, 1.55e-6));
+        settle();
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 1, 0, 1.55e-6);
+        EXPECT_EQ(probe.m_ignored_wavelength_m, 1.53e-6);
+        EXPECT_EQ(probe.m_traced_when_ignored_m, 1.55e-6);
+
+        // Point 2 at 1560 nm: the swept wavelength first, then a smaller one, which is ignored
+        probe.setSweptWavelength(1.56e-6);
+        net.write(sig(3, 0, 1.56e-6));
+        settle();
+        net.write(sig(2, 0, 1.53e-6));
+        settle();
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 9, 0, 1.56e-6);
+
+        // Point 3 at 1570 nm: the net does not carry it, the smallest one present is latched
+        probe.setSweptWavelength(1.57e-6);
+        net.write(sig(1, 0, 1.54e-6));
+        settle();
+        net.write(sig(0, 1, 1.53e-6));
+        settle();
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 1, M_PI / 2, 1.53e-6);
+
+        // Not a wavelength sweep (e.g. power): the smallest one
+        probe.setSweptWavelength(std::numeric_limits<double>::quiet_NaN());
+        net.write(sig(4, 0, 1.55e-6));
+        settle();
+        net.write(sig(2, 0, 1.54e-6));
+        settle();
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 4, 0, 1.54e-6);
     }
     SPECS_TEST_FOOTER();
 }

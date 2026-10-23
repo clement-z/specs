@@ -21,6 +21,17 @@ using std::shared_ptr;
 using std::string;
 using std::function;
 
+class CWSource;
+
+// A .dc sweep order (DCAnalysis::create()): the values of one attribute of a CW source
+struct CWSweepOrder {
+    function<void(double)> apply; // sets the attribute of the source to a value
+    vector<double> values;
+    CWSource *source = nullptr;
+    // WL or F: the source's wavelength changes at each point, and the probes latch it (PD5)
+    bool sweeps_wavelength = false;
+};
+
 namespace spx {
     // Value types
     typedef OpticalSignal oa_value_type;
@@ -106,7 +117,7 @@ public:
     // then keep it instead of applying their default mode (B-004)
     bool simulation_mode_explicit = false;
     AnalysisType analysis_type;
-    map<string, pair<function<void(double)>, vector<double>>> cw_sweep_orders;
+    map<string, CWSweepOrder> cw_sweep_orders;
     double tran_duration = std::numeric_limits<double>::infinity();
     // Master seed of the random streams (F-01): each noisy device draws from
     // spx::rng_for(seed, <its hierarchical name>) (utils/rng.h). Default 0: runs are reproducible

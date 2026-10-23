@@ -492,13 +492,18 @@ name starts with `_` get no automatic probe.
 net that carries several wavelengths a probe sees each of them as a separate event. A PROBE (also an automatic
 `PROBE{<net>}` and a `.save` target) traces one of them and ignores the others. To trace a given wavelength,
 or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to select one.
-- The probe latches one wavelength per analysis point: in `.op` and at each `.dc` point, the smallest
-  wavelength written to its net at that point; in `.tran`, the smallest wavelength its net carried when the
-  probe is enabled (the operating-point values), or, if none, the smallest one arriving in the first time step
-  that brings any. It keeps that one until the end of the transient. In a `.dc` wavelength sweep, each point
-  has its own wavelength. In a `.dc`, a net whose value does not change from one point to the next is not
-  written again: a CW source that is not swept writes its net at the first point only, and its wavelength
-  reaches the probes at that point only (B-185).
+- The probe latches one wavelength per analysis point:
+  - in `.op` and at each `.dc` point, the smallest wavelength written to its net at that point;
+  - in a `.dc` that sweeps the wavelength or the frequency of a source (`WL(src)`, `F(src)`, `/src/WL`,
+    `/src/F`), the swept wavelength of the point when the net carries it at that point, even if a smaller
+    (fixed) wavelength shares the net; the smallest one otherwise. A transmission sweep thus shows the swept
+    wavelength at every point. Other sweeps (e.g. power) use the smallest one;
+  - in `.tran`, the smallest wavelength its net carried when the probe is enabled (the operating-point values),
+    or, if none, the smallest one arriving in the first time step that brings any. It keeps that one until the
+    end of the transient.
+- In a `.dc`, a net whose value does not change from one point to the next is not written again: a CW source
+  that is not swept writes its net at the first point only, and its wavelength reaches the probes at that point
+  only (B-185).
 - When a probe ignores another wavelength, a warning on stderr says so once, at the end of the analysis (the
   probe, its net, the wavelength traced and the first one ignored); the automatic and `.save` probes share one
   summary line.

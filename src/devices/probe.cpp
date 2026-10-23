@@ -124,22 +124,26 @@ bool Probe::accept(const OpticalSignal &s)
         return true;
 
     const sc_time now = sc_time_stamp();
+    // The swept wavelength of a .dc point (never equal to NaN): kept for the point once latched
+    const bool swept = wl == m_swept_wavelength_m;
     // First sample (of the run, or of this analysis point): latched
     if (isnan(m_latched_wavelength_m) || (m_latch_mode == LATCH_PER_TIME_STEP && now != m_latch_time))
     {
         latch(s);
+        m_latch_final = swept;
         return true;
     }
     if (wl == m_latched_wavelength_m)
         return true;
-    // A smaller wavelength in the time step of the latch replaces the latched one, whose sample of
-    // this time step leaves the table (the VCD only records the end of the time step)
-    if (wl < m_latched_wavelength_m && now == m_latch_time && !m_latch_final)
+    // In the time step of the latch, the swept wavelength, else a smaller one, replaces the latched
+    // one, whose sample of this time step leaves the table (the VCD only records the end of the time step)
+    if ((swept || wl < m_latched_wavelength_m) && now == m_latch_time && !m_latch_final)
     {
         const double previous = m_latched_wavelength_m;
         if (m_table)
             m_table->discard(now.to_seconds(), m_table_signal, m_latched_wavelength_id);
         latch(s);
+        m_latch_final = swept;
         // the wavelength ignored in this time step was ignored for this one
         if (m_ignored_time == now && m_traced_when_ignored_m == previous)
             m_traced_when_ignored_m = wl;

@@ -309,15 +309,23 @@ void SPECSConfig::runDCAnalysis()
         exit(1);
     }
     const auto &order = *cw_sweep_orders.begin();
-    wavelengths_vector.reserve(order.second.second.size());
+    wavelengths_vector.reserve(order.second.values.size());
     cout << "Starting sweep on " << order.first;
-    cout << " (" << order.second.second.size() << " points)" << endl;
+    cout << " (" << order.second.values.size() << " points)" << endl;
     size_t point = 0;
-    for (const auto &val : order.second.second)
+    for (const auto &val : order.second.values)
     {
         ++point;
         // Apply sweep param
-        order.second.first(val);
+        order.second.apply(val);
+
+        // A wavelength (or frequency) sweep: the probes latch the swept wavelength of this point
+        // when their net carries it (PD5)
+        const double swept_wavelength_m = order.second.sweeps_wavelength
+                                              ? order.second.source->m_signal_on.getWavelength()
+                                              : std::numeric_limits<double>::quiet_NaN();
+        for (auto probe: all_probes)
+            probe->setSweptWavelength(swept_wavelength_m);
 
         //cout << order.first << " = " << val << endl;
 
@@ -330,7 +338,7 @@ void SPECSConfig::runDCAnalysis()
         // run the fixed point (at most max_iterations delta cycles, F-28) and advance one tick
         const sc_dt::uint64 start_delta = sc_delta_count();
         stringstream what;
-        what << ".dc: sweep point " << point << " of " << order.second.second.size()
+        what << ".dc: sweep point " << point << " of " << order.second.values.size()
              << " (" << order.first << " = " << val << ")";
         if (!runFixedPoint())
             reportNonConvergence(what.str(), start_delta);

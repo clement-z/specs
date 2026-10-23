@@ -103,8 +103,12 @@ void DCAnalysis::create() const
             cerr << "Unknown attribute for " << sweep_order.first.first << ": " << attribute_name << endl;
             exit(1);
         }
-        auto values = sweep_values(sweep_order.second[0], sweep_order.second[1], sweep_order.second[2]);
-        auto order = pair<function<void(double)>, vector<double>>(f, values);
+        CWSweepOrder order;
+        order.apply = f;
+        order.values = sweep_values(sweep_order.second[0], sweep_order.second[1], sweep_order.second[2]);
+        order.source = elem;
+        order.sweeps_wavelength = attribute_name == "WL" || attribute_name == "WAVELENGTH" || attribute_name == "LAMBDA"
+                                  || attribute_name == "F" || attribute_name == "FREQ" || attribute_name == "FREQUENCY";
         auto order_name = attribute_name + "(" + element_name + ")";
         specsGlobalConfig.cw_sweep_orders.emplace(order_name, order);
     }

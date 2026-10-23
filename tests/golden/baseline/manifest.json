@@ -215,6 +215,8 @@
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
   "regress/probe-latch-dc",
+  "regress/probe-latch-dc-swept-f",
+  "regress/probe-latch-dc-swept-wl",
   "regress/probe-latch-tran",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
@@ -329,6 +331,12 @@
    "only": "^(regress/probe-latch-tran|regress/probe-latch-dc|gtest/unit_tests)$",
    "gtest": true,
    "note": "PD5 follow-up (maintainer: no PROBE wavelength selection in v0.3.0): probe2 (wl=<wavelength>) removed from regress/probe-latch-tran and regress/probe-latch-dc (outputs = previous ones minus PROBE2); err/probe-wl-invalid removed; gtest list (Probe.SelectedWavelengthIsTheOnlyOneTraced removed)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T02:34:10Z",
+   "only": "^(regress/probe-latch-dc-swept-wl|regress/probe-latch-dc-swept-f|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD5 follow-up 2 (maintainer: .dc latch on the swept wavelength): new cases regress/probe-latch-dc-swept-wl and regress/probe-latch-dc-swept-f; gtest list (Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint)"
   }
  ]
 }

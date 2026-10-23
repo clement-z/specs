@@ -3802,6 +3802,48 @@
     "tests/golden/netlists/probe-latch-dc.cir"
    ],
    "note": "PD5: PROBE wavelength latch in a .dc: per point, the smallest wavelength written to the net at that point (both sources at the first point, then the swept one only: B-185)"
+  },
+  {
+   "id": "regress/probe-latch-dc-swept-wl",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/probe-latch-dc-swept-wl.cir"
+   ],
+   "note": "PD5 follow-up 2: .dc WL(src) sweep: a PROBE latches the swept wavelength at each point when its net carries it, also at the first point next to a smaller fixed wavelength; a net without it latches the smallest one"
+  },
+  {
+   "id": "regress/probe-latch-dc-swept-f",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/probe-latch-dc-swept-f.cir"
+   ],
+   "note": "PD5 follow-up 2: .dc /src/F frequency sweep (long form): a PROBE latches the swept wavelength (c/f) at each point, also at the first point next to a smaller fixed wavelength"
   }
  ]
 }

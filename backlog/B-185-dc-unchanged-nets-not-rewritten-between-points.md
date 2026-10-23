@@ -32,3 +32,14 @@ first point has a row at 1550 nm. Documented in `doc/netlist.md`, "PROBE, MLPROB
 
 ## Related
 PD5 (PROBE wavelength latch), B-001 (per-wavelength values in FD writes), B-048, B-184.
+
+## Update (PD5 follow-up 2, maintainer decision: option (a) for the swept wavelength)
+In a `.dc` that sweeps a source's wavelength or frequency (`WL(src)`, `F(src)`, `/src/WL`, `/src/F`), the `.dc`
+runner now passes the swept wavelength of each point to the probes (`Probe::setSweptWavelength()`), and a PROBE
+latches it when its net carries it at that point, before the smallest-wavelength rule. **Solved:** the first point,
+where both sources write the net, now shows the swept wavelength even when the fixed one is smaller (golden cases
+`regress/probe-latch-dc-swept-wl`, `regress/probe-latch-dc-swept-f`; before, the fixed 1530 nm was latched there).
+**Still open:** the unchanged-net part. A net whose value does not change between points is not written again, so
+a probe on a net that carries only non-swept wavelengths gets a sample at the first point only, and the fixed
+wavelength is not seen again after the first point (`regress/probe-latch-dc`, `probe2` of
+`regress/probe-latch-dc-swept-wl`). Options (a) to (c) above still apply to it.

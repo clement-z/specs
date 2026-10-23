@@ -68,6 +68,7 @@
   "ParserStateDeathTest.ResolveIncludeBothExist": "PASS",
   "Probe.LatchOnceAtEnableTakesTheSmallestWavelengthReceivedWhileDisabled": "PASS",
   "Probe.LatchOnceKeepsTheSmallestWavelengthOfTheFirstTimeStep": "PASS",
+  "Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint": "PASS",
   "Probe.LatchPerTimeStepTakesTheSmallestWavelengthOfEachPoint": "PASS",
   "Probe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "Probe.SamplesUnchangedNetWhenEnabled": "PASS",

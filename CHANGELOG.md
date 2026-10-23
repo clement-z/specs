@@ -20,9 +20,9 @@
 * Expert option (F-15, `doc/numerics.md`): an event cap (`.options maxevents=N`, `--max-events N`: a `.tran`
   ends there with a warning, an `.op`/`.dc` stops with an error). Default unchanged (no cap)
 * A plain `PROBE` (also the automatic `PROBE{<net>}` probes and the `.save` targets) traces one wavelength of a
-  net that carries several: it latches the smallest one per analysis point (each `.op`/`.dc` point; in a
-  `.tran`, the smallest at the start of the transient, or of its first time step that brings any) and ignores
-  the others, with one warning on stderr per probe (one line for all the automatic probes). Before, it traced
+  net that carries several: it latches the smallest one per analysis point (each `.op`/`.dc` point; in a `.dc`
+  that sweeps a source's wavelength or frequency, the swept wavelength when the net carries it; in a `.tran`,
+  the smallest at the start of the transient, or of its first time step that brings any) and ignores the others, with one warning on stderr per probe (one line for all the automatic probes). Before, it traced
   every event, so it showed one of the wavelengths of each time step, in an unspecified order. For a given
   wavelength, use MLPROBE. Single-wavelength nets, `.dc` wavelength sweeps and the `-t` testbenches are
   unchanged (`doc/netlist.md`)

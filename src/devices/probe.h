@@ -50,11 +50,16 @@ public:
     // runDCAnalysis(), runTRANAnalysis()); the testbenches run none, so their probes trace every event
     enum LatchMode {
         LATCH_OFF,           // every event of the net
-        LATCH_PER_TIME_STEP, // .op, .dc: the smallest wavelength of each time step (analysis point)
+        LATCH_PER_TIME_STEP, // .op, .dc: the smallest wavelength of each time step (analysis point), or
+                             // the swept one of a .dc WL/F sweep (m_swept_wavelength_m)
         LATCH_ONCE,          // .tran: the smallest wavelength when the probe is enabled (the values
                              // kept while it was disabled), else of the first time step that brings any
     };
     LatchMode m_latch_mode = LATCH_OFF;
+    // .dc sweep of a wavelength or frequency: the swept wavelength of the current point (NaN: none), latched
+    // in preference to the smallest one when the net carries it (set by SPECSConfig::runDCAnalysis())
+    double m_swept_wavelength_m = std::numeric_limits<double>::quiet_NaN();
+    void setSweptWavelength(double wavelength_m) { m_swept_wavelength_m = wavelength_m; }
     // PROBE{<net>} probes (traceall, .save): their warnings are summarised in one line
     bool m_automatic = false;
 
@@ -63,7 +68,7 @@ public:
     double m_latched_wavelength_m = std::numeric_limits<double>::quiet_NaN(); // NaN: none yet
     uint32_t m_latched_wavelength_id = 0;
     sc_time m_latch_time;      // time step of the latch
-    bool m_latch_final = false; // latched at the enable: no smaller wavelength replaces it
+    bool m_latch_final = false; // latched at the enable, or the swept one: no other wavelength replaces it
     // The first wavelength ignored (NaN: none), when, and the one traced instead, for the warning
     double m_ignored_wavelength_m = std::numeric_limits<double>::quiet_NaN();
     sc_time m_ignored_time;
