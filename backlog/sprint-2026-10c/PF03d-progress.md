@@ -15,8 +15,8 @@ Prototype (Opus subagent): `/tmp/PF03d-proto` (outside the repository, not durab
 | 1 | Remove `delay_per` | done | (this commit) | product code = reverse of 7e044eb's device/header/parser hunks (no later change to them); 2 golden cases removed; gcc 16 OK 1 skip, strict golden 275/275; asan-clang 16 OK 1 skip, no sanitizer message |
 | 2 | Grid check on the actual intervals | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest numbers bit-identical (linear 0.00345946 / LOO 0.00892046, PCHIP 0.0127283 / 0.0348905) |
 | 3 | PCHIP slopes per run | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest PCHIP 0.0127283 -> 0.00191221, LOO 0.0348905 -> 0.00553862 (linear bit-identical); test_sparam.py pchip between points 9.56e-5 where \|E\| >= 0.1 (same), 9.72e-5 anywhere (5.19e-4) |
-| 4 | Pulse-pair tau0 | **stopped** (output change beyond the prediction) | side branch `PF03d-wip/item4` (worktree `/tmp/PF03d-wt/item4`) | tau0 as expected; `regress/spar-grid-warning` warning text changes (0.707522 at 1.546 um -> 0.704106 at 1.554 um) and its `out` moves by 1.7e-13, not ~1.7e-14 (Log) |
-| 5 | Docs and report | todo | | |
+| 4 | Pulse-pair tau0 | **stopped** (output change beyond the prediction) | side branch `PF03d-wip/item4` (5b41220, worktree `/tmp/PF03d-wt/item4`) | tau0 as expected; `regress/spar-grid-warning` warning text changes (0.707522 at 1.546 um -> 0.704106 at 1.554 um) and its `out` moves by 1.7e-13, not ~1.7e-14 (Log) |
+| 5 | Docs and report | done | 7a4dc6d, report commit | item 2 regression test 81bbe0d; side branch rebased onto 7a4dc6d (5b41220) |
 
 ## Algorithms (written before the code, shared with the prototype)
 
