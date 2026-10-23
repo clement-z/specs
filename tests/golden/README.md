@@ -179,7 +179,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (241 `specs` cases + 1 gtest case)
+## Case list (244 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
