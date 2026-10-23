@@ -12,6 +12,8 @@ check    Run every case and compare against a recorded --baseline directory.
 compare  Compare two already-recorded directories (e.g. two `record` runs,
          to test determinism).
 list     Print the case list.
+stats-record   Run every case with `specs --stats` and store its event counters (F-15).
+stats-compare  Compare the event counters of two `stats-record` directories (two builds).
 
 See tests/golden/README.md for details.
 """
@@ -70,6 +72,12 @@ SPECS_VERSION_RE = re.compile(r'("specs_version"\s*:\s*)"(?:[^"\\]|\\.)*"')
 SPECS_VERSION_LINE_RE = re.compile(r'^(\s*"specs_version"\s*:\s*)"(?:[^"\\]|\\.)*"')
 VERSION_MASK = r'\1"<VERSION>"'
 
+# Run statistics of specs (F-15, src/run_stats.h): <trace>.stats.json (or --stats-file), and
+# `specs --print-stats` on stdout. "wall_time_s" (on its own line) is the only run-dependent value.
+RUN_STATS_SUFFIX = ".stats.json"
+WALL_TIME_LINE_RE = re.compile(r'^(\s*"wall_time_s"\s*:\s*)[-+0-9.eE]+')
+WALL_TIME_MASK = r'\1"<WALL_TIME>"'
+
 # Numbers embedded in text: not glued to identifiers (PS1, COL_0, uut2 ...).
 NUM_RE = re.compile(
     r"(?<![A-Za-z0-9_.])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?(?![A-Za-z0-9_.])"
@@ -116,6 +124,7 @@ def normalise_text(text, pathmap):
         line = RUNTIME_RE.sub("Total runtime: <DURATION> ms", line)
         line = NEG_NAN_RE.sub("nan", line)
         line = SPECS_VERSION_LINE_RE.sub(VERSION_MASK, line)
+        line = WALL_TIME_LINE_RE.sub(WALL_TIME_MASK, line)
         out.append(line.rstrip())
     while out and out[0] == "":
         out.pop(0)
@@ -130,6 +139,13 @@ def normalise_run_manifest(text, pathmap):
     verbatim; the file is still compared as JSON."""
     text = SPECS_VERSION_RE.sub(VERSION_MASK, text.replace("\r\n", "\n"), count=1)
     return pathmap.apply(text)
+
+
+def normalise_run_stats(text):
+    """<trace>.stats.json: the value of "wall_time_s" becomes "<WALL_TIME>". Everything else is
+    kept verbatim; the file is still compared as JSON."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    return "\n".join(WALL_TIME_LINE_RE.sub(WALL_TIME_MASK, line) for line in lines)
 
 
 def canonical_ids(text):
@@ -761,6 +777,8 @@ def run_case(case, specs, repo, tmp_root):
                 content = normalise_vcd(decode(raw))
             elif kind == "json" and rel.endswith(RUN_MANIFEST_SUFFIX):
                 content = normalise_run_manifest(decode(raw), pathmap)
+            elif kind == "json" and rel.endswith(RUN_STATS_SUFFIX):
+                content = normalise_run_stats(decode(raw))
             elif kind == "npz":
                 content = decode_npz(raw)
             elif kind in ("text", "json"):
@@ -1284,6 +1302,172 @@ def cmd_compare(args):
     return summarise(out, args.allow_new)
 
 
+# --------------------------------------------------------------------------
+# Event counters per case (F-15): `stats-record`, `stats-compare`
+# --------------------------------------------------------------------------
+
+# Appended to the arguments of every case: all sections, in a fixed file of the working directory
+STATS_FILE = "golden-case.stats.json"
+STATS_ARGS = ["--stats=ports,devices", "--stats-file", STATS_FILE]
+STATS_FORMAT = "specs-golden-stats"
+
+
+def stats_case(case):
+    """The case with the --stats options appended to its arguments."""
+    c = dict(case)
+    c["args"] = list(case.get("args", [])) + STATS_ARGS
+    return c
+
+
+def run_stats_case(case, specs, repo, tmp_root):
+    """Run a case with --stats; returns {"id", "exit", "stats"}: the run statistics without the wall
+    time, or None when the run wrote none (parse errors, -n, help, ...)."""
+    res = run_case(stats_case(case), specs, repo, tmp_root)
+    f = res["files"].get(STATS_FILE)
+    stats = None
+    if f is not None:
+        try:
+            stats = json.loads(f["content"])
+        except ValueError as e:
+            stats = {"unreadable": str(e)}
+        if isinstance(stats, dict):
+            stats.pop("wall_time_s", None)
+    return {"id": res["id"], "exit": res["exit"], "stats": stats}
+
+
+def stats_path(outdir, case_id):
+    return outdir / "cases" / (safe_rel(case_id) + ".json")
+
+
+def cmd_stats_record(args):
+    spec, cases, gspec = load_cases(args.cases)
+    cases, _ = select(cases, args.only)
+    outdir = Path(args.out).resolve()
+    shutil.rmtree(outdir / "cases", ignore_errors=True)
+    specs = Path(args.specs).resolve()
+    repo = Path(args.repo).resolve()
+    print("Recording the event counters of %d case(s) into %s" % (len(cases), outdir))
+    n_stats = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as ex:
+        futs = [ex.submit(run_stats_case, c, specs, repo, args.tmpdir) for c in cases]
+        for fut in futs:
+            res = fut.result()
+            path = stats_path(outdir, res["id"])
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+            st = res["stats"]
+            if st is not None:
+                n_stats += 1
+            totals = st.get("totals", {}) if isinstance(st, dict) else {}
+            print("  %-44s exit=%-6s %s" % (res["id"], res["exit"],
+                                            "processed=%s" % totals.get("processed") if st else "no stats"))
+    manifest = {
+        "format": STATS_FORMAT,
+        "recorded_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "specs": str(specs),
+        "stats_args": STATS_ARGS,
+        "cases": sorted(c["id"] for c in cases),
+        "note": args.note,
+    }
+    (outdir / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
+    print("%d case(s), %d with run statistics" % (len(cases), n_stats))
+    return 0
+
+
+def keyed_rows(stats):
+    """The "ports" and "devices" lists as dicts keyed by port name / device type, so that a
+    difference names the row rather than its index."""
+    if not isinstance(stats, dict):
+        return stats
+    out = dict(stats)
+    if isinstance(out.get("ports"), list):
+        out["ports"] = {r.get("port"): r for r in out["ports"]}
+    if isinstance(out.get("devices"), list):
+        out["devices"] = {r.get("type"): r for r in out["devices"]}
+    return out
+
+
+def diff_values(a, b, path, diffs, ignore):
+    """Exact comparison of two JSON values; appends "path: a -> b" for every difference whose path
+    matches none of the ignore regexes."""
+    if any(rx.search(path) for rx in ignore):
+        return
+    if isinstance(a, dict) and isinstance(b, dict):
+        for k in sorted(set(a) | set(b), key=str):
+            p = "%s.%s" % (path, k) if path else str(k)
+            if k not in a:
+                if not any(rx.search(p) for rx in ignore):
+                    diffs.append("%s: (absent) -> %s" % (p, json.dumps(b[k])))
+            elif k not in b:
+                if not any(rx.search(p) for rx in ignore):
+                    diffs.append("%s: %s -> (absent)" % (p, json.dumps(a[k])))
+            else:
+                diff_values(a[k], b[k], p, diffs, ignore)
+        return
+    if isinstance(a, list) and isinstance(b, list) and len(a) == len(b):
+        for i, (x, y) in enumerate(zip(a, b)):
+            diff_values(x, y, "%s[%d]" % (path, i), diffs, ignore)
+        return
+    # bool is not a number here: true != 1
+    if type(a) is not type(b) or a != b:
+        diffs.append("%s: %s -> %s" % (path or "stats", json.dumps(a), json.dumps(b)))
+
+
+def compare_stats(a, b, ignore=()):
+    """Differences between two run_stats_case() results (exit status and counters, exact)."""
+    diffs = []
+    if a.get("exit") != b.get("exit"):
+        diffs.append("exit: %r -> %r" % (a.get("exit"), b.get("exit")))
+    diff_values(keyed_rows(a.get("stats")), keyed_rows(b.get("stats")), "", diffs, list(ignore))
+    return diffs
+
+
+def cmd_stats_compare(args):
+    spec, cases, gspec = load_cases(args.cases)
+    cases, _ = select(cases, args.only)
+    base, cand = Path(args.baseline), Path(args.candidate)
+    for d in (base, cand):
+        m = d / "manifest.json"
+        if not m.exists() or json.loads(m.read_text(encoding="utf-8")).get("format") != STATS_FORMAT:
+            raise SystemExit("%s is not a stats-record directory" % d)
+    ignore = [re.compile(r) for r in args.ignore or []]
+    out = {"same": [], "differ": {}, "new": [], "missing": [], "no_stats": []}
+    for c in cases:
+        pa, pb = stats_path(base, c["id"]), stats_path(cand, c["id"])
+        if not pa.exists() or not pb.exists():
+            if pa.exists():
+                out["missing"].append(c["id"])
+                print("MISSING  %s (no result in the candidate)" % c["id"])
+            elif pb.exists():
+                out["new"].append(c["id"])
+                print("NEW      %s (no result in the baseline)" % c["id"])
+            else:
+                out["missing"].append(c["id"])
+                print("MISSING  %s (in neither directory)" % c["id"])
+            continue
+        a = json.loads(pa.read_text(encoding="utf-8"))
+        b = json.loads(pb.read_text(encoding="utf-8"))
+        diffs = compare_stats(a, b, ignore)
+        if diffs:
+            out["differ"][c["id"]] = diffs
+            print("DIFF     %s" % c["id"])
+            for d in diffs[: args.max_diffs]:
+                print("    " + d)
+            if len(diffs) > args.max_diffs:
+                print("    ... %d more" % (len(diffs) - args.max_diffs))
+        else:
+            out["same"].append(c["id"])
+            if a.get("stats") is None:
+                out["no_stats"].append(c["id"])
+            if args.verbose:
+                print("SAME     %s%s" % (c["id"], " (no stats)" if a.get("stats") is None else ""))
+    print("\nSummary: %d same (%d of them without run statistics), %d differ, %d new, %d missing"
+          % (len(out["same"]), len(out["no_stats"]), len(out["differ"]), len(out["new"]), len(out["missing"])))
+    if args.report:
+        Path(args.report).write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
+    return 1 if out["differ"] or out["new"] or out["missing"] else 0
+
+
 def cmd_list(args):
     spec, cases, gspec = load_cases(args.cases)
     cases, with_gtest = select(cases, args.only)
@@ -1361,6 +1545,30 @@ def main(argv=None):
     p.add_argument("--candidate", required=True)
     p.add_argument("--no-unit-tests", action="store_true", help="skip the gtest case explicitly")
     p.set_defaults(func=cmd_compare)
+
+    p = sub.add_parser("stats-record", help="run every case with --stats and store its event counters")
+    p.add_argument("--cases", default=str(DEFAULT_CASES), help="case list (default: %(default)s)")
+    p.add_argument("--only", help="regex: only run case ids matching it")
+    p.add_argument("--specs", required=True, help="path to the specs binary")
+    p.add_argument("--out", required=True, help="output directory (its cases/ is replaced)")
+    p.add_argument("--repo", default=str(DEFAULT_REPO), help="repo root (circuits/ is copied from here)")
+    p.add_argument("--jobs", "-j", type=int, default=1, help="parallel cases (default 1)")
+    p.add_argument("--tmpdir", default=None, help="where to create per-case working dirs")
+    p.add_argument("--note", default="", help="free text stored in manifest.json")
+    p.set_defaults(func=cmd_stats_record)
+
+    p = sub.add_parser("stats-compare", help="compare the event counters of two stats-record directories")
+    p.add_argument("--cases", default=str(DEFAULT_CASES), help="case list (default: %(default)s)")
+    p.add_argument("--only", help="regex: only compare case ids matching it")
+    p.add_argument("--baseline", required=True, help="stats-record directory (e.g. the build before a change)")
+    p.add_argument("--candidate", required=True, help="stats-record directory (e.g. the build after it)")
+    p.add_argument("--ignore", action="append",
+                   help="regex on the key path of a counter not to compare (repeatable), "
+                   "e.g. 'pending_' or '^ports\\.'")
+    p.add_argument("--max-diffs", type=int, default=20, help="differences printed per case (default 20)")
+    p.add_argument("--verbose", "-v", action="store_true", help="also list the identical cases")
+    p.add_argument("--report", help="write a JSON report to this file")
+    p.set_defaults(func=cmd_stats_compare)
 
     p = sub.add_parser("list", help="list cases")
     p.add_argument("--cases", default=str(DEFAULT_CASES))

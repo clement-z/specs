@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f15-wdm-crow-mlprobe.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f15-wdm-crow-mlprobe.cir", "sha256": "60cf6acf246ac526775ddf9584fb31426ef8f9019431f5e71a8e6acf3a5d4dad"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

@@ -3,7 +3,9 @@
 
 using namespace std::complex_literals;
 
+#ifdef SPECS_SIGNAL_IDS
 unsigned int OpticalSignal::nextId = 0;
+#endif
 
 OpticalSignal &OpticalSignal::operator+=(const OpticalSignal &rhs)
 {

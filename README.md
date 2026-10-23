@@ -45,7 +45,8 @@ meson setup build --wrap-mode=nofallback -Dcmake_prefix_path=/path/to/systemc/pr
 SystemC is then looked up with pkg-config, then as a CMake package (`-Dcmake_prefix_path`); args as a CMake
 package (with `nofallback`, the unit tests also need an installed googletest). Useful options: `-Dnative=true` (`-march=native`: faster on the build machine, but the binaries only run on CPUs like
 it and results differ from the golden baseline in the last bits),
-`-Dold_tb=false` (no built-in testbenches), `-Dtests=disabled` (no googletest download). The shared library
+`-Dold_tb=false` (no built-in testbenches), `-Dtests=disabled` (no googletest download), `-Dsignal_ids=true`
+(debug ids of optical signals, printed as `[NNNN]` in signal listings). The shared library
 is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs it), and the Doxygen docs with `ninja -C build doc`.
 `meson install` installs `specs` and, when SystemC is built from its wrap, `libsystemc.so` into `<prefix>/<libdir>`
 (the installed `specs` finds it through its rpath).

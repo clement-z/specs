@@ -11,6 +11,7 @@
 #include <utility>
 #include <functional>
 #include <memory>
+#include <chrono>
 
 using std::vector;
 using std::map;
@@ -19,6 +20,17 @@ using std::make_shared;
 using std::shared_ptr;
 using std::string;
 using std::function;
+
+class CWSource;
+
+// A .dc sweep order (DCAnalysis::create()): the values of one attribute of a CW source
+struct CWSweepOrder {
+    function<void(double)> apply; // sets the attribute of the source to a value
+    vector<double> values;
+    CWSource *source = nullptr;
+    // WL or F: the source's wavelength changes at each point, and the probes latch it (PD5)
+    bool sweeps_wavelength = false;
+};
 
 namespace spx {
     // Value types
@@ -105,7 +117,7 @@ public:
     // then keep it instead of applying their default mode (B-004)
     bool simulation_mode_explicit = false;
     AnalysisType analysis_type;
-    map<string, pair<function<void(double)>, vector<double>>> cw_sweep_orders;
+    map<string, CWSweepOrder> cw_sweep_orders;
     double tran_duration = std::numeric_limits<double>::infinity();
     // Master seed of the random streams (F-01): each noisy device draws from
     // spx::rng_for(seed, <its hierarchical name>) (utils/rng.h). Default 0: runs are reproducible
@@ -120,6 +132,12 @@ public:
     uint64_t max_iterations = DEFAULT_MAX_ITERATIONS;
     // Set when it was chosen explicitly (specs --maxiter): .options maxiter is then ignored
     bool max_iterations_explicit = false;
+    // Expert option (F-15, doc/numerics.md). Event cap: the run stops once the output ports have processed max_events pending entries
+    // (.options maxevents, specs --max-events); 0: no cap
+    uint64_t max_events = 0;
+    bool max_events_explicit = false; // set by specs --max-events: .options maxevents is then ignored
+    // the cap shared by the ports of this run (applyDefaultOpticalOutputPortConfig())
+    shared_ptr<OpticalOutputPortEventCap> event_cap;
 
     // Port options. Tolerances >= 0 (B-153): with both at 0 the emission gate is off
     double default_abstol = 1e-8;
@@ -153,6 +171,16 @@ public:
     vector<string> netlist_files; // files opened by the parser (-f, .include), in first-open order
     bool print_run_manifest = false; // also print the run manifest to stdout, once (--print-manifest)
 
+    // Run statistics (F-15, src/run_stats.h): RunStats::Section flags, 0: off (specs --stats).
+    // Written to stats_filename (--stats-file), else to <trace_filename>.stats.json, else (no
+    // trace file) printed to stdout; also printed with --print-stats
+    unsigned stats_sections = 0;
+    string stats_filename = "";
+    bool print_stats = false;
+    // Progress line on stderr every progress_period_s of wall-clock time (specs --progress); 0: off
+    double progress_period_s = 0;
+    std::chrono::steady_clock::time_point run_start; // start of runAnalysis(), for the wall time
+
     // other
     // Unused since ws-cleanup C-01; kept because removing it shifts the printed
     // OpticalSignal IDs (heap layout, B-016): delete it together with B-016.
@@ -170,6 +198,12 @@ public:
     void applyInitialConditions();
     bool runFixedPoint();
     void reportNonConvergence(const string &what, sc_dt::uint64 start_delta) const;
+    bool eventCapReached() const
+    {
+        return event_cap && event_cap->reached;
+    }
+    void checkEventCap(const string &what) const;
+    void writeRunStats() const;
 
     void applyEngineResolution() {
         // set engine time resolution

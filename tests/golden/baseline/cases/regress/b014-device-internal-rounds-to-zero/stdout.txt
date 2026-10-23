@@ -64,22 +64,22 @@ Current SPECS config:
 - trace all optical nets: 0
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
-ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 ╔═══════════════════╗
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/MZI1/DC1_out1 (OPTICAL) = [#2]  @ 1550 nm (0.022361 √W, 0.000500 W, 0.0000 rad)
-║ - ROOT/MZI1/DC1_out2 (OPTICAL) = [#3]  @ 1550 nm (0.022361 √W, 0.000500 W, 1.5708 rad)
-║ - ROOT/MZI1/DC2_in1 (OPTICAL) = [#4]  @ 1550 nm (0.022358 √W, 0.000500 W, 1.2161 rad)
-║ - ROOT/MZI1/DC2_in2 (OPTICAL) = [#5]  @ 1550 nm (0.022358 √W, 0.000500 W, -1.7127 rad)
-║ - ROOT/MZI1/PS1_in (OPTICAL) = [#6]  @ 1550 nm (0.022359 √W, 0.000500 W, 0.6081 rad)
-║ - ROOT/MZI1/PS1_out (OPTICAL) = [#7]  @ 1550 nm (0.022359 √W, 0.000500 W, 0.6081 rad)
-║ - ROOT/in (OPTICAL) = [#8]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-║ - ROOT/nc (OPTICAL) = [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/o1 (OPTICAL) = [#10]  @ 1550 nm (0.024606 √W, 0.000605 W, -1.6519 rad)
-║ - ROOT/out1 (OPTICAL) = [#11]  @ 1550 nm (0.024606 √W, 0.000605 W, 0.5371 rad)
-║ - ROOT/out2 (OPTICAL) = [#12]  @ 1550 nm (0.019857 √W, 0.000394 W, -2.6045 rad)
+║ - ROOT/MZI1/DC1_out1 (OPTICAL) = @ 1550 nm (0.022361 √W, 0.000500 W, 0.0000 rad)
+║ - ROOT/MZI1/DC1_out2 (OPTICAL) = @ 1550 nm (0.022361 √W, 0.000500 W, 1.5708 rad)
+║ - ROOT/MZI1/DC2_in1 (OPTICAL) = @ 1550 nm (0.022358 √W, 0.000500 W, 1.2161 rad)
+║ - ROOT/MZI1/DC2_in2 (OPTICAL) = @ 1550 nm (0.022358 √W, 0.000500 W, -1.7127 rad)
+║ - ROOT/MZI1/PS1_in (OPTICAL) = @ 1550 nm (0.022359 √W, 0.000500 W, 0.6081 rad)
+║ - ROOT/MZI1/PS1_out (OPTICAL) = @ 1550 nm (0.022359 √W, 0.000500 W, 0.6081 rad)
+║ - ROOT/in (OPTICAL) = @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+║ - ROOT/nc (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/o1 (OPTICAL) = @ 1550 nm (0.024606 √W, 0.000605 W, -1.6519 rad)
+║ - ROOT/out1 (OPTICAL) = @ 1550 nm (0.024606 √W, 0.000605 W, 0.5371 rad)
+║ - ROOT/out2 (OPTICAL) = @ 1550 nm (0.019857 √W, 0.000394 W, -2.6045 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/EVLSRC1 was enabled

@@ -5,8 +5,8 @@ title: "SPECS: Scalable Photonic Event-driven Circuit Simulator"
 abstract: >-
   SPECS is an event-driven photonic circuit simulator built on SystemC, with a SPICE-like netlist
   language, for fast, femtosecond-accurate simulation of large photonic circuits.
-version: "0.2.0"
-date-released: "2026-10-21"
+version: "0.3.0"
+date-released: "2026-10-23"
 license: LGPL-3.0-or-later
 repository-code: "https://github.com/clement-z/specs"
 url: "https://demo.zrounba.fr/specs"

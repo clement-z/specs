@@ -31,7 +31,30 @@ python3 -I tests/golden/run_golden.py compare --baseline DIR_A --candidate DIR_B
 
 # Show the case list
 python3 -I tests/golden/run_golden.py list
+
+# Event counters of every case (F-15): record them for two builds, then compare
+python3 -I tests/golden/run_golden.py stats-record --specs <before>/specs --out /tmp/stats-before -j 8
+python3 -I tests/golden/run_golden.py stats-record --specs <after>/specs --out /tmp/stats-after -j 8
+python3 -I tests/golden/run_golden.py stats-compare --baseline /tmp/stats-before --candidate /tmp/stats-after
 ```
+
+### Event counters (`stats-record`, `stats-compare`)
+
+`stats-record` runs every case (or `--only`) with `--stats=ports,devices --stats-file
+golden-case.stats.json` appended to its arguments and stores, per case, the exit status and the run
+statistics (`specs --stats`, `doc/numerics.md`) without `wall_time_s`, in `<out>/cases/<id>.json`. Cases
+whose run writes no statistics (parse errors, `-n`, `--help`, ...) store `null`; the `-t` testbenches
+write theirs. Outputs are not compared: the appended options only add the file. `stats-compare` compares two
+such directories **exactly** (integers, the doubles bit for bit, the exit status); the rows of `ports` and
+`devices` are matched by port name and device type, so a difference reads
+`ports.ROOT/WG1.out_delayed_writer.processed: 12 -> 14`. Exit 1 if a case differs or is missing on one
+side. `--ignore REGEX` (repeatable) skips the counters whose key path matches (`--ignore pending_`),
+`--report` writes the result as JSON. Two records of the same build compare equal (checked 2026-10-22 on all
+226 cases, 134 of them with statistics).
+
+Use: the F-15 engine refactors must keep the counters of every case identical (D2) or explain each change
+(D3, decision Q1): record with the build before the change and with the build after it (same compiler and
+options), then `stats-compare`.
 
 With Meson, `check` (default tolerances, `-j 4`, `--unit-tests` when the unit
 tests are built, `--no-unit-tests` otherwise) is also registered as a test
@@ -135,7 +158,9 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   changes bit-exactly, so ulp-level differences (`-O0` vs `-O3`, GCC vs clang)
   add or drop redundant records without changing the waveform. Timescale and
   the set of declared variables (with type and width) must match.
-* **JSON** is compared structurally, with numbers using the tolerance.
+* **JSON** is compared structurally, with numbers using the tolerance. In run statistics
+  (`specs --stats`, files `*.stats.json` and `--print-stats` on stdout) the value of `wall_time_s` is
+  masked (`"<WALL_TIME>"`); name a `--stats-file` of a case `*.stats.json` so that it is masked too.
 * **NPZ** is compared as its decoded text, line by line, as **text** is (float
   tolerance and print slack apply; a 1-ulp difference passes).
 * **gtest** results are compared per test name (`Suite.Test`: PASS / FAIL /
@@ -154,7 +179,7 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (211 `specs` cases + 1 gtest case)
+## Case list (234 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
@@ -163,8 +188,8 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*`, `err/fNN-*` (75) | bad inputs from the 2026-10, 2026-10b and 2026-10c fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
-| `regress/bNNN-*`, `regress/fNN-*` (91) | regression cases of the 2026-10, 2026-10b and 2026-10c fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, tracing only the probes of a netlist that has some, `.save`, `--no-trace`, CSV and `.npz` tables, subcircuit instances sharing a net, 64-bit integer literals, zero tolerances, ...); hand-computed expected values are in the netlist headers |
+| `err/bNNN-*`, `err/fNN-*` (82) | bad inputs from the 2026-10, 2026-10b and 2026-10c fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
+| `regress/bNNN-*`, `regress/fNN-*` (101) | regression cases of the 2026-10, 2026-10b and 2026-10c fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, tracing only the probes of a netlist that has some, `.save`, `--no-trace`, CSV and `.npz` tables, subcircuit instances sharing a net, 64-bit integer literals, zero tolerances, run statistics, the event cap `maxevents`, per-wavelength values that must not depend on the order of evaluation within a time step, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change

@@ -1,0 +1,13 @@
+* B-184: MLPROBE at the start of a .tran samples only the wavelength last written to its net.
+* Two CW sources at 1.55 and 1.56 um, 1 W each, into a merger (field x 1/sqrt(2) per input); MLPROBE on the
+* merger output for both wavelengths. Expected from t = 0: 0.5 W, 0.707107 sqrt(W) at each wavelength.
+* Observed (2140dd4 and 54b15dc, pixi gcc and clang): 1550 nm as expected, 1560 nm reads 0 for the whole run
+* (VCD power@1560_000000 = 0; with --format csv, no row at 1.56e-06). The OP listing shows ROOT/m @ 1550 nm only:
+* a net holds the last value written to it, of any wavelength.
+* Run: specs -f backlog/repro/b184-mlprobe-tran-start-multilambda.cir -o traces/b184 --format vcd --format csv
+cwsrc1 a wl=1.55e-6 power=1
+cwsrc2 b wl=1.56e-6 power=1
+merger1 a b m
+mlprobe1 m wl=[1.55e-6, 1.56e-6]
+.options traceall=0
+.tran 1e-9

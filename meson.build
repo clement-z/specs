@@ -1,5 +1,5 @@
 project('specs', 'cpp',
-  version: '0.2.0',
+  version: '0.3.0',
   license: 'LGPL-3.0-or-later',
   meson_version: '>=1.3.0',
   default_options: [
@@ -26,6 +26,10 @@ src_root = meson.project_source_root() / 'src'
 add_project_arguments('-Wfatal-errors', '-iquote', src_root, language: 'cpp')
 if get_option('native')
   add_project_arguments('-march=native', language: 'cpp')
+endif
+# F-15: debug ids of optical signals (OpticalSignal::m_id), off by default
+if get_option('signal_ids')
+  add_project_arguments('-DSPECS_SIGNAL_IDS', language: 'cpp')
 endif
 
 # ---- Dependencies -------------------------------------------------------------------------------

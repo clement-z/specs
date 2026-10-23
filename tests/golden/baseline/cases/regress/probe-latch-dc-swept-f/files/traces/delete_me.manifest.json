@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "vcd", "--format", "csv", "-f", "tests/golden/netlists/probe-latch-dc-swept-f.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/probe-latch-dc-swept-f.cir", "sha256": "f40083c7695622d90d65fb3810c1711aa763df5673da30e2b41c5fb1d57b63a2"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

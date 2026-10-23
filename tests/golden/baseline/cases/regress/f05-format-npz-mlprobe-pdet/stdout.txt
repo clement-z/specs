@@ -57,15 +57,15 @@ Current SPECS config:
 - default reltol: 0.0001
 - resolution multiplier: 1
 - trace all optical nets: 0
-ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.5000 rad)
-ROOT/CWSRC2 emitted: [#2]  @ 1310 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.5000 rad)
+ROOT/CWSRC2 emitted: @ 1310 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
 ╔═══════════════════╗
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/a (OPTICAL) = [#3]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.5000 rad)
-║ - ROOT/b (OPTICAL) = [#4]  @ 1310 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
-║ - ROOT/c (OPTICAL) = [#5]  @ 1550 nm (0.022361 √W, 0.000500 W, 0.5000 rad)
+║ - ROOT/a (OPTICAL) = @ 1550 nm (0.031623 √W, 0.001000 W, 0.5000 rad)
+║ - ROOT/b (OPTICAL) = @ 1310 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+║ - ROOT/c (OPTICAL) = @ 1550 nm (0.022361 √W, 0.000500 W, 0.5000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/PDET1 was enabled

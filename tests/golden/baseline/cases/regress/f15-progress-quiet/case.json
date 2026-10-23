@@ -1,0 +1,25 @@
+{
+ "args": [
+  "--progress=3600",
+  "-o",
+  "traces/x",
+  "-f",
+  "circuits/add_drop_pyspecs.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/x.manifest.json": {
+   "bytes": 432,
+   "kind": "json",
+   "sha256": "5959a8dd1e42f68ef714e2e76fb520fe383f47cd22c2e3e98d644b75e61e890f",
+   "stored": "files/traces/x.manifest.json"
+  },
+  "traces/x.vcd": {
+   "bytes": 403588,
+   "kind": "vcd",
+   "sha256": "96acdaa0b72c46fe3f55d5bd03218bd1390de82613769dcb881ead1a1ba9dd14",
+   "stored": "files/traces/x.vcd"
+  }
+ },
+ "id": "regress/f15-progress-quiet"
+}

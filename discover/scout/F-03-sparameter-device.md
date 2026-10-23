@@ -1,17 +1,24 @@
 # F-03: S-parameter device (`SPAR`): Touchstone and Lumerical/SiEPIC `.sparam` import
 
 value 5 | effort M (frequency-domain semantics) / M+ needs-human (broadband time-domain) | risk med |
-prerequisites: fix the generic device's single-wavelength latch (backlog) | horizon 2
+prerequisites: none (the generic device it was to refactor is removed, decision 2026-10-23) | horizon 2
+
+> **Update 2026-10-23 (maintainer decision, phase D2b).** `GenericTransmissionDevice`, `Generic2x2Coupler`,
+> `GenericWaveguide` and the output ports' delta-write mode (`m_use_deltas`) are removed (54b15dc). F-03 is to be
+> written **from scratch** as a state-holding, per-wavelength device: one memory per input port and wavelength,
+> and on every input event a full recomputation of the outputs from those memories, with absolute-value writes,
+> like the other multi-input devices (merger, directional coupler). The removed code, referenced below with its
+> former line numbers, is in the history at cc1e52e.
 
 ## Problem / user story
 *As a designer I have an FDTD, EME or measured S-matrix of a coupler, grating, MMI or PDK cell and want to drop it
 into a SPECS netlist.* `todo.txt` item 1, GitHub issue #4, and the paper's claim of "generic S-matrix devices".
-Today `GenericTransmissionDevice` is abstract (`src/devices/generic_transmission_device.h:67-94`, `prepareTM()`
-pure at `:82`) with a Taylor-coefficient matrix (`:19-65`); its process latches `S_ij` at the first wavelength
-(`generic_transmission_device.cpp:181-183`) and calls `sc_stop()` on any other wavelength (`:202-208`), runs in
-delta mode (`:76`, which the DC sweep reset breaks) and spawns one process per active (i, j) (`:88-94`).
-`GenericWaveguide` is disabled with `exit(1)` (`src/devices/generic_waveguide.h:18-19`) and has formula errors.
-No netlist element exists. Every comparable tool imports S-parameters (SOURCES A matrix); the SiEPIC EBeam
+Until 2026-10-23, `GenericTransmissionDevice` was abstract (`src/devices/generic_transmission_device.h:67-94`, `prepareTM()`
+pure at `:82`) with a Taylor-coefficient matrix (`:19-65`); its process latched `S_ij` at the first wavelength
+(`generic_transmission_device.cpp:181-183`) and called `sc_stop()` on any other wavelength (`:202-208`), ran in
+delta mode (`:76`, which the DC sweep reset broke) and spawned one process per active (i, j) (`:88-94`).
+`GenericWaveguide` was disabled with `exit(1)` (`src/devices/generic_waveguide.h:18-19`) and had formula errors
+(B-040). All of it was removed on 2026-10-23 (code at cc1e52e). No netlist element exists. Every comparable tool imports S-parameters (SOURCES A matrix); the SiEPIC EBeam
 library alone ships 44 `.sparam` files inside Simphony; Parini et al. fed FDTD S-matrices into SystemC blocks in
 2012 (SOURCES B).
 
@@ -35,11 +42,12 @@ library alone ships 44 `.sparam` files inside Simphony; Parini et al. fed FDTD S
    port names from `! Port[i]`/`! ports:` comments), CSV `wavelength_m, o1@0,o2@0_re, ..._im`. Store per (i, j):
    frequency grid, |S| and **unwrapped** phase; interpolate magnitude and phase separately (gplugins PR 253);
    derive group delay tau_g(i,j) = -d phi/d omega (per frequency or band centre); reciprocity fill optional.
-3. **Runtime semantics (phase 1, exact for CW/`.dc` and narrowband pulses).** Refactor
-   `GenericTransmissionDevice` into `SParamDevice`: per-wavelength `S_ij(lambda)` lookup at event time (per-λ
-   map instead of the latch at `:181-183`; delete the `sc_stop` at `:202-208`), absolute-value outputs (drop
-   `m_use_deltas`, `:76`) so it behaves like every other device, event delay = round(tau_g(lambda)) ticks (same
-   rounding as `src/devices/waveguide.cpp:72`), one process per input port writing all active outputs. This is
+3. **Runtime semantics (phase 1, exact for CW/`.dc` and narrowband pulses).** A new `SParamDevice`, written from
+   scratch (decision 2026-10-23; not a refactor of the removed `GenericTransmissionDevice`): state-holding, one
+   memory per input port and wavelength; on an input event, a full recomputation of the outputs at that
+   wavelength from the memories, with a per-wavelength `S_ij(lambda)` lookup (cached per wavelength), written as
+   absolute values like every other device; event delay = round(tau_g(lambda)) ticks (same rounding as
+   `src/devices/waveguide.cpp`), one process per input port writing all active outputs. This is
    the "per-wavelength S" model Photontorch uses; dispersion *within* a pulse's bandwidth is ignored and
    documented.
 4. **Phase 2 (needs-human).** Broadband time-domain realisation: FIR/IIR fit in a sampled island (F-08) or an
@@ -47,8 +55,8 @@ library alone ships 44 `.sparam` files inside Simphony; Parini et al. fed FDTD S
 5. **Export** (F-13): write a `.dc` sweep as `.sparam`/Touchstone/`.npz` so SPECS blocks can be reused.
 
 ## Touch points
-`src/devices/generic_transmission_device.{h,cpp}` (lines above) · `src/devices/generic_waveguide.h`,
-`generic_2x2_coupler.h` (retire or re-express as `format=taylor`) · `src/parser/parse_element.{h,cpp}` (new
+new `src/devices/sparam_device.{h,cpp}` (the former `generic_transmission_device.{h,cpp}`,
+`generic_waveguide.h` and `generic_2x2_coupler.h`, at cc1e52e, are reference only) · `src/parser/parse_element.{h,cpp}` (new
 element, variable nets) · `src/parser/parser.l:362-457` (prefix `SPAR`), `src/parser/parser.y:248-392` ·
 `src/devices/alldevices.h` · `utils/specs.kicad_sym` (symbol) · docs.
 
@@ -62,12 +70,13 @@ element, variable nets) · `src/parser/parser.l:362-457` (prefix `SPAR`), `src/p
 - Golden: a `cir/spar_bdc` case; unit test for the loader.
 
 ## Effort breakdown
-Loader + fixtures 3 d · element + parser plumbing 2 d · device refactor 3 d · export 1 d · tests/docs 2 d.
+Loader + fixtures 3 d · element + parser plumbing 2 d · device (new) 3 d · export 1 d · tests/docs 2 d.
 Phase 2 is a separate M+ item.
 
 ## Open questions for the maintainer
 - Phase sign convention: SPECS waveguides apply `exp(+j beta L)` while the detector beat term uses
   `exp(+j omega t)` (discovery report 02 §4); Lumerical/scikit-rf phases follow `exp(-j omega t)`. Decide
   whether to conjugate on import and document it once.
-- Is `TransmissionMatrix`'s Taylor form still wanted (`format=taylor`) or can it go?
+- Is a Taylor-coefficient form (as the removed `TransmissionMatrix`, cc1e52e) wanted as an input format
+  (`format=taylor`)?
 - Default behaviour outside the file's frequency range: clamp, extrapolate, or error (proposed: error).

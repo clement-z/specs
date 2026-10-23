@@ -29,3 +29,5 @@ B-047, B-055.
 - Review ids: F-A3-15.
 ## Verification
 Code reading and the B-047 traces.
+
+**2026-10-23 (PD2b):** `GenericTransmissionDevice` (one of the locations above) was removed in 54b15dc; the rest of the item is unchanged.

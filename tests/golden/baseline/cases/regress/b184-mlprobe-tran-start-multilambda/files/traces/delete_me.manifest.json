@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "vcd", "--format", "csv", "-f", "tests/golden/netlists/b184-mlprobe-tran-start-multilambda.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b184-mlprobe-tran-start-multilambda.cir", "sha256": "3c268a3d289947344b709848b9d56d3bdb1edf46e4f515125e78e92575430f09"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

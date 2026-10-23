@@ -1,0 +1,31 @@
+{
+ "args": [
+  "--stats=ports,devices",
+  "-o",
+  "traces/x",
+  "-f",
+  "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/x.manifest.json": {
+   "bytes": 490,
+   "kind": "json",
+   "sha256": "cd38ca7cd958dfe468a343afb145114c10078466513d022e4c167fcfab619158",
+   "stored": "files/traces/x.manifest.json"
+  },
+  "traces/x.stats.json": {
+   "bytes": 2435,
+   "kind": "json",
+   "sha256": "543c73fd09dc34c9eefe1b092e6e2aaf3c78e78729ee7461ed863b480b289737",
+   "stored": "files/traces/x.stats.json"
+  },
+  "traces/x.vcd": {
+   "bytes": 2558,
+   "kind": "vcd",
+   "sha256": "6245617c39b13cba489d1aead39998dc447d1246e4325f283d1f828b4ca7eace",
+   "stored": "files/traces/x.vcd"
+  }
+ },
+ "id": "regress/f15-stats-tran"
+}

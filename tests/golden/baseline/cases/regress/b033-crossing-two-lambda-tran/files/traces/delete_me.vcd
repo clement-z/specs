@@ -92,14 +92,6 @@ r0.3162277660168379 aaaap
 r1.570796326794897 aaaaq
 
 #20
-r0.1 aaaaa
-r0.3162277660168379 aaaab
-r1.570796326794897 aaaac
-r1.56e-06 aaaad
-r0.8999999999999999 aaaae
-r0.9486832980505138 aaaaf
-r0 aaaag
-r1.56e-06 aaaah
 r0.1 aaaal
 r0.3162277660168379 aaaam
 r1.570796326794897 aaaan
@@ -109,11 +101,9 @@ r0.9486832980505138 aaaas
 #50
 r0 aaaaa
 r0 aaaab
-r0 aaaac
-r1.55e-06 aaaad
 r0 aaaae
 r0 aaaaf
-r1.55e-06 aaaah
+r0 aaaag
 r0 aaaai
 r0 aaaaj
 r0 aaaao
@@ -121,8 +111,6 @@ r0 aaaap
 r0 aaaaq
 
 #60
-r1.56e-06 aaaad
-r1.56e-06 aaaah
 r0 aaaal
 r0 aaaam
 r0 aaaan

@@ -1,0 +1,29 @@
+{
+ "args": [
+  "--stats=ports",
+  "-f",
+  "tests/golden/netlists/f15-dispersive-waveguide.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 462,
+   "kind": "json",
+   "sha256": "48cbbfe208d39b7d328a9b0c6017fc43e126e561ca341a00f3e6b4e0524c4da1",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.stats.json": {
+   "bytes": 2560,
+   "kind": "json",
+   "sha256": "74ae44f0943dbbd6e82fbb7e3a1bdd87523b5b78919775fff9d3ddbb5cad2203",
+   "stored": "files/traces/delete_me.stats.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1726,
+   "kind": "vcd",
+   "sha256": "3982e3a02316422761c16ce4d8e13b1a53c11524184783b31996cd18e374cc8b",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f15-dispersive-waveguide"
+}

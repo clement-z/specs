@@ -1,0 +1,6 @@
+* .options coalesce (F-15 expert option, removed 2026-10-23 with specs --no-coalescing) is an unknown
+* option like any other. Expected: "Unknown keyword: coalesce (value: 0 (INTEGER))", exit 1.
+cwsrc1 in wl=1.55e-6 power=1
+wg1 in out
+.options coalesce=0
+.op

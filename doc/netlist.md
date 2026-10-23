@@ -55,7 +55,7 @@ Nets come first, in the order of the table, then the positional arguments, then 
 | `EVLSRC` | electrical out | [EVLSRC](#evlsrc) |
 | `PCMCELL` | in, out | [PCMCELL](#pcmcell) |
 | `PDET` | in, electrical out | [PDET](#pdet) |
-| `PROBE`, `MLPROBE` | net | [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
+| `PROBE`, `MLPROBE` | net | PROBE: `[power [abs [phase]]]` (the wavelength is always traced; a 4th argument or `wl` is accepted and ignored); MLPROBE: `wl=[wl1, ...]`; [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
 | `PWR` | in (power meter) | no arguments |
 | `X` | one net per subcircuit port, then the subcircuit name | [Subcircuits](#subcircuits) |
 
@@ -198,15 +198,17 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 ## Directives
 
 - `.options key=value ...` (keys case-insensitive): `abstol`, `reltol`, `snapfactor`, `timescale` (alias `ts`),
-  `resolution`, `seed`, `maxiter`: see [numerics.md](numerics.md). `traceall` (0 or 1): trace every optical net
+  `resolution`, `seed`, `maxiter`, and the expert option `maxevents`: see [numerics.md](numerics.md). `traceall` (0 or 1): trace every optical net
   (automatic probes `PROBE{<net>}`). Without it, a netlist with probes (PROBE, MLPROBE, also inside a subcircuit)
   or `.save` targets traces only them, and a netlist with neither traces every optical net (F-05, see "PROBE, MLPROBE and traced nets"
   below). An unknown key stops with `Unknown keyword: foo (value: 1 (INTEGER))`.
 - `.nodeset`: disabled, stops with `NODESET is disabled pending bugfixes` (exit status 1).
 - `.ic`: rejected, `the .ic directive is not supported`.
 - `.save target ...` (F-05): trace the listed optical nets. A target is a net name (power, field modulus, phase
-  and wavelength, like a PROBE without arguments) or `QTY(net)` for one quantity, with the PROBE keywords
-  (case-insensitive): `P`/`POW`/`POWER`, `E`/`MOD`/`MODULUS`/`MAG`/`MAGNITUDE`, `PHI`/`PHASE`, `WL`/`WAVELENGTH`.
+  and wavelength, like a PROBE without arguments) or `QTY(net)` for exactly that quantity (SPICE semantics), with
+  the PROBE keywords (case-insensitive): `P`/`POW`/`POWER`, `E`/`MOD`/`MODULUS`/`MAG`/`MAGNITUDE`, `PHI`/`PHASE`,
+  `WL`/`WAVELENGTH`. Unlike a PROBE, `QTY(net)` does not add the wavelength: `WL(net)` adds it
+  (`.save P(out) WL(out)`).
   Example (the paper's Fig. 1b): `.save P(out) P(drop)`. Each saved net gets one probe named like the automatic
   probes, `PROBE{<net>}` (a bidirectional net has two signals, `PROBE{<net>:0}` and `PROBE{<net>:1}`), so its VCD
   variables are the same as with `traceall`; several targets on one net add up (`.save P(out) PHI(out)`). A
@@ -230,6 +232,9 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `--no-trace` | write no trace file and no run manifest file, as `-o ""` (F-05); wins over `-o`. Netlists only: the `-t` testbenches choose their own trace files |
 | `--param name=value` | set a top-level parameter (see Parameters) |
 | `--maxiter N` | `.options maxiter`, overrides the netlist |
+| `--stats[=ports,devices]`, `--stats-file path`, `--print-stats` | run statistics (event counters), `<name>.stats.json`; see "Run statistics" in [numerics.md](numerics.md) |
+| `--progress[=s]` | a progress line on stderr every s seconds of wall-clock time (default 1) |
+| `--max-events N` | expert option `.options maxevents=N`, overrides the netlist |
 | `--abstol x`, `--reltol x`, `-R n` | tolerances and timescale, see [numerics.md](numerics.md) |
 | `--seed N` | master seed, see [reproducibility.md](reproducibility.md) |
 
@@ -477,15 +482,47 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
 
 ## PROBE, MLPROBE and traced nets in `.tran`
 
-`PROBE<name> <net> [power [abs [phase [wl]]]]` traces the last event of its net (power, field modulus, phase,
-wavelength); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and phase per listed wavelength
-(the wavelength must match exactly). A netlist without any probe or `.save` traces every optical net through
+`PROBE<name> <net> [power [abs [phase]]]` traces the events of its net at one wavelength: power, field
+modulus and phase (the positional arguments, or the keywords `power`, `mod`, `phase` set to 0 or 1, choose
+which), and always the wavelength traced, which says which wavelength the probe latched (see below) and is the
+x-axis of a transmission sweep. Since v0.3 the wavelength cannot be turned off: a 4th positional argument and
+the keyword `wl` (alias `wavelength`), which used to choose it, are still accepted, so older netlists run; a true
+value changes nothing, and a false one (`wl=0`, `probe1 out 1 1 1 0`) is ignored, with one warning on stderr for
+all such probes (`Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th
+argument) ignored for ROOT/PROBE1, ROOT/PROBE5`). The automatic probes `PROBE{<net>}` also trace it (all four
+quantities). `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
+phase per listed wavelength (the wavelength must match exactly). A netlist without any probe or `.save` traces every optical net through
 automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
 name starts with `_` get no automatic probe.
 
+**A PROBE traces one wavelength.** A net holds one value, the last one written to it, of any wavelength, so on a
+net that carries several wavelengths a probe sees each of them as a separate event. A PROBE (also an automatic
+`PROBE{<net>}` and a `.save` target) traces one of them and ignores the others. To trace a given wavelength,
+or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to select one.
+- The probe latches one wavelength per analysis point:
+  - in `.op` and at each `.dc` point, the smallest wavelength written to its net at that point;
+  - in a `.dc` that sweeps the wavelength or the frequency of a source (`WL(src)`, `F(src)`, `/src/WL`,
+    `/src/F`), the swept wavelength of the point when the net carries it at that point, even if a smaller
+    (fixed) wavelength shares the net; the smallest one otherwise. A transmission sweep thus shows the swept
+    wavelength at every point. Other sweeps (e.g. power) use the smallest one;
+  - in `.tran`, the smallest wavelength its net carried when the probe is enabled (the operating-point values),
+    or, if none, the smallest one arriving in the first time step that brings any. It keeps that one until the
+    end of the transient.
+- In a `.dc`, a net whose value does not change from one point to the next is not written again: a CW source
+  that is not swept writes its net at the first point only, and its wavelength reaches the probes at that point
+  only (B-185).
+- When a probe ignores another wavelength, a warning on stderr says so once, at the end of the analysis (the
+  probe, its net, the wavelength traced and the first one ignored); the automatic and `.save` probes share one
+  summary line.
+
+Use MLPROBE for per-wavelength values. The `-t` testbenches run no netlist analysis: their probes trace every
+event of their net.
+
 In `.tran`, the probes are disabled during the operating point. When the transient starts, after the operating
-point (`.nodeset` included) and after any initial conditions, every probe samples the current value of its net
-(B-048, sprint 2026-10b): a net set by a CW source shows its operating-point value from t = 0, as printed in the
-operating-point listing on stdout. Before, such a net read 0 in the VCD for the whole transient. A net that was
+point (`.nodeset` included) and after any initial conditions, every probe samples its net (B-048, sprint
+2026-10b): a net set by a CW source shows its operating-point value from t = 0, as printed in the
+operating-point listing on stdout. While disabled, the probes keep the last value of each wavelength of their
+net, so that an MLPROBE starts from the operating-point value of every listed wavelength (B-184; before, only
+from the wavelength written last, the others read 0), and a PROBE from that of its wavelength (see above). Before, such a net read 0 in the VCD for the whole transient. A net that was
 never written (undriven, or fed only by sources that start later) stays at 0 until its first event.

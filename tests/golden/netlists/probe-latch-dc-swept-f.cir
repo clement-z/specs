@@ -1,0 +1,9 @@
+* PD5 (follow-up 2): in a .dc frequency sweep (long form /src/F), a PROBE latches the swept wavelength at each
+* point when its net carries it, also next to a fixed wavelength that is smaller than the swept range.
+* cwsrc1 fixed at 1530 nm (195.9 THz); cwsrc2 swept from 192.3 to 194.5 THz (1559 to 1541 nm), merged into m.
+*   probe1 (m): c/f of the swept source at every point, also at the first one, where 1530 nm arrives too
+cwsrc1 a wl=1.53e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=2e-3
+merger1 a b m
+probe1 m
+.dc /cwsrc2/F 192.3e12 194.5e12 0.55e12

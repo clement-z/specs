@@ -6,6 +6,7 @@
 #include "devices/spx_module.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/transmission_cache.h"
 
 /** An electrically-controllable phase shifter. */
 class PhaseShifterBase : public spx_module {
@@ -29,6 +30,11 @@ public:
         , m_phaseshift_rad(0)
         , m_attenuation_dB(attenuation_dB)
     {}
+
+protected:
+    // F-15: field transmission 10^(-dB/20), computed once before the simulation (the device
+    // threads computed it when they started)
+    double m_transmission_field = 1;
 };
 
 class PhaseShifterUni : public PhaseShifterBase {
@@ -51,13 +57,16 @@ public:
     /** Memory of the current input value for all wavelengths. */
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in;
 
+    /** F-15: polar() only when the phase changes (on_port_in_changed()) */
+    PolarCache m_in_transmission;
+
     // Processes
     /** Main process of the module.
      *
      * It copies the input to the output, after attenuation and delay.
      * Will use the current m_phaseshift_rad at that moment.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** p_in
      * */
@@ -69,11 +78,16 @@ public:
      * using the current optical input, sending it to the output
      * after zero time.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** v_in
      * */
     void on_port_vin_changed();
+    /** --vci only: prints the parameters at initialization (a thread, so that the devices
+     * print in the order their threads used to) */
+    void print_initialization();
+
+    virtual void start_of_simulation();
 
     /** Constructor for PhaseShifter
      *
@@ -85,10 +99,14 @@ public:
     {
         SC_HAS_PROCESS(PhaseShifterUni);
 
-        SC_THREAD(on_port_in_changed);
+        SC_METHOD(on_port_in_changed);
         sensitive << p_in;
-        SC_THREAD(on_port_vin_changed);
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
+        SC_METHOD(on_port_vin_changed);
         sensitive << p_vin;
+        dont_initialize();
     }
 };
 
@@ -120,13 +138,17 @@ public:
     std::map<uint32_t,OpticalSignal::field_type> m_memory_p0;
     std::map<uint32_t,OpticalSignal::field_type> m_memory_p1;
 
+    /** F-15: polar() only when the phase changes (on_p0_in_changed(), on_p1_in_changed()) */
+    PolarCache m_p0_transmission;
+    PolarCache m_p1_transmission;
+
     // Processes
     /** Main process of the module.
      *
      * It copies the input to the output, after attenuation and delay.
      * Will use the current m_phaseshift_rad at that moment.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** p0_in
      * */
@@ -139,11 +161,16 @@ public:
      * using the current optical input, sending it to the output
      * after zero time.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** v_in
      * */
     void on_port_vin_changed();
+    /** --vci only: prints the parameters at initialization (a thread, so that the devices
+     * print in the order their threads used to) */
+    void print_initialization();
+
+    virtual void start_of_simulation();
 
     /** Constructor for PhaseShifter
      *
@@ -156,11 +183,16 @@ public:
     {
         SC_HAS_PROCESS(PhaseShifterBi);
 
-        SC_THREAD(on_p0_in_changed);
+        SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
-        SC_THREAD(on_p1_in_changed);
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
+        SC_METHOD(on_p1_in_changed);
         sensitive << p1_in;
-        SC_THREAD(on_port_vin_changed);
+        dont_initialize();
+        SC_METHOD(on_port_vin_changed);
         sensitive << p_vin;
+        dont_initialize();
     }
 };

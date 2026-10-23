@@ -1,0 +1,2 @@
+Error: .op: the operating point stopped at the event cap: 10 pending entries processed (.options maxevents=10)
+

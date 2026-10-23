@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/probe-wl-ignored.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/probe-wl-ignored.cir", "sha256": "b8420f9e92914862304d5b3ef764b439988504f2a80fc5711101d1419a150625"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

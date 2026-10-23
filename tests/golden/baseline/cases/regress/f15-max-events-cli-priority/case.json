@@ -1,0 +1,33 @@
+{
+ "args": [
+  "--max-events",
+  "0",
+  "--stats",
+  "-o",
+  "traces/x",
+  "-f",
+  "tests/golden/netlists/f15-maxevents-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/x.manifest.json": {
+   "bytes": 475,
+   "kind": "json",
+   "sha256": "e189f92a767b595177c0b632ef4fdbfdb3e52eeee74da0310afc5ab2dfb9f06f",
+   "stored": "files/traces/x.manifest.json"
+  },
+  "traces/x.stats.json": {
+   "bytes": 516,
+   "kind": "json",
+   "sha256": "57dba09f35f99551c51c9999ba4fcece22ac25799a8f428539e536677a5d9785",
+   "stored": "files/traces/x.stats.json"
+  },
+  "traces/x.vcd": {
+   "bytes": 1481,
+   "kind": "vcd",
+   "sha256": "793a511d98fcfab7b6b79878837a9a9b93a0c2710a7a34fa541cea225297f82d",
+   "stored": "files/traces/x.vcd"
+  }
+ },
+ "id": "regress/f15-max-events-cli-priority"
+}

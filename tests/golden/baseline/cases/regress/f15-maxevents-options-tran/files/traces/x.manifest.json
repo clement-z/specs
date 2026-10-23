@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--stats", "-o", "traces/x", "-f", "tests/golden/netlists/f15-maxevents-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f15-maxevents-tran.cir", "sha256": "ef7dc63f4e25253c875a1d0e81f20632fdda23f1aac2f4dcce34cb6cd1834e46"}
+  ],
+  "trace_file": "traces/x.vcd"
+}

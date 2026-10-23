@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f15-wdm-crow-mlprobe.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 437,
+   "kind": "json",
+   "sha256": "b7d212c9b0afded8c790b883a05f6e474ed0ad1fd941267cfdbecf9841303c50",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 452379,
+   "kind": "vcd",
+   "sha256": "c0f639d602cea2600e2d101e4391ec1660e21425a204ce294570ec824271cf8d",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f15-wdm-crow-mlprobe"
+}

@@ -756,6 +756,10 @@ struct ParseTreeCreationHelper {
     map<string, vector<shared_ptr<sc_object>>> circuit_signals;
     map<string, shared_ptr<sc_module>> circuit_modules;
 
+    // PROBE elements given wl=0 or a false 4th argument, which is ignored (PD6: a PROBE always traces
+    // its wavelength); build_circuit() prints one warning for all of them, in name order
+    set<string> probes_ignoring_wavelength_off;
+
     ParseTreeCreationHelper()
     : pt(nullptr)
     {}
@@ -772,6 +776,7 @@ struct ParseTreeCreationHelper {
         elements_backlog.clear();
         circuit_signals.clear();
         circuit_modules.clear();
+        probes_ignoring_wavelength_off.clear();
     }
 
     // return next bidir net which doesn't have a corresponding signal in circuit_signals
