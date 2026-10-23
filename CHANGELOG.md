@@ -43,6 +43,12 @@
   last write of each time step) could show another of the wavelengths written in a step; the per-wavelength
   values (`MLPROBE`) were unchanged in every circuit checked. The PROBE wavelength latch (New) removes this
   dependency on the kernel order
+* A `PROBE` always traces its wavelength (the `wavelength` signal says which wavelength the latch chose, and is
+  the x-axis of a transmission sweep), and so do the automatic `PROBE{<net>}` probes. A 4th positional argument and
+  `wl=`/`wavelength=` are still accepted: a true value changes nothing, a false one (`wl=0`, `probe1 out 0 1 0 0`)
+  is ignored, with one warning on stderr for all such probes. `.save QTY(net)` traces exactly the quantity asked
+  for (`WL(net)` adds the wavelength). C++: the `Probe` constructor keeps its `trace_wavelength` parameter
+  (`doc/netlist.md`)
 
 ### Fixed
 

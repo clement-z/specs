@@ -55,7 +55,7 @@ Nets come first, in the order of the table, then the positional arguments, then 
 | `EVLSRC` | electrical out | [EVLSRC](#evlsrc) |
 | `PCMCELL` | in, out | [PCMCELL](#pcmcell) |
 | `PDET` | in, electrical out | [PDET](#pdet) |
-| `PROBE`, `MLPROBE` | net | PROBE: `[power [abs [phase [wl]]]]`; MLPROBE: `wl=[wl1, ...]`; [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
+| `PROBE`, `MLPROBE` | net | PROBE: `[power [abs [phase]]]` (the wavelength is always traced; a 4th argument or `wl` is accepted and ignored); MLPROBE: `wl=[wl1, ...]`; [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
 | `PWR` | in (power meter) | no arguments |
 | `X` | one net per subcircuit port, then the subcircuit name | [Subcircuits](#subcircuits) |
 
@@ -205,8 +205,10 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 - `.nodeset`: disabled, stops with `NODESET is disabled pending bugfixes` (exit status 1).
 - `.ic`: rejected, `the .ic directive is not supported`.
 - `.save target ...` (F-05): trace the listed optical nets. A target is a net name (power, field modulus, phase
-  and wavelength, like a PROBE without arguments) or `QTY(net)` for one quantity, with the PROBE keywords
-  (case-insensitive): `P`/`POW`/`POWER`, `E`/`MOD`/`MODULUS`/`MAG`/`MAGNITUDE`, `PHI`/`PHASE`, `WL`/`WAVELENGTH`.
+  and wavelength, like a PROBE without arguments) or `QTY(net)` for exactly that quantity (SPICE semantics), with
+  the PROBE keywords (case-insensitive): `P`/`POW`/`POWER`, `E`/`MOD`/`MODULUS`/`MAG`/`MAGNITUDE`, `PHI`/`PHASE`,
+  `WL`/`WAVELENGTH`. Unlike a PROBE, `QTY(net)` does not add the wavelength: `WL(net)` adds it
+  (`.save P(out) WL(out)`).
   Example (the paper's Fig. 1b): `.save P(out) P(drop)`. Each saved net gets one probe named like the automatic
   probes, `PROBE{<net>}` (a bidirectional net has two signals, `PROBE{<net>:0}` and `PROBE{<net>:1}`), so its VCD
   variables are the same as with `traceall`; several targets on one net add up (`.save P(out) PHI(out)`). A
@@ -480,9 +482,15 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
 
 ## PROBE, MLPROBE and traced nets in `.tran`
 
-`PROBE<name> <net> [power [abs [phase [wl]]]]` traces the events of its net at one wavelength (power, field
-modulus, phase, wavelength; the positional arguments, or the keywords `power`, `mod`, `phase`, `wl` set to 0 or
-1, choose which); `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
+`PROBE<name> <net> [power [abs [phase]]]` traces the events of its net at one wavelength: power, field
+modulus and phase (the positional arguments, or the keywords `power`, `mod`, `phase` set to 0 or 1, choose
+which), and always the wavelength traced, which says which wavelength the probe latched (see below) and is the
+x-axis of a transmission sweep. Since v0.3 the wavelength cannot be turned off: a 4th positional argument and
+the keyword `wl` (alias `wavelength`), which used to choose it, are still accepted, so older netlists run; a true
+value changes nothing, and a false one (`wl=0`, `probe1 out 1 1 1 0`) is ignored, with one warning on stderr for
+all such probes (`Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th
+argument) ignored for ROOT/PROBE1, ROOT/PROBE5`). The automatic probes `PROBE{<net>}` also trace it (all four
+quantities). `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
 phase per listed wavelength (the wavelength must match exactly). A netlist without any probe or `.save` traces every optical net through
 automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose

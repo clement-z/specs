@@ -8,8 +8,8 @@ Decision: "PROBE wavelength (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`; 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 0 | references (base a42e0f2) and prediction | done | | gcc `meson test` 12/12, strict golden 234/234; clang/asan-gcc recordings `/tmp/pd6/rec-before-*`; counters `/tmp/pd6/stats-before`; asan-clang test |
-| 1 | PROBE and `PROBE{<net>}` always trace `wavelength`; false 4th argument / `wl=0` ignored, one warning per run | | | |
-| 2 | docs (`doc/netlist.md`, element table, CHANGELOG), tests | | | |
+| 1 | PROBE and `PROBE{<net>}` always trace `wavelength`; false 4th argument / `wl=0` ignored, one warning per run | done | 769a17f | as predicted: re-recorded `regress/b153-zerotol-lossy-ring-tran`, `regress/probe-latch-tran` (+ wavelength signal: 1.55e-6 from 0; PROBE5 = PROBE4, 1.54e-6 from 2 ps; + warning first on stderr; netlist hash); new case `regress/probe-wl-ignored`, gtest `Probe.NetlistProbeAlwaysTracesTheWavelength`; strict gcc 235/235. Warning printed in `ParseTree::build_circuit()` (names collected in `ParseTreeCreationHelper`, no global) |
+| 2 | docs (`doc/netlist.md`, element table, CHANGELOG), tests | done | (this commit) | tests are in 769a17f; cheatsheet is a PDF without source (not updated, as in PD5) |
 | 3 | checks, report | | | |
 
 ## Predicted golden impact (written before any code change)
