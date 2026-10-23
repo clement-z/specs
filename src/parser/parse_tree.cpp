@@ -339,6 +339,10 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     yylex_init_extra(parser_state, &scanner);
     buf = yy_scan_string(subcircuit.netlist.c_str(), scanner);
     yy_switch_to_buffer(buf, scanner);
+    // Parse errors in the body: the file that defines the subcircuit and the line in it (B-182;
+    // a string buffer has no line number of its own)
+    parser_state->current_filename = subcircuit.filename;
+    yyset_lineno(subcircuit.body_line, scanner);
 
     int parsing_result = yyparse(scanner, this);
 

@@ -1,0 +1,11 @@
+* B-182 regression: a syntax error inside a .subckt body names the file that defines the subcircuit and the
+* line (before: "Parsing error (:<uninitialised value>)"). Line 8 ends too early; as for a top-level line, the
+* offending token is its end of line, so the message says line 9.
+cwsrc1 in wl=1.55e-6 power=1
+x1 in out RING
+.subckt RING a b
+wg1 a m length=10e-6
+wg3 m n length=
+wg2 n b length=10e-6
+.ends
+.op

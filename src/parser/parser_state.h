@@ -23,6 +23,10 @@ struct ParserState {
     // subcircuit), then one per open .include. "" for content that is not a file.
     std::vector<string> include_dirs;
 
+    // Line of the current buffer where the body of the subcircuit being read starts (the line after
+    // ".subckt name ..."), for the parse errors in that body (B-182)
+    int subckt_body_line = 1;
+
     // Record path, as used to open it, unless it was already recorded (first-open order)
     void record_input_file(const string &path)
     {

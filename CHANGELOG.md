@@ -8,6 +8,11 @@
   the run, in name order and with every digit needed to tell them from the listed ones, instead of one
   "received unsupported signal" line on stdout per event (B-062; matching stays exact)
 
+### Fixed
+
+* Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line
+  in it, as for top-level lines, instead of an empty file name and an uninitialised line number (B-182)
+
 ## [0.3.0] - 2026-10-23
 
 ### New

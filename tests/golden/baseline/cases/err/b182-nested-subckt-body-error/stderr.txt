@@ -1,0 +1,3 @@
+Parsing error (tests/golden/netlists/b182-nested-subckt-body-error.cir:11): unexpected character: "$"
+-- while parsing line: "wg2 e d length=10e-6 $"
+

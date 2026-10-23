@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b182-subckt-body-syntax-error.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b182-subckt-body-syntax-error"
+}

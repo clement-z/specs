@@ -331,6 +331,8 @@ string convert_special_char(char c)
     // until the corresponding .ends is reached
     yylval_param->s_ptr = new string;
     internal_subckt_count = 0;
+    // the body starts on the next line (yylineno already counts this EOL), B-182
+    ((ParserState *)yyextra)->subckt_body_line = yylineno;
     // cout << endl << "going to subckt definition mode" << endl;
     BEGIN(SUBCKT_DEFINITION); //needs BEGIN and not yy_push_state
 }

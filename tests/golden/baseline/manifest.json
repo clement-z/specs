@@ -74,6 +74,10 @@
   "err/b180-int-literal-positional",
   "err/b180-pcmcell-k-beyond-int",
   "err/b180-pcmcell-n-beyond-int",
+  "err/b182-nested-subckt-body-error",
+  "err/b182-nested-subckt-ends-mismatch",
+  "err/b182-subckt-body-int-literal",
+  "err/b182-subckt-body-syntax-error",
   "err/f01-options-seed-huge-integer",
   "err/f01-options-seed-invalid",
   "err/f01-options-seed-negative",
@@ -351,6 +355,12 @@
    "only": "regress/b062-mlprobe-unlisted-wavelength|gtest/unit_tests",
    "gtest": true,
    "note": "B-062: new case, MLPROBE ignored wavelengths reported once per probe on stderr (PG item 2); gtest list: MLambdaProbe.ReportsIgnoredWavelengthsOnce"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T09:23:08Z",
+   "only": "^err/b182-",
+   "gtest": false,
+   "note": "B-182: new cases, parse errors inside .subckt bodies give the defining file and line (PG item 4)"
   }
  ]
 }
