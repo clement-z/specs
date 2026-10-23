@@ -1,5 +1,5 @@
 # B-184: MLPROBE at the start of a `.tran` samples only the wavelength last written to its net
-severity: med | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: open
+severity: med | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 5f62e0a (sprint 2026-10c PD5)
 location: src/devices/probe.cpp (`MLambdaProbe::on_port_in_changed()`, the B-048 sampling when the probe is enabled)
 
 ## Problem
@@ -34,3 +34,16 @@ wavelength by design) is not concerned.
 
 ## Related
 B-048 (probes sample the OP value at `.tran` start), F-05 (tracing), B-001 (per-wavelength values in FD writes).
+
+## Fix (sprint 2026-10c, phase PD5, 5f62e0a)
+Option (a), local to the probe: while disabled, `MLambdaProbe` keeps listening and stores the last value of each
+listed wavelength (`m_disabled_samples`), without tracing or printing; when enabled, it traces them in
+wavelength order (the net's current value is the last one of its wavelength), then clears them. Chosen over (b)
+because it needs nothing from the output ports (the value seen by the probe is the net's, after `.nodeset` and
+initial conditions, whatever drives it) and it keeps the probe's own B-048 sequence; the cost is one wake-up of
+the disabled probe per event of its net during the operating point. The plain PROBE uses the same memory for its
+wavelength latch (PD5, same phase). Tests: gtest
+`MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled`, golden case
+`regress/b184-mlprobe-tran-start-multilambda` (this repro, VCD and CSV: 0.5 W at both wavelengths from t = 0).
+No other golden case changed: none had an MLPROBE whose net carried two listed wavelengths during the operating
+point.

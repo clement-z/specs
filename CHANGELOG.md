@@ -19,6 +19,13 @@
   without effect on the simulation
 * Expert option (F-15, `doc/numerics.md`): an event cap (`.options maxevents=N`, `--max-events N`: a `.tran`
   ends there with a warning, an `.op`/`.dc` stops with an error). Default unchanged (no cap)
+* A plain `PROBE` (also the automatic `PROBE{<net>}` probes and the `.save` targets) traces one wavelength of a
+  net that carries several: `wl=<wavelength>` selects it (exact match, as MLPROBE), else the probe latches the
+  smallest one per analysis point (each `.op`/`.dc` point; in a `.tran`, the smallest at the start of the
+  transient, or of its first time step that brings any) and ignores the others, with one warning on stderr per
+  probe (one line for all the automatic probes). Before, it traced every event, so it showed one of the
+  wavelengths of each time step, in an unspecified order. `wl=0|1` keeps its meaning (trace the wavelength or
+  not). Single-wavelength nets, `.dc` wavelength sweeps and the `-t` testbenches are unchanged (`doc/netlist.md`)
 
 ### Changed
 
@@ -33,9 +40,15 @@
   stateless device reactions (waveguide, coupler, splitter, merger, crossing, phase shifter) run as SystemC
   methods instead of threads. CROW benchmark (30 rings, no tracing): about 2.5x less CPU time than v0.2.0.
   Results are the same bit for bit, except that on a net that carries several wavelengths, a plain `PROBE` (the
-  last write of each time step) can show another of the wavelengths written in a step; the per-wavelength
-  values (`MLPROBE`) were unchanged in every circuit checked. PROBE is for single-wavelength nets; use MLPROBE
-  on multi-wavelength nets (`doc/netlist.md`)
+  last write of each time step) could show another of the wavelengths written in a step; the per-wavelength
+  values (`MLPROBE`) were unchanged in every circuit checked. The PROBE wavelength latch (New) removes this
+  dependency on the kernel order
+
+### Fixed
+
+* B-184: at the start of a `.tran`, an MLPROBE on a net that carries several wavelengths traces the
+  operating-point value of every listed wavelength. Before, only the wavelength written last to the net during
+  the operating point; the others read 0 until written again (never, with CW sources)
 
 ### Removed
 
