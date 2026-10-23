@@ -1,0 +1,91 @@
+Using trace file: traces/out
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Including file: tests/golden/netlists/b192-value-files/lib/source.cir
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+7 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/a {vlsrc-values.csv (STRING), } {}
+ - ROOT/EVLSRC1 (VALUE LIST SOURCE (ELECTRICAL)) ROOT/e {} {values (STRING) = evlsrc-values.csv, }
+ - ROOT/X1 (SUBCIRCUIT) {b (STRING), SOURCE (STRING), } {}
+ - ROOT/WG1 (WAVEGUIDE (bidir)) ROOT/a ROOT/c {} {length (DOUBLE) = 0.0001, }
+ - ROOT/WG2 (WAVEGUIDE (bidir)) ROOT/b ROOT/d {} {length (DOUBLE) = 0.0001, }
+ - ROOT/PROBE1 (PROBE) ROOT/c {} {}
+ - ROOT/PROBE2 (PROBE) ROOT/d {} {}
+-----------
+5 named nets
+ - ROOT/a: OANALOG<1>u (1|1)
+ - ROOT/b: OANALOG<1>u (0|1)
+ - ROOT/c: OANALOG<1>u (1|1)
+ - ROOT/d: OANALOG<1>u (1|1)
+ - ROOT/e: EANALOG<1>u (0|0)
+-----------
+0 directives
+-----------
+1 subcircuits
+ - SOURCE (SUBCIRCUIT DEFINITION) out {}
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {1e-09 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Flattening ROOT/X1
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/a...
+Creating ROOT/VLSRC1 (reason: connection to unidir net)
+Done creating ROOT/VLSRC1
+Creating ROOT/WG1 (reason: unidir backlog)
+Done creating ROOT/WG1
+Creating ROOT/PROBE1 (reason: unidir backlog)
+Done creating ROOT/PROBE1
+Done (elaborating network of ROOT/a)
+Elaborating network of ROOT/b...
+Creating ROOT/X1/VLSRC1 (reason: connection to unidir net)
+Done creating ROOT/X1/VLSRC1
+Creating ROOT/WG2 (reason: unidir backlog)
+Done creating ROOT/WG2
+Creating ROOT/PROBE2 (reason: unidir backlog)
+Done creating ROOT/PROBE2
+Done (elaborating network of ROOT/b)
+Elaborating network of ROOT/e...
+Creating ROOT/EVLSRC1 (reason: connection to unidir net)
+Done creating ROOT/EVLSRC1
+Done (elaborating network of ROOT/e)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/out.vcd)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/a (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/b (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/c (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/d (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+Simulated 1 ns
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

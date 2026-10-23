@@ -502,6 +502,8 @@ element.cwsrc: T_ELEM_CWSRC net.oa.out
 element.vlsrc: T_ELEM_VLSRC net.oa.out
             {
                 $$ = cur_pt->register_element(new VLSourceElement(*$1, {*$2}));
+                // directory of the file being read, for a relative value file (as .include and SPAR, B-192)
+                static_cast<VLSourceElement *>(cur_pt->elements[$$])->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                 delete $1;
                 delete $2;
             }
@@ -510,6 +512,8 @@ element.vlsrc: T_ELEM_VLSRC net.oa.out
 element.evlsrc: T_ELEM_EVLSRC net.eanalog
             {
                 $$ = cur_pt->register_element(new EVLSourceElement(*$1, {*$2}));
+                // directory of the file being read, for a relative value file (as .include and SPAR, B-192)
+                static_cast<EVLSourceElement *>(cur_pt->elements[$$])->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                 delete $1;
                 delete $2;
             }

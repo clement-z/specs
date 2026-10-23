@@ -1,6 +1,6 @@
 // .include resolution of the scanner (B-143, F-12): ParserState::resolve_include() looks a relative
 // path up next to the including file first, then in the working directory, and warns when both
-// exist and differ.
+// exist and differ. VLSRC/EVLSRC value files are resolved the same way (B-192).
 #include <gtest/gtest.h>
 
 #include <dirent.h>
@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 
+#include "parser/parse_element.h"
 #include "parser/parser_state.h"
 #include "test/utils.h"
 
@@ -158,6 +159,50 @@ TEST(ParserState, ResolveIncludeClosesFiles)
         for (int i = 0; i < 100; ++i)
             EXPECT_EQ(state_in("d").resolve_include("x.cir"), "d/x.cir");
         EXPECT_EQ(open_fd_count(), n_before);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// VLSRC/EVLSRC value files (positional or values=) are resolved as .include, from the directory of the
+// netlist that contains the element (include_dir): next to it first, then in the working directory.
+// data_files() (run manifest) gives the path that create() opens (B-192)
+TEST(ParserStateDeathTest, ValueFilesResolvedAsIncludes)
+{
+    SPECS_TEST_HEADER()
+    {
+        TmpWorkingDir tmp;
+        write_file("d/local.csv", "t,P,wl\n");
+        write_file("cwd.csv", "t,P,wl\n");
+        write_file("d/both.csv", "t,P,wl\n1e-12,1e-3,1.55e-6\n");
+        write_file("both.csv", "t,P,wl\n");
+
+        VLSourceElement vl("vlsrc1", { "a" });
+        vl.include_dir = "d";
+        vl.args.emplace_back(std::string("local.csv"));
+        vl.kwargs["values"] = Variable(std::string("cwd.csv"));
+        EXPECT_EQ(vl.data_files(), (std::vector<std::string>{ "d/local.csv", "cwd.csv" }));
+
+        EVLSourceElement evl("evlsrc1", { "e" });
+        evl.include_dir = "d";
+        evl.kwargs["VALUES"] = Variable(std::string("local.csv"));
+        EXPECT_EQ(evl.data_files(), (std::vector<std::string>{ "d/local.csv" }));
+
+        // no directory (a netlist in the working directory, or a string): the name as given
+        VLSourceElement top("vlsrc2", { "a" });
+        top.args.emplace_back(std::string("local.csv"));
+        EXPECT_EQ(top.data_files(), (std::vector<std::string>{ "local.csv" }));
+
+        // both exist and differ: the one next to the netlist, with the warning of .include
+        auto resolve = [](const std::string &file) {
+            VLSourceElement e("vlsrc3", { "a" });
+            e.include_dir = "d";
+            e.args.emplace_back(file);
+            std::cerr << e.data_files().at(0) << "\n";
+            exit(0);
+        };
+        EXPECT_EXIT(resolve("both.csv"), testing::ExitedWithCode(0),
+                    "^Warning: .include both.csv: using d/both.csv \\(relative to the including file\\); "
+                    "both.csv relative to the working directory is a different file\nd/both.csv\n$");
     }
     SPECS_TEST_FOOTER();
 }

@@ -58,6 +58,11 @@
 * Run manifest (`<trace>.manifest.json`, `--print-manifest`) and run table manifest (`table.manifest.json`):
   `format_version` 2, with a `data_files` list (path and SHA-256 of each `SPAR` S-parameter file and
   `VLSRC`/`EVLSRC` value file read), so a `.step`/`.mc` plan is not resumed against a changed data file (F-01)
+* `VLSRC`/`EVLSRC` value files are looked up as `.include` and `SPAR` files: next to the netlist file that names
+  them first (for an element in a `.subckt` body, the file that defines the subcircuit), then in the working
+  directory. A netlist that names a file relative to the working directory keeps working, but **a file of the same
+  name next to the netlist now wins** (with the warning of `.include` when the two differ). The run manifest's
+  `data_files` give the path opened (B-192)
 * `.options seed` is applied when its line is read (so that the random functions after it use it); a seed that
   changes after a random function drew is an error (F-02)
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of

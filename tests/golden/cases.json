@@ -4669,6 +4669,25 @@
     "traces/out"
    ],
    "note": "B-191: a VLSRC with 2000 inline values on one 55 KB line parses (the scanner no longer uses flex's REJECT, so flex grows its buffer); it failed with \"input buffer overflow, can't enlarge buffer because scanner uses REJECT\", exit 2. The VCD has the 2000 values"
+  },
+  {
+   "id": "regress/b192-value-files-next-to-netlist",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b192-value-files/b192-value-files.cir",
+    "-o",
+    "traces/out"
+   ],
+   "note": "B-192: VLSRC/EVLSRC value files next to the netlist that names them (the -f netlist in a subdirectory, and an included file that defines a subcircuit) are found first, as .include and SPAR files; they were opened relative to the working directory only (Error: Cannot open the file \"vlsrc-values.csv\", exit 1). The run manifest lists the paths used to open them"
   }
  ]
 }

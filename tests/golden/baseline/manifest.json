@@ -201,6 +201,7 @@
   "regress/b180-numeric-net-names",
   "regress/b184-mlprobe-tran-start-multilambda",
   "regress/b191-long-line-vlsrc",
+  "regress/b192-value-files-next-to-netlist",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
@@ -554,6 +555,12 @@
    "only": "^regress/b191-",
    "gtest": false,
    "note": "B-191: new case, a 55 KB netlist line parses"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T22:29:16Z",
+   "only": "^(regress/b192-value-files-next-to-netlist|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-192: new case (value files next to the netlist), new gtest"
   }
  ]
 }

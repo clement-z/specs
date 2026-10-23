@@ -32,3 +32,14 @@ Decision: "Before v0.4.0 (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`.
   exit codes, except a 30 KB comment line (failed before, parses now).
 - New case `regress/b191-long-line-vlsrc`: exit 0, VCD with 2000 value changes of `PROBE{ROOT/out}`
   (1 mW / 2 mW alternating every 10 ps), no stderr. Counters: unchanged for the existing cases.
+
+### Item 4 (B-192), written before recording
+- Existing cases: none changes. The 8 VLSRC/EVLSRC value-file references of the golden netlists (b052-*,
+  b066) are working-directory paths with no file of that name next to their netlist (checked by script), and
+  the param-named ones (`cir/paul_3ring_puf`, `err/b064-*`) name files that exist nowhere: same error text.
+  Strict check with the change: 277/277 before recording.
+- New case `regress/b192-value-files-next-to-netlist`: exit 0 (was exit 1, `Error: Cannot open the file
+  "vlsrc-values.csv".`); manifest `data_files` = `tests/golden/netlists/b192-value-files/vlsrc-values.csv`,
+  `.../lib/values.csv`, `.../evlsrc-values.csv` (element order); VCD with the three sources' values.
+- `gtest/unit_tests`: one new test, `ParserStateDeathTest.ValueFilesResolvedAsIncludes` (re-record of that case
+  only if the harness requires it for a new test name).
