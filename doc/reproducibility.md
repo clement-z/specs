@@ -29,10 +29,32 @@ What draws random numbers today:
 - PDET noise, with `nb=0` (`noise_bypass=false`);
 - the PDET dark-field injection: when the total field on a detector is exactly 0, a tiny random field
   (1e-20 √W times a standard normal draw, i.e. about 1e-40 A) is used instead. It is on by default and can be
-  turned off per detector with `darkfield=0`; see [netlist.md](netlist.md#pdet).
+  turned off per detector with `darkfield=0`; see [netlist.md](netlist.md#pdet);
+- the random functions of netlist expressions (`gauss`, `uniform`, `lognormal`, `choice`, F-02), see below.
 
-Future random parameters (`.param gauss()`, Monte-Carlo runs, scout F-02) are meant to draw from the same master
-seed, through the same per-name streams.
+## Random parameters and Monte-Carlo runs
+
+A random function draws when its line is read, from its own stream of the master seed, named after where it is:
+`<instance path>/<owner>/<name>#<n>`, e.g. `ROOT/.param/L#0` for `.param L=gauss(...)` at the top level,
+`ROOT/X3/.param/L#0` for the same line in the body of instance X3, `ROOT/WG1/length#0` for
+`wg1 a b length=gauss(...)`; `n` counts the draws of the same name before it in the same body. So:
+- adding, removing or reordering other lines does not change a draw;
+- each instance of a subcircuit draws its own values (its body is read once per instance), unless the function
+  has `shared=1` (stream `SUBCKT:<name>/...`: one value for every instance of the subcircuit) or
+  `shared="tag"` (stream `SHARED/tag`: one value for every use of the tag).
+
+The seed must be known when a line draws: `--seed N`, or an `.options seed=N` line before the first random
+function. An `.options seed` that would change the seed after a draw stops the run with an error naming both
+lines (it would not apply to that draw).
+
+`.mc N` (scout F-02, `doc/netlist.md`): Monte-Carlo run k simulates with the seed `s_k`, the first 64-bit output
+of the stream `.mc/k` of the master seed (`.mc seed=S`, `--seed` or `.options seed`). Every draw of the run
+(random functions and PDET noise) comes from `s_k`, so a run is reproducible on its own: `specs --run K` gives the
+same values as run K of the plan, and so does `specs --seed s_k` with the stepped values as `--param` on the
+netlist without its `.step`/`.mc` lines. `s_k` does not depend on the `.step` values: every step point sees the
+same Monte-Carlo draws. Without `.mc`, every run of a `.step` plan uses the master seed. The seed of each run
+is in the run table (`runs.csv`), with every value drawn (`draw_*.npy`) and the table manifest
+`table.manifest.json` (version, master seed, command line, netlist hashes, plan).
 
 ## Order of outputs
 

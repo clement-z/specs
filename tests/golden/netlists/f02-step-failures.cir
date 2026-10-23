@@ -1,0 +1,13 @@
+* F-02: a plan whose middle run fails. The lossless all-pass ring of f28-maxiter-small.cir needs 869
+* delta cycles; .options maxiter={M} with M = 2000, 100, 2000: run 1 stops with the non-convergence
+* error (exit 1). Expected: runs 0 and 2 ok, run 1 failed with the error as its message (runs.csv) and
+* its stderr in logs/run1.log; specs exits 1 after all the runs. An .op writes no table rows (F-05: the
+* tables hold the samples traced in time; the operating point is the listing of a single run).
+.param M=2000
+.step param M list 2000 100 2000
+cwsrc1 in wl=1.55e-6 power=1
+coupler1 in ring_bl out ring_br k=0.3872983346207417
+wg_ring ring_br ring_bl length=775e-6 neff=1 ng=1 att=0
+probe1 out
+.options timescale=-13 maxiter={M}
+.op

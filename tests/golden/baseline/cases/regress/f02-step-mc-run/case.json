@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--run",
+  "4",
+  "-f",
+  "tests/golden/netlists/f02-step-mc.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 452,
+   "kind": "json",
+   "sha256": "9f6c50ae544d215a14a16936086b44269df5cce9943f7a18fbc171d43e7cca53",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1028,
+   "kind": "vcd",
+   "sha256": "f7120bfb574be0019b267fc7873d7af324a9edf88fd1683cab50b2f6ae1540e6",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/f02-step-mc-run"
+}

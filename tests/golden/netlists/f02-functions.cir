@@ -1,0 +1,21 @@
+* F-02: functions in expressions. Math functions (exact values) and random functions drawn from the
+* per-name streams of the master seed (default 0): each instance of MZIARM draws its own length
+* (.param Lr), shared=1 draws one loss for every instance, shared="wafer" one value for both uses.
+* Unbalanced MZI: the output power depends on the drawn lengths. Expected values: the JSON export
+* (lengths of ROOT/X1/WG1 and ROOT/X2/WG1 differ, losses equal) and the .op listing.
+.param nominal=sqrt(1e-8) ; 100 um
+.param neff0=max(2.3, 2.35, 2.2) ng0=2*2.1
+.param w=gauss(0, 1, shared="wafer") w2=gauss(0, 1, shared="wafer")
+.param dn=uniform(-1e-3, 1e-3) pick=choice(1, 2, 3)
+.subckt MZIARM a b L=100e-6 neff=2.3 ng=4
+.param Lr=gauss({L}, 1e-6)
+.param loss=lognormal(0, 0.1, shared=1)
+wg1 a b length={Lr} neff={neff} ng={ng} att={loss}
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+splitter1 in a b
+X1 a c MZIARM L={nominal} neff={neff0} ng={ng0}
+X2 b d MZIARM L={nominal}+10e-6 neff={neff0} ng={ng0}
+merger1 c d out
+probe1 out
+.op

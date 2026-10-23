@@ -168,7 +168,7 @@ void TraceTable::writePending()
             m_line += '\n';
             m_csv.write(m_line.data(), m_line.size());
         }
-        if (m_npz.is_open())
+        if (m_npz.is_open() || m_keep_columns)
         {
             m_time_s.push_back(row.time_s);
             m_signal.push_back(row.signal);

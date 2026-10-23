@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 1,
+  "command_line": ["specs", "--seed", "1", "--json", "traces/flat.json", "-f", "tests/golden/netlists/f02-functions.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f02-functions.cir", "sha256": "8b66dc09e32d6784bc901ca972d4e2073e37924b821f9038d838bb17d04e647b"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

@@ -3,8 +3,10 @@
 For the moment, refer to [the online documentation](https://demo.zrounba.fr/specs/doc/index.html
 ) to see how to download and use SPECS, or try it from the browser on our [demonstration website](https://demo.zrounba.fr/specs)
 
-The netlist syntax (numbers and SI suffixes, parameters and `--param`, `.include`, subcircuits, `.op`/`.dc`/`.tran`)
-and the element arguments (e.g. COUPLER `k`/`kp`/`t`) are documented in [`doc/netlist.md`](doc/netlist.md).
+The netlist syntax (numbers and SI suffixes, parameters and `--param`, functions, `.include`, subcircuits,
+`.op`/`.dc`/`.tran`, parameter sweeps and Monte-Carlo runs with `.step`/`.mc` and their run table) and the element
+arguments (e.g. COUPLER `k`/`kp`/`t`) are documented in [`doc/netlist.md`](doc/netlist.md); `pyspecs/runtable.py`
+reads the run table.
 Tolerances and time resolution (`abstol`, `reltol`, `timescale`, ...) and the iteration cap of `.op`/`.dc`
 (`maxiter`) are documented in [`doc/numerics.md`](doc/numerics.md).
 Seeds (`--seed`, `.options seed`), the order of outputs and the run manifest written next to each trace are

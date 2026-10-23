@@ -1,0 +1,4 @@
+run,status,exit_code,seed,mc_run,M,row_start,row_count,draw_start,draw_count,message
+0,ok,0,0,,2000,0,0,0,0,
+1,failed,1,0,,100,0,0,0,0,"Error: .op: the operating point did not converge within 100 iterations (delta cycles, .options maxiter)"
+2,ok,0,0,,2000,0,0,0,0,

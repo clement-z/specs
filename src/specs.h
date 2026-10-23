@@ -166,6 +166,9 @@ public:
     bool trace_csv = false;
     bool trace_npz = false;
     std::unique_ptr<TraceTable> default_trace_table;
+    // F-02: this process simulates one run of a .step/.mc plan for its run table (the parent warned
+    // once that the table holds no photodetector or power meter readout)
+    bool plan_run = false;
 
     // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
     vector<string> command_line; // argv as received by sc_main

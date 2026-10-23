@@ -1,0 +1,11 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Run plan: 6 runs, .step param n2 (2 values), .mc 3, seed 7
+run 0: n2=2.35 mc_run=0 seed=3535346804037795236
+run 1: n2=2.35 mc_run=1 seed=11544198488309949878
+run 2: n2=2.35 mc_run=2 seed=11084574693173782157
+run 3: n2=2.36 mc_run=0 seed=3535346804037795236
+run 4: n2=2.36 mc_run=1 seed=11544198488309949878
+run 5: n2=2.36 mc_run=2 seed=11084574693173782157
+
