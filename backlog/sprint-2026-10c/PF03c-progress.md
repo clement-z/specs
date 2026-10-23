@@ -48,3 +48,34 @@ Item 1 measurements (scripts and runs in /tmp/PF03c-item1):
   (the run manifest records path and hash), hence that file's hash in `case.json`. Traces, stdout, stderr unchanged.
   No other case. Counters unchanged.
 Result of the strict check: as predicted (the two cases, `netlist_files[0].sha256` only).
+
+### Item 2 (B-190): validation (Opus subagent, prototype `/tmp/PF03c-proto/scripts/proto.py`, results `RESULTS.md`)
+Prototype bit-identical to the C++ (27624 `.dc` evaluations, 8 files, linear and PCHIP). MZI (two 50/50 couplers,
+arms 300/400 um, ng 4.3, att 2 dB/cm, 0.2 nm grid) reproduces PF03b's numbers (0.0226 / 0.0160 / LOO 0.114).
+Variants: B (endpoint rule on the delay-removed S), C (re/im everywhere), D/E (extra tests for a null between two
+points: chord midpoint / segment distance), each with mag/phase on the detrended phase or as today ("s"); tau0 from a
+LS fit, a |S|^2-weighted fit, the end-point mean, the median of 2-point differences, the median of `tau_s`.
+**Chosen: "Es"**, tau0 = median of the entry's `tau_s` (0 if it rotates by < 1e-3 rad over the largest step),
+f_ref = first grid point; re/im intervals: today's endpoint test or the segment [S~_k, S~_k+1] passing within 0.07
+max|S| of 0; re/im of S~ there, rotated back; magnitude/phase intervals exactly as today (linear and PCHIP).
+Worst field error between points (all / LOO), today -> Es:
+- MZI linear 0.0226 -> 0.0016, LOO 0.114 -> 0.0064 (no warning); PCHIP 0.016 -> 0.016, LOO 0.109 -> 0.043 (warns).
+- Ring 0.05 nm linear 9.7e-4 -> 5.4e-4 (|S| >= 0.1: 4.0e-4 both), LOO 0.0039 -> 0.0021; PCHIP 6.6e-4 -> 5.65e-4,
+  LOO 0.0037 -> 0.0019.
+- Delay line, BDC, synthetic dispersive lines, asym, gain: bit-identical (linear and PCHIP).
+- Under-resolved: ring k=0.4 0.21 -> 0.044 (lin), 0.19 -> 0.052 (PCHIP); 1 nm ring 0.54 both; all still warn
+  with today's values (0.43, 0.71, 0.707522 for the golden 11-point file).
+Not chosen: PCHIP on the detrended phase ("Er" for PCHIP: MZI 0.0035, ring 2.7e-4, but the synthetic dispersive
+line 6e-7 -> 1.9e-4 and the BDC LOO +3 %: a degradation of resolved paths, so the conservative choice); B (MZI
+LOO stays 0.114, a warning on a grid that interpolates within 0.0016); C (dispersive line 7.5e-4 -> 0.046 and a
+false warning); fits and the mean as tau0 (the pi steps at nulls bias them to one arm's delay, 4.3 ps vs 5.02 ps).
+
+### Item 2, written before the re-record (from the prototype, `golden.py`)
+- `cir/spar-add-drop-ring`: one value, `out` at 1.55 um (interval within 1e-9 of a grid point, re/im today):
+  S(out,in) changes by 1.02e-12; output field d re +4.0e-13, d im -9.4e-13. Every other point bit-identical.
+- `regress/spar-ring-tran` and the new `regress/spar-ring-tran-output`: `out` field at 1.55 um changes by ~1e-12
+  (d re -1.02e-12, d im +5.4e-14); times, drop, stderr/stdout unchanged.
+- `regress/spar-grid-warning`: `out` by ~4e-15; grid warning text unchanged (0.707522 at 1.546e-06 m).
+- gtest case: changes if a test is added (yes: new SParamFile tests).
+- Every other case bit-identical (wg, touchstone, BDC, passivity, uni-reflection, taylor, err cases). Counters
+  unchanged (changes far below the gates).
