@@ -1,5 +1,5 @@
 # B-179: PUF circuit: ring coupling must be aligned with the reference design before benchmark use
-severity: med | category: physics | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: open (decision pending)
+severity: med | category: physics | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: resolved (maintainer decision 2026-10-23: k = √0.05, netlist unchanged)
 location: circuits/paul_3ring_puf.cir:5 (used at :39-43 and below)
 
 ## Problem
@@ -27,3 +27,10 @@ values file is added; any benchmark built on this netlist changes.
 
 ## Related
 B-037 (field vs power coupling), F-28 (`.op`/`.dc` convergence on high-Q rings).
+
+## Resolution (2026-10-23)
+Maintainer decision: the intended coupling of this PUF is the reference design's field coupling `k = √0.05 =
+0.22360679774997896` (5 % cross-coupling power), which is the value already in `circuits/paul_3ring_puf.cir`. The
+netlist stays as it is; benchmarks of this PUF use that value. Other coupling values seen in derived netlists
+(0.05 and 0.025 as field couplings) are not the design value.
+
