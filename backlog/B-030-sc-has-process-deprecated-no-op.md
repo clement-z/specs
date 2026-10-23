@@ -1,5 +1,5 @@
 # B-030: `SC_HAS_PROCESS` is a deprecated no-op in SystemC 3.0 (36 sites)
-severity: low | category: style/maintainability | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 9f31c11 (sprint 2026-10c PG): the 38 uses removed; clang build without the deprecation warnings
 location: src/optical_output_port.cpp:24 and 35 other `SC_HAS_PROCESS` sites (`grep -rn SC_HAS_PROCESS src`)
 ## Problem
 In SystemC 3.0 it expands to a `static_assert` on a `[[deprecated]]` variable. clang warns once per use. GCC 11

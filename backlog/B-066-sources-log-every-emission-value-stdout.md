@@ -1,5 +1,5 @@
 # B-066: Sources log every emission and value to stdout (per DC point, per VL sample)
-severity: low | category: perf | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: perf | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in 5b946f2 (sprint 2026-10c PG): the MLPROBE per-event print is gone; the source prints stay (see PG-REPORT.md, item 6)
 location: src/devices/cw_source.cpp:33, src/devices/value_list_source.cpp:31,38,49,62, src/devices/value_list_source.h:78,84,95,124, src/devices/electrical_value_list_source.cpp:31,38,60, src/devices/electrical_value_list_source.h:75,81,92,112, src/devices/detector.cpp:45, src/devices/probe.cpp:161
 ## Problem
 Every CW emission is logged unconditionally, and a DC sweep re-emits once per point (30 lines in cir/add_drop). Also logged unconditionally:

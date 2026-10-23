@@ -245,6 +245,8 @@ subcircuit.with_ports: T_DIRECTIVE_SUBCKT T_STR
                         $$ = cur_pt->register_subcircuit(*$2);
                         // directory of the file being scanned, for .include in the body (B-143)
                         cur_pt->subcircuits[$$]->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
+                        // and its name, for the parse errors in the body (B-182)
+                        cur_pt->subcircuits[$$]->filename = yyget_filename(scanner);
                         delete $2;
                     }
                 | subcircuit.with_ports port_name
@@ -270,6 +272,7 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
             {
                 // cout << "Parsed subcircuit " << cur_pt->subcircuits[$1]->name << endl;
                 cur_pt->subcircuits[$1]->netlist = *$2;
+                cur_pt->subcircuits[$1]->body_line = static_cast<ParserState *>(yyget_extra(scanner))->subckt_body_line;
                 delete $2;
             }
           | subcircuit.with_assignments T_DIRECTIVE_ENDS T_STR
@@ -283,6 +286,7 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
                     yyerror(scanner, pt, ss.str().c_str());
                 }
                 cur_pt->subcircuits[$1]->netlist = *$2;
+                cur_pt->subcircuits[$1]->body_line = static_cast<ParserState *>(yyget_extra(scanner))->subckt_body_line;
                 delete $2;
                 delete $3;
             }

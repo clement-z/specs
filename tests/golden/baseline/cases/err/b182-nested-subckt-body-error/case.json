@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b182-nested-subckt-body-error.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/b182-nested-subckt-body-error"
+}

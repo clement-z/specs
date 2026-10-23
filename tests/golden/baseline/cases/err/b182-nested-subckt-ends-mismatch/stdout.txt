@@ -1,0 +1,30 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+2 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/in {} {power (INTEGER) = 1, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/X1 (SUBCIRCUIT) {in (STRING), out (STRING), OUTER (STRING), } {}
+-----------
+1 named nets
+ - ROOT/in: OANALOG<1>u (1|0)
+-----------
+0 directives
+-----------
+1 subcircuits
+ - OUTER (SUBCIRCUIT DEFINITION) a b {}
+-----------
+1 analyses
+ - ANALYSIS[OP] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+

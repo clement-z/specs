@@ -1,5 +1,5 @@
 # B-139: add golden cases for parser/elaboration error paths
-severity: low | category: test-gap | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: test-gap | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed: ~50 err/* cases added in sprints 2026-10b/c (coupler k, .ic, X args, ...); unknown element/param, undefined subckt, duplicate name, missing .ends, no-analysis, empty file, power=1/0 still not covered
 location: tests/golden/cases.json (cli/* group), new tests/golden/netlists/ (suggested)
 ## Problem
 The only parser failures covered are the five broken shipped examples and `cli/missing-netlist`. Error handling for unknown elements/parameters, undefined variables/subcircuits, duplicate names, unterminated blocks, bad analyses is untested, and four dubious inputs are silently accepted.

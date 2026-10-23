@@ -17,8 +17,6 @@ public:
     void monitor();
     SC_CTOR(Merger_tb)
     {
-        SC_HAS_PROCESS(Merger_tb);
-
         SC_THREAD(run_1);
 
         SC_THREAD(monitor);

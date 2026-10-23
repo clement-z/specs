@@ -59,8 +59,6 @@ public:
         : spx_module(name)
         , m_out_writer("out_delayed_writer", p_out)
     {
-        SC_HAS_PROCESS(CWSource);
-
         SC_THREAD(runner);
 
         enable = sc_logic(0);

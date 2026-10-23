@@ -38,7 +38,6 @@ public:
         sortValues();
         enable = sc_logic(0);
 
-        SC_HAS_PROCESS(EVLSource);
         SC_THREAD(runner);
     }
 

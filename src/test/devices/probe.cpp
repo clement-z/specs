@@ -14,6 +14,8 @@
 #include <cstdio>
 #include <fstream>
 #include <limits>
+#include <memory>
+#include <set>
 #include <sstream>
 #include <string>
 
@@ -252,21 +254,24 @@ TEST(MLambdaProbe, UndrivenNetPrintsNothingWhenEnabled)
         probe.enable = sc_logic(0);
         sc_start();
 
-        // The sample taken at the enable is skipped silently: no
-        // "received unsupported signal (lambda = 1.3e-06m)"
+        // The sample taken at the enable is skipped silently: 1.3e-06 m is not noted as ignored
         testing::internal::CaptureStdout();
         probe.enable = sc_logic(1);
         sc_start();
         std::cout << std::flush;
         EXPECT_EQ(testing::internal::GetCapturedStdout(), "");
+        EXPECT_TRUE(probe.m_ignored_wavelengths_m.empty());
         expectMLProbeTraces(probe, 1.55e-6, 0, 0);
 
-        // A real event at a wavelength the probe does not list is still reported
+        // A real event at a wavelength the probe does not list is noted, without a print (B-062)
         testing::internal::CaptureStdout();
+        testing::internal::CaptureStderr();
         net.write(unsupported);
         sc_start();
         std::cout << std::flush;
-        EXPECT_EQ(testing::internal::GetCapturedStdout(), "mlprobe received unsupported signal (lambda = 1.3e-06m)\n");
+        EXPECT_EQ(testing::internal::GetCapturedStdout(), "");
+        EXPECT_EQ(testing::internal::GetCapturedStderr(), "");
+        EXPECT_EQ(probe.m_ignored_wavelengths_m, std::set<double>{1.3e-6});
     }
     SPECS_TEST_FOOTER();
 }
@@ -303,12 +308,13 @@ TEST(MLambdaProbe, TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled)
         expectMLProbeTraces(probe, 1.56e-6, 0, 0);
 
         // Enabled: the last value of each listed wavelength is traced; the current value of the
-        // net (unlisted) is reported as before (B-048)
+        // net (unlisted) is noted as ignored (B-048, B-062)
         testing::internal::CaptureStdout();
         probe.enable = sc_logic(1);
         sc_start();
         std::cout << std::flush;
-        EXPECT_EQ(testing::internal::GetCapturedStdout(), "mlprobe received unsupported signal (lambda = 1.31e-06m)\n");
+        EXPECT_EQ(testing::internal::GetCapturedStdout(), "");
+        EXPECT_EQ(probe.m_ignored_wavelengths_m, std::set<double>{1.31e-6});
         expectMLProbeTraces(probe, 1.55e-6, 2e-3, -0.5);
         expectMLProbeTraces(probe, 1.56e-6, 4e-3, 0.25);
 
@@ -327,6 +333,57 @@ TEST(MLambdaProbe, TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled)
         sc_start();
         expectMLProbeTraces(probe, 1.55e-6, 6e-3, 0.0);
         expectMLProbeTraces(probe, 1.56e-6, 5e-3, 1.0);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-062: an MLPROBE notes the wavelengths it does not list (exact match) and reports them in one
+// warning on stderr, with every digit needed to tell them from the listed ones; the destructor reports
+// what was not reported yet, so the probes of testbenches still warn
+TEST(MLambdaProbe, ReportsIgnoredWavelengthsOnce)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        spx::oa_signal_type net{"net"};
+        auto probe = std::make_unique<MLambdaProbe>("mlprobe", std::set<double>{1.5515e-6, 1.56e-6});
+        probe->p_in(net);
+
+        specsGlobalConfig.prepareSimulation();
+        sc_start(); // initialise the threads
+
+        // 1.55e-6 + 1.5e-9 is not 1.5515e-6 (B-062): ignored, like 1.31e-6; each one is noted once
+        const double near_listed = 1.55e-6 + 1.5e-9;
+        ASSERT_NE(near_listed, 1.5515e-6);
+        testing::internal::CaptureStdout();
+        testing::internal::CaptureStderr();
+        for (double wl : {near_listed, 1.31e-6, near_listed, 1.56e-6, 1.31e-6})
+        {
+            net.write(OpticalSignal(std::polar(std::sqrt(1e-3), 0.0), wl));
+            sc_start();
+        }
+        std::cout << std::flush;
+        EXPECT_EQ(testing::internal::GetCapturedStdout(), "");
+        EXPECT_EQ(testing::internal::GetCapturedStderr(), "");
+        EXPECT_EQ(probe->m_ignored_wavelengths_m, (std::set<double>{1.31e-6, near_listed}));
+        expectMLProbeTraces(*probe, 1.56e-6, 1e-3, 0.0);
+
+        testing::internal::CaptureStderr();
+        probe->reportIgnoredWavelengths();
+        probe->reportIgnoredWavelengths(); // nothing new: no second warning
+        EXPECT_EQ(testing::internal::GetCapturedStderr(),
+                  "Warning: mlprobe ignored the wavelengths of its net net that it does not list "
+                  "(1.31e-06 m, 1.5514999999999999e-06 m; listed: 1.5515e-06 m, 1.56e-06 m)\n");
+
+        // Noted after the report: reported by the destructor
+        net.write(OpticalSignal(std::polar(std::sqrt(1e-3), 0.0), 1.6e-6));
+        sc_start();
+        testing::internal::CaptureStderr();
+        probe.reset();
+        EXPECT_EQ(testing::internal::GetCapturedStderr(),
+                  "Warning: mlprobe ignored the wavelengths of its net net that it does not list "
+                  "(1.6e-06 m; listed: 1.5515e-06 m, 1.56e-06 m)\n");
     }
     SPECS_TEST_FOOTER();
 }

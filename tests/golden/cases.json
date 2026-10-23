@@ -2589,6 +2589,90 @@
    "note": "F-01, B-180: the largest integer literal, .options seed=9223372036854775807 (2^63 - 1), is a valid seed taken exactly (no conversion through double): the VCD is identical to the one of specs --seed 9223372036854775807 on f01-pdet-noise.cir"
   },
   {
+   "id": "err/b182-subckt-body-syntax-error",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b182-subckt-body-syntax-error.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-182: a syntax error inside a .subckt body gives the defining file and the line in it (line 8 ends early; line 9 as for a top-level line), exit 1 (was an empty file name and an uninitialised line number)"
+  },
+  {
+   "id": "err/b182-subckt-body-int-literal",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b182-subckt-body-int-literal.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-182: the B-180 integer-literal range error inside a .subckt body gives the defining file and line 7, exit 1 (was an empty file name and a garbage line number)"
+  },
+  {
+   "id": "err/b182-nested-subckt-ends-mismatch",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b182-nested-subckt-ends-mismatch.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-182: a nested subcircuit with a mismatched .ends name, found when the outer body is parsed per instance, gives the defining file and line 9, exit 1 (was a garbage line number)"
+  },
+  {
+   "id": "err/b182-nested-subckt-body-error",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b182-nested-subckt-body-error.cir"
+   ],
+   "ignore_streams": [
+    "stdout"
+   ],
+   "expect": "fail",
+   "note": "B-182: a syntax error in the body of a nested subcircuit gives the defining file and line 11, exit 1 (was an empty file name and a wrong line)"
+  },
+  {
    "id": "err/b180-int-literal-kwarg",
    "setup": {
     "copy": [
@@ -3739,6 +3823,23 @@
     "--stats=ports"
    ],
    "note": "F-15: --stats with a -t testbench: traces/crow_tb.stats.json next to its VCD; the two CROW ports bound to signals of the testbench function, destroyed when it returns, have \"net\": null (was a SIGSEGV while resolving them, found by stats-record)"
+  },
+  {
+   "id": "regress/b062-mlprobe-unlisted-wavelength",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b062-mlprobe-unlisted-wavelength.cir"
+   ],
+   "note": "B-062: MLPROBEs ignore the wavelengths they do not list (exact match): one warning per probe on stderr at the end of the run, in name order, with full precision (before: one 'received unsupported signal' line per event on stdout)"
   },
   {
    "id": "regress/b184-mlprobe-tran-start-multilambda",

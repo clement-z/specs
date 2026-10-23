@@ -74,6 +74,10 @@
   "err/b180-int-literal-positional",
   "err/b180-pcmcell-k-beyond-int",
   "err/b180-pcmcell-n-beyond-int",
+  "err/b182-nested-subckt-body-error",
+  "err/b182-nested-subckt-ends-mismatch",
+  "err/b182-subckt-body-int-literal",
+  "err/b182-subckt-body-syntax-error",
   "err/f01-options-seed-huge-integer",
   "err/f01-options-seed-invalid",
   "err/f01-options-seed-negative",
@@ -140,6 +144,7 @@
   "regress/b052-pcmcell-positional",
   "regress/b052-vlsrc-positional",
   "regress/b060-pcmcell-k-eq-n",
+  "regress/b062-mlprobe-unlisted-wavelength",
   "regress/b124-allpass-ring-default-reltol",
   "regress/b124-allpass-ring-tight-reltol",
   "regress/b131-nrings-crow",
@@ -344,6 +349,24 @@
    "only": "^(regress/b153-zerotol-lossy-ring-tran|regress/probe-latch-tran|regress/probe-wl-ignored|gtest/unit_tests)$",
    "gtest": true,
    "note": "PD6 (maintainer 2026-10-23: a PROBE always traces its wavelength): regress/b153-zerotol-lossy-ring-tran (false 4th argument) and regress/probe-latch-tran (wl=0) gain the probe's wavelength signal and the PD6 warning line, netlist comments updated (manifest netlist hash); new case regress/probe-wl-ignored; gtest list (Probe.NetlistProbeAlwaysTracesTheWavelength)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T09:05:34Z",
+   "only": "regress/b062-mlprobe-unlisted-wavelength|gtest/unit_tests",
+   "gtest": true,
+   "note": "B-062: new case, MLPROBE ignored wavelengths reported once per probe on stderr (PG item 2); gtest list: MLambdaProbe.ReportsIgnoredWavelengthsOnce"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T09:23:08Z",
+   "only": "^err/b182-",
+   "gtest": false,
+   "note": "B-182: new cases, parse errors inside .subckt bodies give the defining file and line (PG item 4)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T09:32:17Z",
+   "only": "^err/b182-nested-subckt-body-error$",
+   "gtest": false,
+   "note": "B-182: the nested-body case uses a syntax error (exit 1, like every err case) instead of an unexpected character (exit 3, B-172) (PG item 5)"
   }
  ]
 }

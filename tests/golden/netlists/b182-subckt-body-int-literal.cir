@@ -1,0 +1,9 @@
+* B-182 regression: the integer-literal range error (B-180) inside a .subckt body points at line 7 of this
+* file (before: an empty file name and a garbage line number).
+cwsrc1 in wl=1.55e-6 power=1
+x1 in out WG2
+.subckt WG2 a b
+wg1 a m length=10e-6
+wg2 m b length=99999999999999999999
+.ends
+.op

@@ -1,5 +1,5 @@
 # B-104: CHANGELOG is stale: names the tag `v0.1.0` (it is `v0.1`) and omits all work since v0.1 except the CMake switch
-severity: low | category: docs | effort: XS | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: docs | effort: XS | fix-class: needs-design | verdict: CONFIRMED | status: partly: CHANGELOG has [0.2.0] and [0.3.0] sections (d5fdebc, v0.2.0, v0.3.0); heading `## v0.1.0` (should be v0.1) remains
 location: CHANGELOG.md:1-12
 ## Problem
 The tag is `v0.1` (ff9b8bb, 2023-09-30). There are 34 commits since; the unreleased section lists only the CMake switch (and says the Makefile "should still function", which B-120 shows false).

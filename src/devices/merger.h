@@ -48,8 +48,6 @@ public:
         , m_out_writer("out_delayed_writer", p_out)
         , m_attenuation_dB(attenuation_dB)
     {
-        SC_HAS_PROCESS(Merger);
-
         SC_METHOD(on_port_in1_changed);
         sensitive << p_in1;
         dont_initialize();
