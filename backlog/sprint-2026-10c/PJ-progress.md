@@ -6,9 +6,10 @@ Decision: "Follow-ups (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`; B-066.
 | Item | Status | Commit | Notes |
 |---|---|---|---|
 | 0. Baseline (before) | done | — | `pixi run test gcc` 12/12 OK; golden strict (`--rtol 0 --atol 0 --print-slack 0`) 240/240 |
-| 1. Prints behind `--vci`, stderr warning | in progress | | |
-| 2. Golden: re-record + proof + 2 new cases | pending | | |
-| 3. Docs, CHANGELOG, B-066 | pending | | |
+| 1. Prints behind `--vci`, stderr warning | done | baf872b | 6 gtests; the 37 predicted cases re-recorded in the same commit; proof OK (gcc, asan-clang, clang) |
+| 2. Golden: 2 new cases | done | 2fa468a | `regress/b066-vlsrc-vci`, `regress/b066-evlsrc-past`; strict 242/242 |
+| 3. Docs, CHANGELOG, B-066 | done | 7168885 | |
+| Gate: asan-gcc before/after, `meson test` clang/asan-gcc | running | | before builds in `/tmp/PJ-wt/before` (354c5e5) |
 | Report | pending | | |
 
 ## Predicted golden impact (written before the change)
