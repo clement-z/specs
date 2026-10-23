@@ -3,65 +3,54 @@
 
 using namespace std;
 
+void Merger::start_of_simulation()
+{
+    m_transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
+}
+
+void Merger::print_initialization()
+{
+    cout << name() << ":" << endl;
+    cout << "transmission = " << pow(m_transmission, 2) << " W/W" << endl;
+    cout << port_channel_name(p_in1) << endl;
+    cout << "\t --> \t" << port_channel_name(p_out) << endl;
+    cout << port_channel_name(p_in2);
+    cout << endl;
+    cout << endl;
+}
+
 void Merger::on_port_in1_changed()
 {
-    const double transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
+    // Read sum of input signals
+    OpticalSignal p_in1_read = p_in1->read();
 
-    if (specsGlobalConfig.verbose_component_initialization)
-    {
-        cout << name() << ":" << endl;
-        cout << "transmission = " << pow(transmission, 2) << " W/W" << endl;
-        cout << port_channel_name(p_in1) << endl;
-        cout << "\t --> \t" << port_channel_name(p_out) << endl;
-        cout << port_channel_name(p_in2);
-        cout << endl;
-        cout << endl;
-    }
+    auto cur_wavelength_id = p_in1_read.m_wavelength_id;
+    // Updating the field memory
+    m_memory_in1[cur_wavelength_id] = p_in1_read.m_field;
 
-    OpticalSignal p_in1_read;
+    auto s = OpticalSignal(m_memory_in1[cur_wavelength_id] +
+                            m_memory_in2[cur_wavelength_id]
+                            , cur_wavelength_id);
 
-    while (true) {
-        // Wait for a new input signal
-        wait();
-        // Read sum of input signals
-        p_in1_read = p_in1->read();
+    s *= m_transmission;
 
-        auto cur_wavelength_id = p_in1_read.m_wavelength_id;
-        // Updating the field memory
-        m_memory_in1[cur_wavelength_id] = p_in1_read.m_field;
-
-        auto s = OpticalSignal(m_memory_in1[cur_wavelength_id] +
-                                m_memory_in2[cur_wavelength_id]
-                                , cur_wavelength_id);
-
-        s *= transmission;
-
-        m_out_writer.delayedWrite(s,SC_ZERO_TIME);
-    }
+    m_out_writer.delayedWrite(s,SC_ZERO_TIME);
 }
 
 void Merger::on_port_in2_changed()
 {
-    const double transmission = pow(10.0, - m_attenuation_dB / 20) / sqrt(2);
+    // Read sum of input signals
+    OpticalSignal p_in2_read = p_in2->read();
 
-    OpticalSignal p_in2_read;
+    auto cur_wavelength_id = p_in2_read.m_wavelength_id;
+    // Updating the field memory
+    m_memory_in2[cur_wavelength_id] = p_in2_read.m_field;
 
-    while (true) {
-        // Wait for a new input signal
-        wait();
-        // Read sum of input signals
-        p_in2_read = p_in2->read();
+    auto s = OpticalSignal(m_memory_in1[cur_wavelength_id] +
+                            m_memory_in2[cur_wavelength_id]
+                            , cur_wavelength_id);
 
-        auto cur_wavelength_id = p_in2_read.m_wavelength_id;
-        // Updating the field memory
-        m_memory_in2[cur_wavelength_id] = p_in2_read.m_field;
+    s *= m_transmission;
 
-        auto s = OpticalSignal(m_memory_in1[cur_wavelength_id] +
-                                m_memory_in2[cur_wavelength_id]
-                                , cur_wavelength_id);
-
-        s *= transmission;
-
-        m_out_writer.delayedWrite(s,SC_ZERO_TIME);
-    }
+    m_out_writer.delayedWrite(s,SC_ZERO_TIME);
 }

@@ -14,6 +14,7 @@ if gtest_dep.found()
       'devices/models.cpp',
       'devices/pcm.cpp',
       'devices/probe.cpp',
+      'devices/process_style.cpp',
       'devices/waveguide.cpp',
       'fixed_point.cpp',
       'general_utils.cpp',

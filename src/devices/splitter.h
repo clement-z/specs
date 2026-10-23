@@ -54,11 +54,25 @@ public:
      *
      * It copies the input to both output, after attenuation and delay.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** p_in
      * */
     void on_port_in_changed();
+    /** --vci only: prints the parameters at initialization (a thread, so that the devices
+     * print in the order their threads used to) */
+    void print_initialization();
+
+    virtual void start_of_simulation();
+
+private:
+    // F-15: computed once before the simulation (the device thread computed them when it
+    // started)
+    double m_transmission = 1;
+    double m_S12 = 0;
+    double m_S13 = 0;
+
+public:
 
     // Constructor
     /** Constructor for Splitter
@@ -76,7 +90,10 @@ public:
     {
         SC_HAS_PROCESS(Splitter);
 
-        SC_THREAD(on_port_in_changed);
+        SC_METHOD(on_port_in_changed);
         sensitive << p_in;
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
     }
 };

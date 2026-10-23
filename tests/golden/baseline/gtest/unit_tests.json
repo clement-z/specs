@@ -68,6 +68,8 @@
   "Probe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "Probe.SamplesUnchangedNetWhenEnabled": "PASS",
   "Probe.UndrivenNetTracesNothingWhenEnabled": "PASS",
+  "ProcessStyle.ReactionsAndOutputPortsAreMethods": "PASS",
+  "ProcessStyle.VerboseInitializationAddsOnePrintThreadPerDevice": "PASS",
   "Rng.ConfigSeedDefaultsToZero": "PASS",
   "Rng.DifferentSeedsOrNamesGiveDifferentSequences": "PASS",
   "Rng.KnownAnswers": "PASS",
