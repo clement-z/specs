@@ -8,7 +8,7 @@ Branch `ws/cleanup3`. Heartbeat id: `837055bd` (delete after the report is commi
 | 2 MLPROBE per-event print | done | 5b946f2 | as predicted: no existing case changed; new case regress/b062-mlprobe-unlisted-wavelength; counters identical |
 | 3 SC_HAS_PROCESS | done | 9f31c11 | 38 uses removed; clang warnings 455 -> 4 (pre-existing), gcc 9 -> 9; bit-identical and counters identical on gcc, clang, asan-gcc, asan-clang |
 | 4 B-182 subckt line numbers | done | 6561510 | as predicted: 4 new err cases, nothing else changed; counters identical |
-| 5 small items | todo | | |
+| 5 small items | done | 69c774f | memcpy guard, dangling-else, CI comment, Doxyfile (12 obsolete tags; 3 translated ones written as current tags, same effective config on 1.9.8 and 1.18), README counts; nested B-182 case now exit 1 |
 | 6 VLSource prints (look only) | todo | | |
 
 ## Before references (tip 6e5e83c)
@@ -29,3 +29,4 @@ counters `/tmp/pg/stats-before-<tc>`. gcc strict golden: 235/235 pass. `meson te
   none has an error inside a `.subckt` body, so no existing case changes. New err cases: errors inside a body
   (syntax error, B-180 integer literal, nested `.ends` name mismatch, error in a nested body) give the defining
   file and the line in that file.
+- Item 5: predicted no output change. Result: as predicted.
