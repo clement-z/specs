@@ -112,6 +112,8 @@ int yy_load_next_buf(yyscan_t scanner)
     if ( last_file )
     {
         fclose(last_file);
+        // a later parse in the same process (F-02 --run) must not close it again
+        last_file = nullptr;
     }
 
     if (netlist_content_fifo.empty())
@@ -452,6 +454,12 @@ string convert_special_char(char c)
     return T_ELEM_SPLITTER;
 }
 
+^SPAR({ALPHA_PLUS_NUM})+ {
+    /* S-parameter device instance name (F-03) */
+    yylval_param->s_ptr = new string(yytext);
+    return T_ELEM_SPAR;
+}
+
 ^COUPLER({ALPHA_PLUS_NUM})+ {
     /* DC instance name */
     yylval_param->s_ptr = new string(yytext);
@@ -533,6 +541,8 @@ string convert_special_char(char c)
 ^\.TRAN { return T_ANALYSIS_TRAN; }
 
 ^\.OPTIONS { return T_DIRECTIVE_OPTIONS; }
+^\.STEP { return T_DIRECTIVE_STEP; }
+^\.MC { return T_DIRECTIVE_MC; }
 ^\.NODESET { return T_DIRECTIVE_NODESET; }
 ^\.IC { yylerror(yyscanner, "the .ic directive is not supported"); exit(1); }
 ^\.SUBCKT {

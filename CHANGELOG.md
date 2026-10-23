@@ -2,16 +2,93 @@
 
 ## [unreleased]
 
+### New
+
+* Accuracy suite (`tests/bench/`, F-06): SPECS's `.dc` and `.tran` results against closed forms, as the Meson
+  suite `oracle`: the add-drop ring (Yariv, Bogaerts) on `circuits/add_drop.cir`, and CROWs with random ring
+  lengths (Poon transfer matrices), complex through/drop responses within 1e-5; each check also proves that
+  three injected physics errors (k read as a power ratio, no dispersion slope, a real cross coupling) would
+  fail it. The CROW generator (`crow_gen.py`, from the feature scout) gains CW and `.dc` forms and a
+  `crow_tb` preset that reproduces `specs -t ac_crow` (same event times, powers within 1e-12 W, checked by
+  the suite)
+* Benchmark (`tests/bench/bench.py`): the CROW case matrix with per-run user time, peak RSS, VCD size and
+  `--stats` counters, appended to a local `tests/bench/history.jsonl` (not versioned); the Meson suite
+  `bench` checks only ratios (event plateau from 30 to 300 rings, WDM linearity, and the user-time plateau on
+  optimised builds without sanitizers)
+* Activity map (`utils/activity_map.py`, F-31): the circuit of a run drawn with Graphviz's layout, each device
+  coloured by its processed events (linear scale) over a background field that blends nearby devices over
+  about a node's size (`--field-spread`) and is zero between devices that are not close, subcircuit
+  instances as clusters, optional suppression-ratio discs (clear of the labels), a legend and
+  the run totals; reads `--json` and `--stats=ports,devices`, writes DOT (standard library only), SVG and
+  PNG (numpy, matplotlib, Graphviz; pixi's `py` environment now includes Graphviz). See
+  `doc/activity_map.md`
+* `SPAR`: an N-port device given by an S-parameter file (F-03, `doc/netlist.md` "SPAR", `doc/sparam.md`):
+  Lumerical/SiEPIC `.sparam`, Touchstone 1.x/2.x, a CSV form and a Taylor-coefficient form. Phases are
+  converted to SPECS's convention on import (Touchstone, written in the RF convention, is conjugated; a test
+  shows that a waveguide written in each format gives the phase and delay of a `WG` of the same length).
+  Magnitude and unwrapped phase are interpolated in frequency (`interp=linear|pchip`), real and imaginary
+  parts of the entry with its median group delay taken out near transmission nulls (B-190: an unbalanced
+  MZI sampled 28 times per FSR is within 0.0016 between grid points instead of 0.023); in `.tran` the S-matrix of the carrier wavelength applies with a group delay
+  per path (each path a delayed copy of its input; no dispersion within a pulse; negative delays become 0,
+  reported per path), or with `delay_per="output"` one delay per output (that of its largest path). A grid too coarse for the device is reported when the file is loaded (leave-one-out
+  check). Unidirectional or bidirectional like `COUPLER`; a wavelength outside the data range is an error;
+  `passivity=check|ignore|enforce`, `delay=auto|none|<s>`, `ports=`, `convention=`. Test data: the SiEPIC
+  EBeam broadband directional coupler (MIT, `tests/sparam/data/siepic/NOTICE`)
+* `utils/sparam_export.py`: writes the S-matrix of a subcircuit, from one `.dc` sweep per port, as
+  `.sparam`, Touchstone or CSV (F-03)
+* KiCad symbols `SPAR_2PORT` and `SPAR_4PORT` (`utils/specs.kicad_sym`)
+* Parameter sweeps and Monte-Carlo (F-02, `doc/netlist.md` "Functions" and "`.step` and `.mc`"):
+  * functions in expressions: `sqrt exp log log10 sin cos tan asin acos atan abs floor ceil min max`, and the
+    random `gauss(mu, sigma)`, `uniform(a, b)`, `lognormal(mu, sigma)`, `choice(...)`. Each draw takes its own
+    stream of the master seed, named after where it is (instance path, element or `.param`, assigned name), so a
+    random parameter in a subcircuit body is drawn per instance; `shared=1` shares it between the instances of
+    the subcircuit, `shared="name"` between every use of the name
+  * `.step param NAME start stop step` (stop included, as `.dc`) and `.step param NAME list ...`, nested, and
+    `.mc N [seed=S]`: one run per point, each in its own process (`-j N` at a time). Monte-Carlo run k has a seed
+    derived from the master seed and k, the same at every step point
+  * one run table for all runs, `<output>.runs/`: `runs.csv` (status, exit code, seed, stepped and drawn values,
+    message of each run) and appendable NumPy columns of every run's probe samples and random draws, readable
+    without loading them (`np.load(..., mmap_mode="r")`, `pyspecs/runtable.py`). A failing or crashing run is
+    recorded and the others go on; running the same command again resumes (completed runs are skipped);
+    `--overwrite` starts over. `--run K` simulates one run alone with the outputs of a single run
+
 ### Changed
 
+* Run manifest (`<trace>.manifest.json`, `--print-manifest`) and run table manifest (`table.manifest.json`):
+  `format_version` 2, with a `data_files` list (path and SHA-256 of each `SPAR` S-parameter file and
+  `VLSRC`/`EVLSRC` value file read), so a `.step`/`.mc` plan is not resumed against a changed data file (F-01)
+* `.options seed` is applied when its line is read (so that the random functions after it use it); a seed that
+  changes after a random function drew is an error (F-02)
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
   the run, in name order and with every digit needed to tell them from the listed ones, instead of one
-  "received unsupported signal" line on stdout per event (B-062; matching stays exact)
+  "received unsupported signal" line on stdout per event (B-062)
+* VLSRC and EVLSRC are quiet by default: the values read from a value file (and its skipped lines),
+  "`<name> was enabled`" and the "`@<t>, <name> emitted: <value>`" line of every emission are only printed with
+  `--vci`. The values whose time is already past when the source reaches them are reported in one warning per
+  source on stderr, with their count, instead of one "invalid time for signal emission !" line on stdout per
+  value (VLSRC; EVLSRC skipped them silently). The emitted values are unchanged (B-066)
+* Wavelengths equal within a relative 1e-12 are one wavelength (compile-time constant, `doc/numerics.md`): in the
+  wavelength registry (the first registered value is kept), so sources at "the same" wavelength written
+  differently (`1550*1e-9`, `1.55e-6`, c/f) add coherently instead of as two wavelengths, and in MLPROBE's
+  wavelength list, so a computed wavelength is traced (B-010, B-062). A `.dc` point that drifted to within 1e-12
+  of a registered wavelength takes that value (e.g. 1.550000000000001e-06 -> 1.55e-06 in `circuits/add_drop.cir`,
+  values at that point change by about 1e-13 relative)
+* `.dc`: each sweep point is a fresh steady state: every output port writes each of its wavelengths at least
+  once per point, also when its value did not change since the previous point, so the wavelength of a source
+  that is not swept reaches the nets and probes after it at every point (before, at the first point only); a
+  PROBE on such a net now has a sample at every point. More events per point in such circuits (`--stats`);
+  `.op` and `.tran` are unchanged (B-185)
 
 ### Fixed
 
+* `.dc`: a sweep point whose output falls below `abstol` (e.g. a null of an MZI) is written (0 after the snap)
+  instead of keeping the previous point's value and wavelength (B-003)
 * Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line
   in it, as for top-level lines, instead of an empty file name and an uninitialised line number (B-182)
+* pixi: `pixi run test` (and the other build tasks) failed with `gtest/gtest.h: No such file or directory` on a
+  host with googletest installed (e.g. Arch Linux's `gtest`): the environment's pkg-config found the host's
+  `gtest.pc`. The pixi builds now use the googletest wrap; remove a `build-pixi/<toolchain>` directory configured
+  before this fix
 
 ## [0.3.0] - 2026-10-23
 

@@ -1,0 +1,8 @@
+* PF03b: the add-drop ring of tests/sparam/add_drop_ring.cir exported on a 1 nm grid (spar-ring-1nm.sparam,
+* 1.545 to 1.555 um, utils/sparam_export.py): the grid is too coarse for its through-port null, which the
+* grid-adequacy check reports at load time; in .tran the through path's negative group delay is clamped to 0
+vlsrc1 in values=[[0, 0, 1.55e-6], [1e-12, 1, 1.55e-6], [20e-12, 0, 1.55e-6]]
+spar1 in add out drop file="spar-ring-1nm.sparam"
+.options timescale=-15
+.save out drop
+.tran 40e-12

@@ -1,0 +1,25 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "--vci",
+  "-f",
+  "tests/golden/netlists/spar-ring-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 371,
+   "kind": "text",
+   "sha256": "27827e5d51b6630e899e447b3785316feb18b23a2c06f97ec11a1695e5f32126",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 631,
+   "kind": "json",
+   "sha256": "58adb1671bce759f0f68db9fbf53dac62c5817e93730f77b0c5f3a884954c92c",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/spar-ring-tran"
+}

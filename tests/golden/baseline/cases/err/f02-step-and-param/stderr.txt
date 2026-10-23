@@ -1,0 +1,2 @@
+Error: .step param L (tests/golden/netlists/f02-step-linear.cir:5) and --param L set the same parameter
+

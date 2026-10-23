@@ -79,14 +79,6 @@ Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
 ║ - ROOT/unused (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
-ROOT/VLSRC1 was enabled
-ROOT/VLSRC2 was enabled
-@0 s, ROOT/VLSRC2 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@10 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@20 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@30 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@50 ps, ROOT/VLSRC2 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 Simulated 50 ps
 ╔═══════════════════╗
 ║        DONE       ║

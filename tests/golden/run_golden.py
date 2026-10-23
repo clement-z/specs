@@ -212,6 +212,8 @@ def file_kind(rel):
         return "json"
     if low.endswith(".npz"):
         return "npz"
+    if low.endswith(".npy"):
+        return "npy"
     if low.endswith((".txt", ".csv", ".log", ".out", ".dat", ".cir")):
         return "text"
     return "auto"
@@ -278,6 +280,16 @@ def decode_npy(data):
         else:
             values = [str(v) for v in values]
     return descr, shape, values
+
+
+def decode_npy_file(raw):
+    """A .npy file (bytes; the columns of a run table, F-02) -> deterministic text as decode_npz():
+    a header line, then one value per line. Never raises."""
+    try:
+        descr, shape, values = decode_npy(raw)
+    except Exception as e:
+        return "npy: cannot decode: %s\n" % e
+    return "".join(line + "\n" for line in ["npy: descr=%s shape=%r" % (descr, shape)] + values)
 
 
 def decode_npz(raw):
@@ -781,12 +793,14 @@ def run_case(case, specs, repo, tmp_root):
                 content = normalise_run_stats(decode(raw))
             elif kind == "npz":
                 content = decode_npz(raw)
+            elif kind == "npy":
+                content = decode_npy_file(raw)
             elif kind in ("text", "json"):
                 content = normalise_text(decode(raw), pathmap) if kind == "text" else decode(raw)
             else:
                 content = raw
             files[rel] = {"kind": kind, "content": content}
-            if kind == "npz":
+            if kind in ("npz", "npy"):
                 # The raw bytes may differ between compilers (last bits): kept, never compared.
                 files[rel]["raw_sha256"] = sha256(raw)
                 files[rel]["raw_bytes"] = len(raw)
@@ -879,8 +893,9 @@ def store_result(outdir, res, max_file_bytes):
         content = f["content"]
         data = content.encode("utf-8") if isinstance(content, str) else content
         entry = {"kind": f["kind"], "bytes": len(data), "sha256": sha256(data)}
-        stored_rel = rel + ".txt" if f["kind"] == "npz" else rel   # the decoded text, not a fake .npz
-        if f["kind"] == "npz":
+        # the decoded text, not a fake .npz/.npy
+        stored_rel = rel + ".txt" if f["kind"] in ("npz", "npy") else rel
+        if f["kind"] in ("npz", "npy"):
             entry["raw_sha256"] = f["raw_sha256"]
             entry["raw_bytes"] = f["raw_bytes"]
         gz = None
@@ -896,7 +911,7 @@ def store_result(outdir, res, max_file_bytes):
             entry["stored"] = None
             if f["kind"] == "vcd":
                 entry["summary"] = vcd_summary(content)
-            elif f["kind"] in ("text", "json", "npz"):
+            elif f["kind"] in ("text", "json", "npz", "npy"):
                 entry["summary"] = {"lines": content.count("\n") + 1}
         meta["files"][rel] = entry
     (cdir / "case.json").write_text(json.dumps(meta, indent=1, sort_keys=True) + "\n", encoding="utf-8")
@@ -1008,7 +1023,7 @@ def compare_case(base, cand, case, tol, lenient_order=False):
                     diffs += jd
                 except ValueError:
                     diffs += compare_text(eb["content"], ec["content"], tol, rel)
-            elif kind in ("text", "npz"):
+            elif kind in ("text", "npz", "npy"):
                 diffs += compare_text(eb["content"], ec["content"], tol, rel)
             else:
                 diffs.append("%s: binary content differs" % rel)

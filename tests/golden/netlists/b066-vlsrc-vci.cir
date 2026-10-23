@@ -1,0 +1,8 @@
+* B-066: the per-value prints of the value-list sources are only printed with --vci (this case runs
+* with --vci): the values read from the file and its skipped lines (header, empty, commented), then
+* "<name> was enabled" and one "@<t>, <name> emitted: <value>" line per emission, for VLSRC and EVLSRC.
+* Without --vci they print none of these lines (e.g. regress/b052-vlsrc-positional).
+vlsrc1 a "tests/golden/netlists/b066-vlsrc-values.csv"
+probe1 a
+evlsrc1 e "tests/golden/netlists/b052-evlsrc-values.csv"
+.tran 1e-9

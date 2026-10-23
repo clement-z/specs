@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/b144-bidir-source-first.cir", "sha256": "fe86e9e1fbc49781f3ef593f859453302b3039f27a9db48d55f3de501466c897"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

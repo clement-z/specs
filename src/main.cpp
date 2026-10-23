@@ -12,10 +12,14 @@
 
 #include "specs.h"
 #include "optical_output_port.h"
+#include "parser/parse_directive.h"
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
 #include "run_manifest.h"
+#include "run_plan.h"
 #include "run_stats.h"
+#include "run_table.h"
+#include "trace_table.h"
 #include <utils/version.h>
 
 using namespace std;
@@ -75,8 +79,9 @@ bool is_param_name(const string &name)
 }
 
 // Value of a --param override (F-12): the line ".param name=value" parsed with the netlist grammar
-// into a scratch tree, before the netlist (its parameters are not visible)
-Variable parse_param_value(const string &name, const string &value)
+// into a scratch tree, before the netlist (its parameters are not visible). Its random draws (F-02)
+// are recorded in pt, as the draws of the root netlist (same stream names)
+Variable parse_param_value(const string &name, const string &value, ParseTree &pt)
 {
     ParseTree scratch;
     ParserState parser_state;
@@ -96,11 +101,22 @@ Variable parse_param_value(const string &name, const string &value)
         cerr << "Invalid --param value: '" << name << "=" << value << "' (expected name=value)" << endl;
         exit(1);
     }
+    for (const auto &d : scratch.draws)
+        pt.draws.push_back(d);
+    if (scratch.has_drawn && !pt.has_drawn)
+    {
+        pt.has_drawn = true;
+        pt.drawn_seed = scratch.drawn_seed;
+        pt.first_draw_where = scratch.first_draw_where;
+    }
     return scratch.local_assignments.at(name);
 }
 
-int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer="")
+// Parses the netlist files and the footer into pt. quiet: nothing on stdout (the parse of --run K, which
+// only reads the run plan, F-02)
+int parse_netlist(ParseTree &pt, const vector<string> &filenames, const string &footer, bool quiet = false)
 {
+    std::streambuf *cout_buf = quiet ? cout.rdbuf(nullptr) : nullptr;
     yyscan_t scanner;
     ParserState *parser_state = new ParserState();
     // run manifest (F-01): every netlist file opened by the scanners goes to pt's list
@@ -131,15 +147,40 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
     yylex_destroy(scanner);
     delete parser_state;
 
+    if (quiet)
+    {
+        cout.rdbuf(cout_buf);
+        cout.clear();
+    }
+
     // Return if unsuccessful
     if (parsing_result != 0) {
         return parsing_result;
     }
 
-    for (const auto &p : pt.param_overrides)
+    if (!quiet)
     {
-        if (!p.second)
-            cerr << "Warning: --param " << p.first << ": the netlist has no .param " << p.first << endl;
+        for (const auto &p : pt.param_overrides)
+        {
+            if (!p.second)
+                cerr << "Warning: --param " << p.first << ": the netlist has no .param " << p.first << endl;
+        }
+    }
+    return 0;
+}
+
+// Builds the circuit of a parsed netlist (pt from parse_netlist())
+void build_circuit(ParseTree &pt)
+{
+    // F-02: the random functions must draw with the final seed
+    if (!pt.draw_seed_conflict.empty())
+    {
+        cerr << "Error: " << pt.draw_seed_conflict << "; put .options seed before the first random "
+             << "function, or give the seed with --seed";
+        if (pt.first_draw_where.rfind("--param", 0) == 0)
+            cerr << " (a --param value is read before the netlist)";
+        cerr << endl;
+        exit(1);
     }
 
     pt.print();
@@ -149,8 +190,71 @@ int build_circuit(ParseTree &pt, const vector<string> &filenames, string footer=
     cout << "╚══════════════════════╝" << endl;
 
     pt.build_circuit();
+}
 
-    return 0;
+// F-02: the command line of a run table's manifest: argv without the options that do not change the
+// results (-j/--jobs, --overwrite), so that a plan can be resumed with another -j
+vector<string> table_command_line(int argc, char *argv[])
+{
+    vector<string> out;
+    for (int i = 0; i < argc; ++i)
+    {
+        const string a = argv[i];
+        if (a == "-j" || a == "--jobs")
+        {
+            ++i;
+            continue;
+        }
+        if (a == "--overwrite" || a.rfind("--jobs=", 0) == 0 || (a.size() > 2 && a.rfind("-j", 0) == 0))
+            continue;
+        out.push_back(a);
+    }
+    return out;
+}
+
+// F-02: the netlist parsed again for one run of the plan: its stepped values (as --param overrides,
+// after the ones of the command line) and its seed
+void parse_run_point(ParseTree &pt, const RunPlan::Point &point, const vector<pair<string, string>> &param_overrides,
+                     const vector<string> &filenames, const string &footer)
+{
+    specsGlobalConfig.seed = point.seed;
+    specsGlobalConfig.seed_explicit = true;
+    for (const auto &p : param_overrides)
+        pt.set_param_override(p.first, parse_param_value(p.first, p.second, pt));
+    for (const auto &p : point.params)
+        pt.set_param_override(p.first, p.second);
+    const int parse_result = parse_netlist(pt, filenames, footer);
+    if (parse_result)
+    {
+        cerr << "Parsing failed with code " << parse_result << endl;
+        exit(parse_result);
+    }
+}
+
+// F-02: the results of a run's process for the run table: the probe table, the draws and the values
+// of the drawn top-level parameters
+RunChunk run_chunk(const ParseTree &pt)
+{
+    RunChunk chunk;
+    const TraceTable *table = specsGlobalConfig.default_trace_table.get();
+    if (table)
+    {
+        chunk.signal_names = table->signal_names();
+        chunk.time_s = table->time_s();
+        chunk.signal = table->signal();
+        chunk.wavelength_m = table->wavelength_m();
+        chunk.power_W = table->power_W();
+        chunk.field_re = table->field_re();
+        chunk.field_im = table->field_im();
+    }
+    for (const auto &d : pt.draws)
+    {
+        chunk.draw_names.push_back(d.first);
+        chunk.draw_values.push_back(d.second);
+    }
+    for (const auto &name : pt.drawn_params)
+        chunk.drawn_params.emplace_back(name, RunPlan::format_value(pt.local_assignments.at(name)));
+    return chunk;
 }
 
 int sc_main(int argc, char *argv[])
@@ -236,6 +340,20 @@ int sc_main(int argc, char *argv[])
                           "Set the netlist parameter <name>, parsed as in .param name=value; "
                           "overrides the netlist's .param/.assign of the same name (repeatable)",
                           { "param" });
+
+    args::ValueFlag<string> set_run(parser,
+                          "K",
+                          "Run only run K of the netlist's .step/.mc plan, in this process, with the outputs of "
+                          "a single run (trace, tables, manifest, stdout): each run is reproducible on its own",
+                          { "run" });
+    args::ValueFlag<string> set_jobs(parser,
+                          "N",
+                          "Runs of a .step/.mc plan simulated at the same time, one process each (default 1)",
+                          { 'j', "jobs" });
+    args::Flag set_overwrite(parser,
+                          "overwrite",
+                          "Replace the run table <output>.runs/ of a .step/.mc plan instead of resuming it",
+                          { "overwrite" });
 
     args::ValueFlag<string> set_maxiter(parser,
                           "set_maxiter",
@@ -528,57 +646,249 @@ int sc_main(int argc, char *argv[])
         }
         footer << endl;
         //cout << footer.str() << endl;
+
+        // Builds and simulates a parsed netlist (the single run, or one run of a .step/.mc plan)
+        auto simulate = [&](ParseTree &pt) -> int
+        {
+            build_circuit(pt);
+            // after build_circuit(): the .include files of subcircuit bodies are opened while flattening (B-150)
+            specsGlobalConfig.netlist_files = pt.input_files;
+            if (set_dry_run.Get() && specsGlobalConfig.print_run_manifest)
+            {
+                // no prepareSimulation() in a dry run, and no trace file is written
+                cout << RunManifest(specsGlobalConfig, "").to_json() << flush;
+                specsGlobalConfig.print_run_manifest = false;
+            }
+            string json_filename = export_json.Get();
+            if (!json_filename.empty())
+            {
+                ofstream outfile;
+                outfile.open(json_filename, ios::out | ios::trunc);
+                if (!outfile)
+                {
+                    cerr << "Error: cannot open JSON output file \"" << json_filename << "\"" << endl;
+                    return 1;
+                }
+                outfile << pt.to_json();
+                outfile.close();
+                cout << "Exported flattened circuit as JSON > " << json_filename << endl;
+            }
+
+            if (!set_dry_run.Get())
+            {
+                cout << "╔══════════════════════╗" << endl;
+                cout << "║      SIMULATION      ║" << endl;
+                cout << "╚══════════════════════╝" << endl;
+
+                specsGlobalConfig.runAnalysis();
+            }
+            else
+            {
+                cout << "╔══════════════════════╗" << endl;
+                cout << "║  SIMULATION SKIPPED  ║" << endl;
+                cout << "╚══════════════════════╝" << endl;
+            }
+
+            cout << "╔═══════════════════╗" << endl;
+            cout << "║        DONE       ║" << endl;
+            cout << "╚═══════════════════╝" << endl;
+            return 0;
+        };
+
         ParseTree pt;
         // the last one wins if a name is given twice
         for (const auto &p : param_overrides)
-            pt.set_param_override(p.first, parse_param_value(p.first, p.second));
-        int parse_result = build_circuit(pt, file.Get(), footer.str());
+            pt.set_param_override(p.first, parse_param_value(p.first, p.second, pt));
+        // --run K: this parse only reads the run plan, the run's own parse prints
+        int parse_result = parse_netlist(pt, file.Get(), footer.str(), set_run);
         if (parse_result)
         {
             cerr << "Parsing failed with code " << parse_result << endl;
             exit(parse_result);
         }
-        // after build_circuit(): the .include files of subcircuit bodies are opened while flattening (B-150)
-        specsGlobalConfig.netlist_files = pt.input_files;
-        if (set_dry_run.Get() && specsGlobalConfig.print_run_manifest)
+        if (pt.plan.empty())
         {
-            // no prepareSimulation() in a dry run, and no trace file is written
-            cout << RunManifest(specsGlobalConfig, "").to_json() << flush;
-            specsGlobalConfig.print_run_manifest = false;
-        }
-        string json_filename = export_json.Get();
-        if (!json_filename.empty())
-        {
-            ofstream outfile;
-            outfile.open(json_filename, ios::out | ios::trunc);
-            if (!outfile)
+            if (set_run || set_jobs || set_overwrite)
             {
-                cerr << "Error: cannot open JSON output file \"" << json_filename << "\"" << endl;
+                cerr << "Error: --run, --jobs and --overwrite need a .step or .mc line in the netlist" << endl;
                 return 1;
             }
-            outfile << pt.to_json();
-            outfile.close();
-            cout << "Exported flattened circuit as JSON > " << json_filename << endl;
+            return simulate(pt);
         }
 
-        if (!set_dry_run.Get())
+        // F-02: a run plan (.step, .mc)
+        for (const auto &s : pt.plan.steps)
         {
-            cout << "╔══════════════════════╗" << endl;
-            cout << "║      SIMULATION      ║" << endl;
-            cout << "╚══════════════════════╝" << endl;
-
-            specsGlobalConfig.runAnalysis();
+            if (pt.param_overrides.count(s.param))
+            {
+                cerr << "Error: .step param " << s.param << " (" << s.where << ") and --param " << s.param
+                     << " set the same parameter" << endl;
+                return 1;
+            }
+            if (!pt.local_assignments.count(s.param))
+            {
+                cerr << "Error: .step param " << s.param << " (" << s.where << "): the netlist has no .param "
+                     << s.param << endl;
+                return 1;
+            }
         }
-        else
+        // names of runs.csv columns
+        const set<string> reserved_columns = { "run", "status", "exit_code", "seed", "mc_run", "row_start",
+                                               "row_count", "draw_start", "draw_count", "message" };
+        for (const auto &s : pt.plan.steps)
         {
-            cout << "╔══════════════════════╗" << endl;
-            cout << "║  SIMULATION SKIPPED  ║" << endl;
-            cout << "╚══════════════════════╝" << endl;
+            if (reserved_columns.count(s.param))
+            {
+                cerr << "Error: .step param " << s.param << " (" << s.where << "): " << s.param
+                     << " is a column of the run table, rename the parameter" << endl;
+                return 1;
+            }
+        }
+        for (const auto &name : pt.drawn_params)
+        {
+            if (reserved_columns.count(name))
+            {
+                cerr << "Error: .param " << name << " draws a random value and " << name
+                     << " is a column of the run table of a .step/.mc plan, rename the parameter" << endl;
+                return 1;
+            }
+        }
+        // the .options of the netlist: their errors once here rather than in every run (each run applies
+        // them again)
+        for (const auto *d : pt.directives)
+        {
+            if (dynamic_cast<const OPTIONSDirective *>(d))
+                d->create();
+        }
+        if (pt.plan.mc_seed_given && pt.options_seed_given && pt.plan.mc_seed != pt.options_seed)
+        {
+            cerr << "Error: .mc seed=" << pt.plan.mc_seed << " (" << pt.plan.mc_where << ") and .options seed="
+                 << pt.options_seed << " give two seeds" << endl;
+            return 1;
+        }
+        // --seed, then .mc seed=, then .options seed (already applied by the parse), then 0
+        const uint64_t master_seed = !specsGlobalConfig.seed_explicit && pt.plan.mc_seed_given
+                                     ? pt.plan.mc_seed : specsGlobalConfig.seed;
+        const RunPlan plan(pt.plan, master_seed);
+        if (plan.size() == 0)
+        {
+            cerr << "Error: the .step/.mc lines make more than " << RunPlan::max_runs() << " runs" << endl;
+            return 1;
         }
 
-        cout << "╔═══════════════════╗" << endl;
-        cout << "║        DONE       ║" << endl;
-        cout << "╚═══════════════════╝" << endl;
+        if (set_run)
+        {
+            uint64_t run = 0;
+            const string &s = set_run.Get();
+            const auto res = std::from_chars(s.data(), s.data() + s.size(), run, 10);
+            if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size() || run >= plan.size())
+            {
+                cerr << "Invalid --run value: '" << s << "' (expected a run of the plan, 0 to " << plan.size() - 1
+                     << ")" << endl;
+                return 1;
+            }
+            const RunPlan::Point point = plan.point(run);
+            cout << "Run " << run << " of " << plan.size() << ": " << plan.describe(point) << endl;
+            ParseTree run_pt;
+            parse_run_point(run_pt, point, param_overrides, file.Get(), footer.str());
+            return simulate(run_pt);
+        }
+
+        cout << "Run plan: " << plan.size() << " run" << (plan.size() > 1 ? "s" : "");
+        for (const auto &s : pt.plan.steps)
+            cout << ", .step param " << s.param << " (" << s.values.size() << " values)";
+        if (pt.plan.mc)
+            cout << ", .mc " << pt.plan.mc_runs;
+        cout << ", seed " << master_seed << endl;
+        if (set_dry_run.Get())
+        {
+            for (uint64_t run = 0; run < plan.size(); ++run)
+                cout << "run " << run << ": " << plan.describe(plan.point(run)) << endl;
+            return 0;
+        }
+
+        // the outputs of a single run do not apply to the runs of a plan
+        const vector<pair<bool, string>> single_run_options = {
+            { bool(set_formats), "--format" }, { bool(set_no_trace), "--no-trace" },
+            { bool(export_json), "--json" }, { bool(set_stats) || bool(set_stats_file) || bool(print_stats), "--stats" },
+            { bool(set_progress), "--progress" }, { bool(print_manifest), "--print-manifest" },
+        };
+        for (const auto &o : single_run_options)
+        {
+            if (o.first)
+            {
+                cerr << "Error: " << o.second << " does not apply to the runs of a .step/.mc plan (they write the "
+                     << "run table <output>.runs/); use --run K for one run" << endl;
+                return 1;
+            }
+        }
+        unsigned jobs = 1;
+        if (set_jobs)
+        {
+            const string &s = set_jobs.Get();
+            const auto res = std::from_chars(s.data(), s.data() + s.size(), jobs, 10);
+            if (s.empty() || res.ec != std::errc() || res.ptr != s.data() + s.size() || jobs < 1 || jobs > 1024)
+            {
+                cerr << "Invalid --jobs value: '" << s << "' (expected 1 to 1024)" << endl;
+                return 1;
+            }
+        }
+        // the subcircuit bodies: their errors once here rather than in every run, and their .include
+        // files in the table manifest
+        {
+            std::streambuf *cout_buf = cout.rdbuf(nullptr);
+            pt.flatten();
+            cout.rdbuf(cout_buf);
+            cout.clear();
+        }
+        for (const auto *e : pt.elements)
+        {
+            if (e->kind() == "PHOTODETECTOR" || e->kind() == "POWER METER")
+            {
+                cerr << "Warning: photodetector and power meter readouts are not in the run table (it holds "
+                     << "the probes); use --run K to trace them in a VCD" << endl;
+                break;
+            }
+        }
+        RunManifest manifest;
+        manifest.specs_version = spx::version::full;
+        manifest.systemc_version = sc_release();
+        manifest.seed = master_seed;
+        manifest.command_line = table_command_line(argc, argv);
+        manifest.netlist_files = pt.input_files;
+        // the data files of the runs, from the flattened elements: this process does not build the circuit
+        manifest.data_files = pt.data_files();
+        vector<string> drawn_names;
+        for (const auto &name : pt.drawn_params)
+        {
+            if (!pt.plan.steps.empty() && std::any_of(pt.plan.steps.begin(), pt.plan.steps.end(),
+                                                      [&](const ParseStep &s) { return s.param == name; }))
+                continue;
+            drawn_names.push_back(name);
+        }
+        RunTable table(specsGlobalConfig.trace_filename + ".runs", table_manifest_json(manifest, plan, drawn_names),
+                       plan.param_names(), drawn_names, set_overwrite.Get());
+        const RunnerOutcome outcome = run_plan(plan, table, jobs);
+        if (!outcome.child)
+            return outcome.exit_code;
+
+        // the process of one run: its results go to the table through a chunk file
+        const RunPlan::Point point = plan.point(outcome.run);
+        ParseTree run_pt;
+        parse_run_point(run_pt, point, param_overrides, file.Get(), footer.str());
+        specsGlobalConfig.trace_filename = "";
+        specsGlobalConfig.trace_vcd = false;
+        specsGlobalConfig.plan_run = true;
+        specsGlobalConfig.default_trace_table = std::make_unique<TraceTable>("", "");
+        specsGlobalConfig.default_trace_table->keepColumns();
+        const int result = simulate(run_pt);
+        if (result != 0)
+            return result;
+        if (!run_chunk(run_pt).write(RunTable::chunk_path(table.dir(), outcome.run)))
+        {
+            cerr << "Error: cannot write the results of run " << outcome.run << endl;
+            return 1;
+        }
         return 0;
     }
     if (test) {

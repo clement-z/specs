@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/mzi_tb.manifest.json": {
-   "bytes": 247,
+   "bytes": 267,
    "kind": "json",
-   "sha256": "f1b81e813e5d6365d6fbf4c63696773d8395ada47324f1ea9a5342baf2d01374",
+   "sha256": "3fce6ee8576f3808bee59d5747547a5bafff110af784ea9f323ca116531493be",
    "stored": "files/traces/mzi_tb.manifest.json"
   },
   "traces/mzi_tb.vcd": {

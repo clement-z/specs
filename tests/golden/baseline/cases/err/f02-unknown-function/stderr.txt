@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/f02-unknown-function.cir:2): unknown function gaussian()
+-- offending token: ")"
+-- while parsing line: ".param a=gaussian(1, 0.1)"
+

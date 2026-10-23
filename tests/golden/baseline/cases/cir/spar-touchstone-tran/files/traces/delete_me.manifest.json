@@ -1,0 +1,15 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-touchstone-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-touchstone-tran.cir", "sha256": "7891f5f3f5e4241acad3970e9ca2f2e7c4942fe2919a1740f1b9bd3cafcdb956"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/../../sparam/fixtures/wg_v2.ts", "sha256": "7d7e6c39c8e95b85d6396dd167628beb1c01f4ac365db52924dc59a81f5f6fa1"}
+  ],
+  "trace_file": "traces/delete_me.csv"
+}

@@ -68,9 +68,6 @@ Info: (I703) tracing timescale unit set: 100 fs (traces/x.vcd)
 ║ - ROOT/ring_br (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
-ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@1 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 
 Info: /OSCI/SystemC: Simulation stopped by user.
 Simulated 30 ps

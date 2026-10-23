@@ -1,0 +1,16 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b010-near-duplicate-lambda.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 469,
+   "kind": "json",
+   "sha256": "db1aa47c3e5a2347c533eed21b05c1cb46ed615524046869f9fbddd763376295",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/b010-near-duplicate-lambda"
+}

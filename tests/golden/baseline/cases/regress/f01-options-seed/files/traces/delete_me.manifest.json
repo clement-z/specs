@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 12345,
@@ -9,5 +9,6 @@
     {"path": "tests/golden/netlists/f01-pdet-noise-options-seed.cir", "sha256": "781de9d5b5d3f40baa17ec4477b940f0b11e38348aa0a0527f44b21d92a94dcd"},
     {"path": "tests/golden/netlists/f01-pdet-noise.cir", "sha256": "e87f5a7b5e9886959b227702f636dbc7c67b0ca52dbc7b3f358cd411f57711fc"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

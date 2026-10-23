@@ -1,0 +1,7 @@
+* F-02: .step of a parameter that the netlist does not define: error, exit 1
+.param L=100e-6
+.step param W list 1 2
+cwsrc1 in wl=1.55e-6 power=1e-3
+wg1 in out length={L} neff=2.35 ng=4.2
+probe1 out
+.tran 1p

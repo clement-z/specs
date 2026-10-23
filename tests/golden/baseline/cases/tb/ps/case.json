@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/ps_tb.manifest.json": {
-   "bytes": 245,
+   "bytes": 265,
    "kind": "json",
-   "sha256": "383874f1e3b661d01a72b649fa2cdee6449bf93feebcd61f509cf794074f20d3",
+   "sha256": "49981e0a6a2f07602e40266fef7b72da414b17d6c37c0aab552a396af2001278",
    "stored": "files/traces/ps_tb.manifest.json"
   },
   "traces/ps_tb.vcd": {

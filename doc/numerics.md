@@ -134,6 +134,16 @@ threshold first (by order of magnitude, then by name; at most 10 are listed)
       ROOT/ring_bl (ROOT/WG_RING) @ 1550 nm: |dE| = 0.0001 > 1.38425e-08 (7224.15 x)
     A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss
 
+**A `.dc` point** (B-003, B-185). Before each point the output ports drop their pending entries and forget the
+values they emitted; the devices keep theirs (the input values of each wavelength), so the iterations of a point
+start from the state the previous one left. At each point, the first value of each wavelength that a port
+receives is written whatever the emission gate says, and the snap applies to it (a value below `snapfactor` *
+`abstol` is written as 0); it is written with a value-change event even if the net already holds that value
+(an unchanged source, an unchanged wavelength next to a swept one), so it reaches every device and probe after
+it. The later values of the point go through the gate as above. Without this, a point whose value falls below
+`abstol` kept the previous point's value and wavelength, and an unchanged value was not propagated again. In
+`.op` and `.tran` nothing is forced: the first value of a wavelength is compared with 0.
+
 Each net is shown with the device that writes it. In a `.dc` the first line names the sweep point
 (`.dc: sweep point 1 of 3 (WL(ROOT/CWSRC1) = 1.55e-06) did not converge ...`), before a `.tran` it says
 `.tran: the operating point before the transient`. A circuit that converges is not affected: same results,
@@ -188,6 +198,26 @@ Use: comparing SPECS with a fixed-step discrete model of the same circuit (same 
 the gate off no event is dropped, so the differences left come from the models, the delay rounding and the
 floating-point rounding, not from the tolerances. Keep non-zero tolerances for normal runs: they bound the
 number of events and make feedback circuits quiesce.
+
+## Wavelength matching
+
+Wavelengths equal within a relative 1e-12, |a - b| <= 1e-12 · max(|a|, |b|), are one wavelength (B-010, B-062):
+
+- The wavelength registry gives each wavelength an id; the devices keep their values per id, and only fields of
+  the same id add coherently. A wavelength that matches one already registered gets its id, and the **first
+  registered value is kept**: `wl=1550*1e-9` (1.5500000000000002e-06) next to `wl=1.55e-6` is 1.55e-6, so the two
+  sources interfere (before, they were two wavelengths that only looked alike, both printed "@ 1550 nm"). The same
+  holds for wavelengths computed from a frequency (c/f) or by an expression, and for `.dc` points that drift
+  from start + i·step (B-009): in `circuits/add_drop.cir` the point 1.550000000000001e-06 takes the source's
+  registered 1.55e-6.
+- An MLPROBE traces a wavelength of its net that matches one of its list (`doc/netlist.md`).
+
+The tolerance is the compile-time constant `OpticalSignal::WAVELENGTH_MATCH_RTOL` (`src/optical_signal.h`),
+not an option. 1e-12 is far below any physical spacing (1 pm at 1550 nm is 6.5e-7) and above the rounding of
+a few operations (1e-16 each). It is a possible source of error, not studied further (B-187): two
+wavelengths that really differ by less than 1e-12 relative are merged, and a computed value that drifts by more
+(a long accumulation, a `.dc` sweep with many points) is not matched. The registry is looked up when the sources
+are set up and once per `.dc` point, never per event.
 
 ## Time resolution
 
@@ -283,7 +313,7 @@ Counters (per port, summed in `totals` and per device type):
 | `scheduled` | values written to the port by its device (`delayedWrite()`), at a time and wavelength |
 | `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one) |
 | `processed` | pending entries taken at their time |
-| `emitted` | of which written to the net with a new value (the gate passed) |
+| `emitted` | of which written to the net with a new value (the gate passed), or the first value of a wavelength at a `.dc` point (written whatever the gate says) |
 | `suppressed.abstol` | not written: \|E - E_last\| <= abstol |
 | `suppressed.reltol` | not written: above abstol, \|E - E_last\| <= reltol·\|E_last\| |
 | `suppressed.snap` | the gate passed, but the value was snapped to 0 and 0 was already the last value emitted at that wavelength: written again, no change |

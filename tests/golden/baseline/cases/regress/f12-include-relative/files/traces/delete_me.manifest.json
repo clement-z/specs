@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -12,5 +12,6 @@
     {"path": "tests/golden/netlists/f12-include/sub/probes.cir", "sha256": "26d0d7731aa9b1f81b4e61977011ccba1860d2bae1d9c68b0071e85cc96e0ddc"},
     {"path": "tests/golden/netlists/f12-include/sub/src_body.cir", "sha256": "336b5a124eabf1335f04721b736b8a0fda3b5b036ea697b81cfa237209e00384"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

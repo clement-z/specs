@@ -1,0 +1,26 @@
+{
+ "args": [
+  "--seed",
+  "1",
+  "--json",
+  "traces/flat.json",
+  "-f",
+  "tests/golden/netlists/f02-functions.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 488,
+   "kind": "json",
+   "sha256": "851b6af2a3bce68884d14f253427f72aae217ab95ba79c79397b4ea08ed4f582",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/flat.json": {
+   "bytes": 2121,
+   "kind": "json",
+   "sha256": "1c074ba672f50a43b6d98c670ff10ad1b07db3397f2bd26a588ad27ca1a5fd24",
+   "stored": "files/traces/flat.json"
+  }
+ },
+ "id": "regress/f02-functions-seed"
+}

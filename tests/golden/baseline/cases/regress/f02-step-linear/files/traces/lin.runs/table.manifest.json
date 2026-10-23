@@ -1,0 +1,18 @@
+{
+  "format": "specs-run-table",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-o", "traces/lin", "-f", "tests/golden/netlists/f02-step-linear.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f02-step-linear.cir", "sha256": "dd5ade2bb04e28ea8230ccebb73e0ad67a5b2588c1267eb4dc8e8da4711b1287"}
+  ],
+  "data_files": [],
+  "steps": [
+    {"param": "L", "values": [1e-04, 0.00011, 0.00012]}
+  ],
+  "mc_runs": null,
+  "runs": 3,
+  "drawn_parameters": []
+}

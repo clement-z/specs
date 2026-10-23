@@ -67,9 +67,10 @@ OpticalSignal &OpticalSignal::operator-=(const OpticalSignal &rhs)
 
 uint32_t OpticalSignal::getIDFromWavelength(const double &wavelength)
 {
-    auto it = find (specsGlobalConfig.wavelengths_vector.cbegin(),
-                    specsGlobalConfig.wavelengths_vector.cend(),
-                    wavelength);
+    // The first registered wavelength that matches (B-010; not per event: sources, .dc points)
+    auto it = find_if(specsGlobalConfig.wavelengths_vector.cbegin(),
+                      specsGlobalConfig.wavelengths_vector.cend(),
+                      [&wavelength](double registered) { return sameWavelength(registered, wavelength); });
 
     uint32_t index;
 

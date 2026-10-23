@@ -1,0 +1,122 @@
+{
+ "args": [
+  "-o",
+  "traces/lin",
+  "-f",
+  "tests/golden/netlists/f02-step-linear.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/lin.runs/.lock": {
+   "bytes": 0,
+   "kind": "text",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stored": "files/traces/lin.runs/.lock"
+  },
+  "traces/lin.runs/draw_name.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "040ce28f7590a34af85fbdb8115c90c9a0529a73b047533889c859c2f2c6e627",
+   "sha256": "3256b779cb2a36317fb96a766fbc46b98c3b3dc301c4737cfe2e76bfdc54a519",
+   "stored": "files/traces/lin.runs/draw_name.npy.txt"
+  },
+  "traces/lin.runs/draw_names.txt": {
+   "bytes": 0,
+   "kind": "text",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stored": "files/traces/lin.runs/draw_names.txt"
+  },
+  "traces/lin.runs/draw_run.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "040ce28f7590a34af85fbdb8115c90c9a0529a73b047533889c859c2f2c6e627",
+   "sha256": "3256b779cb2a36317fb96a766fbc46b98c3b3dc301c4737cfe2e76bfdc54a519",
+   "stored": "files/traces/lin.runs/draw_run.npy.txt"
+  },
+  "traces/lin.runs/draw_value.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/lin.runs/draw_value.npy.txt"
+  },
+  "traces/lin.runs/field_im.npy": {
+   "bytes": 92,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "46bf7468d0c4061dd7923afaa3f8fb9d4be041b3290b951f1d454113b6412350",
+   "sha256": "17e9dcb6448ec0307f12818d17314012cac4af2b8c3f96318c77953aa863fe0d",
+   "stored": "files/traces/lin.runs/field_im.npy.txt"
+  },
+  "traces/lin.runs/field_re.npy": {
+   "bytes": 91,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "9432396e27dfafd31b989928a81392de86095f37b789982635d0de0ed25a524d",
+   "sha256": "013210dc2838529bade6290cfab338ce9acae27bacecce4e3a59d8dea635ed6f",
+   "stored": "files/traces/lin.runs/field_re.npy.txt"
+  },
+  "traces/lin.runs/power_W.npy": {
+   "bytes": 93,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "5f83f1538c68d22df4013769da7696758bda8cc82c89dc114522f1b619aa298b",
+   "sha256": "d599c6d6f9f126ecee526f3720e698f668de95cf629393de982b70c384589c11",
+   "stored": "files/traces/lin.runs/power_W.npy.txt"
+  },
+  "traces/lin.runs/run.npy": {
+   "bytes": 32,
+   "kind": "npy",
+   "raw_bytes": 140,
+   "raw_sha256": "c8b16caa0f7bbe2bf06df66bd02f201f13a961ad617f011fe3a2e540cac89a62",
+   "sha256": "08332765a8e7178b062772be0c203a6f4eaefa75783114bf34329526e2132e13",
+   "stored": "files/traces/lin.runs/run.npy.txt"
+  },
+  "traces/lin.runs/runs.csv": {
+   "bytes": 164,
+   "kind": "text",
+   "sha256": "2545f40ea0398c0f5dea49965c67ff1ff3b5ded17a48ac76120111baaf677b3a",
+   "stored": "files/traces/lin.runs/runs.csv"
+  },
+  "traces/lin.runs/signal.npy": {
+   "bytes": 32,
+   "kind": "npy",
+   "raw_bytes": 140,
+   "raw_sha256": "1eeec9786e6f14468051d05b8e77f97b6319fc4d6e23fa4c7100381e725ad4a4",
+   "sha256": "ca17b8760f2799b8cab966609a02c13d982199f544d66f07111cfa8b08f02a4d",
+   "stored": "files/traces/lin.runs/signal.npy.txt"
+  },
+  "traces/lin.runs/signal_names.txt": {
+   "bytes": 12,
+   "kind": "text",
+   "sha256": "5b18e84cd6bf9a38758c020d11ffaf88d38329f1f27df23d1d41242ca870c6af",
+   "stored": "files/traces/lin.runs/signal_names.txt"
+  },
+  "traces/lin.runs/table.manifest.json": {
+   "bytes": 556,
+   "kind": "json",
+   "sha256": "3fa25168acd78c4af5b0fb7967c231c2255cd3c5b6de9f7616554175f30e2182",
+   "stored": "files/traces/lin.runs/table.manifest.json"
+  },
+  "traces/lin.runs/time_s.npy": {
+   "bytes": 38,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "0237082f316c456f6dfc5bfd9f16db975dd4a0020cf5ba83f3d4d7820f60efe8",
+   "sha256": "576077eb68445135b29d8095b5b07619c5b7876f8fcc2831a12038bc7545043d",
+   "stored": "files/traces/lin.runs/time_s.npy.txt"
+  },
+  "traces/lin.runs/wavelength_m.npy": {
+   "bytes": 53,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "9b1994580c239995dad6659204c212067dd8dbdba84293abdb5608b2408ef047",
+   "sha256": "5396d0d42686d977a8c56d7e2d4d7ff4abae1af9be70b7717b0d3bfc6ca7b459",
+   "stored": "files/traces/lin.runs/wavelength_m.npy.txt"
+  }
+ },
+ "id": "regress/f02-step-linear"
+}

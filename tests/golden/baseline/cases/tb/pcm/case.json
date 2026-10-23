@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/pcm_device_tb.manifest.json": {
-   "bytes": 254,
+   "bytes": 274,
    "kind": "json",
-   "sha256": "e4bacb7bd8c6dd158852b938d3e4b06e7df2e516cb99031de0afa5f64625ef23",
+   "sha256": "d5be07b05dad8f386f3ee49cd17a63b5b85bfe67bed43c87ccab978237d024c7",
    "stored": "files/traces/pcm_device_tb.manifest.json"
   },
   "traces/pcm_device_tb.vcd": {

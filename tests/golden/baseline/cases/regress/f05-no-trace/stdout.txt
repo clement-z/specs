@@ -60,7 +60,7 @@ Current SPECS config:
 - trace all optical nets: 0
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -68,6 +68,7 @@ Current SPECS config:
   "netlist_files": [
     {"path": "tests/golden/netlists/f05-save-tran.cir", "sha256": "c83b595a1e45049e16b4f97879ec8a102cbbb4b2243ee2425fbb436f869707e3"}
   ],
+  "data_files": [],
   "trace_file": null
 }
 ╔═══════════════════╗
@@ -81,9 +82,6 @@ Current SPECS config:
 ║ - ROOT/ring_out (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
-ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@100 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 1 ns
 ╔═══════════════════╗
 ║        DONE       ║

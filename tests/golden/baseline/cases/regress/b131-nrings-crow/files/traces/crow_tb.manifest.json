@@ -1,10 +1,11 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
   "command_line": ["specs", "-t", "ac_crow", "--nrings_crow", "2"],
   "netlist_files": [],
+  "data_files": [],
   "trace_file": "traces/crow_tb.vcd"
 }

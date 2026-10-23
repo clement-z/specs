@@ -50,6 +50,12 @@ SPECSConfig::SPECSConfig(sc_module_name name)
 
 SPECSConfig::~SPECSConfig() {}
 
+void SPECSConfig::record_data_file(const string &path)
+{
+    if (std::find(data_files.begin(), data_files.end(), path) == data_files.end())
+        data_files.push_back(path);
+}
+
 void SPECSConfig::runAnalysis()
 {
     run_start = std::chrono::steady_clock::now();
@@ -297,9 +303,12 @@ void SPECSConfig::runDCAnalysis()
         mlprobe->enable = sc_logic(0);
     }
 
-    // Set all ports mode to NO_DELAY
+    // Set all ports mode to NO_DELAY. Each sweep point is a fresh steady state (B-003, B-185): after
+    // the reset of the ports at each point, each port writes the first value of each of its
+    // wavelengths, with an event, also below abstol or unchanged since the previous point
     for (auto oop: all_oop) {
         oop->m_mode = OpticalOutputPortMode::NO_DELAY;
+        oop->m_emit_each_wavelength = true;
     }
 
     // Activate CW sources
@@ -587,7 +596,7 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
     if (!default_trace_file)
     {
         // the tables only hold the probes (F-05)
-        if (!all_pdets.empty() || !all_pwr_meters.empty())
+        if ((!all_pdets.empty() || !all_pwr_meters.empty()) && !plan_run)
             cerr << "Warning: photodetector and power meter readouts are only traced in the VCD "
                  << "(add --format vcd)" << endl;
         return;

@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-grid-warning.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 358,
+   "kind": "text",
+   "sha256": "4cae8596ca2510e6470d00dc040c98d23adff1b674c4f9e3dd2a59b50c0a8d43",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 610,
+   "kind": "json",
+   "sha256": "a48671a17689cb9cc26ae396930f589a8ce7059b07b839dd37b3164816f4f885",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/spar-grid-warning"
+}

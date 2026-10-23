@@ -42,7 +42,7 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   (`LSAN_OPTIONS=suppressions=$PWD/tests/sanitizers/lsan.supp:print_suppressions=0`), else error cases fail on leak reports.
 - Bit-identical outputs (`--rtol 0 --atol 0 --print-slack 0`): the baseline comes from a portable (non-native) gcc
   release build (B-183), and gcc release builds reproduce it exactly (system gcc 11, pixi gcc 15). clang and
-  debug/sanitizer builds differ in 6 cases at one sweep point (<= 1e-14 relative), native builds in 28 (<= 1e-12);
+  debug/sanitizer builds differ in 7 cases at one sweep point (<= 1e-14 relative), native builds in 28 (<= 1e-12);
   all pass the default tolerances and `--atol 0`. For bit-identity before/after a change, compare like with like.
 - If a change **intentionally** alters outputs (a bug fix), re-record with
   `run_golden.py record ... --out tests/golden/baseline --only '<ids>' --note "<why, backlog ID>"`, inspect the diff

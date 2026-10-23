@@ -1,0 +1,9 @@
+* F-02: a random function in the parameter defaults of a .subckt line: error, exit 1 (it would be
+* drawn once for every instance)
+.subckt ARM a b L=gauss(100e-6, 1e-6)
+wg1 a b length={L}
+.ends
+cwsrc1 in wl=1.55e-6 power=1e-3
+X1 in out ARM
+probe1 out
+.op

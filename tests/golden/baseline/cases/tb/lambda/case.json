@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/lambda_tb.manifest.json": {
-   "bytes": 253,
+   "bytes": 273,
    "kind": "json",
-   "sha256": "c5a1c6ed31719d4dc8a2a9b43bad739f2184ebbaffe39d8153359f4c2677f819",
+   "sha256": "e90e3aff9bbba2ccefd6143f318676291a3abeb85417b7e0a81a66b1b5dfeba0",
    "stored": "files/traces/lambda_tb.manifest.json"
   },
   "traces/lambda_tb.vcd": {

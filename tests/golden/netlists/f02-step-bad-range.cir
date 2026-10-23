@@ -1,0 +1,7 @@
+* F-02: .step param NAME start stop step with stop < start: parse error with file:line, exit 1
+.param L=100e-6
+.step param L 200e-6 100e-6 10e-6
+cwsrc1 in wl=1.55e-6 power=1e-3
+wg1 in out length={L} neff=2.35 ng=4.2
+probe1 out
+.tran 1p

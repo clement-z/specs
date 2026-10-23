@@ -1,0 +1,15 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-grid-warning.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-grid-warning.cir", "sha256": "80f4e96252e4eb2e9d2f155751f8994e8de7f4b172c4afe8e39d2cdb83bc08e2"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/spar-ring-1nm.sparam", "sha256": "ebf28ad84ee14f24ad5b08bee4e3c1881a9dd66504bec25b94f621fff4565816"}
+  ],
+  "trace_file": "traces/delete_me.csv"
+}

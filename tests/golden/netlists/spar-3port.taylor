@@ -1,0 +1,19 @@
+specs-taylor 1
+# F-03 golden case spar-3port-taylor: a lossy Y-junction (ports a, b: arms, c: stem)
+ports a b c
+center 1.55e-6
+range 1.5e-6 1.6e-6
+S c a amp 0.69 -1e5
+S c a phase 0.5 2e6
+S c a delay 1e-12
+S c b amp 0.69 -1e5
+S c b phase 0.5 2e6
+S c b delay 1e-12
+S a c amp 0.69 -1e5
+S a c phase 0.5 2e6
+S a c delay 1e-12
+S b c amp 0.69 -1e5
+S b c phase 0.5 2e6
+S b c delay 1e-12
+S a a amp 0.05
+S a a phase 3.0

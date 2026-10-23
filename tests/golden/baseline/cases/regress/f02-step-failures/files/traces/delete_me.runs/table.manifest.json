@@ -1,0 +1,18 @@
+{
+  "format": "specs-run-table",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/f02-step-failures.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/f02-step-failures.cir", "sha256": "99d1e7e7e0e8b09025eecc33b9193469f1ea04c8a42a1f3b2855ff97ee60ef02"}
+  ],
+  "data_files": [],
+  "steps": [
+    {"param": "M", "values": [2000, 100, 2000]}
+  ],
+  "mc_runs": null,
+  "runs": 3,
+  "drawn_parameters": []
+}

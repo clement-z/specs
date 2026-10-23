@@ -15,6 +15,10 @@
   "cir/double_ring",
   "cir/paul_3ring_puf",
   "cir/paul_simple_ring",
+  "cir/spar-add-drop-ring",
+  "cir/spar-siepic-bdc",
+  "cir/spar-touchstone-tran",
+  "cir/spar-wg-dc",
   "cir/subckt_test",
   "cir/subckt_tests",
   "cir/triple_ring",
@@ -86,6 +90,16 @@
   "err/f01-seed-negative",
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
+  "err/f02-options-seed-after-draw",
+  "err/f02-plan-format",
+  "err/f02-run-out-of-range",
+  "err/f02-run-without-plan",
+  "err/f02-step-and-param",
+  "err/f02-step-bad-range",
+  "err/f02-step-reserved-name",
+  "err/f02-step-unknown-param",
+  "err/f02-subckt-default-draw",
+  "err/f02-unknown-function",
   "err/f05-format-invalid",
   "err/f05-format-no-trace",
   "err/f05-format-unwritable",
@@ -110,6 +124,11 @@
   "err/f28-maxiter-small",
   "err/f28-options-maxiter-fraction",
   "err/f28-options-maxiter-negative",
+  "err/spar-bad-delay-per",
+  "err/spar-bad-ports",
+  "err/spar-missing-file",
+  "err/spar-net-count",
+  "err/spar-out-of-range",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -117,10 +136,12 @@
   "opt/tracefile-o",
   "opt/vci",
   "regress/b001-fd-multilambda-stale",
+  "regress/b003-dc-dark-point",
   "regress/b004-mode-fd-tran",
   "regress/b004-mode-td-dc",
   "regress/b004-mode-td-op",
   "regress/b006-empty-output",
+  "regress/b010-near-duplicate-lambda",
   "regress/b014-delay-rounding-warning",
   "regress/b014-device-internal-rounds-to-zero",
   "regress/b021-snapfactor",
@@ -144,7 +165,10 @@
   "regress/b052-pcmcell-positional",
   "regress/b052-vlsrc-positional",
   "regress/b060-pcmcell-k-eq-n",
+  "regress/b062-mlprobe-computed-wavelength",
   "regress/b062-mlprobe-unlisted-wavelength",
+  "regress/b066-evlsrc-past",
+  "regress/b066-vlsrc-vci",
   "regress/b124-allpass-ring-default-reltol",
   "regress/b124-allpass-ring-tight-reltol",
   "regress/b131-nrings-crow",
@@ -189,6 +213,13 @@
   "regress/f01-print-manifest",
   "regress/f01-seed-large",
   "regress/f01-seed-max",
+  "regress/f02-functions",
+  "regress/f02-functions-seed",
+  "regress/f02-step-failures",
+  "regress/f02-step-linear",
+  "regress/f02-step-mc",
+  "regress/f02-step-mc-dry-run",
+  "regress/f02-step-mc-run",
   "regress/f05-format-csv-npz",
   "regress/f05-format-npz-mlprobe-pdet",
   "regress/f05-format-vcd-csv-dc",
@@ -224,6 +255,12 @@
   "regress/probe-latch-dc-swept-wl",
   "regress/probe-latch-tran",
   "regress/probe-wl-ignored",
+  "regress/spar-3port-taylor",
+  "regress/spar-grid-warning",
+  "regress/spar-passivity",
+  "regress/spar-ring-tran",
+  "regress/spar-ring-tran-output",
+  "regress/spar-uni-reflection",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -367,6 +404,138 @@
    "only": "^err/b182-nested-subckt-body-error$",
    "gtest": false,
    "note": "B-182: the nested-body case uses a syntax error (exit 1, like every err case) instead of an unexpected character (exit 3, B-172) (PG item 5)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T11:25:11Z",
+   "only": "^regress/(probe-latch-dc|probe-latch-dc-swept-wl|b003-dc-dark-point)$",
+   "gtest": false,
+   "note": "B-003, B-185: each .dc point is a fresh steady state (every port writes each of its wavelengths, with an event): probe2 of probe-latch-dc-swept-wl samples its fixed-wavelength net at every point (CSV rows), new case b003-dc-dark-point (null point written as 0 W); probe-latch-dc: netlist comment only (manifest sha256)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T11:34:20Z",
+   "only": "^(cir/add_drop_pyspecs|cir/subckt_tests|opt/tracefile\\-o|regress/b004\\-mode\\-fd\\-tran|regress/b006\\-empty\\-output|regress/b014\\-delay\\-rounding\\-warning|regress/b014\\-device\\-internal\\-rounds\\-to\\-zero|regress/b031\\-mzi\\-bidir|regress/b033\\-crossing\\-two\\-lambda\\-tran|regress/b049\\-pdet\\-drives\\-net|regress/b050\\-pdet\\-two\\-open\\-tran|regress/b052\\-evlsrc\\-positional|regress/b052\\-vlsrc\\-positional|regress/b062\\-mlprobe\\-unlisted\\-wavelength|regress/b153\\-zerotol\\-cli|regress/b153\\-zerotol\\-lossy\\-ring\\-tran|regress/b153\\-zerotol\\-open\\-loop|regress/f01\\-options\\-seed|regress/f01\\-options\\-seed\\-cli\\-priority|regress/f01\\-options\\-seed\\-int64\\-max|regress/f01\\-options\\-seed\\-int\\-literal|regress/f01\\-options\\-seed\\-int\\-max|regress/f01\\-options\\-seed\\-large|regress/f01\\-pdet\\-noise\\-default\\-seed|regress/f01\\-pdet\\-noise\\-seed|regress/f01\\-seed\\-large|regress/f01\\-seed\\-max|regress/f05\\-format\\-csv\\-npz|regress/f05\\-no\\-trace|regress/f05\\-save\\-tran|regress/f15\\-dispersive\\-waveguide|regress/f15\\-max\\-events\\-cli\\-priority|regress/f15\\-maxevents\\-options\\-tran|regress/f15\\-progress\\-quiet|regress/f15\\-stats\\-tran|regress/f15\\-wdm\\-crow\\-mlprobe|regress/probe\\-latch\\-tran|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-066 (PJ): VLSRC/EVLSRC per-value prints (emissions, 'was enabled', value-file listing, skipped lines) only with --vci: 37 stdouts lose 201 lines, nothing else changes; gtest: new VLSource/EVLSource tests"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T11:36:59Z",
+   "only": "^regress/b066-",
+   "gtest": false,
+   "note": "B-066 (PJ): new cases regress/b066-vlsrc-vci (the VLSRC/EVLSRC per-value prints are still printed with --vci) and regress/b066-evlsrc-past (values in the past: one stderr warning per source with their count)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T11:37:45Z",
+   "only": "^(cir/add_drop|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|regress/b004-mode-td-dc|regress/f15-stats-dc|regress/f05-save-paper-fig1b|regress/f05-format-vcd-csv-dc|regress/b062-mlprobe-unlisted-wavelength|regress/b010-near-duplicate-lambda|regress/b062-mlprobe-computed-wavelength|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-010, B-062: wavelengths equal within a relative 1e-12 are one wavelength (registry: first registered value kept; MLPROBE lists). The .dc point accumulated to ~1550 nm (B-009) now takes the source's registered 1.55e-6 (bit-identical to a fresh point at 1.55e-6); b062 MLPROBE1 matches its computed wavelength; new cases b010-near-duplicate-lambda, b062-mlprobe-computed-wavelength; gtest: new tests of PH"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T12:48:10Z",
+   "only": "^(cir|regress|err)/spar-|^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-03: new cases of the S-parameter device SPAR (11) and the 13 loader unit tests (gtest)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T13:29:21Z",
+   "only": "^(regress/f02-functions(-seed)?|err/f02-.*)$",
+   "gtest": false,
+   "note": "F-02: new cases (functions in expressions: math, gauss/uniform/lognormal/choice, shared=, .options seed after a draw)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T13:45:39Z",
+   "only": "^(cli/help|cli/no-args|err/f15-no-coalescing-removed)$",
+   "gtest": false,
+   "note": "F-02: --help lists the new options --run, -j/--jobs and --overwrite (help text only)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T13:45:40Z",
+   "only": "^(regress/f02-step-.*|err/f02-step-.*|err/f02-plan-format|err/f02-run-.*)$",
+   "gtest": false,
+   "note": "F-02: new cases (.step, .mc, run table, --run, failures)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T14:09:06Z",
+   "only": "^err/f02-step-reserved-name$",
+   "gtest": false,
+   "note": "F-02: new case (reserved column name)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T14:09:21Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-02: new gtest cases (ExpressionFunctions, RunPlan, RunTable)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:23:59Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-touchstone-tran)$",
+   "gtest": false,
+   "note": "F-03/PF03b item 1: per-path delayed copies replace the one delay per output (SPAR-discussion.md, decision 2026-10-23)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:27:54Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
+   "gtest": false,
+   "note": "PF03b item 8: tests/sparam/data/add_drop_ring.sparam re-exported on a 0.05 nm grid (maintainer decision 2026-10-23)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:35:16Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PF03b item 4: mixed interpolation near transmission nulls (real/imaginary where |S| < 0.07 max|S|)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:27:34Z",
+   "only": "^(cir/add_drop|cir/add_drop_pyspecs|cir/add_drop_sub|cir/spar\\-add\\-drop\\-ring|cir/spar\\-touchstone\\-tran|cir/spar\\-wg\\-dc|cir/subckt_test|cir/subckt_tests|err/b014\\-delay\\-rounds\\-to\\-zero|err/b014\\-subckt\\-wg\\-rounds\\-to\\-zero|err/b153\\-zerotol\\-lossless\\-ring\\-op|err/f28\\-lossless\\-ring\\-dc|err/f28\\-lossless\\-ring\\-op|err/f28\\-lossless\\-ring\\-tran|err/f28\\-maxiter\\-small|err/spar\\-out\\-of\\-range|opt/mode\\-fd|opt/multi\\-file|opt/tol\\-resolution\\-overrides|opt/tracefile\\-o|opt/vci|regress/b001\\-fd\\-multilambda\\-stale|regress/b003\\-dc\\-dark\\-point|regress/b004\\-mode\\-fd\\-tran|regress/b004\\-mode\\-td\\-dc|regress/b004\\-mode\\-td\\-op|regress/b010\\-near\\-duplicate\\-lambda|regress/b014\\-delay\\-rounding\\-warning|regress/b014\\-device\\-internal\\-rounds\\-to\\-zero|regress/b021\\-snapfactor|regress/b021\\-snapfactor\\-default|regress/b021\\-snapfactor\\-zero|regress/b031\\-mzi\\-bidir|regress/b032\\-crossing\\-isolation\\-sign|regress/b032\\-crossing\\-passive|regress/b033\\-crossing\\-two\\-lambda|regress/b033\\-crossing\\-two\\-lambda\\-tran|regress/b036\\-vci\\-crow|regress/b048\\-mlprobe\\-cw\\-tran|regress/b048\\-probe\\-cw\\-tran|regress/b048\\-undriven\\-tran|regress/b049\\-pdet\\-drives\\-net|regress/b050\\-pdet\\-beat|regress/b050\\-pdet\\-two\\-open\\-tran|regress/b051\\-pcmcell\\-tc\\-zero|regress/b052\\-cwsrc\\-positional|regress/b052\\-evlsrc\\-positional|regress/b052\\-pcmcell\\-positional|regress/b052\\-vlsrc\\-positional|regress/b060\\-pcmcell\\-k\\-eq\\-n|regress/b062\\-mlprobe\\-computed\\-wavelength|regress/b062\\-mlprobe\\-unlisted\\-wavelength|regress/b066\\-evlsrc\\-past|regress/b066\\-vlsrc\\-vci|regress/b124\\-allpass\\-ring\\-default\\-reltol|regress/b124\\-allpass\\-ring\\-tight\\-reltol|regress/b131\\-nrings\\-crow|regress/b144\\-bidir\\-source\\-first|regress/b144\\-three\\-writers|regress/b144\\-two\\-sources\\-one\\-net|regress/b144\\-uni\\-writer\\-first|regress/b144\\-uni\\-writer\\-second|regress/b145\\-upgrade\\-reader|regress/b145\\-upgrade\\-reader\\-case2|regress/b145\\-upgrade\\-reader\\-case2\\-ref|regress/b145\\-upgrade\\-reader\\-ref|regress/b145\\-upgrade\\-roles|regress/b146\\-x\\-shared\\-delayed|regress/b146\\-x\\-shared\\-delayed\\-flat|regress/b146\\-x\\-shared\\-net|regress/b146\\-x\\-shared\\-net\\-flat|regress/b147\\-crossing\\-out\\-bidir|regress/b147\\-crossing\\-out\\-explicit\\-splitter|regress/b147\\-crossing\\-out\\-explicit\\-splitter\\-first|regress/b147\\-crossing\\-out\\-explicit\\-wg|regress/b150\\-include\\-in\\-subckt|regress/b153\\-reltol\\-zero|regress/b153\\-zerotol\\-cli|regress/b153\\-zerotol\\-lossy\\-ring\\-tran|regress/b153\\-zerotol\\-open\\-loop|regress/b153\\-zerotol\\-ring\\-op|regress/b159\\-crossing\\-backward|regress/b180\\-numeric\\-net\\-names|regress/b184\\-mlprobe\\-tran\\-start\\-multilambda|regress/f01\\-manifest|regress/f01\\-options\\-seed|regress/f01\\-options\\-seed\\-cli\\-priority|regress/f01\\-options\\-seed\\-int\\-literal|regress/f01\\-options\\-seed\\-int\\-max|regress/f01\\-options\\-seed\\-int64\\-max|regress/f01\\-options\\-seed\\-large|regress/f01\\-pdet\\-darkfield|regress/f01\\-pdet\\-noise\\-default\\-seed|regress/f01\\-pdet\\-noise\\-seed|regress/f01\\-print\\-manifest|regress/f01\\-seed\\-large|regress/f01\\-seed\\-max|regress/f02\\-functions|regress/f02\\-functions\\-seed|regress/f02\\-step\\-failures|regress/f02\\-step\\-linear|regress/f02\\-step\\-mc|regress/f02\\-step\\-mc\\-run|regress/f05\\-format\\-csv\\-npz|regress/f05\\-format\\-npz\\-mlprobe\\-pdet|regress/f05\\-format\\-vcd\\-csv\\-dc|regress/f05\\-mlprobe\\-in\\-subckt|regress/f05\\-no\\-trace|regress/f05\\-save\\-paper\\-fig1b|regress/f05\\-save\\-traceall\\-bidir|regress/f05\\-save\\-tran|regress/f12\\-dc\\-p\\-alias|regress/f12\\-dc\\-wl\\-alias|regress/f12\\-dc\\-wl\\-slash|regress/f12\\-ends\\-name|regress/f12\\-include\\-both\\-differ|regress/f12\\-include\\-relative|regress/f12\\-param\\-override|regress/f12\\-param\\-undefined|regress/f12\\-si\\-op|regress/f15\\-dispersive\\-waveguide|regress/f15\\-max\\-events\\-cli\\-priority|regress/f15\\-maxevents\\-options\\-tran|regress/f15\\-progress\\-quiet|regress/f15\\-stats\\-dc|regress/f15\\-stats\\-file\\-print|regress/f15\\-stats\\-testbench|regress/f15\\-stats\\-tran|regress/f15\\-wdm\\-crow\\-mlprobe|regress/f28\\-maxiter\\-cli\\-priority|regress/f28\\-maxiter\\-zero|regress/probe\\-latch\\-dc|regress/probe\\-latch\\-dc\\-swept\\-f|regress/probe\\-latch\\-dc\\-swept\\-wl|regress/probe\\-latch\\-tran|regress/probe\\-wl\\-ignored|regress/spar\\-3port\\-taylor|regress/spar\\-passivity|regress/spar\\-ring\\-tran|regress/spar\\-uni\\-reflection|tb/ac_add_drop|tb/ac_add_drop\\-fd|tb/ac_crow|tb/dc|tb/det|tb/detector|tb/directional_coupler|tb/lambda|tb/merg|tb/merger|tb/mesh|tb/mzi|tb/pcm|tb/phaseshifter|tb/ps|tb/ring|tb/spli|tb/splitter|tb/waveguide|tb/wg|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "F-01/PF03b: data_files in the run manifest, format_version 2"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:38:00Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
+   "gtest": false,
+   "note": "F-01/PF03b: data_files sha256 of the re-exported add_drop_ring.sparam (item 8), with the manifest change"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:42:30Z",
+   "only": "^(regress/spar-grid-warning|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PF03b item 3: grid-adequacy warning (new case, new gtest)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:45:46Z",
+   "only": "^(regress/spar-ring-tran|regress/spar-grid-warning)$",
+   "gtest": false,
+   "note": "PF03b item 2: negative group delay reported per path (port names, wavelength, grid hint, loop caveat)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:47:49Z",
+   "only": "^cir/spar-siepic-bdc$",
+   "gtest": false,
+   "note": "PF03b item 6: SiEPIC BDC fixture (new case)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T17:50:21Z",
+   "only": "^regress/spar-ring-tran-output$",
+   "gtest": false,
+   "note": "PF03c item 1: new case, SPAR delay_per=\"output\" (per-output delays, F-03 phase 1)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T17:54:01Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
+   "gtest": false,
+   "note": "PF03c item 3: stale header comments of the two netlists corrected; run manifests change by the netlist hash only"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T18:13:44Z",
+   "only": "^(cir/spar-add-drop-ring|regress/spar-ring-tran|regress/spar-ring-tran-output|regress/spar-grid-warning|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-190 (PF03c item 2): delay-removed re/im interpolation near nulls; out at 1.55 um in the four ring cases (~1e-12); new gtest"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T18:19:41Z",
+   "only": "^err/spar-bad-delay-per$",
+   "gtest": false,
+   "note": "PF03c: new case, invalid delay_per value"
   }
  ]
 }

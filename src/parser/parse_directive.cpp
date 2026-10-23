@@ -15,6 +15,24 @@ using spx::ea_signal_type;
 using spx::ed_signal_type;
 using spx::ed_bus_type;
 
+bool options_unsigned_integer(const Variable &val, uint64_t &result)
+{
+    if (val.type == Variable::INTEGER)
+    {
+        if (val.inum < 0)
+            return false;
+        result = static_cast<uint64_t>(val.inum);
+        return true;
+    }
+    if (!val.is_number())
+        return false;
+    const double v = val.as_double();
+    if (!(v >= 0 && v <= 9007199254740992.0 && v == std::trunc(v)))
+        return false;
+    result = static_cast<uint64_t>(v);
+    return true;
+}
+
 // Value of an .options keyword stored as an unsigned 64-bit integer (seed, maxiter, maxevents). An integer
 // literal is exact over its whole range, 0 to 2^63 - 1 (B-180); other netlist numbers are doubles,
 // whose integers are exact up to 2^53 only.

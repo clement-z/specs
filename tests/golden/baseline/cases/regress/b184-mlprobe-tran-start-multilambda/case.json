@@ -16,9 +16,9 @@
    "stored": "files/traces/delete_me.csv"
   },
   "traces/delete_me.manifest.json": {
-   "bytes": 505,
+   "bytes": 525,
    "kind": "json",
-   "sha256": "59ae978bf3aa7d4832bf8aad59258ee56473b1ad34c589d85981279cd76e7aee",
+   "sha256": "bd03a8d0afe39bb9e9bde7c4e2266e9970377eba5538bf99df61d333e8fd74cc",
    "stored": "files/traces/delete_me.manifest.json"
   },
   "traces/delete_me.vcd": {

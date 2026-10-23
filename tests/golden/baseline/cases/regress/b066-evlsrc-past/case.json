@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b066-evlsrc-past.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 449,
+   "kind": "json",
+   "sha256": "dd7868134670e8794c4b82718f3fe45f1b1a379baa85b9de8e7de68d4bc8f160",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 723,
+   "kind": "vcd",
+   "sha256": "1d6fdb4b9f5528bd6ba788db91fa92b8afe937fa8bfa50f9cd5ee82b15eb1999",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b066-evlsrc-past"
+}

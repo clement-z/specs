@@ -1,0 +1,10 @@
+* B-003: each .dc point is a fresh steady state. MZI wavelength sweep whose point 1 (1557.63 nm) is an exact
+* null of the output (|E| ~ 1e-13 sqrt(W), below abstol). Expected: 4 points; ROOT/out has a sample at every
+* point, point 1 written as 0 W (snapped) at 1557.63 nm. Before the fix, point 1 was not written: the net and
+* PROBE{ROOT/out} kept point 0 (1 W at 1552.80 nm). From backlog/repro/a1-dc-dark-point-stale.cir.
+cwsrc1 in wl=1.55e-6 power=1
+splitter1 in a b
+wga a a2 length=100e-6 neff=2.5 ng=2.5 att=0
+wgb b b2 length=200e-6 neff=2.5 ng=2.5 att=0
+merger1 a2 b2 out
+.dc /cwsrc1/WL 1.5527950310559006e-06 1.569725817998878e-06 4.837367697993543e-09

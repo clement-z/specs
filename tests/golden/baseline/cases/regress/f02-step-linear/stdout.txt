@@ -1,0 +1,11 @@
+Using trace file: traces/lin
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Run plan: 3 runs, .step param L (3 values), seed 0
+Run table: traces/lin.runs (3 runs, 0 already done, 3 to run, 1 at a time)
+run 0: ok
+run 1: ok
+run 2: ok
+Runs: 3, 3 ok (0 from before), 0 failed
+

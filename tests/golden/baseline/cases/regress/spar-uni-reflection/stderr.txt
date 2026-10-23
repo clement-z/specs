@@ -1,0 +1,3 @@
+Warning (ROOT/SPAR1): unidirectional, the paths from an input (first half of the nets) to an input are not used; the largest, from ROOT/a to ROOT/a, reaches -20 dB (make a net bidirectional with & to use them)
+Warning (ROOT/SPAR2): unidirectional, the paths from an input (first half of the nets) to an input are not used; the largest, from ROOT/b to ROOT/b, reaches -13.9794 dB (make a net bidirectional with & to use them)
+

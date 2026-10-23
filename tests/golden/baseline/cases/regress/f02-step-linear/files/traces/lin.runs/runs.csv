@@ -1,0 +1,4 @@
+run,status,exit_code,seed,mc_run,L,row_start,row_count,draw_start,draw_count,message
+0,ok,0,0,,1e-04,0,1,0,0,
+1,ok,0,0,,0.00011,1,1,0,0,
+2,ok,0,0,,0.00012,2,1,0,0,

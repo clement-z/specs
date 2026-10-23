@@ -1,5 +1,5 @@
 # B-185: In a `.dc`, a net whose value does not change between points is not written again, so a probe sees a non-swept wavelength only at the first point
-severity: low | category: bug | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: open
+severity: low | category: bug | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: fixed in b6488a3 (sprint 2026-10c PH)
 location: src/specs.cpp (`SPECSConfig::runDCAnalysis()`: per-point reset of the output ports and CW sources), src/devices/probe.cpp (`Probe::accept()`, the per-point latch)
 
 ## Problem
@@ -43,3 +43,17 @@ where both sources write the net, now shows the swept wavelength even when the f
 a probe on a net that carries only non-swept wavelengths gets a sample at the first point only, and the fixed
 wavelength is not seen again after the first point (`regress/probe-latch-dc`, `probe2` of
 `regress/probe-latch-dc-swept-wl`). Options (a) to (c) above still apply to it.
+
+## Fix (sprint 2026-10c PH, b6488a3): option (a)
+Maintainer decision (2026-10-23, third round): each `.dc` point is a fresh steady state; after the per-point
+reset every output port emits each of its wavelengths at least once. A CW source that is not swept did write its
+net at each point (its port was reset, so the gate compared the value with 0), but with the value the net
+already held, so `sc_signal` notified nothing. The nets are now `OpticalNet` (an `sc_signal` with
+`writeWithEvent()`), and the first entry of each wavelength at a `.dc` point is written with a value-change event
+(B-003 for the details), so the fixed wavelengths are propagated again at every point and reach the probes.
+`.op` and `.tran` are unchanged (bit-identical, same counters).
+- `regress/probe-latch-dc-swept-wl`: `probe2` (net n, two fixed sources) has a sample at every point (was the first
+  only); `regress/probe-latch-dc`: unchanged output (its probe latches the swept wavelength, PD5 follow-up 2; the
+  expectation "1550, 1550 nm" above predates that rule), comment updated.
+- Event counters: the 3 multi-source `.dc` golden cases process more entries (e.g. merger 5 -> 8 over 4 points);
+  every other case is identical.

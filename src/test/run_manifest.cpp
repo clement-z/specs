@@ -1,8 +1,10 @@
 // Run manifest unit tests (F-01): JSON format and key order, string escaping, null hash and null
-// trace file, wiring to SPECSConfig and prepareSimulation(), and the netlist file list of ParserState.
+// trace file, wiring to SPECSConfig and prepareSimulation(), the netlist file list of ParserState and
+// the data files read while the circuit is built (SPAR, VLSRC, EVLSRC).
 #include <gtest/gtest.h>
 #include <systemc.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <fstream>
@@ -10,10 +12,15 @@
 #include <string>
 #include <vector>
 
+#include "parser/parse_tree.h"
 #include "parser/parser_state.h"
 #include "run_manifest.h"
 #include "specs.h"
 #include "test/utils.h"
+#include "utils/sha256.h"
+
+#include "parser.h"
+#include "scanner.h"
 
 namespace {
 std::string tmp_path(const std::string &suffix)
@@ -33,6 +40,30 @@ size_t count(const std::string &haystack, const std::string &needle)
     for (size_t pos = haystack.find(needle); pos != std::string::npos; pos = haystack.find(needle, pos + 1))
         ++n;
     return n;
+}
+void write_text(const std::string &path, const std::string &text)
+{
+    std::ofstream f(path, std::ios::binary | std::ios::trunc);
+    f << text;
+}
+std::string sha256_of(const std::string &path)
+{
+    std::string hex;
+    EXPECT_TRUE(spx::sha256_file_hex(path, hex)) << path;
+    return hex;
+}
+int parse_netlist(ParseTree &tree, const std::string &text)
+{
+    ParserState state;
+    state.current_filename = "test.cir";
+    yyscan_t scanner;
+    yylex_init_extra(&state, &scanner);
+    YY_BUFFER_STATE buf = yy_scan_string(text.c_str(), scanner);
+    yy_switch_to_buffer(buf, scanner);
+    yyset_lineno(1, scanner);
+    const int result = yyparse(scanner, &tree);
+    yylex_destroy(scanner);
+    return result;
 }
 }
 
@@ -54,12 +85,13 @@ TEST(RunManifest, JsonFormatAndKeyOrder)
         m.seed = UINT64_MAX; // printed as an integer, not truncated
         m.command_line = { "specs", "-f", "a.cir" };
         m.netlist_files = { abc, missing };
+        m.data_files = { missing, abc };
         m.trace_file = "traces/m.vcd";
 
         const std::string expected =
             "{\n"
             "  \"format\": \"specs-run-manifest\",\n"
-            "  \"format_version\": 1,\n"
+            "  \"format_version\": 2,\n"
             "  \"specs_version\": \"v1.2-3.gabcdef0\",\n"
             "  \"systemc_version\": \"3.0.2-Accellera\",\n"
             "  \"seed\": 18446744073709551615,\n"
@@ -67,6 +99,10 @@ TEST(RunManifest, JsonFormatAndKeyOrder)
             "  \"netlist_files\": [\n"
             "    {\"path\": " + RunManifest::json_quote(abc) + ", \"sha256\": \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\"},\n"
             "    {\"path\": " + RunManifest::json_quote(missing) + ", \"sha256\": null}\n"
+            "  ],\n"
+            "  \"data_files\": [\n"
+            "    {\"path\": " + RunManifest::json_quote(missing) + ", \"sha256\": null},\n"
+            "    {\"path\": " + RunManifest::json_quote(abc) + ", \"sha256\": \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\"}\n"
             "  ],\n"
             "  \"trace_file\": \"traces/m.vcd\"\n"
             "}\n";
@@ -85,7 +121,8 @@ TEST(RunManifest, NullTraceFileAndNoNetlistFiles)
         RunManifest m;
         m.command_line = { "specs", "-t", "wg" };
         const std::string json = m.to_json();
-        EXPECT_NE(json.find("\n  \"netlist_files\": [],\n"), std::string::npos) << json;
+        // the data_files key is always there, right after netlist_files
+        EXPECT_NE(json.find("\n  \"netlist_files\": [],\n  \"data_files\": [],\n"), std::string::npos) << json;
         EXPECT_NE(json.find("\n  \"trace_file\": null\n}\n"), std::string::npos) << json;
         EXPECT_NE(json.find("\n  \"seed\": 0,\n"), std::string::npos) << json;
     }
@@ -129,6 +166,7 @@ TEST(RunManifest, FromConfig)
         c.seed = 42;
         c.command_line = { "specs", "-f", "a.cir" };
         c.netlist_files = { "a.cir", "b.cir" };
+        c.data_files = { "s.sparam", "v.csv" };
 
         RunManifest m(c, "traces/a.vcd");
         EXPECT_FALSE(m.specs_version.empty());
@@ -136,6 +174,7 @@ TEST(RunManifest, FromConfig)
         EXPECT_EQ(m.seed, 42u);
         EXPECT_EQ(m.command_line, c.command_line);
         EXPECT_EQ(m.netlist_files, c.netlist_files);
+        EXPECT_EQ(m.data_files, c.data_files);
         EXPECT_EQ(m.trace_file, "traces/a.vcd");
     }
     SPECS_TEST_FOOTER();
@@ -194,6 +233,73 @@ TEST(RunManifest, ParserStateRecordsInputFilesOnce)
         s.record_input_file("circuits/sub.cir");
         s.record_input_file("./main.cir"); // the path string as used to open the file
         EXPECT_EQ(files, (std::vector<std::string>{ "main.cir", "circuits/sub.cir", "./main.cir" }));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// SPECSConfig::record_data_file(): each data file once, in first-open order, as the path string used
+TEST(RunManifest, ConfigRecordsDataFilesOnce)
+{
+    SPECS_TEST_HEADER()
+    {
+        SPECSConfig &c = specsGlobalConfig;
+        EXPECT_TRUE(c.data_files.empty());
+        c.record_data_file("v.csv");
+        c.record_data_file("dir/s.sparam");
+        c.record_data_file("v.csv");
+        c.record_data_file("./v.csv");
+        EXPECT_EQ(c.data_files, (std::vector<std::string>{ "v.csv", "dir/s.sparam", "./v.csv" }));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// The data files read while the circuit is built (SPAR file=, VLSRC/EVLSRC value files, positional or
+// values=) are in the manifest once each, with their SHA-256; ParseTree::data_files(), which the run
+// table of a .step/.mc plan uses without building the circuit, gives the same paths
+TEST(RunManifest, DataFilesOfSparAndValueListSources)
+{
+    SPECS_TEST_HEADER()
+    {
+        specsGlobalConfig.analysis_type = SPECSConfig::TRAN;
+        specsGlobalConfig.engine_timescale = SPECSConfig::ONE_FS;
+        specsGlobalConfig.applyEngineResolution();
+
+        const std::string spar = tmp_path("_wg.taylor");
+        const std::string values = tmp_path("_values.csv");
+        const std::string evalues = tmp_path("_evalues.csv");
+        write_text(spar, "specs-taylor 1\nports in out\ncenter 1.55e-6\nrange 1.5e-6 1.6e-6\nS out in amp 0.9\n");
+        write_text(values, "first line\ntime,power,wavelength\n1e-12,1e-3,1.55e-6\n");
+        write_text(evalues, "first line\ntime,value\n1e-12,1.5\n");
+
+        // two elements read each file
+        const std::string netlist =
+            "vlsrc1 a \"" + values + "\"\n"
+            "vlsrc2 b values=\"" + values + "\"\n"
+            "evlsrc1 e \"" + evalues + "\"\n"
+            "spar1 a c file=\"" + spar + "\"\n"
+            "spar2 b d file=\"" + spar + "\"\n";
+        ParseTree tree;
+        ASSERT_EQ(parse_netlist(tree, netlist), 0);
+        tree.build_circuit();
+
+        const std::vector<std::string> expected = { values, evalues, spar };
+        EXPECT_EQ(tree.data_files(), expected); // element order
+        const std::vector<std::string> &recorded = specsGlobalConfig.data_files;
+        EXPECT_EQ(recorded.size(), 3u);
+        EXPECT_TRUE(std::is_permutation(recorded.begin(), recorded.end(), expected.begin(), expected.end()));
+
+        const std::string json = RunManifest(specsGlobalConfig, "").to_json();
+        const size_t data_key = json.find("\n  \"data_files\": [\n");
+        ASSERT_NE(data_key, std::string::npos) << json;
+        EXPECT_NE(json.find("\"format_version\": 2,"), std::string::npos) << json;
+        for (const auto &f : expected)
+        {
+            const std::string entry = "{\"path\": " + RunManifest::json_quote(f) + ", \"sha256\": \"" + sha256_of(f) + "\"}";
+            EXPECT_EQ(count(json, entry), 1u) << entry << "\n" << json;
+            EXPECT_GT(json.find(entry), data_key) << json;
+        }
+        for (const auto &f : expected)
+            std::remove(f.c_str());
     }
     SPECS_TEST_FOOTER();
 }

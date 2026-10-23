@@ -1,0 +1,7 @@
+* F-02: an .options seed after a random draw that it would change: error, exit 1 (the draw already
+* used seed 0; put .options seed first or use --seed)
+.param a=gauss(1, 0.1)
+cwsrc1 in wl=1.55e-6 power={a}*1e-3
+probe1 in
+.options seed=5
+.op

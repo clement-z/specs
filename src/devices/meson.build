@@ -19,6 +19,7 @@ core_sources += files(
   'phaseshifter.cpp',
   'power_meter.cpp',
   'probe.cpp',
+  'sparam_device.cpp',
   'splitter.cpp',
   'value_list_source.cpp',
   'waveguide.cpp',

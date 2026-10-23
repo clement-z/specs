@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/merger_tb.manifest.json": {
-   "bytes": 251,
+   "bytes": 271,
    "kind": "json",
-   "sha256": "8220e20c3157e133d7981c6f0843e81ca8974833248e2ea85d20da329d92db6b",
+   "sha256": "8267a0684e739cb8f4d8a05c1e7fda8ca1a50eca46d4aa0ffac9127b2bf7ad8d",
    "stored": "files/traces/merger_tb.manifest.json"
   },
   "traces/merger_tb.vcd": {

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/spar-net-count.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/spar-net-count"
+}

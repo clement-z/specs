@@ -22,14 +22,30 @@ void EVLSource::runner()
     {
         // cout << name() << " waiting for enable" << endl;
         wait(enable.posedge_event());
-        cout << name() << " was enabled" << endl;
+        if (specsGlobalConfig.verbose_component_initialization)
+            cout << name() << " was enabled" << endl;
     }
+
+    // B-066: one warning for all the values the loop below skips (time only advances in its waits)
+    size_t n_past = 0;
+    sc_time t_emit = sc_time_stamp();
+    for (const auto &v : m_values_queue)
+    {
+        if (isPast(v.first, t_emit))
+            ++n_past;
+        else
+            t_emit = sc_time(v.first, SC_SEC);
+    }
+    if (n_past)
+        cerr << "Warning: " << name() << ": invalid time for signal emission (in the past) for " << n_past
+             << " of " << m_values_queue.size() << " values, not emitted" << endl;
 
     // Emitting 0 at enable (will only go through if there is no value at t=0)
     if (m_values_queue.cbegin() == m_values_queue.cend()
         || sc_time(m_values_queue.front().first, SC_SEC).value() > 0)
     {
-        cout << "@" << sc_time_stamp() << ", " << name() << " emitted: " << spx::ea_value_type(0) << endl;
+        if (specsGlobalConfig.verbose_component_initialization)
+            cout << "@" << sc_time_stamp() << ", " << name() << " emitted: " << spx::ea_value_type(0) << endl;
         p_out->write(spx::ea_value_type(0));
     }
 
@@ -37,7 +53,7 @@ void EVLSource::runner()
     while (it != m_values_queue.cend())
     {
         sc_time now = sc_time_stamp();
-        if (it->first < now.to_seconds())
+        if (isPast(it->first, now))
         {
             ++it;
             continue;
@@ -51,7 +67,8 @@ void EVLSource::runner()
 
         // Write value to output
         p_out->write(Vout);
-        cout << "@" << sc_time_stamp() << ", " << name() << " emitted: " << Vout << endl;
+        if (specsGlobalConfig.verbose_component_initialization)
+            cout << "@" << sc_time_stamp() << ", " << name() << " emitted: " << Vout << endl;
 
         ++it;
     }

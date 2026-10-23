@@ -18,9 +18,9 @@
    "stored": "files/traces/t.csv"
   },
   "traces/t.manifest.json": {
-   "bytes": 471,
+   "bytes": 491,
    "kind": "json",
-   "sha256": "660d9d8e48ddd2c21b60220fef8c0e162eedb35c0519ef65828681ac8ccb2d0a",
+   "sha256": "2babbd54876533d5d2ebb1c40ee6663c871455ec598854641726216f78ade37d",
    "stored": "files/traces/t.manifest.json"
   },
   "traces/t.npz": {

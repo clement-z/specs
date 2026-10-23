@@ -3839,7 +3839,7 @@
     "-f",
     "tests/golden/netlists/b062-mlprobe-unlisted-wavelength.cir"
    ],
-   "note": "B-062: MLPROBEs ignore the wavelengths they do not list (exact match): one warning per probe on stderr at the end of the run, in name order, with full precision (before: one 'received unsupported signal' line per event on stdout)"
+   "note": "B-062: MLPROBEs ignore the wavelengths they do not list (matched within a relative 1e-12 since PH: MLPROBE1 traces a computed wavelength, MLPROBE0 misses one by 6.4e-11): one warning per probe on stderr at the end of the run, in name order, with full precision (before: one 'received unsupported signal' line per event on stdout)"
   },
   {
    "id": "regress/b184-mlprobe-tran-start-multilambda",
@@ -3902,7 +3902,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-dc.cir"
    ],
-   "note": "PD5: PROBE wavelength latch in a .dc: per point, the smallest wavelength written to the net at that point (both sources at the first point, then the swept one only: B-185)"
+   "note": "PD5: PROBE wavelength latch in a .dc: per point, the swept wavelength (both sources write the net at every point since B-185; before, only at the first point)"
   },
   {
    "id": "regress/probe-latch-dc-swept-wl",
@@ -3923,7 +3923,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-dc-swept-wl.cir"
    ],
-   "note": "PD5 follow-up 2: .dc WL(src) sweep: a PROBE latches the swept wavelength at each point when its net carries it, also at the first point next to a smaller fixed wavelength; a net without it latches the smallest one"
+   "note": "PD5 follow-up 2: .dc WL(src) sweep: a PROBE latches the swept wavelength at each point when its net carries it, also at the first point next to a smaller fixed wavelength; a net without it latches the smallest one, at every point since B-185 (before: the first point only)"
   },
   {
    "id": "regress/probe-latch-dc-swept-f",
@@ -3947,6 +3947,65 @@
    "note": "PD5 follow-up 2: .dc /src/F frequency sweep (long form): a PROBE latches the swept wavelength (c/f) at each point, also at the first point next to a smaller fixed wavelength"
   },
   {
+   "id": "regress/b003-dc-dark-point",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b003-dc-dark-point.cir"
+   ],
+   "note": "B-003: a .dc point whose output falls below abstol (an MZI null) is written (0 W, snapped) instead of keeping the previous point's value and wavelength"
+  },
+  {
+   "id": "regress/b010-near-duplicate-lambda",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b010-near-duplicate-lambda.cir"
+   ],
+   "note": "B-010: two sources at 1.55e-6 and 1550*1e-9 (equal within a relative 1e-12) share one wavelength id and add coherently: m = 2 W (before: two ids, 0.5 W shown)"
+  },
+  {
+   "id": "regress/b062-mlprobe-computed-wavelength",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b062-mlprobe-computed-wavelength.cir"
+   ],
+   "note": "B-062: a wavelength computed from a frequency (c/f = 1.5499999999999998e-06) matches the 1.55e-6 an MLPROBE lists (within a relative 1e-12): traced, no warning"
+  },
+  {
    "id": "regress/probe-wl-ignored",
    "setup": {
     "copy": [
@@ -3962,6 +4021,658 @@
     "tests/golden/netlists/probe-wl-ignored.cir"
    ],
    "note": "PD6: a PROBE always traces its wavelength: wl=0, wavelength=0 and a false 4th argument (also in a subcircuit) are ignored with one warning for all, in name order; a true value changes nothing; .save E(b) traces abs only"
+  },
+  {
+   "id": "regress/b066-vlsrc-vci",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--vci",
+    "-f",
+    "tests/golden/netlists/b066-vlsrc-vci.cir"
+   ],
+   "note": "B-066: the per-value prints of VLSRC and EVLSRC (values read from the file, skipped lines, 'was enabled', one line per emission) are only printed with --vci"
+  },
+  {
+   "id": "regress/b066-evlsrc-past",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b066-evlsrc-past.cir"
+   ],
+   "note": "B-066: values in the past (negative times in EVLSRC) are skipped with one warning on stderr per source, with their count; nothing on stdout"
+  },
+  {
+   "id": "cir/spar-wg-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-wg-dc.cir"
+   ],
+   "note": "F-03: SPAR from a Lumerical .sparam (100 um waveguide, path relative to the netlist) next to the same WG in a .dc sweep on and between grid points: same fields"
+  },
+  {
+   "id": "cir/spar-touchstone-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-touchstone-tran.cir"
+   ],
+   "note": "F-03: SPAR from Touchstone 2 (conjugated on import) in .tran: pulses at two wavelengths leave SPAR and the WG at the same times with the same fields"
+  },
+  {
+   "id": "cir/spar-add-drop-ring",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-add-drop-ring.cir"
+   ],
+   "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py (0.05 nm grid since PF03b); .dc, so no delay and no negative-delay warning"
+  },
+  {
+   "id": "cir/spar-siepic-bdc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-siepic-bdc.cir"
+   ],
+   "note": "PF03b: the SiEPIC EBeam BDC (tests/sparam/data/siepic, MIT, NOTICE) as a 4-port SPAR, .dc sweep of the split over 1.5-1.6 um: about 0.5 per output near 1.55 um"
+  },
+  {
+   "id": "regress/spar-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "--vci",
+    "-f",
+    "tests/golden/netlists/spar-ring-tran.cir"
+   ],
+   "note": "F-03: the exported ring as SPAR in .tran; delay=auto per path (PF03b): out follows the in->out path, whose negative delay is clamped to 0, drop its own delay; --vci prints the device parameters"
+  },
+  {
+   "id": "regress/spar-ring-tran-output",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "--vci",
+    "-f",
+    "tests/golden/netlists/spar-ring-tran-output.cir"
+   ],
+   "note": "PF03c: regress/spar-ring-tran with delay_per=\"output\" (per-output delays, the device before PF03b): out and drop both leave with the drop path's delay (+1.721 ps), no negative-delay warning; --vci prints delay_per"
+  },
+  {
+   "id": "regress/spar-grid-warning",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-grid-warning.cir"
+   ],
+   "note": "PF03b: SPAR on a 1 nm export of the add-drop ring (too coarse for its through null): the grid-adequacy warning at load time, the clamped negative delay of the through path in .tran"
+  },
+  {
+   "id": "regress/spar-3port-taylor",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-3port-taylor.cir"
+   ],
+   "note": "F-03: a 3-port SPAR (odd net count: bidirectional) from the Taylor form, a reflection, explicit delays, two sources"
+  },
+  {
+   "id": "regress/spar-passivity",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-passivity.cir"
+   ],
+   "note": "F-03: |S21| = 1.05: passivity=check warns, passivity=enforce warns and scales S to |S21| = 1"
+  },
+  {
+   "id": "regress/spar-uni-reflection",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-uni-reflection.cir"
+   ],
+   "note": "F-03: a unidirectional SPAR does not use the input-to-input paths (one warning); ports= reversed selects S12; Touchstone 1 and 2 port orders"
+  },
+  {
+   "id": "err/spar-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-out-of-range.cir"
+   ],
+   "note": "F-03: a wavelength outside the data range is an error, with the range"
+  },
+  {
+   "id": "err/spar-bad-delay-per",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-bad-delay-per.cir"
+   ],
+   "note": "PF03c: delay_per=\"input\" is rejected (expected path or output)"
+  },
+  {
+   "id": "err/spar-bad-ports",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-bad-ports.cir"
+   ],
+   "note": "F-03: ports= names a port that the file does not have"
+  },
+  {
+   "id": "err/spar-net-count",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-net-count.cir"
+   ],
+   "note": "F-03: the number of nets differs from the number of ports of the file"
+  },
+  {
+   "id": "err/spar-missing-file",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-missing-file.cir"
+   ],
+   "note": "F-03: the S-parameter file cannot be opened"
+  },
+  {
+   "id": "regress/f02-functions",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--json",
+    "traces/flat.json",
+    "-f",
+    "tests/golden/netlists/f02-functions.cir"
+   ],
+   "note": "F-02: math functions (exact values) and random functions (default seed 0) in expressions; the flattened JSON shows a different length per MZIARM instance (.param Lr in the body), the same shared=1 loss in both, and w = w2 (shared=\"wafer\"); the .op listing depends on the drawn lengths"
+  },
+  {
+   "id": "regress/f02-functions-seed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--seed",
+    "1",
+    "--json",
+    "traces/flat.json",
+    "-f",
+    "tests/golden/netlists/f02-functions.cir"
+   ],
+   "note": "F-02: regress/f02-functions with --seed 1: the math values are the same, every drawn value differs"
+  },
+  {
+   "id": "err/f02-options-seed-after-draw",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-options-seed-after-draw.cir"
+   ],
+   "note": "F-02: .options seed=5 after a gauss() that drew with seed 0: error naming both lines, exit 1"
+  },
+  {
+   "id": "err/f02-subckt-default-draw",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-subckt-default-draw.cir"
+   ],
+   "note": "F-02: gauss() in a .subckt parameter default (drawn once for every instance): parse error, exit 1"
+  },
+  {
+   "id": "err/f02-unknown-function",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-unknown-function.cir"
+   ],
+   "note": "F-02: unknown function gaussian(): parse error with file:line, exit 1"
+  },
+  {
+   "id": "regress/f02-step-mc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-j",
+    "2",
+    "-f",
+    "tests/golden/netlists/f02-step-mc.cir"
+   ],
+   "note": "F-02: .step param n2 list (2 values) x .mc 3 seed=7 = 6 runs, 2 processes at a time: runs.csv (seeds of Monte-Carlo runs 0-2 repeat at both step points, the drawn top-level dL is a column), the table columns (one row per run, the output probe at t = 0) in run order whatever -j, the draws (dL and the per-instance length of X1/.param Lr), table.manifest.json (plan, seed 7)"
+  },
+  {
+   "id": "regress/f02-step-mc-dry-run",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/f02-step-mc.cir"
+   ],
+   "note": "F-02: -n lists the 6 runs of the plan (stepped values, Monte-Carlo run, seed) and writes nothing"
+  },
+  {
+   "id": "regress/f02-step-mc-run",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--run",
+    "4",
+    "-f",
+    "tests/golden/netlists/f02-step-mc.cir"
+   ],
+   "note": "F-02: --run 4 simulates run 4 alone (n2=2.36, Monte-Carlo run 1 and its seed) with the outputs of a single run: its VCD holds the power_W of row 4 of regress/f02-step-mc's table (checked bit for bit, and equal to --seed <seed> --param n2=2.36 on the netlist without .step/.mc)"
+  },
+  {
+   "id": "regress/f02-step-linear",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-o",
+    "traces/lin",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: .step param L 100e-6 120e-6 10e-6 (stop included): 3 ok runs in traces/lin.runs/, master seed 0, no draws"
+  },
+  {
+   "id": "regress/f02-step-failures",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-failures.cir"
+   ],
+   "note": "F-02: run 1 (maxiter=100) fails with the .op non-convergence error: recorded as failed (exit 1, the Error line as message, logs/run1.log), runs 0 and 2 still run (ok); specs exits 1 at the end"
+  },
+  {
+   "id": "err/f02-step-unknown-param",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-unknown-param.cir"
+   ],
+   "note": "F-02: .step param W without a .param W: error naming the .step line, exit 1"
+  },
+  {
+   "id": "err/f02-step-bad-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-bad-range.cir"
+   ],
+   "note": "F-02: .step param L with stop < start: parse error at the .step line, exit 1"
+  },
+  {
+   "id": "err/f02-step-and-param",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "L=1e-6",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: --param L and .step param L set the same parameter: error, exit 1"
+  },
+  {
+   "id": "err/f02-plan-format",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "npz",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: --format does not apply to the runs of a plan (they write the run table): error, exit 1"
+  },
+  {
+   "id": "err/f02-run-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--run",
+    "3",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: --run 3 of a 3-run plan: error, exit 1"
+  },
+  {
+   "id": "err/f02-run-without-plan",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--run",
+    "0",
+    "-f",
+    "tests/golden/netlists/f02-functions.cir"
+   ],
+   "note": "F-02: --run on a netlist without .step/.mc: error, exit 1"
+  },
+  {
+   "id": "err/f02-step-reserved-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-reserved-name.cir"
+   ],
+   "note": "F-02: .step param seed: seed is a column of runs.csv, error naming the .step line, exit 1"
   }
  ]
 }

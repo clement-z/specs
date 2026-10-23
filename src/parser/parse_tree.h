@@ -294,6 +294,26 @@ struct Variable {
     operator string() const { return get_str(); }
 };
 
+// F-02: a .step line of the root netlist: the values of a parameter, one run per value (src/run_plan.h)
+struct ParseStep {
+    string param;
+    vector<Variable> values;
+    string where; // file:line
+};
+
+// F-02: the run plan of the root netlist, its .step lines (in netlist order, the first one is the
+// outermost loop) and its .mc line
+struct ParsePlan {
+    vector<ParseStep> steps;
+    bool mc = false;
+    uint64_t mc_runs = 0;
+    bool mc_seed_given = false;
+    uint64_t mc_seed = 0;
+    string mc_where;
+
+    bool empty() const { return steps.empty() && !mc; }
+};
+
 /* Dummy circuit directive struct */
 struct ParseDirective {
     ParseTree *parent;
@@ -567,6 +587,11 @@ struct ParseElement {
 
     virtual string kind() const { return "UNDEFINED"; }
 
+    // Data files that create() reads (S-parameter, value list files), as the paths it opens them with,
+    // without creating the element: for the run table manifest of a .step/.mc plan, whose process
+    // does not build the circuit (F-01)
+    virtual vector<string> data_files() const { return {}; }
+
     virtual ~ParseElement() {}
 
     virtual string to_json() const;
@@ -594,6 +619,37 @@ struct ParseTree {
     // Set before the netlist is parsed; a .param/.assign of the same name does not replace them.
     map<string, bool> param_overrides;
 
+    // Random draws of expressions (F-02, parser/parse_functions.h). Each draw has its own stream,
+    // spx::rng_for(seed, "<scope><owner>/<key>#<n>"): scope = name_prefix() (the instance path),
+    // owner = what the line being parsed defines (element name, ".param", ".OPTIONS", ...), key = the
+    // name being assigned ("" in a positional argument), n = the draws of the same
+    // "<scope><owner>/<key>" before it in this tree. Set by the register_*() functions and the grammar.
+    string draw_owner;
+    string draw_key;
+    map<string, uint64_t> draw_counts;
+    // Set while a .subckt line is parsed: its parameter defaults are evaluated once for every
+    // instance, so they cannot draw
+    bool draws_forbidden = false;
+    // Subcircuit trees: name of the subcircuit definition (streams of shared=1 draws)
+    string subckt_name;
+    // Root tree only: every draw (stream name, value; NaN for a non-number), in draw order (subcircuit
+    // trees, parsed while flattening, record theirs here); the top-level .param names assigned a value
+    // that drew; and the seed of the draws, to detect an .options seed parsed after a draw
+    mutable vector<pair<string, double>> draws;
+    vector<string> drawn_params;
+    mutable bool has_drawn = false;
+    mutable uint64_t drawn_seed = 0;
+    mutable string first_draw_where;
+    // Non-empty: an .options seed changed the seed after a draw (the error message)
+    mutable string draw_seed_conflict;
+    // Draws recorded (root's list) when the assignment being parsed started
+    size_t draws_at_assignment = 0;
+    // F-02: .options seed of the root netlist (the last one), applied when parsed
+    bool options_seed_given = false;
+    uint64_t options_seed = 0;
+    // F-02: .step and .mc lines (root tree; a subcircuit body ignores them with a warning)
+    ParsePlan plan;
+
     ParseTree(const string &name = "ROOT")
     : name(name)
     {}
@@ -604,6 +660,45 @@ struct ParseTree {
         while (root->parent)
             root = root->parent;
         return &root->input_files;
+    }
+
+    const ParseTree *root_tree() const
+    {
+        const ParseTree *tree = this;
+        while (tree->parent)
+            tree = tree->parent;
+        return tree;
+    }
+
+    // F-02: stream name of the next draw in this tree (counts it), see draw_owner. shared: 0 = this
+    // instance, 1 = every instance of the same subcircuit, 2 = the named stream "SHARED/<shared_name>"
+    string next_draw_stream(int shared, const string &shared_name);
+    // F-02: records a draw (root's list) made with the seed `seed` at `where` (file:line)
+    void record_draw(const string &stream, double value, uint64_t seed, const string &where) const;
+    // F-02: an .options seed of the root netlist, applied when its line is parsed (so that the draws
+    // after it use it) unless the seed was given with --seed
+    void apply_options_seed(uint64_t seed, const string &where);
+    // F-02: a .step line (values: start stop step, or the list after the keyword "list"); returns
+    // false with a message in error if it is invalid
+    bool add_step(const string &keyword_param, const string &name, const string &keyword_list,
+                  const vector<Variable> &values, const string &where, string &error);
+    // F-02: an .mc line; returns false with a message in error if it is invalid
+    bool set_mc(const Variable &runs, const map<string, Variable> &kwargs, const string &where, string &error);
+    // F-02: called after a .param/.assign of `name`: in the root netlist, `name` goes to drawn_params
+    // if its value drew and is not overridden (--param, .step)
+    void note_assigned_param(const string &name)
+    {
+        if (parent || is_subcircuit || param_overrides.count(name))
+            return;
+        const auto it = find(drawn_params.begin(), drawn_params.end(), name);
+        if (root_tree()->draws.size() == draws_at_assignment)
+        {
+            // assigned again without a draw: its value is not drawn
+            if (it != drawn_params.end())
+                drawn_params.erase(it);
+        }
+        else if (it == drawn_params.end())
+            drawn_params.push_back(name);
     }
 
     ParseTree(const string &name, const ParseSubcircuit &subcircuit, const map<string, Variable> &kwargs);
@@ -727,6 +822,9 @@ struct ParseTree {
 
     void build_circuit();
     void flatten();
+    // Data files of the elements (ParseElement::data_files()), each once, in element order (call after
+    // flatten() for those of the subcircuit instances)
+    vector<string> data_files() const;
 
     ~ParseTree()
     {

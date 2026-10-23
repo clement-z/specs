@@ -251,8 +251,8 @@ void MLambdaProbe::on_port_in_changed()
         // wavelength without tracing it (B-184). Unlisted wavelengths are ignored silently
         if (!enable.read().to_bool())
         {
-            if (p_in->event() && !isDefaultSignal(s) && m_lambdas.count(s.getWavelength()))
-                m_disabled_samples[s.getWavelength()] = s;
+            if (p_in->event() && !isDefaultSignal(s) && !isnan(listedWavelength(s)))
+                m_disabled_samples[listedWavelength(s)] = s;
             continue;
         }
 
@@ -265,12 +265,12 @@ void MLambdaProbe::on_port_in_changed()
         // last one of its wavelength
         if (enable.posedge())
         {
-            if (sampled && m_lambdas.count(s.getWavelength()))
-                m_disabled_samples[s.getWavelength()] = s;
+            if (sampled && !isnan(listedWavelength(s)))
+                m_disabled_samples[listedWavelength(s)] = s;
             for (const auto &p : m_disabled_samples)
-                traceSample(p.second);
+                traceSample(p.second, p.first);
             m_disabled_samples.clear();
-            if (sampled && !m_lambdas.count(s.getWavelength()))
+            if (sampled && isnan(listedWavelength(s)))
                 m_ignored_wavelengths_m.insert(s.getWavelength());
             continue;
         }
@@ -280,19 +280,41 @@ void MLambdaProbe::on_port_in_changed()
 
         // A listed wavelength (the VCD signals only exist with a trace file: without one, e.g. with
         // --no-trace or --format csv, a listed wavelength is not "unsupported", F-05)
-        if (m_lambdas.count(s.getWavelength()))
+        const double listed_m = listedWavelength(s);
+        if (!isnan(listed_m))
         {
             //cout << name() << " received supported signal (lambda = " << s.getWavelength() << "m)" << endl;
-            traceSample(s);
+            traceSample(s, listed_m);
         }
         else
             m_ignored_wavelengths_m.insert(s.getWavelength());
     }
 }
 
-void MLambdaProbe::traceSample(const OpticalSignal &s)
+// The listed wavelength that the wavelength of s matches (OpticalSignal::sameWavelength(), B-062), NaN
+// if none; the smallest one if several do. Computed once per wavelength id
+double MLambdaProbe::listedWavelength(const OpticalSignal &s)
 {
-    auto search = m_lambda_signals.find(s.getWavelength());
+    const auto cached = m_listed_by_id.find(s.m_wavelength_id);
+    if (cached != m_listed_by_id.end())
+        return cached->second;
+    const double wl = s.getWavelength();
+    double listed_m = std::numeric_limits<double>::quiet_NaN();
+    for (const double l : m_lambdas)
+    {
+        if (OpticalSignal::sameWavelength(l, wl))
+        {
+            listed_m = l;
+            break;
+        }
+    }
+    m_listed_by_id.emplace(s.m_wavelength_id, listed_m);
+    return listed_m;
+}
+
+void MLambdaProbe::traceSample(const OpticalSignal &s, double listed_m)
+{
+    auto search = m_lambda_signals.find(listed_m);
     if (search != m_lambda_signals.end())
     {
         search->second[0]->write(s.power());

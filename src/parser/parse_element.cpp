@@ -1,6 +1,7 @@
 #include "parser/parse_element.h"
 #include "devices/alldevices.h"
 #include "specs.h"
+#include "parser/parser_state.h"
 #include "utils/strutils.h"
 
 #include <cstdint>
@@ -890,6 +891,26 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     return obj;
 }
 
+// Value files of a VLSRC/EVLSRC line, as create() opens them: the positional argument, then
+// values="<file>" (a path relative to the working directory)
+static vector<string> value_list_files(const ParseElement &e)
+{
+    vector<string> files;
+    if (!e.args.empty() && e.args[0].type == Variable::STRING)
+        files.push_back(e.args[0].str);
+    for (const auto &p : e.kwargs)
+    {
+        if (strutils::iequals(p.first, "VALUES") && p.second.type == Variable::STRING)
+            files.push_back(p.second.str);
+    }
+    return files;
+}
+
+vector<string> VLSourceElement::data_files() const
+{
+    return value_list_files(*this);
+}
+
 /** ******************************************* **/
 /**                 EVL Source                  **/
 /** ******************************************* **/
@@ -1031,6 +1052,11 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
     }
     return obj;
+}
+
+vector<string> EVLSourceElement::data_files() const
+{
+    return value_list_files(*this);
 }
 
 /** ******************************************* **/
@@ -1409,6 +1435,349 @@ sc_module *PhotodetectorElement::create(ParseTreeCreationHelper &pt_helper) cons
             exit(1);
         }
     }
+    return obj;
+}
+
+/** ******************************************* **/
+/**           S-parameter device (F-03)         **/
+/** ******************************************* **/
+void SPARElement::set_net_roles(ParseTree &pt) const
+{
+    const bool odd = nets.size() % 2 != 0;
+    for (size_t k = 0; k < nets.size(); ++k)
+    {
+        ParseNet &net = pt.nets[nets[k]];
+        if (odd)
+        {
+            // no unidirectional variant: reader and writer of a bidirectional net (as net&)
+            net.m_bidirectional = true;
+            net.m_readers_count++;
+            net.m_writers_count++;
+        }
+        else if (writes_net(k))
+            net.m_writers_count++;
+        else
+            net.m_readers_count++;
+    }
+}
+
+INSTANTIATE_AND_CONNECT_UNI(SPARElement, pt_helper)
+{
+    element_type_uni *obj = new element_type_uni(name.c_str(), nets.size());
+
+    // first half: inputs, second half: outputs
+    for (size_t k = 0; k < nets.size(); ++k)
+    {
+        if (writes_net(k))
+            pt_helper.connect_uni<spx::oa_signal_type>(*obj->p_out[k - nets.size() / 2], nets[k], AS_WRITER);
+        else
+            pt_helper.connect_uni<spx::oa_signal_type>(*obj->p_in[k], nets[k], AS_READER);
+    }
+    return obj;
+}
+
+INSTANTIATE_AND_CONNECT_BI(SPARElement, pt_helper)
+{
+    element_type_bi *obj = new element_type_bi(name.c_str(), nets.size());
+    const bool odd = nets.size() % 2 != 0;
+
+    for (size_t k = 0; k < nets.size(); ++k)
+    {
+        // Update the unidirectional nets (role of the device on each net: as in the uni variant; an odd
+        // number of nets has none, its nets are already bidirectional)
+        if (!odd && !pt_helper.nets->at(nets[k]).bidirectional())
+        {
+            if (writes_net(k))
+                (*pt_helper.nets)[nets[k]].m_readers_count++;
+            else
+                (*pt_helper.nets)[nets[k]].m_writers_count++;
+        }
+        pt_helper.upgrade_signal(nets[k], odd || writes_net(k));
+    }
+    for (size_t k = 0; k < nets.size(); ++k)
+        pt_helper.connect_bi<spx::oa_signal_type>(*obj->p_in[k], *obj->p_out[k], nets[k]);
+    return obj;
+}
+
+string SPARElement::resolve_file(const string &file) const
+{
+    // Relative path: next to the netlist file first, then in the working directory (as .include)
+    ParserState state;
+    state.include_dirs.push_back(include_dir);
+    return state.resolve_include(file);
+}
+
+vector<string> SPARElement::data_files() const
+{
+    // the file= that create() keeps (the last one)
+    string file;
+    for (const auto &p : kwargs)
+    {
+        if (strutils::iequals(p.first, "FILE") && p.second.type == Variable::STRING)
+            file = p.second.str;
+    }
+    if (file.empty())
+        return {};
+    return { resolve_file(file) };
+}
+
+sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
+{
+    element_type_base *obj = nullptr;
+
+    if (nets.empty())
+    {
+        cerr << "Error (" << name << "): an S-parameter device needs at least one net" << endl;
+        exit(1);
+    }
+    if (!args.empty())
+    {
+        cerr << "Error (" << name << "): unexpected positional argument " << args[0].get_str()
+             << " (give the file with file=\"...\")" << endl;
+        exit(1);
+    }
+
+    // Keyword arguments
+    string file;
+    string ports;
+    SParamData::Format format = SParamData::FORMAT_AUTO;
+    SParamData::Convention convention = SParamData::CONVENTION_AUTO;
+    SParamData::Interp interp = SParamData::INTERP_LINEAR;
+    string passivity = "check";
+    SParamDeviceBase::DelayMode delay_mode = SParamDeviceBase::DELAY_AUTO;
+    double delay_s = 0;
+    bool per_path_delays = true;
+    auto string_kw = [this](const pair<const string, Variable> &p) {
+        if (p.second.type != Variable::STRING)
+        {
+            cerr << "Error (" << name << "): " << p.first << " must be a string in quotes (got "
+                 << p.second.get_str() << ")" << endl;
+            exit(1);
+        }
+        string v = p.second.as_string();
+        return v;
+    };
+    auto bad_value = [this](const string &kw, const string &v, const string &expected) {
+        cerr << "Error (" << name << "): invalid " << kw << "=\"" << v << "\" (expected " << expected << ")" << endl;
+        exit(1);
+    };
+    for (auto &p: kwargs)
+    {
+        string kw = p.first;
+        strutils::toupper(kw);
+        if (kw == "FILE")
+            file = string_kw(p);
+        else if (kw == "PORTS")
+            ports = string_kw(p);
+        else if (kw == "FORMAT")
+        {
+            const string v = string_kw(p);
+            if (strutils::iequals(v, "auto")) format = SParamData::FORMAT_AUTO;
+            else if (strutils::iequals(v, "sparam") || strutils::iequals(v, "lumerical")) format = SParamData::FORMAT_SPARAM;
+            else if (strutils::iequals(v, "touchstone")) format = SParamData::FORMAT_TOUCHSTONE;
+            else if (strutils::iequals(v, "csv")) format = SParamData::FORMAT_CSV;
+            else if (strutils::iequals(v, "taylor")) format = SParamData::FORMAT_TAYLOR;
+            else bad_value(p.first, v, "auto, sparam (or lumerical), touchstone, csv or taylor");
+        }
+        else if (kw == "CONVENTION")
+        {
+            const string v = string_kw(p);
+            if (strutils::iequals(v, "auto")) convention = SParamData::CONVENTION_AUTO;
+            else if (strutils::iequals(v, "physics")) convention = SParamData::CONVENTION_PHYSICS;
+            else if (strutils::iequals(v, "engineering")) convention = SParamData::CONVENTION_ENGINEERING;
+            else bad_value(p.first, v, "auto, physics or engineering");
+        }
+        else if (kw == "INTERP")
+        {
+            const string v = string_kw(p);
+            if (strutils::iequals(v, "linear")) interp = SParamData::INTERP_LINEAR;
+            else if (strutils::iequals(v, "pchip")) interp = SParamData::INTERP_PCHIP;
+            else bad_value(p.first, v, "linear or pchip");
+        }
+        else if (kw == "PASSIVITY")
+        {
+            passivity = string_kw(p);
+            if (!strutils::iequals(passivity, "check") && !strutils::iequals(passivity, "ignore")
+                    && !strutils::iequals(passivity, "enforce"))
+                bad_value(p.first, passivity, "check, ignore or enforce");
+        }
+        else if (kw == "DELAY")
+        {
+            if (p.second.is_number())
+            {
+                delay_mode = SParamDeviceBase::DELAY_FIXED;
+                delay_s = p.second.as_double();
+                if (!(delay_s >= 0) || !std::isfinite(delay_s))
+                {
+                    cerr << "Error (" << name << "): delay must be >= 0 (got " << delay_s << " s)" << endl;
+                    exit(1);
+                }
+            }
+            else
+            {
+                const string v = string_kw(p);
+                if (strutils::iequals(v, "auto")) delay_mode = SParamDeviceBase::DELAY_AUTO;
+                else if (strutils::iequals(v, "none")) delay_mode = SParamDeviceBase::DELAY_NONE;
+                else bad_value(p.first, v, "auto, none or a delay in seconds");
+            }
+        }
+        else if (kw == "DELAY_PER")
+        {
+            const string v = string_kw(p);
+            if (strutils::iequals(v, "path")) per_path_delays = true;
+            else if (strutils::iequals(v, "output")) per_path_delays = false;
+            else bad_value(p.first, v, "path or output");
+        }
+        else {
+            cerr << "Unknown keyword: " << p.first << endl;
+            exit(1);
+        }
+    }
+    if (file.empty())
+    {
+        cerr << "Error (" << name << "): missing file=\"...\" (the S-parameter file)" << endl;
+        exit(1);
+    }
+
+    const string path = resolve_file(file);
+    std::shared_ptr<const SParamData> data = SParamData::load(path, format, convention, interp);
+    specsGlobalConfig.record_data_file(path); // run manifest (F-01)
+
+    // Ports of the data, in net order
+    vector<size_t> port_map;
+    if (!ports.empty())
+    {
+        // comma-separated names or 1-based indices
+        vector<string> items(1);
+        for (char ch : ports)
+        {
+            if (ch == ',')
+                items.emplace_back();
+            else if (!isspace(static_cast<unsigned char>(ch)))
+                items.back() += ch;
+        }
+        for (const auto &p : items)
+        {
+            const int idx = data->portIndex(p);
+            if (idx < 0)
+            {
+                cerr << "Error (" << name << "): no port '" << p << "' in " << path << " (ports:";
+                for (const auto &pn : data->portNames())
+                    cerr << " '" << pn << "'";
+                cerr << ")" << endl;
+                exit(1);
+            }
+            port_map.push_back(static_cast<size_t>(idx));
+        }
+    }
+    else
+    {
+        for (size_t k = 0; k < data->ports(); ++k)
+            port_map.push_back(k);
+    }
+    if (port_map.size() != nets.size())
+    {
+        cerr << "Error (" << name << "): " << nets.size() << " nets for " << port_map.size()
+             << (ports.empty() ? " ports in " + path : " ports in ports=") << endl;
+        exit(1);
+    }
+    for (size_t k = 0; k < port_map.size(); ++k)
+        for (size_t m = 0; m < k; ++m)
+            if (port_map[k] == port_map[m])
+            {
+                cerr << "Error (" << name << "): port '" << data->portNames()[port_map[k]] << "' is given twice in ports=" << endl;
+                exit(1);
+            }
+
+    // Passivity (doc/sparam.md): power leaving the device for a unit input, 3 % above 1 (INTERCONNECT)
+    if (!strutils::iequals(passivity, "ignore"))
+    {
+        const auto report = data->passivity();
+        if (report.max_power_sum > 1.03)
+        {
+            cerr << "Warning (" << name << "): the S-parameters of " << path << " are not passive: for an input on port '"
+                 << data->portNames()[report.input] << "', the output power is " << report.max_power_sum
+                 << " times the input power at " << report.wavelength_m << " m"
+                 << (strutils::iequals(passivity, "enforce") ? " (passivity=enforce scales S where it exceeds 1)" : "")
+                 << endl;
+        }
+    }
+
+    // Create signals if they don't exist
+    pt_helper.create_signals(this);
+
+    // Unidirectional unless the number of nets is odd or a net is bidirectional (as COUPLER)
+    bool bidirectional = nets.size() % 2 != 0;
+    for (const auto &net : nets)
+        bidirectional |= pt_helper.nets->at(net).bidirectional();
+
+    // Unidirectional: light enters only the inputs (the outputs are only written), and what the data send
+    // from an input back to an input (reflections, couplings between inputs) is not used; the largest such
+    // path, if above -40 dB
+    if (!bidirectional)
+    {
+        double largest = 0;
+        size_t largest_out = 0, largest_in = 0;
+        for (size_t o = 0; o < nets.size(); ++o)
+            for (size_t i = 0; i < nets.size(); ++i)
+            {
+                if (writes_net(o) || writes_net(i))
+                    continue;
+                const double m = data->maxMagnitude(port_map[o], port_map[i]);
+                if (m > largest)
+                {
+                    largest = m;
+                    largest_out = o;
+                    largest_in = i;
+                }
+            }
+        if (largest * largest > 1e-4)
+        {
+            cerr << "Warning (" << name << "): unidirectional, the paths from an input (first half of the nets) to an "
+                 << "input are not used; the largest, from " << nets[largest_in] << " to " << nets[largest_out]
+                 << ", reaches " << 20 * log10(largest) << " dB (make a net bidirectional with & to use them)" << endl;
+        }
+    }
+
+    // Grid adequacy (doc/sparam.md): the worst leave-one-out error of the paths the device uses (unidirectional:
+    // from an input to an output), one warning per device
+    {
+        SParamData::GridReport worst;
+        size_t worst_out = 0, worst_in = 0;
+        for (size_t o = 0; o < nets.size(); ++o)
+            for (size_t i = 0; i < nets.size(); ++i)
+            {
+                if (!bidirectional && (!writes_net(o) || writes_net(i)))
+                    continue;
+                const auto r = data->gridCheck(port_map[o], port_map[i]);
+                if (r.error > worst.error)
+                {
+                    worst = r;
+                    worst_out = o;
+                    worst_in = i;
+                }
+            }
+        if (worst.error > SParamData::GRID_CHECK_THRESHOLD)
+        {
+            cerr << "Warning (" << name << "): the frequency grid of " << path << " may be too coarse: at "
+                 << worst.wavelength_m << " m, S from port '" << data->portNames()[port_map[worst_in]] << "' to port '"
+                 << data->portNames()[port_map[worst_out]] << "' interpolated from the neighbouring grid points differs "
+                 << "from the file by " << worst.error << " (field; more than " << SParamData::GRID_CHECK_THRESHOLD
+                 << "): features narrower than the grid spacing are not resolved, and the interpolated values and "
+                 << "group delays near there are unreliable" << endl;
+        }
+    }
+
+    // Create the object and connect ports to signals
+    INSTANTIATE(pt_helper, bidirectional);
+
+    obj->m_data = data;
+    obj->m_port_map = port_map;
+    obj->m_delay_mode = delay_mode;
+    obj->m_delay_s = delay_s;
+    obj->m_per_path_delays = per_path_delays;
+    obj->m_enforce_passivity = strutils::iequals(passivity, "enforce");
+    obj->m_from_netlist = true;
     return obj;
 }
 
