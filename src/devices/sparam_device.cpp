@@ -93,9 +93,17 @@ void SParamDeviceBase::print_initialization()
 
 sc_time SParamDeviceBase::autoDelay(double tau_s)
 {
+    // Delays are only honoured by event-driven ports in a time-domain analysis (as checkDelayRounding())
+    const auto &config = m_out_writers.empty() ? nullptr : m_out_writers[0]->getConfig();
+    const bool timed = config && config->m_mode == OpticalOutputPortMode::EVENT_DRIVEN
+                       && specsGlobalConfig.analysis_type == SPECSConfig::TIME_DOMAIN;
+    const double resolution_s = sc_get_time_resolution().to_seconds() * (config ? config->m_timestep_value : 1);
     if (tau_s < 0)
     {
-        if (!m_negative_delay_reported)
+        // a causal delay is >= 0: 0 is used. Reported once per device when it matters, i.e. when the
+        // negative delay is at least half a time step (smaller ones, e.g. the finite-difference noise of a
+        // constant phase, round to 0 anyway)
+        if (timed && !m_negative_delay_reported && -tau_s >= resolution_s / 2)
         {
             cerr << "Warning (" << name() << "): negative group delay " << tau_s
                  << " s in the S-parameters, 0 used (reported once)" << endl;
@@ -103,16 +111,12 @@ sc_time SParamDeviceBase::autoDelay(double tau_s)
         }
         tau_s = 0;
     }
-    if (!m_delay_rounding_reported && !m_out_writers.empty())
+    if (timed && !m_delay_rounding_reported
+            && classifyDelayRounding(tau_s, resolution_s, OpticalOutputPort::DELAY_ROUNDING_WARN_THRESHOLD) != DELAY_ROUNDING_OK)
     {
         // B-014: one report per device, as the waveguides' (a warning: not written in the netlist)
-        const auto &config = m_out_writers[0]->getConfig();
-        const double resolution_s = sc_get_time_resolution().to_seconds() * (config ? config->m_timestep_value : 1);
-        if (classifyDelayRounding(tau_s, resolution_s, OpticalOutputPort::DELAY_ROUNDING_WARN_THRESHOLD) != DELAY_ROUNDING_OK)
-        {
-            m_out_writers[0]->checkDelayRounding(name(), tau_s, false);
-            m_delay_rounding_reported = true;
-        }
+        m_out_writers[0]->checkDelayRounding(name(), tau_s, false);
+        m_delay_rounding_reported = true;
     }
     // the same rounding as a waveguide's (sc_time from ns)
     return sc_time(tau_s * 1e9, SC_NS);

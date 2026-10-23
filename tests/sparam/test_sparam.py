@@ -4,7 +4,8 @@
     python3 -I tests/sparam/test_sparam.py --specs build/specs [--keep DIR] [--only REGEX]
 
 Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
-- fixtures: tests/sparam/gen_fixtures.py rewrites tests/sparam/fixtures byte for byte;
+- fixtures: tests/sparam/gen_fixtures.py rewrites tests/sparam/fixtures byte for byte, and exporting the
+  ring again gives tests/sparam/data/add_drop_ring.sparam (1e-12);
 - phase convention, .dc: each wg.* fixture (a 100 um waveguide written in each format's own convention)
   through SPAR gives the field of a WG of the same length, at the grid points and between them; read
   with the opposite convention, the Touchstone fixtures do not;
@@ -33,7 +34,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 FIXTURES = os.path.join(HERE, 'fixtures')
 sys.path.insert(0, os.path.join(ROOT, 'utils'))
+sys.path.insert(0, HERE)
 import sparam_export  # noqa: E402
+import sparam_io  # noqa: E402
 
 C0 = 299792458.0
 WG_LINE = 'wg1 {a} {b} length=100e-6 neff=2.2 ng=4.2 att=10'
@@ -116,6 +119,25 @@ def test_fixtures(t):
     same = p.returncode == 0 and sorted(os.listdir(out)) == names and all(
         filecmp.cmp(os.path.join(out, n), fixture(n), shallow=False) for n in names)
     t.check('fixtures/regenerated-identical', same, '%d files' % len(names))
+
+
+def test_ring_data(t):
+    # tests/sparam/data/add_drop_ring.sparam (golden case cir/spar-add-drop-ring) is the export of the ring
+    # with the command of tests/sparam/README.md: exporting again gives the same values
+    committed = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
+    again = os.path.join(t.work, 'add_drop_ring.sparam')
+    sparam_export.export(t.specs, os.path.join(HERE, 'add_drop_ring.cir'), 'ring', (1.535e-6, 1.565e-6, 1e-9), again,
+                         'sparam')
+    pa, a = sparam_io.read_sparam(committed)
+    pb, b = sparam_io.read_sparam(again)
+    worst = 0.0
+    same = pa == pb and sorted(a) == sorted(b)
+    for key in a if same else []:
+        if [f for f, _ in a[key]] != [f for f, _ in b[key]]:
+            same = False
+            break
+        worst = max([worst] + [abs(x - y) for (_, x), (_, y) in zip(a[key], b[key])])
+    t.check('data/add-drop-ring-reproduced', same and worst <= 1e-12, 'max |S difference| = %.3g (<= 1e-12)' % worst)
 
 
 def dc_netlist(device, start, stop, step):
@@ -282,7 +304,7 @@ def test_round_trip(t):
                 '%.3g anywhere (<= 0.03)' % (n, smooth, tol, anywhere))
 
 
-TESTS = [test_fixtures, test_phase_dc, test_phase_tran, test_bidirectional, test_port_order, test_passivity,
+TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_port_order, test_passivity,
          test_range, test_round_trip]
 
 

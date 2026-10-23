@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-3port-taylor.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-3port-taylor.cir", "sha256": "95d458f665610825e0c4967cea629b75370cd09820e5d946dda1eb4306218d9f"}
+  ],
+  "trace_file": "traces/delete_me.csv"
+}

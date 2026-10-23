@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-uni-reflection.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-uni-reflection.cir", "sha256": "a8e4312219268b612b01b9b241cbf286de22f2216c13a3678438f7a909c1219c"}
+  ],
+  "trace_file": "traces/delete_me.csv"
+}

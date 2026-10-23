@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/spar-missing-file.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/spar-missing-file"
+}

@@ -1,0 +1,2 @@
+Error (ROOT/SPAR1): no port 'middle' in tests/golden/netlists/../../sparam/fixtures/asym.s2p (ports: 'left' 'right')
+

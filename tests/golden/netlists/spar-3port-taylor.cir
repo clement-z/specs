@@ -1,0 +1,7 @@
+* F-03: a 3-port SPAR (odd net count: bidirectional) from the Taylor form spar-3port.taylor, a lossy
+* Y-junction with a reflection and explicit delays; sources on two ports
+cwsrc1 a wl=1.55e-6 power=1
+cwsrc2 b wl=1.55e-6 power=0.5 phi=1
+spar1 a b c file="spar-3port.taylor" delay="auto"
+.save a b c
+.dc /cwsrc1/WL 1.54e-6 1.56e-6 5e-9

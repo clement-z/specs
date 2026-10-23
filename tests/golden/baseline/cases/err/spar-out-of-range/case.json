@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/spar-out-of-range.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 431,
+   "kind": "json",
+   "sha256": "d80db98fe5d0397ed4b3b470a8279ee8ce3978c1a09981a52aa41020bccf2164",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1483,
+   "kind": "vcd",
+   "sha256": "6fe1662084a33ba4ab5cd78951be97631184a35ce6ad69c1555cf71a43c45b1f",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "err/spar-out-of-range"
+}

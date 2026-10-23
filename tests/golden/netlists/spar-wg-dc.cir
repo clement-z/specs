@@ -1,0 +1,8 @@
+* F-03: SPAR, a 100 um waveguide given as Lumerical .sparam (tests/sparam/fixtures/wg.sparam, path relative
+* to this file), next to the same WG: same fields at every point of the .dc sweep, on and between grid points
+cwsrc1 in wl=1.53e-6 power=1
+splitter1 in a b
+wg1 a out_wg length=100e-6 neff=2.2 ng=4.2 att=10
+spar1 b out_spar file="../../sparam/fixtures/wg.sparam"
+.save out_wg out_spar
+.dc /cwsrc1/WL 1.53e-6 1.5325e-6 0.1e-9

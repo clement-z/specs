@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-add-drop-ring.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-add-drop-ring.cir", "sha256": "002bc5e966511bff205cb91f49f290c5b7da65c86318d20da3953c1839f77162"}
+  ],
+  "trace_file": "traces/delete_me.csv"
+}

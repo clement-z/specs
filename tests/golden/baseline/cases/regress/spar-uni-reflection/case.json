@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-uni-reflection.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 391,
+   "kind": "text",
+   "sha256": "e4ab146ea5f1e6b9e115b0acdb6bb9b2533f83ae89769b4087fab0168699e258",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 454,
+   "kind": "json",
+   "sha256": "80ccf2fa5e02268a60733b2dfb810bd5a6a508fde1f586376f94eccb15c0acd7",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/spar-uni-reflection"
+}

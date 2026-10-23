@@ -1658,7 +1658,9 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
     for (const auto &net : nets)
         bidirectional |= pt_helper.nets->at(net).bidirectional();
 
-    // Unidirectional: the paths other than input -> output are not used; the largest one, if above -40 dB
+    // Unidirectional: light enters only the inputs (the outputs are only written), and what the data send
+    // from an input back to an input (reflections, couplings between inputs) is not used; the largest such
+    // path, if above -40 dB
     if (!bidirectional)
     {
         double largest = 0;
@@ -1666,7 +1668,7 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
         for (size_t o = 0; o < nets.size(); ++o)
             for (size_t i = 0; i < nets.size(); ++i)
             {
-                if (writes_net(o) && !writes_net(i))
+                if (writes_net(o) || writes_net(i))
                     continue;
                 const double m = data->maxMagnitude(port_map[o], port_map[i]);
                 if (m > largest)
@@ -1678,8 +1680,8 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
             }
         if (largest * largest > 1e-4)
         {
-            cerr << "Warning (" << name << "): unidirectional, the paths other than from an input (first half of the nets) "
-                 << "to an output are not used; the largest, from " << nets[largest_in] << " to " << nets[largest_out]
+            cerr << "Warning (" << name << "): unidirectional, the paths from an input (first half of the nets) to an "
+                 << "input are not used; the largest, from " << nets[largest_in] << " to " << nets[largest_out]
                  << ", reaches " << 20 * log10(largest) << " dB (make a net bidirectional with & to use them)" << endl;
         }
     }

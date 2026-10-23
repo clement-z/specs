@@ -4056,6 +4056,230 @@
     "tests/golden/netlists/b066-evlsrc-past.cir"
    ],
    "note": "B-066: values in the past (negative times in EVLSRC) are skipped with one warning on stderr per source, with their count; nothing on stdout"
+  },
+  {
+   "id": "cir/spar-wg-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-wg-dc.cir"
+   ],
+   "note": "F-03: SPAR from a Lumerical .sparam (100 um waveguide, path relative to the netlist) next to the same WG in a .dc sweep on and between grid points: same fields"
+  },
+  {
+   "id": "cir/spar-touchstone-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-touchstone-tran.cir"
+   ],
+   "note": "F-03: SPAR from Touchstone 2 (conjugated on import) in .tran: pulses at two wavelengths leave SPAR and the WG at the same times with the same fields"
+  },
+  {
+   "id": "cir/spar-add-drop-ring",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-add-drop-ring.cir"
+   ],
+   "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py; the negative through-port group delay near resonance is reported"
+  },
+  {
+   "id": "regress/spar-ring-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "--vci",
+    "-f",
+    "tests/golden/netlists/spar-ring-tran.cir"
+   ],
+   "note": "F-03: the exported ring as SPAR in .tran (delay=auto per output); --vci prints the device parameters"
+  },
+  {
+   "id": "regress/spar-3port-taylor",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-3port-taylor.cir"
+   ],
+   "note": "F-03: a 3-port SPAR (odd net count: bidirectional) from the Taylor form, a reflection, explicit delays, two sources"
+  },
+  {
+   "id": "regress/spar-passivity",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-passivity.cir"
+   ],
+   "note": "F-03: |S21| = 1.05: passivity=check warns, passivity=enforce warns and scales S to |S21| = 1"
+  },
+  {
+   "id": "regress/spar-uni-reflection",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-uni-reflection.cir"
+   ],
+   "note": "F-03: a unidirectional SPAR does not use the input-to-input paths (one warning); ports= reversed selects S12; Touchstone 1 and 2 port orders"
+  },
+  {
+   "id": "err/spar-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-out-of-range.cir"
+   ],
+   "note": "F-03: a wavelength outside the data range is an error, with the range"
+  },
+  {
+   "id": "err/spar-bad-ports",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-bad-ports.cir"
+   ],
+   "note": "F-03: ports= names a port that the file does not have"
+  },
+  {
+   "id": "err/spar-net-count",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-net-count.cir"
+   ],
+   "note": "F-03: the number of nets differs from the number of ports of the file"
+  },
+  {
+   "id": "err/spar-missing-file",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-missing-file.cir"
+   ],
+   "note": "F-03: the S-parameter file cannot be opened"
   }
  ]
 }
