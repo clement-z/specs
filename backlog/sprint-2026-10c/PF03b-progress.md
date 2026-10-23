@@ -10,7 +10,7 @@ Base: 48e510f.
 | 1 | Per-path delayed copies | done | 7e9e03b | checks clang/asan running |
 | 2 | Negative delay warning per path | todo | | |
 | 3 | Grid-adequacy warning | todo | | |
-| 4 | Mixed interpolation near nulls | done | (see git log) | threshold 0.07 x max|S|; measurements in the report |
+| 4 | Mixed interpolation near nulls | done | 368bf61 | threshold 0.07 x max|S|; measurements in the report |
 | 5 | Data files in the run manifest | todo | | own commit |
 | 6 | SiEPIC BDC fixture + golden | todo | | |
 | 7 | Tests and docs | todo | | |
