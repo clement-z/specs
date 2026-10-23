@@ -48,7 +48,8 @@ The core uses the standard library only.
 |---|---|
 | `-o OUT` | output base name (required): writes `OUT.dot`, `OUT.svg`, `OUT.png` |
 | `--format svg,png` | formats to render (default both) |
-| `--suppression` | disc at the top-right corner of each device, coloured by suppressed / processed, with its own colour bar |
+| `--suppression` | solid disc on the top-right corner of each device, coloured by suppressed / processed, with its own colour bar |
+| `--field-spread S` | spread of the background field, in median node widths (default 0.5, see below) |
 | `--no-field` | white background instead of the background field |
 | `--dot-only` | write only `OUT.dot`; imports no third-party module and does not call `dot` |
 | `--title TEXT` | figure title (default: the stats file name) |
@@ -69,18 +70,22 @@ and the SVG is reproducible (fixed hash salt, no date).
 
 ## Background field
 
-The background is 0 (white) far from every device and interpolates between devices. With x_i the centre of
-device node i and a_i its activity:
+The background is 0 (white) away from the devices, rises around each device and blends between devices that
+are close. With x_i the centre of device node i and a_i its activity:
 
     f(x) = sum_i a_i K_i(x) / (sum_i K_i(x) + K0),   K_i(x) = exp(-|x - x_i|^2 / (2 sigma^2))
 
-- sigma = median nearest-neighbour distance between device centres (a quarter of the bounding-box diagonal
-  with fewer than two devices), never less than the median node half-width.
+- sigma = `--field-spread` x the median node width (default 0.5, roughly 50 to 70 points for the usual node boxes),
+  so the activity of a device spreads over a distance of the order of one node. Larger values blend more
+  distant devices, smaller values give isolated spots.
 - K0 = exp(-2): at 2 sigma from a lone device the field is half its activity; next to a device it is close to
-  that device's activity; where all K_i are much smaller than K0 it is 0.
+  that device's activity; where all K_i are much smaller than K0 (devices further than about 3 sigma, i.e.
+  about two node widths) it is 0. Two neighbouring nodes (about 1.5 node widths apart) blend smoothly;
+  components that are not close are separated by white.
 - Only devices count (not terminals or junctions). The field is evaluated on a grid of about 400 pixels on the
-  longest side, drawn with the same colour map and 0..max normalisation as the nodes. The view extends past
-  the graph by up to 2 sigma (at most 250 points) so the fade to 0 is visible.
+  longest side, drawn with the same colour map and 0..max normalisation as the nodes, so the colour bar is the
+  scale of both the field and the nodes (linear). The view extends past the graph by 2 sigma so the fade to 0
+  is visible.
 
 ## Limits
 
@@ -88,4 +93,8 @@ device node i and a_i its activity:
   the simulator and are a later feature.
 - Activity is per device (sum over its output ports); the per-wavelength and per-port detail of the stats is
   not drawn.
-- Layout is Graphviz `rankdir=LR`; large circuits give wide figures.
+- Layout is Graphviz `rankdir=LR`; long chains give wide figures (a 10-ring CROW is about 4:1). Node boxes are
+  sized to their text. Folding or re-laying-out long graphs is not done here: the layout is to come from a
+  schematic inferred from the netlist.
+- The suppression disc is centred on the top-right corner of the node box, so it never covers the name or
+  type line (the box width keeps a margin around the text that is larger than the disc radius).
