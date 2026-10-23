@@ -15,7 +15,7 @@ Prototype (Opus subagent): `/tmp/PF03d-proto` (outside the repository, not durab
 | 1 | Remove `delay_per` | done | (this commit) | product code = reverse of 7e044eb's device/header/parser hunks (no later change to them); 2 golden cases removed; gcc 16 OK 1 skip, strict golden 275/275; asan-clang 16 OK 1 skip, no sanitizer message |
 | 2 | Grid check on the actual intervals | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest numbers bit-identical (linear 0.00345946 / LOO 0.00892046, PCHIP 0.0127283 / 0.0348905) |
 | 3 | PCHIP slopes per run | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest PCHIP 0.0127283 -> 0.00191221, LOO 0.0348905 -> 0.00553862 (linear bit-identical); test_sparam.py pchip between points 9.56e-5 where \|E\| >= 0.1 (same), 9.72e-5 anywhere (5.19e-4) |
-| 4 | Pulse-pair tau0 | todo | | |
+| 4 | Pulse-pair tau0 | **stopped** (output change beyond the prediction) | side branch `PF03d-wip/item4` (worktree `/tmp/PF03d-wt/item4`) | tau0 as expected; `regress/spar-grid-warning` warning text changes (0.707522 at 1.546 um -> 0.704106 at 1.554 um) and its `out` moves by 1.7e-13, not ~1.7e-14 (Log) |
 | 5 | Docs and report | todo | | |
 
 ## Algorithms (written before the code, shared with the prototype)
@@ -54,6 +54,10 @@ largest step of the whole grid and f_ref = first grid point, unchanged.
   re/im intervals (delay lines, dispersive line, BDC, the B-190 gtest's delay line); the B-190 gtest's PCHIP
   worst value drops from 0.0127 (summary's reference MZI: 0.0165 -> 9.2e-4; ring through 6.3e-4 -> 2.1e-4);
   `test_sparam.py` PCHIP between-points bound (2e-4 where |E| >= 0.1) still holds with a changed value.
+- Item 4 (prompt and summary): `out` of `cir/spar-add-drop-ring`, `regress/spar-ring-tran`,
+  `regress/spar-grid-warning` move by about 1.7e-14; warning text unchanged (0.707522 at 1.546 um); tau0 ring
+  through 0.74919 ps, drop 1.1236, 1 nm file 0.6235 / 1.1406, wg +1.40097; gtest numbers may move in the last
+  digits.
 
 ## Log
 
@@ -64,3 +68,21 @@ largest step of the whole grid and f_ref = first grid point, unchanged.
 - Item 1: manifest bookkeeping = the two ids removed from the `cases` list; the `rerecords` history is kept as is
   (entries of past records stay true; no record was run for a removal), as the PD5 removal of
   `err/probe-wl-invalid` (1f44df4) did for its case list.
+- Item 4, measured (C++, gcc -O3, `/tmp/PF03d-meas/tau0.cpp` and `gtestnum.cpp`): tau0 ring 0.05 nm through
+  0.74919125801533026 ps (median 0.76199814204238836), drop 1.1235952555311075 (0.80631412032717187); 1 nm file
+  through 0.623467229805865 (-0.014514455988249953), drop 1.1406498331338579 (0.98742985968978259); `wg`
+  fixtures 1.400969199832238 (1.4009691998322635); BDC and asym fixtures unchanged (0 or same); B-190 gtest MZI
+  4.99049 -> 4.99163 ps, worst values unchanged to 6 digits (linear 0.00345946 / LOO 0.00892046, PCHIP
+  0.00191221 / 0.00553862). All as expected.
+- Item 4, strict golden (gcc): exactly the three predicted cases fail, but:
+  - `cir/spar-add-drop-ring` out at 1.55 um: field moves by 1.72e-14 (re 7.0e-15, im 1.57e-14), power
+    5.194275354576741e-06 -> 5.194275354654886e-06: as predicted;
+  - `regress/spar-ring-tran` out: 1.7e-14 (re), as predicted;
+  - `regress/spar-grid-warning`: **the warning changes**, "at 1.546e-06 m ... 0.707522" -> "at 1.554e-06 m ...
+    0.704106", and `out` moves by 1.7e-13 (re 1.22e-13, im 1.25e-13; tau0 of that file moves by 0.64 ps, against
+    0.013 ps for the 0.05 nm file): both beyond the prediction.
+  - Cause of the warning change: the interaction of items 2 and 4, which the discussion measured separately. A
+    variant with the pulse-pair tau0 and the old doubled-interval LOO rule gives 0.707522 again (the
+    discussion's measurement); with item 2's rule the worst point moves to the mirror point of the null.
+  - Decision: item 4 stopped on `ws/spar4` (rule: an output change beyond the prediction); the complete change
+    (code, docs, re-recorded baseline) is prepared on `PF03d-wip/item4` for the maintainer.
