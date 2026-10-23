@@ -653,7 +653,7 @@
     "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"
    ],
    "timeout": 30,
-   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| only; stderr: one warning. Short timeout so that a regression (never quiescing) fails fast"
+   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| and, since PD6, the wavelength (its false 4th argument is ignored); stderr: the PD6 warning for ROOT/PROBE1, then the zero-tolerance warning. Short timeout so that a regression (never quiescing) fails fast"
   },
   {
    "id": "err/b153-zerotol-lossless-ring-op",
@@ -3780,7 +3780,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-tran.cir"
    ],
-   "note": "PD5: PROBE wavelength latch in a .tran: the smallest wavelength at the enable (OP values), a smaller wavelength arriving later ignored, a VL-only net latched in its first time step, wl=0 keeps its meaning (wavelength not traced); warnings (one per probe, one line for the automatic probes); each PROBE trace equals an MLPROBE trace of the same run"
+   "note": "PD5: PROBE wavelength latch in a .tran: the smallest wavelength at the enable (OP values), a smaller wavelength arriving later ignored, a VL-only net latched in its first time step, wl=0 ignored since PD6 (PROBE5 traces its wavelength, with the PD6 warning first on stderr); warnings (one per probe, one line for the automatic probes); each PROBE trace equals an MLPROBE trace of the same run"
   },
   {
    "id": "regress/probe-latch-dc",
@@ -3844,6 +3844,23 @@
     "tests/golden/netlists/probe-latch-dc-swept-f.cir"
    ],
    "note": "PD5 follow-up 2: .dc /src/F frequency sweep (long form): a PROBE latches the swept wavelength (c/f) at each point, also at the first point next to a smaller fixed wavelength"
+  },
+  {
+   "id": "regress/probe-wl-ignored",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/probe-wl-ignored.cir"
+   ],
+   "note": "PD6: a PROBE always traces its wavelength: wl=0, wavelength=0 and a false 4th argument (also in a subcircuit) are ignored with one warning for all, in name order; a true value changes nothing; .save E(b) traces abs only"
   }
  ]
 }

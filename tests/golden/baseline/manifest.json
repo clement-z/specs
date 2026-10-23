@@ -218,6 +218,7 @@
   "regress/probe-latch-dc-swept-f",
   "regress/probe-latch-dc-swept-wl",
   "regress/probe-latch-tran",
+  "regress/probe-wl-ignored",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -337,6 +338,12 @@
    "only": "^(regress/probe-latch-dc-swept-wl|regress/probe-latch-dc-swept-f|gtest/unit_tests)$",
    "gtest": true,
    "note": "PD5 follow-up 2 (maintainer: .dc latch on the swept wavelength): new cases regress/probe-latch-dc-swept-wl and regress/probe-latch-dc-swept-f; gtest list (Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T08:00:26Z",
+   "only": "^(regress/b153-zerotol-lossy-ring-tran|regress/probe-latch-tran|regress/probe-wl-ignored|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD6 (maintainer 2026-10-23: a PROBE always traces its wavelength): regress/b153-zerotol-lossy-ring-tran (false 4th argument) and regress/probe-latch-tran (wl=0) gain the probe's wavelength signal and the PD6 warning line, netlist comments updated (manifest netlist hash); new case regress/probe-wl-ignored; gtest list (Probe.NetlistProbeAlwaysTracesTheWavelength)"
   }
  ]
 }

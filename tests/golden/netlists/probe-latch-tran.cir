@@ -4,8 +4,8 @@
 *   probe1 (m): 1550 nm, the smallest wavelength at the enable (operating-point values), = mlprobe2@1550
 *   probe3 (m2): 1550 nm; the 1540 nm light, smaller but arriving later, is ignored, = mlprobe3@1550
 *   probe4 (c): 1540 nm, latched in the first time step that brings any, = mlprobe4@1540
-*   probe5 (c, wl=0): the wavelength is not traced
-* stderr: one warning per probe that ignores a wavelength, one line for the automatic probes (traceall).
+*   probe5 (c, wl=0): wl=0 is ignored since PD6: it traces its wavelength, as probe4
+* stderr: the PD6 warning for wl=0 (at elaboration), one warning per probe that ignores a wavelength, one line for the automatic probes (traceall).
 cwsrc1 a wl=1.56e-6 power=1e-3
 cwsrc2 b wl=1.55e-6 power=4e-3
 merger1 a b m
