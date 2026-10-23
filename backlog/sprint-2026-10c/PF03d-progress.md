@@ -13,7 +13,7 @@ Prototype (Opus subagent): `/tmp/PF03d-proto` (outside the repository, not durab
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | Remove `delay_per` | done | (this commit) | product code = reverse of 7e044eb's device/header/parser hunks (no later change to them); 2 golden cases removed; gcc 16 OK 1 skip, strict golden 275/275; asan-clang 16 OK 1 skip, no sanitizer message |
-| 2 | Grid check on the actual intervals | todo | | |
+| 2 | Grid check on the actual intervals | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest numbers bit-identical (linear 0.00345946 / LOO 0.00892046, PCHIP 0.0127283 / 0.0348905) |
 | 3 | PCHIP slopes per run | todo | | |
 | 4 | Pulse-pair tau0 | todo | | |
 | 5 | Docs and report | todo | | |
@@ -46,6 +46,9 @@ largest step of the whole grid and f_ref = first grid point, unchanged.
 - Item 1 (before the change): no output of any remaining case changes (the default path mode is the code that
   stays); `regress/spar-ring-tran-output` and `err/spar-bad-delay-per` disappear. Result: strict golden 275 passed
   (274 + gtest), 0 new, 0 missing.
+- Item 2 (before the change): no golden output changes (summary: identical worst values with linear on every
+  fixture and on the golden 1 nm file, 0.707522 at 1.546 um; only the PCHIP 1 nm value moves, no golden case uses
+  PCHIP); all `SParamFile` gtests pass (the B-190 gtest's linear LOO 0.0089 may move in its last digits).
 
 ## Log
 

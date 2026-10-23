@@ -40,7 +40,8 @@ public:
     // nothing to gain, and the re/im interpolation of S linear in frequency stays exact)
     static constexpr double DELAY_REMOVAL_MIN_ROTATION = 1e-3;
     // Grid-adequacy check (doc/sparam.md): a grid point is flagged when S interpolated there from its
-    // neighbours alone (leave-one-out, the device's own interpolant) differs from the file's value by
+    // neighbours alone (leave-one-out, the device's own interpolant, real/imaginary parts when the device
+    // uses them on either of the two grid intervals around the point) differs from the file's value by
     // more than this (field). Leaving a point out doubles the spacing, so the error is about 4 times the
     // one between the points of the actual grid: 0.02 stands for about 0.005 between points. A delay
     // line gives 1e-12; the SiEPIC BDC 0.0024, the add-drop ring on a 0.05 nm grid 0.0021, an MZI with

@@ -64,7 +64,11 @@ convention and what the device does with the data.
   form gives it or derives it from its phase polynomial.
 - **Grid check.** When a tabulated file is loaded, each entry the device uses (unidirectional: from an input
   to an output) is checked at each interior grid point: S interpolated there from the grid without that
-  point (leave-one-out, with the device's own interpolation above) is compared with the file's value. When
+  point (leave-one-out, with the device's own interpolation above; real and imaginary parts when the device
+  uses them on either of the two intervals around the point, so the check describes the interpolant of the
+  actual grid: deciding on the doubled interval would take the delay-removed rotation of two steps for a
+  null and warn on resolved dispersive paths, e.g. a group delay of 1 +- 4 ps on a 0.5 nm grid) is
+  compared with the file's value. When
   the largest difference exceeds 0.02 (field), one warning per device names the path, the wavelength and the
   difference: the grid does not resolve a feature there (a resonance or a null narrower than the spacing),
   so the values between those points and the group delays near them are unreliable. Leaving a point out

@@ -555,7 +555,9 @@ vector<double> SParamData::leaveOneOutErrors(const Table &t) const
             return evalSegment(x, y, &slopes, a, t.f_Hz[j]);
         };
         complex_type s;
-        if (realImaginaryInterval(t, j - 1, j + 1))
+        // re/im where the device uses them on either side of the point on the actual grid (the doubled
+        // interval would see the rotation of two steps as a null: SPAR-discussion-2.md, topic 2)
+        if (realImaginaryInterval(t, j - 1, j) || realImaginaryInterval(t, j, j + 1))
         {
             s = complex_type(eval(t.re_d), eval(t.im_d));
             if (t.tau0_s != 0)
