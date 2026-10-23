@@ -8,7 +8,7 @@ Inputs are the two files written by one SPECS run:
 Usage:
 
     activity_map.py traces/run.json traces/run.stats.json -o traces/map
-    activity_map.py CIRCUIT_JSON STATS_JSON -o OUT [--format svg,png] [--suppression] [--no-field]
+    activity_map.py CIRCUIT_JSON STATS_JSON -o OUT [--format svg,png] [--suppression] [--field-spread S] [--no-field]
                     [--dot-only] [--title TEXT] [--net-labels]
 
 Writes OUT.dot always, and OUT.svg / OUT.png unless --dot-only is given. The core (reading the files and
@@ -41,9 +41,12 @@ INK = "#1a1a1a"
 EDGE_COLOR = "#555555"
 CLUSTER_COLOR = "#8a8a8a"
 FIELD_K0 = math.exp(-2.0)  # background field offset, see field_grid()
+FIELD_SPREAD = 0.5  # default spread of the background field, in median node widths (--field-spread)
 FIELD_PIXELS = 400  # field grid resolution on the longest side
-CHAR_WIDTH_PT = 6.0  # estimated text width per character at NODE_FONT_PT, for the node box width
 NODE_FONT_PT = 9
+TYPE_FONT_PT = NODE_FONT_PT - 2.5  # device type line
+NAME_CHAR_PT = 0.72 * NODE_FONT_PT  # estimated width per character of the (bold) name line
+TYPE_CHAR_PT = 0.62 * TYPE_FONT_PT  # ... and of the type line, for the node box width
 NODE_HEIGHT_PT = 38.0
 
 
@@ -192,7 +195,7 @@ def build_graph(circuit, act, netdata, net_labels=False):
         a = act[e["name"]]
         fill = ramp_color(ACTIVITY_STOPS, a["processed"] / vmax if vmax else 0.0)
         lines = [short_name(e["name"]), str(e.get("type", ""))]
-        w = max(76.0, max(len(s) for s in lines) * CHAR_WIDTH_PT + 30.0)
+        w = max(70.0, len(lines[0]) * NAME_CHAR_PT + 26.0, len(lines[1]) * TYPE_CHAR_PT + 22.0)
         out.append('%s%s [label=%s, shape=box, style="rounded,filled", fixedsize=true, width=%.4f, '
                    'height=%.4f, fillcolor="%s", fontcolor="%s", color="%s", tooltip=%s];'
                    % (indent, node_id[e["name"]], dot_quote("\n".join(lines)), w / 72.0,
@@ -312,18 +315,10 @@ def parse_edge_pos(pos):
     return pts, ae, as_
 
 
-def field_sigma(centers, half_widths, bbox):
-    """Median nearest-neighbour distance between device centres (fallback: bbox diagonal / 4), but never
-    less than the median node half-width."""
-    if len(centers) >= 2:
-        nn = sorted(min(math.hypot(xi - xj, yi - yj) for j, (xj, yj) in enumerate(centers) if j != i)
-                    for i, (xi, yi) in enumerate(centers))
-        m = len(nn)
-        sigma = nn[m // 2] if m % 2 else 0.5 * (nn[m // 2 - 1] + nn[m // 2])
-    else:
-        sigma = 0.25 * math.hypot(bbox[2] - bbox[0], bbox[3] - bbox[1])
-    hw = sorted(half_widths)
-    return max(sigma, hw[len(hw) // 2] if hw else 0.0, 1.0)
+def field_sigma(widths, spread):
+    """Spread of the background field: `spread` times the median node width (points), at least 1."""
+    w = sorted(widths)
+    return max(spread * (w[len(w) // 2] if w else 0.0), 1.0)
 
 
 def field_grid(centers, acts, bbox, sigma, vmax, np):
@@ -331,9 +326,10 @@ def field_grid(centers, acts, bbox, sigma, vmax, np):
 
         f(x) = sum_i a_i K_i(x) / (sum_i K_i(x) + K0),   K_i(x) = exp(-|x - x_i|^2 / (2 sigma^2))
 
-    x_i are the device node centres, a_i their activity, K0 = exp(-2). Near a device f is close to its
-    activity; between devices it interpolates smoothly; far from all devices (every K_i << K0) it goes to
-    0, the colour of the surface. At 2 sigma from a lone device K = K0, so f is half its activity.
+    x_i are the device node centres, a_i their activity, K0 = exp(-2), sigma = field_sigma(). Near a device f
+    is close to its activity; between devices that are close (a few sigma) it interpolates smoothly; where
+    every K_i << K0 (devices further than about 3 sigma) it goes to 0, the colour of the surface. At 2 sigma
+    from a lone device K = K0, so f is half its activity.
     Returns the grid divided by vmax (so 0..1 on the colour scale).
     """
     x0, y0, x1, y1 = bbox
@@ -369,7 +365,7 @@ def totals_text(stats, ndev):
     ])
 
 
-def render(dot_text, circuit, stats, act, outbase, formats, title, suppression, field):
+def render(dot_text, circuit, stats, act, outbase, formats, title, suppression, field, spread):
     import numpy as np
     import matplotlib
     matplotlib.use("Agg")
@@ -401,16 +397,16 @@ def render(dot_text, circuit, stats, act, outbase, formats, title, suppression, 
     vmax = max([a["processed"] for a in act.values()] + [0])
     norm = Normalize(0, vmax if vmax else 1)
 
-    centers, acts, halfw = [], [], []
+    centers, acts, widths = [], [], []
     for nid, e in elem_of.items():
         o = nodes[nid]
         centers.append(parse_point(o["pos"]))
         acts.append(act[e["name"]]["processed"])
-        halfw.append(float(o["width"]) * 72.0 / 2)
+        widths.append(float(o["width"]) * 72.0)
 
     # The field decays over about 2 sigma beyond the outermost devices: pad the view so the surface shows.
-    base = (bb[0] - 24.0, bb[1] - 24.0, bb[2] + 24.0, bb[3] + 24.0)
-    margin = 24.0 + (min(2.0 * field_sigma(centers, halfw, base), 250.0) if field else 0.0)
+    sigma = field_sigma(widths, spread)
+    margin = 24.0 + (2.0 * sigma if field else 0.0)
     bbox = (bb[0] - margin, bb[1] - margin, bb[2] + margin, bb[3] + margin)
     gw, gh = bbox[2] - bbox[0], bbox[3] - bbox[1]
     inch = 1.0 / 72.0  # one graph point -> one inch
@@ -426,7 +422,6 @@ def render(dot_text, circuit, stats, act, outbase, formats, title, suppression, 
     fig.text(0.1 / fig_w, 1 - 0.1 / fig_h, title, ha="left", va="top", fontsize=11)
 
     if field and centers:
-        sigma = field_sigma(centers, halfw, bbox)
         grid = field_grid(centers, acts, bbox, sigma, vmax, np)
         ax.imshow(grid, origin="lower", extent=(bbox[0], bbox[2], bbox[1], bbox[3]), cmap=cmap_act,
                   vmin=0, vmax=1, interpolation="bilinear", aspect="auto", zorder=0)
@@ -481,10 +476,12 @@ def render(dot_text, circuit, stats, act, outbase, formats, title, suppression, 
             ax.text(cx, cy + h * 0.17, short_name(e["name"]), ha="center", va="center", fontsize=NODE_FONT_PT,
                     color=tc, fontweight="bold", zorder=6)
             ax.text(cx, cy - h * 0.22, str(e.get("type", "")), ha="center", va="center",
-                    fontsize=NODE_FONT_PT - 2.5, color=tc, zorder=6)
+                    fontsize=TYPE_FONT_PT, color=tc, zorder=6)
             if suppression:
-                r = 0.35 * h
-                ax.add_patch(Circle((cx + w / 2 - r * 0.4, cy + h / 2 - r * 0.4), r,
+                # Centred on the top-right corner, so only its inner quarter lies over the box, inside the
+                # margin that the node width reserves around the name and type lines.
+                r = 0.28 * h
+                ax.add_patch(Circle((cx + w / 2, cy + h / 2), r,
                                     fc=rgb_to_hex(ramp_color(SUPPRESSION_STOPS, a["ratio"])), ec=INK, lw=0.6,
                                     zorder=7))
         elif o.get("shape") == "point":
@@ -530,6 +527,8 @@ def parse_args(argv):
     ap.add_argument("--format", default="svg,png", help="comma-separated: svg, png (default: svg,png)")
     ap.add_argument("--suppression", action="store_true",
                     help="draw a disc per device coloured by suppressed / processed")
+    ap.add_argument("--field-spread", type=float, default=FIELD_SPREAD, metavar="S",
+                    help="spread of the background field in median node widths (default %g)" % FIELD_SPREAD)
     ap.add_argument("--no-field", action="store_true", help="white background instead of the activity field")
     ap.add_argument("--dot-only", action="store_true", help="write only the DOT file (standard library only)")
     ap.add_argument("--title", help="figure title (default: the stats file name)")
@@ -540,6 +539,8 @@ def parse_args(argv):
 def main(argv=None):
     args = parse_args(argv)
     try:
+        if not args.field_spread > 0:
+            raise InputError("--field-spread must be positive")
         formats = [f.strip().lower() for f in args.format.split(",") if f.strip()]
         for f in formats:
             if f not in ("svg", "png"):
@@ -559,7 +560,7 @@ def main(argv=None):
                   % (", ".join(missing), args.output), file=sys.stderr)
             return 3
         render(dot_text, circuit, stats, act, args.output, formats, args.title or os.path.basename(args.stats_json),
-               args.suppression, not args.no_field)
+               args.suppression, not args.no_field, args.field_spread)
     except InputError as e:
         print("activity_map: error: %s" % e, file=sys.stderr)
         return 2

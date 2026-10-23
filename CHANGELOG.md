@@ -16,8 +16,9 @@
   `bench` checks only ratios (event plateau from 30 to 300 rings, WDM linearity, and the user-time plateau on
   optimised builds without sanitizers)
 * Activity map (`utils/activity_map.py`, F-31): the circuit of a run drawn with Graphviz's layout, each device
-  coloured by its processed events (linear scale) over a background field that interpolates between devices
-  and is zero far from them, subcircuit instances as clusters, optional suppression-ratio discs, a legend and
+  coloured by its processed events (linear scale) over a background field that blends nearby devices over
+  about a node's size (`--field-spread`) and is zero between devices that are not close, subcircuit
+  instances as clusters, optional suppression-ratio discs (clear of the labels), a legend and
   the run totals; reads `--json` and `--stats=ports,devices`, writes DOT (standard library only), SVG and
   PNG (numpy, matplotlib, Graphviz; pixi's `py` environment now includes Graphviz). See
   `doc/activity_map.md`
