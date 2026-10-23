@@ -699,11 +699,23 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
+    // Power in W: negative or not finite is an error, not a NaN field (B-189)
+    auto checked_power = [this](const Variable &v)
+    {
+        const double power = v.as_double();
+        if (!(power >= 0) || !std::isfinite(power))
+        {
+            cerr << "Error (" << name << "): power must be >= 0 and finite (got " << power << " W)" << endl;
+            exit(1);
+        }
+        return power;
+    };
+
     // Parse positional arguments (wl power phi)
     if(args.size() > 0)
         obj->setWavelength(args[0].as_double());
     if(args.size() > 1)
-        obj->setPower(args[1].as_double());
+        obj->setPower(checked_power(args[1]));
     if(args.size() > 2)
         obj->setPhase(args[2].as_double());
 
@@ -715,7 +727,7 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
         if (kw == "WL" || kw == "WAVELENGTH")
             obj->setWavelength(p.second.as_double());
         else if (kw == "POWER")
-            obj->setPower(p.second.as_double());
+            obj->setPower(checked_power(p.second));
         else if (kw == "PHI")
             continue; // handle it after all power commands are executed
         else {
@@ -732,6 +744,16 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
             obj->setPhase(p.second.as_double());
     }
     return obj;
+}
+
+// Path to open for a data file named in a netlist (value files, SPAR file=): relative to include_dir,
+// the directory of the netlist file that names it, first, then to the working directory (as .include,
+// ParserState::resolve_include(), B-143, B-192)
+static string resolve_data_file(const string &include_dir, const string &file)
+{
+    ParserState state;
+    state.include_dirs.push_back(include_dir);
+    return state.resolve_include(file);
 }
 
 /** ******************************************* **/
@@ -770,7 +792,7 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
     // Parse positional arguments (file)
     if(args.size() > 0)
-        obj->setValues(args[0].as_string());
+        obj->setValues(resolve_data_file(include_dir, args[0].as_string()));
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -879,7 +901,7 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
             if (is_string)
             {
-                obj->setValues(p.second.as_string());
+                obj->setValues(resolve_data_file(include_dir, p.second.as_string()));
             }
         }
         else {
@@ -892,23 +914,23 @@ sc_module *VLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 }
 
 // Value files of a VLSRC/EVLSRC line, as create() opens them: the positional argument, then
-// values="<file>" (a path relative to the working directory)
-static vector<string> value_list_files(const ParseElement &e)
+// values="<file>", each resolved as create() does (resolve_data_file(), B-192)
+static vector<string> value_list_files(const ParseElement &e, const string &include_dir)
 {
     vector<string> files;
     if (!e.args.empty() && e.args[0].type == Variable::STRING)
-        files.push_back(e.args[0].str);
+        files.push_back(resolve_data_file(include_dir, e.args[0].str));
     for (const auto &p : e.kwargs)
     {
         if (strutils::iequals(p.first, "VALUES") && p.second.type == Variable::STRING)
-            files.push_back(p.second.str);
+            files.push_back(resolve_data_file(include_dir, p.second.str));
     }
     return files;
 }
 
 vector<string> VLSourceElement::data_files() const
 {
-    return value_list_files(*this);
+    return value_list_files(*this, include_dir);
 }
 
 /** ******************************************* **/
@@ -947,7 +969,7 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
     // Parse positional arguments (file)
     if(args.size() > 0)
-        obj->setValues(args[0].as_string());
+        obj->setValues(resolve_data_file(include_dir, args[0].as_string()));
 
     // Parse keyword arguments
     for (auto &p: kwargs)
@@ -1042,7 +1064,7 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
             if (is_string)
             {
-                obj->setValues(p.second.as_string());
+                obj->setValues(resolve_data_file(include_dir, p.second.as_string()));
             }
         }
         else {
@@ -1056,7 +1078,7 @@ sc_module *EVLSourceElement::create(ParseTreeCreationHelper &pt_helper) const
 
 vector<string> EVLSourceElement::data_files() const
 {
-    return value_list_files(*this);
+    return value_list_files(*this, include_dir);
 }
 
 /** ******************************************* **/
@@ -1502,9 +1524,7 @@ INSTANTIATE_AND_CONNECT_BI(SPARElement, pt_helper)
 string SPARElement::resolve_file(const string &file) const
 {
     // Relative path: next to the netlist file first, then in the working directory (as .include)
-    ParserState state;
-    state.include_dirs.push_back(include_dir);
-    return state.resolve_include(file);
+    return resolve_data_file(include_dir, file);
 }
 
 vector<string> SPARElement::data_files() const

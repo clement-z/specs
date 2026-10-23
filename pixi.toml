@@ -30,6 +30,9 @@ flex = "*"
 bison = ">=3"
 python = "3.12.*"
 ccache = "*"
+# For meson test: tests/tools/test_run_table.py (pyspecs/runtable.py) needs them; skipped without (B-193)
+numpy = "*"
+pandas = "*"
 
 [target.linux.dependencies]
 gcc = "15.*"

@@ -59,3 +59,7 @@ The fix is behaviour-neutral: it only replaces a null dereference.
 - The fix is behaviour-neutral.
 
 **Orchestrator:** Missing include added to the suggested fix.
+
+Note (sprint 2026-10c, PK): `-t ac_crow` was removed, and `backlog/repro/a2-vci-crow.sh` with it. The CROW class
+(`sc_signal<OpticalSignal>` ports) has no user left, so no golden case reaches the non-`spx` channel path of the
+`--vci` prints; `regress/crow-tb-preset-n8-vci` runs `--vci` on the same circuit as a netlist.

@@ -1,0 +1,4 @@
+* B-192: a subcircuit whose VLSRC value file is next to this file (lib/values.csv)
+.subckt SOURCE out
+vlsrc1 out "values.csv"
+.ends SOURCE

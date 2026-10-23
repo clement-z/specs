@@ -1,6 +1,5 @@
 Valid testbench identifiers:
 	ac_add_drop
-	ac_crow
 	dc
 	det
 	detector

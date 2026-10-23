@@ -1,0 +1,25 @@
+{
+ "args": [
+  "--vci",
+  "-f",
+  "tests/golden/netlists/crow-tb-preset-n8.cir",
+  "-o",
+  "traces/out"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/out.manifest.json": {
+   "bytes": 474,
+   "kind": "json",
+   "sha256": "14fe561a402fa4dae842f8a469b4a91236335c8cb1a3b27a40dfe02db39e0965",
+   "stored": "files/traces/out.manifest.json"
+  },
+  "traces/out.vcd": {
+   "bytes": 518640,
+   "kind": "vcd",
+   "sha256": "36a37a509ecf7e1db8022193689a5dc4c7a4a2cdfad1ef04efe9706fa9b69bab",
+   "stored": "files/traces/out.vcd"
+  }
+ },
+ "id": "regress/crow-tb-preset-n8-vci"
+}

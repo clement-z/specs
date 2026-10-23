@@ -105,9 +105,9 @@ writes `<trace>.manifest.json` next to it, before the simulation starts. With th
   working directory), with the SHA-256 of their content when the manifest was written (`sha256sum` gives the
   same value; `null` if the file could not be read).
 - `data_files` lists, in the same form, every data file the devices read while the circuit was built, once, in
-  the order they were first opened: the S-parameter files of `SPAR` (`file=`, resolved as `.include`: relative
-  to the netlist file first) and the value files of `VLSRC`/`EVLSRC` (relative to the working directory). It is
-  `[]` when there is none.
+  the order they were first opened: the S-parameter files of `SPAR` (`file=`) and the value files of
+  `VLSRC`/`EVLSRC`, resolved as `.include` (relative to the netlist file first, B-192), with the path opened. It
+  is `[]` when there is none.
 - `format_version` 2 added `data_files`: a version 1 manifest did not record the data files.
 - `trace_file` is the VCD SPECS opened. SystemC creates the file at the first traced time step, so a run that
   never advances time (a `.op` alone) has a manifest but no VCD.

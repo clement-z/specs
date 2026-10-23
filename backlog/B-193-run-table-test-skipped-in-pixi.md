@@ -1,5 +1,5 @@
 # B-193: The run-table test is always skipped in pixi builds
-severity: low | category: test-gap | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: open
+severity: low | category: test-gap | effort: XS | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in a8b4721 (sprint 2026-10c PK)
 location: tests/tools/meson.build, tests/tools/test_run_table.py, pixi.toml
 
 ## Problem

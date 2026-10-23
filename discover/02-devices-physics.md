@@ -147,7 +147,7 @@ Abbreviations: o = optical port (`spx::oa_*`, `OpticalSignal`); e = electrical p
 ### CROW (`devices/crow.{h,cpp}`)
 - Pthr = 0.85 (κ_power = 0.15). This matches the paper. Defaults are neff 2.2, ng 4.3, 2 dB/cm (crow.h:27-30).
 - Each ring is 2 × WG(L/2) (crow.cpp:28-47). The alternating direction for even/odd rings is correct (counter-rotating coupled rings), and the DC through path keeps light inside a ring.
-- **Paper benchmark not reproducible:** the paper samples L_i ~ N(33.2, 5.0) µm per waveguide, but the code applies the same length to every waveguide. `crow_tb.cpp:179` uses 60 µm per ring.
+- **Paper benchmark not reproducible:** the paper samples L_i ~ N(33.2, 5.0) µm per waveguide, but the code applies the same length to every waveguide. `crow_tb.cpp:179` uses 60 µm per ring. (The testbench was removed in v0.4.0; `tests/bench/crow_gen.py` draws the paper's lengths.)
 - Debug `cout` spam: crow.h:62,74 and crow.cpp:33,39,45.
 
 ### Ring (`devices/ring.h`) — dead code

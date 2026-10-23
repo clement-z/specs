@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-stats",
+  "format_version": 1,
+  "analysis": "TRAN",
+  "sections": ["summary", "ports"],
+  "options": {"abstol": 1e-08, "reltol": 1e-04, "snapfactor": 10, "maxevents": 0},
+  "event_cap_reached": false,
+  "end_time_s": 0.40000000001,
+  "wall_time_s": "<WALL_TIME>",
+  "totals": {"output_ports": 0, "scheduled": 0, "coalesced": 0, "processed": 0, "emitted": 0, "suppressed": {"abstol": 0, "reltol": 0, "snap": 0}, "pending_max": 0, "pending_mean": 0, "pending_end": 0, "last_emission_s": null},
+  "ports": []
+}

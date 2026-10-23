@@ -479,7 +479,7 @@ Continuous-wave optical source: `CWSRC<name> <out> [wl [power [phi]]] [keyword=v
   more is an error.
 - Keywords (case-insensitive): `WL` (alias `WAVELENGTH`), `POWER`, `PHI`. A keyword overrides the
   positional value; `PHI` is applied after `POWER`.
-- Required: none. `power` defaults to 0 W; always give `wl`.
+- Required: none. `power` defaults to 0 W; always give `wl`. A negative power is an error.
 - Example: `cwsrc1 in 1.55e-6 1e-3 0.5` is `cwsrc1 in wl=1.55e-6 power=1e-3 phi=0.5`.
 
 ## VLSRC
@@ -487,8 +487,10 @@ Continuous-wave optical source: `CWSRC<name> <out> [wl [power [phi]]] [keyword=v
 Optical value-list source: `VLSRC<name> <out> [file] [VALUES=...]`
 
 - Nets: `out`, optical output.
-- Positional arguments: `file` (string, path relative to the working directory). At most 1; more is
-  an error.
+- Positional arguments: `file` (string). At most 1; more is an error. A relative path (here and in
+  `VALUES=`) is looked up next to the netlist file that contains the element first (for an element in a
+  `.subckt` body, the file that defines the subcircuit), then in the working directory, as `.include`
+  (same warning when both exist and differ).
 - Keywords (case-insensitive): `VALUES`, either a file name (string) or a list
   `[[t0, p0, wl0], [t1, p1, wl1], ...]` (s, W, m). `FILE` and `SCALE` are reserved: they give a
   "not implemented" error.
@@ -509,8 +511,10 @@ Optical value-list source: `VLSRC<name> <out> [file] [VALUES=...]`
 Electrical value-list source: `EVLSRC<name> <out> [file] [VALUES=...]`
 
 - Nets: `out`, electrical output.
-- Positional arguments: `file` (string, path relative to the working directory). At most 1; more is
-  an error.
+- Positional arguments: `file` (string). At most 1; more is an error. A relative path (here and in
+  `VALUES=`) is looked up next to the netlist file that contains the element first (for an element in a
+  `.subckt` body, the file that defines the subcircuit), then in the working directory, as `.include`
+  (same warning when both exist and differ).
 - Keywords (case-insensitive): `VALUES`, either a file name (string) or a list `[[t0, V0], [t1, V1], ...]`
   (s, V). `FILE` and `SCALE` are reserved: they give a "not implemented" error.
 - File format: one `t,voltage` line per value (s, V). The first line of the file is always skipped

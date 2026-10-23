@@ -19,7 +19,7 @@ Repo: worktree `sprint/2026-10` @ d9eb1e6. Method: static reading + `clang-forma
   - "Generic S-matrix devices" exist only as an abstract class, not usable from a netlist.
   - There is no impulse-response analysis.
   - Mixed-mode (sampled-time) is an empty stub that silently drops every output event.
-- **CROW benchmark**: the testbench exists (`-t ac_crow`) but uses different parameters from the paper, and `--nrings_crow` does nothing. With a paper-like netlist (via a generator) and the **default CMake build (no `CMAKE_BUILD_TYPE` → -O0)**, a 20 ns run takes 2.3 s (N=3), 14.6 s (N=10) and 21.3 s (N=30). After the paper's ×0.015 normalisation to 300 ps that is about 35 / 220 / 320 ms, against the paper's ≤~40 ms plateau. The plateau trend does appear; the absolute numbers are 3–8× off, which most likely comes from -O0 plus VCD output.
+- **CROW benchmark**: the testbench exists (`-t ac_crow`) but uses different parameters from the paper, and `--nrings_crow` does nothing (both removed in v0.4.0: `tests/bench/crow_gen.py` writes the paper's CROW and, with `--preset crow_tb`, the testbench's). With a paper-like netlist (via a generator) and the **default CMake build (no `CMAKE_BUILD_TYPE` → -O0)**, a 20 ns run takes 2.3 s (N=3), 14.6 s (N=10) and 21.3 s (N=30). After the paper's ×0.015 normalisation to 300 ps that is about 35 / 220 / 320 ms, against the paper's ≤~40 ms plateau. The plateau trend does appear; the absolute numbers are 3–8× off, which most likely comes from -O0 plus VCD output.
 - **Docs are thin and partly stale**:
   - README points to an external website.
   - `QUICKSTART.md` was deleted, but Doxyfile and mainpage still reference it.
@@ -146,7 +146,7 @@ Repo: worktree `sprint/2026-10` @ d9eb1e6. Method: static reading + `clang-forma
 | 26 | Usable as a SystemC library / co-simulation | `libspx` SHARED, EXCLUDE_FROM_ALL `CMakeLists.txt:50` (excludes parser); electrical signal types `specs.h:24-51` | **partial**: no embedding API, example or docs; netlist parsing is not in the library |
 | 27 | Feedback circuits terminate thanks to tolerances | Row 5 | implemented |
 | 28 | Single-threaded | SystemC kernel | as claimed. Parallelisation is in `todo.txt` |
-| 29 | CROW benchmark circuit | `src/devices/crow.{h,cpp}`, `src/tb/crow_tb.cpp`, `-t ac_crow` (`tb/alltestbenches.cpp:20`) | **partial**: fixed lengths (no N(33.2,5) µm sampling), κ_power=0.2, 1 W field=1 (not 1 mW), 4 pulses, 50 ns, λ reassigned 8× (`crow_tb.cpp:42-49`), `nrings_crow=3` hard-coded (`:33`), `--nrings_crow` is a no-op (`main.cpp:244-247,341-345`) |
+| 29 | CROW benchmark circuit | `src/devices/crow.{h,cpp}`, `src/tb/crow_tb.cpp`, `-t ac_crow` (`tb/alltestbenches.cpp:20`; testbench removed in v0.4.0, see `tests/bench/crow_gen.py`) | **partial**: fixed lengths (no N(33.2,5) µm sampling), κ_power=0.2, 1 W field=1 (not 1 mW), 4 pulses, 50 ns, λ reassigned 8× (`crow_tb.cpp:42-49`), `nrings_crow=3` hard-coded (`:33`), `--nrings_crow` is a no-op (`main.cpp:244-247,341-345`) |
 | 30 | Speed figures (6290×/5090×, ~40 ms plateau), RMSE < 3 µW | — | **missing** as tests/harness. No reference data from Photontorch or Interconnect in the repo |
 | 31 | GTKWave / Pandas (poster) | VCD output; `utils/openwave.sh`; `pyspecs/specsparse.py` (needs `pyDigitalWaveTools`) | implemented |
 

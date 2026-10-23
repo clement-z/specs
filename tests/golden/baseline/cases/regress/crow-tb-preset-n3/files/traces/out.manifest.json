@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/crow-tb-preset-n3.cir", "-o", "traces/out"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/crow-tb-preset-n3.cir", "sha256": "198ed7ffb4da362eafc9b0610d453601d108bf73c1994ae2adc15de36fcf432f"}
+  ],
+  "data_files": [],
+  "trace_file": "traces/out.vcd"
+}

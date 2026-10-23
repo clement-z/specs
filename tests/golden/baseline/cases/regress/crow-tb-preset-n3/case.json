@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/crow-tb-preset-n3.cir",
+  "-o",
+  "traces/out"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/out.manifest.json": {
+   "bytes": 465,
+   "kind": "json",
+   "sha256": "ca64dd64eccd03bc3c30470c954c58f8e4aa0ca7d3fdb397a09d41e2d09df1fe",
+   "stored": "files/traces/out.manifest.json"
+  },
+  "traces/out.vcd": {
+   "bytes": 203791,
+   "kind": "vcd",
+   "sha256": "f909f03d1229bc3c41829f8d2c6981491e6ccc9ad6ccd96d55241598e1b95867",
+   "stored": "files/traces/out.vcd"
+  }
+ },
+ "id": "regress/crow-tb-preset-n3"
+}
