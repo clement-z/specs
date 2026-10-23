@@ -5,3 +5,11 @@ test('activity-map', find_program('python3'),
   suite: 'tools',
   depends: specs_exe,
 )
+
+# pyspecs/runtable.py (F-02): reads the run tables of two .step/.mc plans; skipped (exit 77) without numpy
+# and pandas (pixi run -e py python -I tests/tools/test_run_table.py --specs ... --repo . runs it)
+test('run-table', find_program('python3'),
+  args: ['-I', files('test_run_table.py'), '--specs', specs_exe, '--repo', meson.project_source_root()],
+  suite: 'tools',
+  depends: specs_exe,
+)
