@@ -95,10 +95,6 @@ ROOT/CWSRC2 emitted: @ 1550 nm (0.063246 √W, 0.004000 W, 0.0000 rad)
 ║ - ROOT/m2 (OPTICAL) = @ 1560 nm (0.015811 √W, 0.000250 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
-ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: @ 1560 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@2 ps, ROOT/VLSRC1 emitted: @ 1540 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
-@6 ps, ROOT/VLSRC1 emitted: @ 1540 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 10 ps
 ╔═══════════════════╗
 ║        DONE       ║

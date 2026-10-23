@@ -79,20 +79,6 @@ Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
 ║ - ROOT/out (OPTICAL) = @ 1540 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
-ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: @ 1540 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-ROOT/VLSRC2 was enabled
-@0 s, ROOT/VLSRC2 emitted: @ 1540 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-ROOT/VLSRC3 was enabled
-@0 s, ROOT/VLSRC3 emitted: @ 1540 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@1 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@2 ps, ROOT/VLSRC1 emitted: @ 1560 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
-@3 ps, ROOT/VLSRC2 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@4 ps, ROOT/VLSRC3 emitted: @ 1540 nm (0.063246 √W, 0.004000 W, 0.0000 rad)
-@20 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@21 ps, ROOT/VLSRC1 emitted: @ 1560 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@30 ps, ROOT/VLSRC2 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@40 ps, ROOT/VLSRC3 emitted: @ 1540 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 200 ps
 Run statistics written to traces/delete_me.stats.json
 ╔═══════════════════╗
