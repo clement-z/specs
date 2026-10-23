@@ -6,6 +6,7 @@
 // net carried while it was disabled.
 // PD5: the wavelength latch of a PROBE run by a netlist analysis (Probe::LatchMode).
 // PD6: a netlist PROBE always traces its wavelength; wl=0 is ignored, with one warning.
+// B-186: an MLPROBE traces each .dc point as a whole, 0 for a listed wavelength absent at that point.
 #include <gtest/gtest.h>
 #include <systemc.h>
 
@@ -333,6 +334,69 @@ TEST(MLambdaProbe, TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled)
         sc_start();
         expectMLProbeTraces(probe, 1.55e-6, 6e-3, 0.0);
         expectMLProbeTraces(probe, 1.56e-6, 5e-3, 1.0);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-186: in a .dc, an MLPROBE traces each point as a whole (SPECSConfig::runDCAnalysis() calls
+// tracePoint() once the point converged): the last value of each listed wavelength received at this point,
+// and 0 for a listed wavelength its net did not carry at this point (fresh steady state), in the VCD
+// signals and in the table, in wavelength order
+TEST(MLambdaProbe, DcPointTracesEveryListedWavelengthOrZero)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+        const std::string csv = testing::TempDir() + "specs_test_b186_" + std::to_string(getpid()) + ".csv";
+        {
+            TraceTable table(csv, "");
+            spx::oa_signal_type net{"net"};
+            MLambdaProbe probe("mlprobe", {1.55e-6, 1.56e-6, 1.57e-6});
+            probe.p_in(net);
+
+            specsGlobalConfig.prepareSimulation();
+            probe.setTraceTable(&table);
+            sc_start(); // initialise the threads
+            probe.m_per_point = true;
+
+            // Point 1: two listed wavelengths (1.55 twice: the last value counts) and an unlisted one;
+            // nothing is traced before tracePoint()
+            for (const auto &s : {sig(1, 0, 1.55e-6), sig(3, 0, 1.56e-6), sig(0, 2, 1.55e-6), sig(1, 0, 1.31e-6)})
+            {
+                net.write(s);
+                settle();
+            }
+            expectMLProbeTraces(probe, 1.55e-6, 0, 0);
+            expectMLProbeTraces(probe, 1.56e-6, 0, 0);
+            probe.tracePoint();
+            sc_start(sc_time::from_value(1));
+            expectMLProbeTraces(probe, 1.55e-6, 4, std::atan2(2, 0));
+            expectMLProbeTraces(probe, 1.56e-6, 9, 0);
+            expectMLProbeTraces(probe, 1.57e-6, 0, 0);
+
+            // Point 2: only 1.56; 1.55, not carried at this point, reads 0
+            net.write(sig(1, 1, 1.56e-6));
+            settle();
+            probe.tracePoint();
+            sc_start(sc_time::from_value(1));
+            expectMLProbeTraces(probe, 1.55e-6, 0, 0);
+            expectMLProbeTraces(probe, 1.56e-6, 2, std::atan2(1, 1));
+            expectMLProbeTraces(probe, 1.57e-6, 0, 0);
+            EXPECT_EQ(probe.m_ignored_wavelengths_m, std::set<double>{1.31e-6});
+            probe.m_ignored_wavelengths_m.clear();
+
+            EXPECT_TRUE(table.close());
+            EXPECT_EQ(table.rows(), 6u);
+        }
+        EXPECT_EQ(readFile(csv),
+                  "time_s,signal,wavelength_m,power_W,field_re,field_im\n"
+                  "0,mlprobe,1.55e-06,4,0,2\n"
+                  "0,mlprobe,1.56e-06,9,3,0\n"
+                  "0,mlprobe,1.57e-06,0,0,0\n"
+                  "1e-15,mlprobe,1.55e-06,0,0,0\n"
+                  "1e-15,mlprobe,1.56e-06,2,1,1\n"
+                  "1e-15,mlprobe,1.57e-06,0,0,0\n");
+        std::remove(csv.c_str());
     }
     SPECS_TEST_FOOTER();
 }

@@ -35,6 +35,10 @@ public:
     uint32_t signal_index(const std::string &name);
     // One sample of a signal (time_s: the current simulation time, never decreasing)
     void append(double time_s, uint32_t signal, const OpticalSignal &s);
+    // A zero row (power and field 0) at wavelength_m, which need not be a registered wavelength: a listed
+    // wavelength that the net of an MLPROBE does not carry at a .dc point (B-186). Appended once per time
+    // step, signal and wavelength: no later sample replaces it
+    void appendZero(double time_s, uint32_t signal, double wavelength_m);
     // Drops the sample of (signal, wavelength id) of the current time step, if any: a PROBE that
     // latches a smaller wavelength within the time step of its latch (PD5)
     void discard(double time_s, uint32_t signal, uint32_t wavelength_id);

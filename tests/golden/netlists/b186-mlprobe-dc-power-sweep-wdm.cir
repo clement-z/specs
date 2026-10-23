@@ -1,0 +1,21 @@
+* B-186: MLPROBE in a .dc that sweeps a source power (not a wavelength) of a two-channel WDM circuit:
+* cwsrc1 (1550 nm, on a resonance of the add-drop ring) swept 1, 2, 3 mW; cwsrc2 (1552 nm, off resonance)
+* fixed at 1 mW; the merger halves both. At every point both MLPROBEs record both channels: at 1550 nm the
+* drop port reads 0.497, 0.994, 1.491 mW (the through port a few nW); at 1552 nm the drop port reads 0.16 mW
+* and the through port 0.34 mW at every point (equal within the convergence tolerance: each point iterates
+* from the previous point's values). probe1 (drop) traces the smallest wavelength, 1550 nm (PD5: no
+* wavelength sweep)
+.assign lambda0 = 1.55e-6
+.assign neff = 2.3
+.assign length_2pi = {lambda0}/{neff}
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.552e-6 power=1e-3
+merger1 a b in
+coupler1 in ring_bl out ring_br k=0.85
+coupler2 add ring_tr drop ring_tl k=0.85
+wg_ring_l ring_tl ring_bl att=2 length=101*{length_2pi} neff={neff} ng=4.3
+wg_ring_r ring_br ring_tr att=2 length=101*{length_2pi} neff={neff} ng=4.3
+mlprobe_out out wl=[1.55e-6, 1.552e-6]
+mlprobe_drop drop wl=[1.55e-6, 1.552e-6]
+probe1 drop
+.dc P(cwsrc1) 1e-3 3e-3 1e-3

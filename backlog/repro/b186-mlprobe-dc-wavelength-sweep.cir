@@ -1,5 +1,5 @@
 * MLPROBE in a .dc wavelength sweep, next to a fixed 1.55 um source
-* Run: specs -f backlog/repro/b186-mlprobe-dc-wavelength-sweep.cir -o traces/out (needs traces/); MLPROBE1 records nothing, PROBE1 one value per point
+* Run: specs -f backlog/repro/b186-mlprobe-dc-wavelength-sweep.cir -o traces/out (needs traces/); before the fix (sprint 2026-10c PL) MLPROBE1 recorded nothing, PROBE1 one value per point
 CWSRC1 a wl=1.548e-6 power=1e-3
 CWSRC2 b wl=1.55e-6 power=2e-3
 MERGER1 a b c

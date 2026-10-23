@@ -82,6 +82,10 @@
 
 ### Fixed
 
+* `.dc`: an MLPROBE records each sweep point (B-186; before, it declared its VCD signals but recorded no value
+  in a `.dc`): the converged value of each listed wavelength at each point, in the VCD and in the CSV/npz
+  tables, and 0 for a listed wavelength that its net does not carry at that point. A PROBE still follows the
+  swept wavelength of a wavelength or frequency sweep; an MLPROBE records its fixed listed wavelengths
 * `.dc`: a sweep point whose output falls below `abstol` (e.g. a null of an MZI) is written (0 after the snap)
   instead of keeping the previous point's value and wavelength (B-003)
 * Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line

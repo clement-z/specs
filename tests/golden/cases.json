@@ -3947,6 +3947,48 @@
    "note": "PD5 follow-up 2: .dc /src/F frequency sweep (long form): a PROBE latches the swept wavelength (c/f) at each point, also at the first point next to a smaller fixed wavelength"
   },
   {
+   "id": "regress/b186-mlprobe-dc-wavelength-sweep",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b186-mlprobe-dc-wavelength-sweep.cir"
+   ],
+   "note": "B-186: an MLPROBE records each point of a .dc wavelength sweep: its three listed wavelengths per point, 0 for one its net does not carry at that point (1.548 um at point 2, 1.549 um at point 1); PROBE1 keeps the swept wavelength (before: the MLPROBE recorded nothing in a .dc)"
+  },
+  {
+   "id": "regress/b186-mlprobe-dc-power-sweep-wdm",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b186-mlprobe-dc-power-sweep-wdm.cir"
+   ],
+   "note": "B-186: MLPROBEs at the through and drop ports of an add-drop ring record both channels of a two-channel WDM circuit at each point of a .dc power sweep (P(cwsrc1)); probe1 traces the smallest wavelength"
+  },
+  {
    "id": "regress/b003-dc-dark-point",
    "setup": {
     "copy": [

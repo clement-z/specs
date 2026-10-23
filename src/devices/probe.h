@@ -154,6 +154,11 @@ public:
     // Wavelength id -> the listed wavelength it matches within OpticalSignal::WAVELENGTH_MATCH_RTOL (NaN:
     // none), filled at the first event of each wavelength (listedWavelength(), B-062)
     std::map<uint32_t, double> m_listed_by_id;
+    // .dc (B-186): the probe traces each sweep point as a whole, in tracePoint(), called by
+    // SPECSConfig::runDCAnalysis() once the point converged. Meanwhile, the last value of each listed
+    // wavelength received at this point. Keyed by the listed wavelength
+    bool m_per_point = false;
+    std::map<double, OpticalSignal> m_point_samples;
 
     void setTraceFile(sc_trace_file *Tf);
     void setTraceTable(TraceTable *table);
@@ -161,6 +166,10 @@ public:
     double listedWavelength(const OpticalSignal &s);
     // Traces s, of the listed wavelength listed_m
     void traceSample(const OpticalSignal &s, double listed_m);
+    // .dc point (m_per_point): traces every listed wavelength, in wavelength order, with the last value its
+    // net received at this point, or 0 if the net did not carry it at this point (each point is a fresh
+    // steady state, B-185, B-186)
+    void tracePoint();
     // One warning on stderr if the probe ignored wavelengths, then forgets them. Called for every
     // MLPROBE in name order at the end of a netlist run (SPECSConfig::runAnalysis()), and by the
     // destructor for the probes of testbenches and C++ users
