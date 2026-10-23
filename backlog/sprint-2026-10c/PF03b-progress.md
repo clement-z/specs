@@ -8,7 +8,7 @@ Base: 48e510f.
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | Per-path delayed copies | done | 7e9e03b | clang/asan-gcc: same 2 cases; asan-clang clean |
-| 2 | Negative delay warning per path | todo | | |
+| 2 | Negative delay warning per path | done | (see git log) | reported when the path is first used |
 | 3 | Grid-adequacy warning | done | 964b75a | threshold 0.02 (leave-one-out); no existing case changed; new case regress/spar-grid-warning |
 | 4 | Mixed interpolation near nulls | done | 368bf61 | threshold 0.07 x max|S|; measurements in the report |
 | 5 | Data files in the run manifest | done | 805dc8c | subagent (opus) in /tmp/PF03b-wt/manifest, reviewed, cherry-picked; ring manifests re-recorded for item 8's file |
@@ -88,3 +88,13 @@ Re-recorded: the gtest case (new test SParamFile.GridCheckFlagsANullNarrowerThan
 `regress/spar-grid-warning` (1 nm ring export, 11 points: expected warning on the worst used path, from the
 prototype on the 31-point file: ~0.7 at the through null near 1.55 um or 1.546 um; .tran: out at +0 with the old
 negative-delay message, drop at the 1 nm grid's in->drop delay).
+
+### Item 2 (negative delay warning per path), written before the strict run
+Reported once per path, in .tran, when the path is first used (an input event on its input), at least half a time
+step; text: path (port names), wavelength, value, grid hint when the delay depends on a flagged grid point, the
+zero-delay-in-a-loop caveat. Only stderr can change; times, fields and counters unchanged.
+- `regress/spar-ring-tran`: stderr line replaced by the new text: in->out, 1.55e-06 m, -3.73047e-11 s, no grid hint
+  (the 0.05 nm file has no flagged point). add->drop is also negative there but add is never lit: not reported.
+- `regress/spar-grid-warning`: line replaced: in->out, 1.55e-06 m, -6.775e-13 s, with the grid hint.
+- Every other case unchanged (no other .tran case has a negative delay).
+Result: as predicted (2 stderr lines).

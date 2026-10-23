@@ -497,6 +497,12 @@
    "only": "^(regress/spar-grid-warning|gtest/unit_tests)$",
    "gtest": true,
    "note": "PF03b item 3: grid-adequacy warning (new case, new gtest)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:45:46Z",
+   "only": "^(regress/spar-ring-tran|regress/spar-grid-warning)$",
+   "gtest": false,
+   "note": "PF03b item 2: negative group delay reported per path (port names, wavelength, grid hint, loop caveat)"
   }
  ]
 }

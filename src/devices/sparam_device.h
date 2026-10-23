@@ -77,10 +77,12 @@ protected:
     /** Inputs (indices into p_in) that reach each output */
     std::vector<std::vector<size_t>> m_sources;
 
-    /** Per wavelength: S(output k, input i) and the delay of that path, at [k * inputs + i] (the path index) */
+    /** Per wavelength: S(output k, input i) and the delay of that path, at [k * inputs + i] (the path index);
+     * the group delay of the data where it was negative (0 was used), else 0 */
     struct WavelengthEntry {
         std::vector<OpticalSignal::field_type> S;
         std::vector<sc_time> delay;
+        std::vector<double> negative_delay_s;
     };
     WavelengthCache<WavelengthEntry> m_cache;
     /** Delayed copy of each path (index k * inputs + i) and wavelength id: the input field that has
@@ -106,9 +108,9 @@ protected:
     sc_event m_arrival_event;
 
     sc_time m_fixed_delay;
-    // One report per device (B-014 rounding, negative group delays)
+    // One report per device (B-014 rounding) and per path (negative group delays)
     bool m_delay_rounding_reported = false;
-    bool m_negative_delay_reported = false;
+    std::vector<char> m_negative_delay_reported;
 
     void onInput(size_t input, const OpticalSignal &s);
     /** Copies the arrivals due now and writes the outputs they change */
@@ -117,6 +119,8 @@ protected:
     void writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e);
     WavelengthEntry computeEntry(const OpticalSignal &s);
     sc_time autoDelay(double tau_s);
+    /** .tran: reports a negative group delay of a path (0 used) once per path, when the path is first used */
+    void reportNegativeDelay(size_t k, size_t i, double wavelength_m, double tau_s);
 };
 
 class SParamDeviceUni : public SParamDeviceBase {

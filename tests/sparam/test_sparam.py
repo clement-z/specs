@@ -14,6 +14,7 @@ Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 - bidirectional: two sources on both sides of SPAR (nets with two writers) as on both sides of a WG;
 - per-path delays, .tran: two lit inputs whose paths into each output have different delays (two waveguides
   into a coupler) give the transient of the explicit circuit;
+- negative group delays: reported once per path, when the path is first lit;
 - port order: the asymmetric Touchstone 1 and 2 fixtures give S21 and, with ports= reversed, S12;
 - passivity: check warns, ignore does not, enforce scales the matrix;
 - range: a wavelength outside the data is an error with the range;
@@ -272,6 +273,28 @@ def test_per_path_tran(t):
             'max |E_SPAR - E_explicit| = %.3g, sample times %s (only 0)' % (d, t0))
 
 
+def test_negative_delay_warning(t):
+    # the ring at its through-port null (1.55 um): the through paths in->out and add->drop have a negative
+    # group delay. Each is reported once, when its input is first lit; an unlit input's paths are not
+    ring = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
+    def netlist(add_lit):
+        lines = ['* negative group delays, .tran',
+                 'vlsrc1 in values=[[0, 0, 1.55e-6], [1e-12, 1, 1.55e-6], [5e-12, 0.5, 1.55e-6], [9e-12, 0, 1.55e-6]]']
+        if add_lit:
+            lines.append('vlsrc2 add values=[[0, 0, 1.55e-6], [3e-12, 1, 1.55e-6], [7e-12, 0, 1.55e-6]]')
+        lines += ['spar1 in add out drop file="%s"' % ring, '.options timescale=-15', '.save out drop',
+                  '.tran 20e-12', '']
+        return '\n'.join(lines) + '\n'
+    for add_lit, expected in [(False, ["'in' to port 'out'"]), (True, ["'in' to port 'out'", "'add' to port 'drop'"])]:
+        r = t.run(netlist(add_lit), 'negative_delay')
+        found = [line for line in r.stderr.splitlines() if 'negative group delay' in line]
+        ok = r.status == 0 and len(found) == len(expected) and all(
+            any(e in line for line in found) for e in expected) and all(
+            'once per path' in line and 'without delay' in line and 'artefact' not in line for line in found)
+        t.check('negative-delay/%s' % ('in-and-add' if add_lit else 'in-only'), ok,
+                '%d warning(s): %s' % (len(found), '; '.join(line[:110] for line in found)))
+
+
 def test_port_order(t):
     for fx in ['asym.s2p', 'asym_v2.ts']:
         for ports, expected in [('', 0.8j), (' ports="right,left"', 0.3)]:
@@ -358,7 +381,7 @@ def test_round_trip(t):
                 '%.3g anywhere (<= 2e-3)' % (n, smooth, tol, anywhere))
 
 
-TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_port_order, test_passivity,
+TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_negative_delay_warning, test_port_order, test_passivity,
          test_range, test_round_trip]
 
 
