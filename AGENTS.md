@@ -57,7 +57,12 @@ Orientation: `discover/ONBOARDING.md`; deep dives in `discover/0*.md`; known iss
   `.clang-format`. Reformat only lines you change, in the local style. Control statements mostly use Allman braces.
 - `#pragma once`. Project includes are quoted and relative to `src/` (`#include "devices/waveguide.h"`); `<systemc.h>`.
 - Classes PascalCase; Uni/Bi variants share an `XxxBase`. Members `m_` **with units in the name**
-  (`m_length_cm`, `m_attenuation_dB_cm`). Ports `p_in`/`p_out`, `p0_in`/`p1_out`. Threads `on_<port>_changed()`.
+  (`m_length_cm`, `m_attenuation_dB_cm`). Ports `p_in`/`p_out`, `p0_in`/`p1_out`. Reactions `on_<port>_changed()`.
+- Process style (F-15): a stateless device reaction is an `SC_METHOD` (`dont_initialize()`; constants computed in
+  `start_of_simulation()`, `--vci` prints in a one-shot `print_initialization()` thread created only with `--vci`).
+  `SC_THREAD` only where `wait()` with a time is needed (sources, detector tick). The kernel runs a delta cycle's
+  methods before its threads, so converting a process changes its order relative to the others: check strict
+  golden and `stats-compare` (`tests/golden/README.md`).
   Method case is mixed (camelCase/snake_case), so follow the class you're in. `typedef` over `using`.
 - Units: SI in netlists, **cm internally** for waveguide lengths, dB/cm; optical field is √W.
 - Errors: `std::cerr << ...; exit(1);` is the existing pattern. Don't add new `assert`s for user-input validation.

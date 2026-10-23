@@ -10,7 +10,7 @@
 
 #include "test/utils.h"
 
-// Owns an OpticalOutputPort bound to a signal, so that the thread
+// Owns an OpticalOutputPort bound to a signal, so that the process
 // OpticalOutputPort::on_data_ready() can be driven directly through its
 // (public) queue and event queue. Used for the error paths of B-020.
 class OOPHarness : public sc_module {

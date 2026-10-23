@@ -39,6 +39,8 @@ private:
 // are compared bit for bit: -0 and +0 give different imaginary parts, NaN != NaN
 class PolarCache {
 public:
+    // amplitude 0 until assigned (devices assign it before the simulation)
+    PolarCache() {}
     explicit PolarCache(double amplitude)
         : m_amplitude(amplitude)
     {}
@@ -56,7 +58,7 @@ public:
     }
 
 private:
-    double m_amplitude;
+    double m_amplitude = 0;
     bool m_valid = false;
     uint64_t m_phase_bits = 0;
     std::complex<double> m_value;

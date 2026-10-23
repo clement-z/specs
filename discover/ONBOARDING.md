@@ -33,12 +33,13 @@ specs -f circuit.cir [-o trace] [-T ts] [--abstol/--reltol] [-t tb]
                                                                     │ new Device(...) ; bind sc_signal<OpticalSignal>
   global specsGlobalConfig (SPECSConfig : sc_module, specs.cpp:19) ◄┘ owns all objects, runs analyses
      .op/.dc → every output port NO_DELAY, delta-cycle fixed point   .tran → OP first, then event-driven
-  Device SC_THREAD ─ read p_in ─► compute ─► OpticalOutputPort.delayedWrite(sig, delay)
+  Device SC_METHOD ─ read p_in ─► compute ─► OpticalOutputPort.delayedWrite(sig, delay)
                                            └► PQueue + pending sc_event ─ abstol∧reltol gate ─► sc_signal write
   Sinks: Probe / MLambdaProbe / Detector / PowerMeter ─► VCD + stdout
 ```
 - WDM is time-multiplexed: a net holds only the **last (λ, field)** written. Stateful devices keep per-λ maps.
-- Device pattern: `XxxBase` (parameters) + `XxxUni` / `XxxBi` (ports), one `SC_THREAD` per input.
+- Device pattern: `XxxBase` (parameters) + `XxxUni` / `XxxBi` (ports), one `SC_METHOD` per input
+  (`SC_THREAD` for sources and the detector tick, which wait for a time).
   Only waveguides have delay.
 - Errors: `cerr` + `exit(1)` everywhere, plus `assert` on user input (core dumps on bad netlists).
 
@@ -76,7 +77,7 @@ Full trace with file:line in report 01 §3.
 ## Conventions
 - `#pragma once`; project includes are quoted and relative to `src/` (`-iquote src`); `<systemc.h>`.
 - PascalCase classes; `m_` members **with units in the name** (`m_length_cm`); ports `p_in`/`p0_out`;
-  threads `on_<port>_changed()`; method case varies, so **follow the surrounding class**; `typedef`, not `using`.
+  reactions `on_<port>_changed()`; method case varies, so **follow the surrounding class**; `typedef`, not `using`.
 - Units: SI in netlists, **cm internally for waveguides**, dB/cm; field is √W (labelled V/m).
 - **Never run `ninja clang-format` / bulk clang-format**: 104/108 files are non-compliant. Match local style.
 - Git: work on `dev`, `--no-ff` merges to `master`; lowercase imperative commit subjects; one tag `v0.1`.

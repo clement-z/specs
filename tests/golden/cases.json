@@ -3570,6 +3570,23 @@
    "note": "F-15 (PD2): waveguides with dispersion (D != 0, no other case has one): wavelength-dependent transmission and group delay, cached per wavelength since F-15; uni (two wavelengths on one net) and bidirectional; arrival times and powers in the netlist header"
   },
   {
+   "id": "regress/f15-wdm-crow-mlprobe",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f15-wdm-crow-mlprobe.cir"
+   ],
+   "note": "F-15 (PD3): per-wavelength values (MLPROBE) of a 4-wavelength 3-ring CROW, recorded with the build before the SC_METHOD conversion (39f1bf9); they must not depend on the order of evaluation within a time step (the PD2 time-only queue order changes 1551.2 nm by 4e-5 relative). No plain PROBE (it shows the last write of a time step on a multi-wavelength net)"
+  },
+  {
    "id": "regress/f15-maxevents-options-tran",
    "setup": {
     "copy": [

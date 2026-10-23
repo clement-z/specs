@@ -210,6 +210,7 @@
   "regress/f15-stats-op-no-trace",
   "regress/f15-stats-testbench",
   "regress/f15-stats-tran",
+  "regress/f15-wdm-crow-mlprobe",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
   "tb/ac_add_drop",
@@ -289,6 +290,18 @@
    "only": "^(cli/help|cli/no-args|regress/f15-stats-tran|regress/f15-stats-op-no-trace|regress/f15-stats-file-print|regress/f15-stats-dc|regress/f15-dispersive-waveguide|regress/f15-maxevents-options-tran|regress/f15-max-events-cli-priority|err/f15-max-events-op|regress/f15-stats-testbench|err/f15-options-coalesce-removed|err/f15-no-coalescing-removed|gtest/unit_tests)$",
    "gtest": true,
    "note": "PD2b item 1 (decision 2026-10-23): --no-coalescing and .options coalesce removed. cli/help, cli/no-args: the --no-coalescing help lines removed; the stats JSON of 9 cases lose the options key coalesce (only that key: files identical once ', \"coalesce\": true' is removed, checked); gtest: PendingWithoutCoalescingKeepsEveryWrite and NoCoalescingKeepsEveryWriteInOrder removed; new cases err/f15-options-coalesce-removed (unknown .options key, exit 1) and err/f15-no-coalescing-removed (unknown flag); cases regress/f15-coalesce-options and regress/f15-no-coalescing-cli removed with their netlist"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T00:12:59Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "PD3 (F-15 SC_METHOD conversion): gtest list only, two new tests ProcessStyle.ReactionsAndOutputPortsAreMethods and ProcessStyle.VerboseInitializationAddsOnePrintThreadPerDevice"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T00:17:07Z",
+   "only": "^regress/f15-wdm-crow-mlprobe$",
+   "gtest": false,
+   "note": "PD3: new case regress/f15-wdm-crow-mlprobe, recorded with the build before the SC_METHOD conversion (39f1bf9, pixi gcc 15 release)"
   }
  ]
 }

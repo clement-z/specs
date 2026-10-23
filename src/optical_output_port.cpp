@@ -105,13 +105,12 @@ OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
 {
     SC_HAS_PROCESS(OpticalOutputPort);
 
-    // created before the thread, as the method of the former sc_event_queue member was
-    SC_METHOD(fire_pending);
+    // F-15: a method, not a thread (no context switch per entry). It runs only when an entry
+    // is due (the thread it replaces ran at initialization only to wait). It also does the work
+    // of the method of the former sc_event_queue member (fire_pending())
+    SC_METHOD(on_data_ready);
     sensitive << m_pending_event;
     dont_initialize();
-
-    SC_THREAD(on_data_ready);
-    sensitive << m_pending_event;
 }
 
 void OpticalOutputPort::applyConfig() {
@@ -143,124 +142,127 @@ void OpticalOutputPort::start_of_simulation() {
     applyConfig();
 }
 
+// F-15: m_pending_event fired: emit the entry that is due, then notify the next one. The kernel
+// ran the two (as separate methods, both sensitive to m_pending_event) in this order
 void OpticalOutputPort::on_data_ready()
+{
+    emit_due_entry();
+    fire_pending();
+}
+
+void OpticalOutputPort::emit_due_entry()
 {
     spx::oa_value_type::field_type desired;
 
-    while (true) {
-        // Wait for data ready notification
-        wait();
+    // Check if output queue is empty (would be a bug)
+    if (m_queue.size() == 0) {
+        cerr << "error: write cancelled, because no values are present" << endl;
+        sc_stop();
+        return;
+    }
 
-        // Check if output queue is empty (would be a bug)
-        if (m_queue.size() == 0) {
-            cerr << "error: write cancelled, because no values are present" << endl;
-            sc_stop();
-            continue;
-        }
+    // Get current time
+    sc_time now = sc_time_stamp();
 
-        // Get current time
-        sc_time now = sc_time_stamp();
+    // Get the next queue item and pop it from the queue
+    auto tuple = m_queue.top();
+    m_queue.pop();
 
-        // Get the next queue item and pop it from the queue
-        auto tuple = m_queue.top();
-        m_queue.pop();
+    // Assign to more readable names
+    const auto &t = tuple.first; //time
+    const auto &s = tuple.second; //signal
 
-        // Assign to more readable names
-        const auto &t = tuple.first; //time
-        const auto &s = tuple.second; //signal
+    // Check whether the signal should indeed be emitted now (if not, it's a bug)
+    if (t != now)
+    {
+        cerr << "error: desync in optical output port " << this->name() << endl;
+        cerr << "\t - expected time:" << t.to_seconds() << endl;
+        cerr << "\t - current time:" << now.to_seconds() << endl;
+        cerr << "\t - signal:" << s << endl;
+        sc_stop();
+        return;
+    }
 
-        // Check whether the signal should indeed be emitted now (if not, it's a bug)
-        if (t != now)
+    // Check signal error to decice whether to emit signal
+    bool emit_signal = false;
+    bool pass_abstol = false;
+    bool pass_reltol = false;
+
+    uint32_t wlid = s.m_wavelength_id;
+
+    auto &emitted = m_emitted_fields[wlid];
+
+    // Store the desired output value which we know is valid
+    desired = s.m_field;
+
+    // Decide whether to emit signal or not (rule: see check_emit_by_reltol(), B-021)
+    pass_abstol = check_emit_by_abstol(desired, emitted);
+    pass_reltol = check_emit_by_reltol(desired, emitted);
+
+    // Only emits when passes both tests
+    emit_signal = pass_abstol && pass_reltol;
+
+    // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
+    // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
+    bool snapped = false;
+    if (emit_signal && check_snap_to_zero(desired))
+    {
+        desired = complex<double>(0,0);
+        snapped = true;
+    }
+
+    // F-15 --stats: one count per processed entry (OpticalOutputPortStats)
+    if (m_collect_stats)
+    {
+        ++m_stats.processed;
+        m_stats.wavelength_ids.insert(wlid);
+        if (!emit_signal && !m_skip_next_convergence_check)
         {
-            cerr << "error: desync in optical output port " << this->name() << endl;
-            cerr << "\t - expected time:" << t.to_seconds() << endl;
-            cerr << "\t - current time:" << now.to_seconds() << endl;
-            cerr << "\t - signal:" << s << endl;
-            sc_stop();
-            continue;
-        }
-
-        // Check signal error to decice whether to emit signal
-        bool emit_signal = false;
-        bool pass_abstol = false;
-        bool pass_reltol = false;
-
-        uint32_t wlid = s.m_wavelength_id;
-
-        auto &emitted = m_emitted_fields[wlid];
-
-        // Store the desired output value which we know is valid
-        desired = s.m_field;
-
-        // Decide whether to emit signal or not (rule: see check_emit_by_reltol(), B-021)
-        pass_abstol = check_emit_by_abstol(desired, emitted);
-        pass_reltol = check_emit_by_reltol(desired, emitted);
-
-        // Only emits when passes both tests
-        emit_signal = pass_abstol && pass_reltol;
-
-        // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
-        // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
-        bool snapped = false;
-        if (emit_signal && check_snap_to_zero(desired))
-        {
-            desired = complex<double>(0,0);
-            snapped = true;
-        }
-
-        // F-15 --stats: one count per processed entry (OpticalOutputPortStats)
-        if (m_collect_stats)
-        {
-            ++m_stats.processed;
-            m_stats.wavelength_ids.insert(wlid);
-            if (!emit_signal && !m_skip_next_convergence_check)
-            {
-                if (!pass_abstol)
-                    ++m_stats.suppressed_abstol;
-                else
-                    ++m_stats.suppressed_reltol;
-            }
-            else if (snapped && desired == emitted)
-                ++m_stats.suppressed_snap;
+            if (!pass_abstol)
+                ++m_stats.suppressed_abstol;
             else
-            {
-                ++m_stats.emitted;
-                m_stats.has_emitted = true;
-                m_stats.last_emission = now;
-            }
+                ++m_stats.suppressed_reltol;
         }
-
-        // F-15 event cap: stop at the end of this delta cycle once the run has processed
-        // max_events entries (SPECSConfig reports it)
-        if (m_event_cap && ++m_event_cap->processed >= m_event_cap->max_events && !m_event_cap->reached)
+        else if (snapped && desired == emitted)
+            ++m_stats.suppressed_snap;
+        else
         {
-            m_event_cap->reached = true;
-            sc_stop();
+            ++m_stats.emitted;
+            m_stats.has_emitted = true;
+            m_stats.last_emission = now;
         }
+    }
+
+    // F-15 event cap: stop at the end of this delta cycle once the run has processed
+    // max_events entries (SPECSConfig reports it)
+    if (m_event_cap && ++m_event_cap->processed >= m_event_cap->max_events && !m_event_cap->reached)
+    {
+        m_event_cap->reached = true;
+        sc_stop();
+    }
 
 
-        // cout << "emit: " << emit_signal << endl;
-        // Emit the desired output value if its stars are aligned
-        if (emit_signal || m_skip_next_convergence_check)
-        {
-            // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
-            // cout << " emitting " << desired << endl;
-            m_skip_next_convergence_check = false;
+    // cout << "emit: " << emit_signal << endl;
+    // Emit the desired output value if its stars are aligned
+    if (emit_signal || m_skip_next_convergence_check)
+    {
+        // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
+        // cout << " emitting " << desired << endl;
+        m_skip_next_convergence_check = false;
 
-            // Remember the change, for the .op/.dc non-convergence report (F-28)
-            // (the magnitudes are computed when the report asks for them)
-            m_has_emitted = true;
-            m_last_emission_delta = sc_delta_count();
-            m_last_emission_wlid = wlid;
-            m_last_emission_desired = desired;
-            m_last_emission_last = emitted;
+        // Remember the change, for the .op/.dc non-convergence report (F-28)
+        // (the magnitudes are computed when the report asks for them)
+        m_has_emitted = true;
+        m_last_emission_delta = sc_delta_count();
+        m_last_emission_wlid = wlid;
+        m_last_emission_desired = desired;
+        m_last_emission_last = emitted;
 
-            // Replace the stored emitted output value at that wavelength
-            emitted = desired;
+        // Replace the stored emitted output value at that wavelength
+        emitted = desired;
 
-            // Write the value to the port
-            m_port->write(spx::oa_value_type(desired, wlid));
-        }
+        // Write the value to the port
+        m_port->write(spx::oa_value_type(desired, wlid));
     }
 }
 

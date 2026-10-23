@@ -1,0 +1,127 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+12 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/in {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.551203e-06}]}, {"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.550401e-06}]}, {"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.549599e-06}]}, {"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.548799e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.551203e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.550401e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.549599e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.548799e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.551203e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.550401e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.549599e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"DOUBLE","value":1.000000e-03}, {"type":"DOUBLE","value":1.548799e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.551203e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.550401e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.549599e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.548799e-06}]}], }
+ - ROOT/COUPLER0 (DIRECTIONAL COUPLER (bidir)) ROOT/in ROOT/r1b_out ROOT/through ROOT/r1a_in {} {kp (DOUBLE) = 0.15, }
+ - ROOT/COUPLER1 (DIRECTIONAL COUPLER (bidir)) ROOT/r1a_out ROOT/r2b_out ROOT/r1b_in ROOT/r2a_in {} {kp (DOUBLE) = 0.15, }
+ - ROOT/COUPLER2 (DIRECTIONAL COUPLER (bidir)) ROOT/r2a_out ROOT/r3b_out ROOT/r2b_in ROOT/r3a_in {} {kp (DOUBLE) = 0.15, }
+ - ROOT/COUPLER3 (DIRECTIONAL COUPLER (bidir)) ROOT/r3a_out ROOT/add ROOT/r3b_in ROOT/drop {} {kp (DOUBLE) = 0.15, }
+ - ROOT/WG1A (WAVEGUIDE (bidir)) ROOT/r1a_in ROOT/r1a_out {} {L (DOUBLE) = 3.96409e-05, att (INTEGER) = 2, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+ - ROOT/WG1B (WAVEGUIDE (bidir)) ROOT/r1b_in ROOT/r1b_out {} {L (DOUBLE) = 4.04472e-05, att (INTEGER) = 2, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+ - ROOT/WG2A (WAVEGUIDE (bidir)) ROOT/r2a_in ROOT/r2a_out {} {L (DOUBLE) = 3.35317e-05, att (INTEGER) = 2, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+ - ROOT/WG2B (WAVEGUIDE (bidir)) ROOT/r2b_in ROOT/r2b_out {} {L (DOUBLE) = 2.93773e-05, att (INTEGER) = 2, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+ - ROOT/WG3A (WAVEGUIDE (bidir)) ROOT/r3a_in ROOT/r3a_out {} {L (DOUBLE) = 2.77391e-05, att (INTEGER) = 2, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+ - ROOT/WG3B (WAVEGUIDE (bidir)) ROOT/r3b_in ROOT/r3b_out {} {L (DOUBLE) = 3.33567e-05, att (INTEGER) = 2, neff (DOUBLE) = 2.2, ng (DOUBLE) = 4.3, }
+ - ROOT/MLPROBE_DROP (MULTIWAVELENGTH PROBE) ROOT/drop {} {wl (LIST) = [{"type":"DOUBLE","value":1.551203e-06}, {"type":"DOUBLE","value":1.550401e-06}, {"type":"DOUBLE","value":1.549599e-06}, {"type":"DOUBLE","value":1.548799e-06}], }
+-----------
+16 named nets
+ - ROOT/add: OANALOG<1>u (0|1)
+ - ROOT/drop: OANALOG<1>u (1|1)
+ - ROOT/in: OANALOG<1>u (1|1)
+ - ROOT/r1a_in: OANALOG<1>u (1|1)
+ - ROOT/r1a_out: OANALOG<1>u (1|1)
+ - ROOT/r1b_in: OANALOG<1>u (1|1)
+ - ROOT/r1b_out: OANALOG<1>u (1|1)
+ - ROOT/r2a_in: OANALOG<1>u (1|1)
+ - ROOT/r2a_out: OANALOG<1>u (1|1)
+ - ROOT/r2b_in: OANALOG<1>u (1|1)
+ - ROOT/r2b_out: OANALOG<1>u (1|1)
+ - ROOT/r3a_in: OANALOG<1>u (1|1)
+ - ROOT/r3a_out: OANALOG<1>u (1|1)
+ - ROOT/r3b_in: OANALOG<1>u (1|1)
+ - ROOT/r3b_out: OANALOG<1>u (1|1)
+ - ROOT/through: OANALOG<1>u (1|0)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-08, reltol (DOUBLE) = 0.0001, timescale (DOUBLE) = -13, }
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {4e-10 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/add...
+Creating ROOT/COUPLER3 (reason: connection to unidir net)
+Done creating ROOT/COUPLER3
+Creating ROOT/WG3A (reason: unidir backlog)
+Done creating ROOT/WG3A
+Creating ROOT/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/COUPLER2
+Creating ROOT/WG2A (reason: unidir backlog)
+Done creating ROOT/WG2A
+Creating ROOT/COUPLER1 (reason: unidir backlog)
+Done creating ROOT/COUPLER1
+Creating ROOT/WG1A (reason: unidir backlog)
+Done creating ROOT/WG1A
+Creating ROOT/COUPLER0 (reason: unidir backlog)
+Done creating ROOT/COUPLER0
+Creating ROOT/VLSRC1 (reason: unidir backlog)
+Done creating ROOT/VLSRC1
+Creating ROOT/WG1B (reason: unidir backlog)
+Done creating ROOT/WG1B
+Creating ROOT/WG2B (reason: unidir backlog)
+Done creating ROOT/WG2B
+Creating ROOT/WG3B (reason: unidir backlog)
+Done creating ROOT/WG3B
+Creating ROOT/MLPROBE_DROP (reason: unidir backlog)
+Done creating ROOT/MLPROBE_DROP
+Done (elaborating network of ROOT/add)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/add (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1a_in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1a_out (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1b_in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1b_out (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2a_in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2a_out (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2b_in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2b_out (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3a_in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3a_out (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3b_in (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3b_out (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/through (OPTICAL) = @ 1551.203 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+ROOT/VLSRC1 was enabled
+@0 s, ROOT/VLSRC1 emitted: @ 1551.203 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1550.4008 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1549.5994 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1548.7988 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+Simulated 400 ps
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

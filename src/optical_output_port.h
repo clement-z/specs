@@ -111,8 +111,8 @@ public:
     // F-15: the notifications of the pending entries, as the sc_event_queue used here before
     // made them, without its allocation per notification: m_pending_event fires once per entry,
     // at its time (equal times in successive delta cycles). m_pending_times holds the times not
-    // yet fired; fire_pending() (a method, as in sc_event_queue, so that the kernel runs the
-    // processes in the same order) takes the time that fired and notifies the next one
+    // yet fired; fire_pending() (called by the method on_data_ready(), at the point where the
+    // kernel ran the method of sc_event_queue) takes the time that fired and notifies the next one
     sc_event m_pending_event;
     std::priority_queue<sc_time, std::vector<sc_time>, std::greater<sc_time>> m_pending_times;
 
@@ -151,6 +151,7 @@ public:
     std::shared_ptr<const OpticalOutputPortConfig> m_config;
 
     void on_data_ready();
+    void emit_due_entry();
     void fire_pending();
     void notify_pending(const sc_time &delay);
     void count_scheduled(bool coalesced);

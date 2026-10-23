@@ -28,9 +28,13 @@
   `-march=native`: 28 cases change in the last one or two digits of floats (within 1e-12 relative)
 * Signal listings (`.op`/`.dc` net listings, source and testbench prints) no longer start with the `[NNNN]`
   debug id of the signal: the id is a build option, `-Dsignal_ids=true`, off by default (F-15). Values unchanged
-* Faster engine, same results bit for bit (F-15): emission gate on squared norms, waveguide transmissions and
-  delays computed once per wavelength, the output ports' event notifications without an allocation per event.
-  CROW benchmark (30 rings, no tracing): about 1.5x less CPU time than v0.2.0
+* Faster engine (F-15): emission gate on squared norms, waveguide transmissions and delays computed once per
+  wavelength, the output ports' event notifications without an allocation per event, and the output ports and
+  stateless device reactions (waveguide, coupler, splitter, merger, crossing, phase shifter) run as SystemC
+  methods instead of threads. CROW benchmark (30 rings, no tracing): about 2.5x less CPU time than v0.2.0.
+  Results are the same bit for bit, except that on a net that carries several wavelengths, a plain `PROBE` (the
+  last write of each time step) can show another of the wavelengths written in a step; the per-wavelength
+  values (`MLPROBE`) were unchanged in every circuit checked
 
 ### Removed
 
