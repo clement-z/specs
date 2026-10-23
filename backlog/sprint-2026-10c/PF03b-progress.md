@@ -7,11 +7,11 @@ Base: 48e510f.
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| 1 | Per-path delayed copies | done | 7e9e03b | checks clang/asan running |
+| 1 | Per-path delayed copies | done | 7e9e03b | clang/asan-gcc: same 2 cases; asan-clang clean |
 | 2 | Negative delay warning per path | todo | | |
 | 3 | Grid-adequacy warning | todo | | |
 | 4 | Mixed interpolation near nulls | done | 368bf61 | threshold 0.07 x max|S|; measurements in the report |
-| 5 | Data files in the run manifest | todo | | own commit |
+| 5 | Data files in the run manifest | done | 805dc8c | subagent (opus) in /tmp/PF03b-wt/manifest, reviewed, cherry-picked; ring manifests re-recorded for item 8's file |
 | 6 | SiEPIC BDC fixture + golden | todo | | |
 | 7 | Tests and docs | todo | | |
 | 8 | Re-export ring file at 0.05 nm | done | 5e1b14f | predictions above; counters: only spar-ring-tran drop last_emission |
@@ -75,3 +75,8 @@ intervals with min(|S_k|, |S_k+1|) < 0.07 max|S| change; group delays unchanged 
 Result of the strict check: as predicted, only `out` at 1.55 um in the two ring cases; the change is up to 4.2e-11
 (I had estimated ~1e-11 or less). The new values are closer to the exact ones (the 1 nm file's grid value there).
 The gtest case also changes (one new test, SParamFile.MixedInterpolationNearANull).
+
+### Item 5 (data files in the run manifest)
+Decisions: key `data_files` always present (`[]`), right after `netlist_files`; `format_version` 1 -> 2 in the run
+manifest and the run table manifest. Every recorded manifest changes in those two places only (160 cases); the
+non-empty lists: the 8 SPAR cases and b052-vlsrc/evlsrc-positional, b066-vlsrc-vci. Checked mechanically.
