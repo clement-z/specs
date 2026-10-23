@@ -111,3 +111,4 @@ outside the decisions stops the chain and goes to the maintainer. v0.3.0: tag an
 - 2026-10-23 — maintainer answers (decisions after v0.3.0, third round): PUF coupling √0.05 (B-179 resolved); `.dc` numerics yes; wavelength tolerance 1e-12 compile-time constant; feature answers recorded (F-03 with a Taylor form, F-02 one resilient table, F-06 ratios only, F-31 linear interpolated map). Phase H launched.
 - 2026-10-23 — maintainer report: `pixi run test` on Arch Linux fails, `gtest/gtest.h` not found (host gtest picked up, invisible to the conda compiler). Phase I launched.
 - 2026-10-23 — maintainer: Taylor form yes; static activity map now, time windows later; VL source prints as recommended (phase J); push and merge into dev (no release).
+- 2026-10-23 — pushed `sprint/2026-10c` (ffe7bb7; CI run 39945619511 green on all blocking jobs) and merged into `dev` (cf66bee, --no-ff, tree = sprint tip), pushed. master unchanged (v0.3.0).
