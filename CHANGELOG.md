@@ -2,6 +2,20 @@
 
 ## [unreleased]
 
+### Added
+
+* `SPAR`: an N-port device given by an S-parameter file (F-03, `doc/netlist.md` "SPAR", `doc/sparam.md`):
+  Lumerical/SiEPIC `.sparam`, Touchstone 1.x/2.x, a CSV form and a Taylor-coefficient form. Phases are
+  converted to SPECS's convention on import (Touchstone, written in the RF convention, is conjugated; a test
+  shows that a waveguide written in each format gives the phase and delay of a `WG` of the same length).
+  Magnitude and unwrapped phase are interpolated in frequency (`interp=linear|pchip`); in `.tran` the
+  S-matrix of the carrier wavelength applies with a group delay per output (no dispersion within a pulse).
+  Unidirectional or bidirectional like `COUPLER`; a wavelength outside the data range is an error;
+  `passivity=check|ignore|enforce`, `delay=auto|none|<s>`, `ports=`, `convention=`
+* `utils/sparam_export.py`: writes the S-matrix of a subcircuit, from one `.dc` sweep per port, as
+  `.sparam`, Touchstone or CSV (F-03)
+* KiCad symbols `SPAR_2PORT` and `SPAR_4PORT` (`utils/specs.kicad_sym`)
+
 ### Changed
 
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of

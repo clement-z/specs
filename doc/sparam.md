@@ -29,7 +29,11 @@ convention and what the device does with the data.
   taken within (-pi, pi]), and both are interpolated in frequency, separately: linearly (`interp=linear`,
   the default) or with a monotone cubic (`interp=pchip`, Fritsch-Carlson). At a grid point the file's value
   is used as is. The grid must be fine enough for the phase to change by less than pi between two points
-  (else the unwrapping, and the group delay, are wrong).
+  (else the unwrapping, and the group delay, are wrong). Near a transmission null the phase turns quickly
+  and this interpolation is poor: the add-drop ring of `circuits/add_drop.cir` exported on a 0.05 nm grid
+  and evaluated between its points is within 4e-4 (linear) or 1e-4 (pchip) of the circuit where
+  |S| >= 0.1, but 0.02 (field) at the through-port null at 1.55 um, where |S| = 0.03
+  (`tests/sparam/test_sparam.py`, round-trip/between-points).
 - **Range.** A wavelength outside the data range is an error, with the range in the message (relative
   tolerance 1e-12 at the ends, as for wavelength matching, `doc/numerics.md`). The range of a tabulated file
   is the intersection of the grids of its non-zero entries; the Taylor form gives it explicitly.
@@ -118,16 +122,24 @@ or by 1-based index, in the order of the element's nets.
   one of the carrier wavelength: dispersion within a pulse's bandwidth is ignored** (a broadband
   time-domain model, e.g. a fitted filter, is not implemented).
 - Delay (`delay=`): `auto` (default) uses, for each output port and wavelength, the group delay of the
-  largest of the paths into that port, rounded to the time step like a waveguide's (negative delays become
-  0, with one warning per device); all the writes to that output use it, so that the last write is always the
-  newest value. Paths with different delays into the same output therefore arrive together (exact in steady
-  state, approximate in transients). `delay=none` is 0; `delay=<seconds>` is that delay on every path. A
-  delay that is rounded badly (B-014) gives one warning per device; a `delay=<seconds>` that rounds to 0
-  time steps is an error, like a waveguide's length.
+  largest (|S| at that wavelength) of the paths into that port, rounded to the time step like a waveguide's;
+  all the writes to that output use it, so that the last write is always the newest value (with a delay per
+  path, a later input event could be written before an earlier one and leave a stale output). Paths with
+  different delays into the same output therefore arrive together: exact in steady state, approximate in
+  transients. A negative group delay (the through port of a ring near resonance, or the finite-difference
+  noise of a constant phase) is replaced by 0; in `.tran` it is reported once per device when it is at least
+  half a time step. `delay=none` is 0; `delay=<seconds>` is that delay on every path. A delay that is
+  rounded badly (B-014) gives one warning per device in `.tran`; a `delay=<seconds>` that rounds to 0 time
+  steps is an error, like a waveguide's length.
 - Unidirectional and bidirectional, like `COUPLER`: with an even number of nets and no bidirectional net,
-  the first half are inputs and the second half outputs, and only the paths from an input to an output are
-  used (a warning gives the largest of the others when it exceeds -40 dB). With an odd number of nets, or if
-  one of its nets is bidirectional (`&`, or two writers), the device is bidirectional and uses every entry.
+  the first half are inputs and the second half outputs. Light then only enters the inputs, and only the
+  paths from an input to an output are used: the paths from an input back to an input (reflections,
+  couplings between inputs) are dropped, with one warning giving the largest when it exceeds -40 dB. With an
+  odd number of nets, or if one of its nets is bidirectional (`&`, or two writers), the device is
+  bidirectional and uses every entry.
+- One `SC_METHOD` reacts to all the inputs: in a delta cycle it handles every input with a new value, in
+  net order.
+- String values of the keywords are written in quotes (`format="touchstone"`, `delay="none"`).
 
 ## Export: `utils/sparam_export.py`
 
@@ -141,4 +153,14 @@ For each port `k`, it runs a `.dc` sweep of a CW source (power 1 W, phase 0) on 
 saved (`.save`), and reads the traces (`--format csv`): `S[j][k]` is the field leaving port `j`. On the
 excited port the field written by the source is told apart from the reflected one (bidirectional nets);
 on a unidirectional device the reflections are 0. See `--help` for the options (tolerances of the runs,
-port names, Touchstone version).
+default `abstol=1e-12 reltol=1e-9`; port names; Touchstone version).
+
+- The `--netlist` file must only define the subcircuit (and what it needs): a top-level element or an
+  analysis in it ends up in every run.
+- Exciting an output port of a unidirectional subcircuit gives its net two writers (the source and the
+  device), so SPECS makes the device bidirectional for that sweep: those columns are the bidirectional
+  model's (the same values for the reciprocal devices of SPECS).
+- The grid must resolve the device's phase (above): the tool does not check it.
+- Round trip (`tests/sparam/test_sparam.py`): the ring of `circuits/add_drop.cir` exported at the grid of
+  its sweep and used as one `SPAR` gives the circuit's fields within 7.2e-7 (the circuit's own reltol is
+  1e-6), in each of the three formats.

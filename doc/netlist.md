@@ -56,6 +56,7 @@ Nets come first, in the order of the table, then the positional arguments, then 
 | `PCMCELL` | in, out | [PCMCELL](#pcmcell) |
 | `PDET` | in, electrical out | [PDET](#pdet) |
 | `PROBE`, `MLPROBE` | net | PROBE: `[power [abs [phase]]]` (the wavelength is always traced; a 4th argument or `wl` is accepted and ignored); MLPROBE: `wl=[wl1, ...]`; [PROBE and MLPROBE](#probe-mlprobe-and-traced-nets-in-tran) |
+| `SPAR` | n1, ..., nN, one per port of the file (unidirectional: first half inputs, second half outputs) | [SPAR](#spar) |
 | `PWR` | in (power meter) | no arguments |
 | `X` | one net per subcircuit port, then the subcircuit name | [Subcircuits](#subcircuits) |
 
@@ -495,6 +496,44 @@ Photodetector: `PDET<name> <in> <out> [ts [r]] [keyword=value ...]`
   PSHIFT or MZI driven by a PDET saw 0) and two detectors made an open-ended `.tran` run forever.
 - Example: `pdet1 in vout` then `pshift1 a b vout sensitivity=1000`. With 1 mW on `in` (R = 1 A/W), `vout`
   is 1 mA and the phase shifter adds 1000 rad/A · 1 mA = 1 rad.
+
+## SPAR
+
+S-parameter device: an N-port given by an S-parameter file (F-03). Formats, phase convention, interpolation
+and the export of a SPECS subcircuit to a file: [doc/sparam.md](sparam.md).
+
+    SPARname n1 n2 ... nN file="path" [keyword=value ...]
+
+- Nets: one per port, any number. Net k is port k of the file, or the k-th port of `ports=`. With an even
+  number of nets and no bidirectional net the device is **unidirectional**, like `COUPLER`: the first half
+  of the nets are inputs, the second half outputs, and only the paths from an input to an output are used
+  (the paths from an input back to an input, e.g. reflections, are reported in one warning when they exceed
+  -40 dB). With an odd number of nets, or when one of its nets is bidirectional (`net&`, or two writers),
+  every net is an input and an output and every entry of the matrix is used.
+- No positional argument. Keywords (case-insensitive; string values in quotes):
+
+| Keyword | Values | Default | Meaning |
+| --- | --- | --- | --- |
+| `file` | path | required | the S-parameter file; a relative path is looked up next to the netlist file first, then in the working directory (as `.include`) |
+| `format` | `"auto"`, `"sparam"` (or `"lumerical"`), `"touchstone"`, `"csv"`, `"taylor"` | `"auto"` | file format; `auto`: from the extension (`.sparam`/`.dat`, `.sNp`/`.ts`, `.csv`, `.taylor`) |
+| `ports` | `"a,b,..."` | the file's order | file ports (names or 1-based indices) of the nets, in net order; as many as nets |
+| `convention` | `"auto"`, `"physics"`, `"engineering"` | `"auto"` | time convention of the file's phases: Touchstone files are conjugated (engineering), the others are not; see [doc/sparam.md](sparam.md) |
+| `interp` | `"linear"`, `"pchip"` | `"linear"` | interpolation in frequency of magnitude and unwrapped phase, between grid points |
+| `passivity` | `"check"`, `"ignore"`, `"enforce"` | `"check"` | warn when an input gives more than 1.03 times its power at the outputs; `enforce` also scales the matrix where it exceeds 1 |
+| `delay` | `"auto"`, `"none"`, a number (s) | `"auto"` | `.tran` delay of the outputs: `auto`, per output and wavelength the group delay of the largest path into it; `none`, 0; a number, that delay on every path (rounding to 0 time steps is an error, as for `WG`) |
+
+- `.op`, `.dc`: the outputs are `S(lambda)` times the inputs at each wavelength. `.tran`: S of the carrier
+  wavelength and a group delay per output; **dispersion within a pulse's bandwidth is ignored**.
+- A wavelength outside the range of the data is an error (the message gives the range).
+- The number of nets must equal the number of ports of the file (or of `ports=`).
+
+Example: the add-drop ring of `circuits/add_drop.cir` exported to a file, then used as one element (inputs
+`in`, `add`; outputs `out`, `drop`):
+
+    python3 -I utils/sparam_export.py --specs build/specs --netlist tests/sparam/add_drop_ring.cir \
+        --subckt ring --wl 1.535e-6 1.565e-6 1e-9 -o ring.sparam
+
+    spar1 in add out drop file="ring.sparam"
 
 ## PROBE, MLPROBE and traced nets in `.tran`
 
