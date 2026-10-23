@@ -26,8 +26,6 @@ public:
     PowerMeter(sc_module_name name)
         : spx_module(name)
     {
-        SC_HAS_PROCESS(PowerMeter);
-
         SC_THREAD(on_port_in_changed);
         sensitive << p_in;
     }

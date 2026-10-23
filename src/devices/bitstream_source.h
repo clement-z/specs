@@ -53,8 +53,6 @@ public:
         : sc_module(name)
         , m_out_writer("out_delayed_writer", p_out)
     {
-        SC_HAS_PROCESS(BitstreamSource);
-
         SC_THREAD(runner);
         sensitive << p_clk.pos() << p_clk.neg();
     }
@@ -70,8 +68,6 @@ public:
         , m_signal_on(signal_on)
         , m_signal_off(signal_off)
     {
-        SC_HAS_PROCESS(BitstreamSource);
-
         SC_THREAD(runner);
         sensitive << p_clk.pos() << p_clk.neg();
     }
@@ -97,8 +93,6 @@ public:
 
         m_current_value = (m_values.empty() ? 0 : m_values[0]);
 
-        SC_HAS_PROCESS(BitstreamSource);
-        
         SC_THREAD(runner);
         sensitive << p_clk.pos() << p_clk.neg();
     }

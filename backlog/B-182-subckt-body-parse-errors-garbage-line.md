@@ -1,5 +1,5 @@
 # B-182: Parse errors inside a `.subckt` body print an empty file name and a garbage line number
-severity: low | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: open
+severity: low | category: parser | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 6561510 (sprint 2026-10c PG): defining file and line in the body, nested bodies included
 location: src/parser/parse_tree.cpp (~339, `ParseTree(name, subcircuit, kwargs)`)
 
 ## Problem

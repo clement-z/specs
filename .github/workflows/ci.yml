@@ -100,8 +100,6 @@ jobs:
           name: meson-logs-${{ matrix.compiler }}
           path: build/meson-logs
 
-  # Not gating yet: known memory bugs (backlog, e.g. `specs -t mesh` use-after-free), and the
-  # sanitizer reports change the stderr the golden test compares.
   sanitizers:
     name: asan + ubsan (debug, gcc)
     runs-on: ubuntu-24.04

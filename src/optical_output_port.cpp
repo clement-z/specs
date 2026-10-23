@@ -103,8 +103,6 @@ OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
     , m_port(p)
     , m_config(nullptr)
 {
-    SC_HAS_PROCESS(OpticalOutputPort);
-
     // F-15: a method, not a thread (no context switch per entry). It runs only when an entry
     // is due (the thread it replaces ran at initialization only to wait). It also does the work
     // of the method of the former sc_event_queue member (fire_pending())

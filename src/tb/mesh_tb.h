@@ -17,8 +17,6 @@ public:
     void monitor();
     SC_CTOR(mesh_tb)
     {
-        SC_HAS_PROCESS(mesh_tb);
-
         SC_THREAD(run_1);
 
         SC_THREAD(monitor);

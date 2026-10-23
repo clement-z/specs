@@ -532,7 +532,6 @@ public:
         : sc_module(name)
         , m_out_writer("out_writer", p_out)
     {
-        SC_HAS_PROCESS(PendingHarness);
         p_out(out);
         auto config = make_shared<OpticalOutputPortConfig>();
         m_out_writer.setConfig(config);
@@ -574,7 +573,9 @@ TEST(OpticalOutputPort, PendingEqualTimesOnePerDeltaCycle)
             EXPECT_EQ(h.seen[i].t, sc_time(1, SC_NS));
             EXPECT_EQ(OpticalSignal::getWavelength(h.seen[i].wavelength_id), wl[i]);
             if (i > 0)
+            {
                 EXPECT_EQ(h.seen[i].delta, h.seen[i - 1].delta + 1);
+            }
         }
         EXPECT_EQ(h.out.read().m_field, OpticalSignal::field_type(1, 0));
         EXPECT_TRUE(h.m_out_writer.isempty());

@@ -41,6 +41,7 @@
   "IntegerLiterals.VariableStores64Bits": "PASS",
   "IntegerLiteralsDeathTest.AsIntegerOfDoubleOutOfRange": "PASS",
   "IntegerLiteralsDeathTest.LexerRejectsBeyond64Bits": "PASS",
+  "MLambdaProbe.ReportsIgnoredWavelengthsOnce": "PASS",
   "MLambdaProbe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "MLambdaProbe.SamplesUnchangedNetWhenEnabled": "PASS",
   "MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled": "PASS",

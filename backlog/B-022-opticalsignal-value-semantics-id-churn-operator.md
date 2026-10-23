@@ -1,5 +1,5 @@
 # B-022: OpticalSignal value semantics: id churn, `operator=` by value, vptr, inverted `operator<`
-severity: low | category: perf | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: perf | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in a935b7e (sprint 2026-10c D2): no virtual destructor, ids only with -Dsignal_ids, defaulted copy; the inverted operator< stays open
 location: src/optical_signal.h:23-28,52-63,58,120-123,147-153,231
 ## Problem
 The copy constructor copies `m_id` and then overwrites it with `getNewId()`. `operator=` returns **by value**, an

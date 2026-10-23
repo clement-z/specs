@@ -20,8 +20,6 @@ public:
     void monitor();
     SC_CTOR(ps_tb)
     {
-        SC_HAS_PROCESS(ps_tb);
-
         SC_THREAD(run_1);
 
         SC_THREAD(monitor);

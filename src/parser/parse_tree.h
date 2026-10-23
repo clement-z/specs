@@ -374,6 +374,10 @@ struct ParseSubcircuit {
     // directory of the file that defines the subcircuit: .include in the body is relative to it
     // first (B-143); "" if none
     string include_dir;
+    // file name (as in the parse errors of top-level lines) and line where the body starts in it:
+    // the parse errors in the body point there (B-182)
+    string filename;
+    int body_line = 1;
 
     ParseSubcircuit(const string &name, ParseTree *parent = nullptr)
     : name(name)

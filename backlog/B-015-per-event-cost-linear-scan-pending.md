@@ -1,5 +1,5 @@
 # B-015: Per-event cost: linear scan of the pending queue, plus a heap allocation per notify
-severity: med | category: perf | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: perf | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in 67d1702 (sprint 2026-10c D2): no heap allocation per notify (sc_event_queue replaced); the linear find_if over pending entries stays open
 location: src/optical_output_port.cpp:341-343,348-349
 ## Problem
 Every event-driven write does a `find_if` over all pending entries of the port. That is O(n) per write and O(n²)

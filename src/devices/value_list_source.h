@@ -41,7 +41,6 @@ public:
         sortValues();
         enable = sc_logic(0);
 
-        SC_HAS_PROCESS(VLSource);
         SC_THREAD(runner);
     }
 

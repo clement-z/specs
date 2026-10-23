@@ -35,8 +35,6 @@ public:
         : sc_module(name)
         , m_sig(sig)
     {
-        SC_HAS_PROCESS(TraceRecorder);
-
         SC_METHOD(on_sig_changed);
         sensitive << m_sig;
         dont_initialize();

@@ -69,8 +69,6 @@ public:
         , m_speed(speed)
         , m_stateCurrent(state)
     {
-        SC_HAS_PROCESS(PCMElement);
-
         SC_THREAD(on_input_changed);
         sensitive << p_in;
     }

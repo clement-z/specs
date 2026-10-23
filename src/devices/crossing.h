@@ -109,8 +109,6 @@ public:
         , m_out1_writer("out1_delayed_writer", p_out1)
         , m_out2_writer("out2_delayed_writer", p_out2)
     {
-        SC_HAS_PROCESS(CrossingUni);
-
         SC_METHOD(on_port_in1_changed);
         sensitive << p_in1;
         dont_initialize();
@@ -180,8 +178,6 @@ public:
         , m_p2_out_writer("p2_out_delayed_writer", p2_out)
         , m_p3_out_writer("p3_out_delayed_writer", p3_out)
     {
-        SC_HAS_PROCESS(CrossingBi);
-
         SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
         dont_initialize();
