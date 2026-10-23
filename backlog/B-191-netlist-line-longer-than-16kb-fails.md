@@ -17,3 +17,10 @@ as a stopgap; add a golden case with a long inline list.
 
 ## Golden impact
 None for existing cases; one new case.
+
+## Fix (sprint 2026-10c PK, 8fc95cb)
+REJECT is removed from the scanner (twin start conditions for the line rule, fixed-length trailing contexts):
+flex grows its buffer, so lines of any length scan; outputs are otherwise unchanged (golden bit-identical,
+independent differential review of about 92,000 inputs). Remaining limits, not fixed: bison's parser stack
+(10,000 deep) fails a list of about 5,000 inline VLSRC values (`memory exhausted`, exit 1; 4,000 parse); and
+scanning one line costs time quadratic in its length (8 MB: 24 s). A value file has neither limit.
