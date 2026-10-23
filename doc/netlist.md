@@ -237,6 +237,7 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `--max-events N` | expert option `.options maxevents=N`, overrides the netlist |
 | `--abstol x`, `--reltol x`, `-R n` | tolerances and timescale, see [numerics.md](numerics.md) |
 | `--seed N` | master seed, see [reproducibility.md](reproducibility.md) |
+| `--vci` | verbose component initialisation: each device prints its parameters before the simulation starts; `VLSRC`/`EVLSRC` also print the values read from a file, "`<name> was enabled`" and one line per emission (see [VLSRC](#vlsrc)) |
 
 `specs -h` lists all options. `-t name` runs a legacy C++ testbench instead of a netlist (`-p` lists them).
 
@@ -390,7 +391,12 @@ Optical value-list source: `VLSRC<name> <out> [file] [VALUES=...]`
   skipped (B-053), so start the file with a header line. Empty lines and lines starting with `;` are
   skipped.
 - Required: none. When enabled, the source emits 0 W unless a value is given at t = 0; without
-  values it emits nothing else.
+  values it emits nothing else. Times must be >= 0.
+- Output: quiet by default. With `--vci` it prints on stdout the values read from the file (and the lines it
+  skips), "`<name> was enabled`" and one "`@<t>, <name> emitted: <value>`" line per emission (B-066). A value
+  whose time is already past when the source reaches it is not emitted: the source reports them in one warning
+  on stderr with their count (`Warning: <name>: invalid time for signal emission (in the past) for <n> of <N>
+  values, not emitted`).
 - Example: `vlsrc1 in "pulses.csv"` is `vlsrc1 in values="pulses.csv"`.
 
 ## EVLSRC
@@ -406,6 +412,8 @@ Electrical value-list source: `EVLSRC<name> <out> [file] [VALUES=...]`
   (B-053), so start the file with a header line. Empty lines and lines starting with `;` are skipped.
 - Required: none. When enabled, the source emits 0 V unless a value is given at t = 0; without
   values it emits nothing else.
+- Output: as VLSRC (the per-value lines only with `--vci`). The values before the time at which the source is
+  enabled (the start of the `.tran`), e.g. negative times, are not emitted, with one warning on stderr per source.
 - Example: `evlsrc1 e "drive.csv"` is `evlsrc1 e values="drive.csv"`.
 
 ## PCMCELL

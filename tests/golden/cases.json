@@ -3962,6 +3962,41 @@
     "tests/golden/netlists/probe-wl-ignored.cir"
    ],
    "note": "PD6: a PROBE always traces its wavelength: wl=0, wavelength=0 and a false 4th argument (also in a subcircuit) are ignored with one warning for all, in name order; a true value changes nothing; .save E(b) traces abs only"
+  },
+  {
+   "id": "regress/b066-vlsrc-vci",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--vci",
+    "-f",
+    "tests/golden/netlists/b066-vlsrc-vci.cir"
+   ],
+   "note": "B-066: the per-value prints of VLSRC and EVLSRC (values read from the file, skipped lines, 'was enabled', one line per emission) are only printed with --vci"
+  },
+  {
+   "id": "regress/b066-evlsrc-past",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b066-evlsrc-past.cir"
+   ],
+   "note": "B-066: values in the past (negative times in EVLSRC) are skipped with one warning on stderr per source, with their count; nothing on stdout"
   }
  ]
 }

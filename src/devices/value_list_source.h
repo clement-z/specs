@@ -33,6 +33,9 @@ public:
     // Processes
     void runner();
 
+    // A value whose time is before `now` is skipped (B-066: counted in one warning at enable)
+    static bool isPast(double t_s, const sc_time &now) { return sc_time(t_s, SC_SEC) < now; }
+
     VLSource(sc_module_name name, const vector<time_value_pair_type> &values = {})
     : spx_module(name)
     , m_out_writer((string(this->name()) + "_out_writer").c_str(), p_out)
@@ -74,13 +77,15 @@ public:
             // Skip if line is empty or starts with ;
             if (line.empty())
             {
-                cout << "Skipping empty line." << endl;
+                if (specsGlobalConfig.verbose_component_initialization)
+                    cout << "Skipping empty line." << endl;
                 continue;
             }
             // Skip if line starts with ;
             if (line[0] == ';')
             {
-                cout << "Skipping commented line: " << line << endl;
+                if (specsGlobalConfig.verbose_component_initialization)
+                    cout << "Skipping commented line: " << line << endl;
                 continue;
             }
 
@@ -91,7 +96,8 @@ public:
             // Skip header line if it exists
             if(lineNumber == 1 && field == "time")
             {
-                cout << "Skipping header line: " << line << endl;
+                if (specsGlobalConfig.verbose_component_initialization)
+                    cout << "Skipping header line: " << line << endl;
                 continue;
             }
 
@@ -120,7 +126,8 @@ public:
                 exit(1);
             }
 
-            cout << t << ": " << P << "W @" << WL*1e9 << "nm" << endl;
+            if (specsGlobalConfig.verbose_component_initialization)
+                cout << t << ": " << P << "W @" << WL*1e9 << "nm" << endl;
             m_values_queue.emplace_back(t, OpticalSignal(sqrt(P), WL));
         }
 

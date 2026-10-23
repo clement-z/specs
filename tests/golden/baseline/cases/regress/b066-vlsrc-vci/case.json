@@ -1,0 +1,23 @@
+{
+ "args": [
+  "--vci",
+  "-f",
+  "tests/golden/netlists/b066-vlsrc-vci.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 434,
+   "kind": "json",
+   "sha256": "5f491f6bc1d38f011e06500118ba0de309dfbcb5ad47f6a72918e667f7e7b94b",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1118,
+   "kind": "vcd",
+   "sha256": "31d1ea0237fb46a2c4a4569bc47cc3a743f2bc734f14135ff6ead4a10c226567",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b066-vlsrc-vci"
+}

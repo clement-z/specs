@@ -1,0 +1,7 @@
+* B-066: values whose time is in the past when the source reaches them are skipped, with one warning
+* on stderr per source and their count (it was one stdout line per value in VLSRC, nothing in EVLSRC).
+* EVLSRC compares the times in seconds, so the two negative times are in the past at the enable (t = 0):
+* "Warning: ROOT/EVLSRC1: invalid time for signal emission (in the past) for 2 of 4 values, not emitted".
+* The others are emitted: 0 V at the enable (no value at t = 0), 1.5 V at 100 ps, -0.5 V at 200 ps.
+evlsrc1 e values=[[-2e-10, 5], [-1e-10, 4], [1e-10, 1.5], [2e-10, -0.5]]
+.tran 1e-9

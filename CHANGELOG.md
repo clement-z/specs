@@ -7,6 +7,11 @@
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
   the run, in name order and with every digit needed to tell them from the listed ones, instead of one
   "received unsupported signal" line on stdout per event (B-062; matching stays exact)
+* VLSRC and EVLSRC are quiet by default: the values read from a value file (and its skipped lines),
+  "`<name> was enabled`" and the "`@<t>, <name> emitted: <value>`" line of every emission are only printed with
+  `--vci`. The values whose time is already past when the source reaches them are reported in one warning per
+  source on stderr, with their count, instead of one "invalid time for signal emission !" line on stdout per
+  value (VLSRC; EVLSRC skipped them silently). The emitted values are unchanged (B-066)
 
 ### Fixed
 

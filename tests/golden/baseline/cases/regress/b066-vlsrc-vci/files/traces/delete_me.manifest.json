@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--vci", "-f", "tests/golden/netlists/b066-vlsrc-vci.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b066-vlsrc-vci.cir", "sha256": "803a7e2ed4a27b42c74013226ad182dd6160769bf5ff9f6a5047fe964c5804f4"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}
