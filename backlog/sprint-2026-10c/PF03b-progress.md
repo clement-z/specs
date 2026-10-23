@@ -10,7 +10,7 @@ Base: 48e510f.
 | 1 | Per-path delayed copies | done | 7e9e03b | checks clang/asan running |
 | 2 | Negative delay warning per path | todo | | |
 | 3 | Grid-adequacy warning | todo | | |
-| 4 | Mixed interpolation near nulls | todo | | |
+| 4 | Mixed interpolation near nulls | done | (see git log) | threshold 0.07 x max|S|; measurements in the report |
 | 5 | Data files in the run manifest | todo | | own commit |
 | 6 | SiEPIC BDC fixture + golden | todo | | |
 | 7 | Tests and docs | todo | | |
@@ -59,3 +59,19 @@ Result of the strict check (before the re-record): as predicted (drop at 2.721 /
 out at 1 / 20 ps, field changes <= 4.3e-11 absolute in both cases). One statement of the prediction was wrong:
 the default tolerances (rtol 1e-9, atol 1e-12) do not pass at one point, `out` at 1.55 um in
 `cir/spar-add-drop-ring`, where |E| = 0.002: the 4.3e-11 change is 2e-8 relative there.
+
+### Item 4 (mixed interpolation, threshold 0.07 x the entry's largest |S|), written before the strict run
+Values at grid points are unchanged bit for bit (magnitude and phase there, as before); between grid points only
+intervals with min(|S_k|, |S_k+1|) < 0.07 max|S| change; group delays unchanged (from the phase table).
+- Delay-line and constant fixtures (`cir/spar-wg-dc`, `cir/spar-touchstone-tran`, `regress/spar-passivity`,
+  `regress/spar-uni-reflection`) and the Taylor form (`regress/spar-3port-taylor`): unchanged (constant |S|).
+- `cir/spar-add-drop-ring`: only the sweep point at 1.55 um changes, on `out` (S(out,in) = 0.00228 there; its
+  neighbours on the 0.05 nm grid are below 0.07): the point is ~1e-9 of an interval off the grid point, so the
+  two interpolants differ by ~1e-9 x |dS| ~ 1e-11 or less. The other through nulls (1545.90, 1554.10, ... nm)
+  are >= 0.1 nm from the 1 nm sweep points, where |S| >= 0.1: unchanged. `drop`: unchanged (S(drop,in) has no null).
+- `regress/spar-ring-tran`: `out` at 1.55 um changes by ~1e-11 or less (same reason); times unchanged; drop unchanged.
+- Counters: unchanged everywhere (same events, values change by far less than the gates).
+- Every other case unchanged.
+Result of the strict check: as predicted, only `out` at 1.55 um in the two ring cases; the change is up to 4.2e-11
+(I had estimated ~1e-11 or less). The new values are closer to the exact ones (the 1 nm file's grid value there).
+The gtest case also changes (one new test, SParamFile.MixedInterpolationNearANull).

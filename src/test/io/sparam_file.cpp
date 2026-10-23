@@ -270,6 +270,39 @@ TEST(SParamFile, PchipIsExactAtNodesAndMonotone)
     }
 }
 
+TEST(SParamFile, MixedInterpolationNearANull)
+{
+    // S(2 <- 1) = (f - fz) / (2 df) + 0.001j, linear in frequency, with a null of 0.001 between grid points 10
+    // and 11 (|S| = 0.25 there, below 0.07 x its largest |S|, 5.25): real and imaginary parts are interpolated
+    // on the intervals touching them, exact for a linear S; magnitude and phase would give |S| = 0.25 at the
+    // null. S(1 <- 2) = 0.5 exp(j f / df) turns by 1 rad per point: magnitude and phase, |S| stays 0.5
+    const double f0 = 1.9e14, df = 1e10, fz = f0 + 10.5 * df;
+    auto g = [&](double f) { return cplx((f - fz) / (2 * df), 0.001); };
+    auto h = [&](double f) { return std::polar(0.5, (f - f0) / df); };
+    std::ostringstream text;
+    text.precision(17);
+    text << "('2','TE',1,'1',1,'transmission')\n(21,3)\n";
+    for (int k = 0; k <= 20; ++k)
+        text << f0 + k * df << " " << std::abs(g(f0 + k * df)) << " " << std::arg(g(f0 + k * df)) << "\n";
+    text << "('1','TE',1,'2',1,'transmission')\n(21,3)\n";
+    for (int k = 0; k <= 20; ++k)
+        text << f0 + k * df << " 0.5 " << std::remainder((f0 + k * df - f0) / df, 2 * M_PI) << "\n";
+    for (auto interp : {SParamData::INTERP_LINEAR, SParamData::INTERP_PCHIP})
+    {
+        auto d = parse(text.str(), "x.sparam", SParamData::CONVENTION_AUTO, interp);
+        for (double k : {9.5, 10.25, 10.5, 10.75, 11.5})
+            expect_near(d->S(0, 1, c / (f0 + k * df)), g(f0 + k * df), 1e-12);
+        EXPECT_LT(std::abs(d->S(0, 1, c / fz)), 0.0011);
+        // at a grid point: the file's magnitude and phase, as before
+        const double fk = f0 + 10 * df;
+        EXPECT_EQ(d->S(0, 1, c / fk), std::polar(std::abs(g(fk)), std::arg(g(fk))));
+        for (double k : {2.5, 10.5, 15.3})
+            EXPECT_NEAR(std::abs(d->S(1, 0, c / (f0 + k * df))), 0.5, 1e-12) << k;
+        if (interp == SParamData::INTERP_LINEAR)
+            expect_near(d->S(1, 0, c / (f0 + 2.5 * df)), h(f0 + 2.5 * df), 1e-12);
+    }
+}
+
 TEST(SParamFile, PassivityReportsTheWorstInput)
 {
     const std::string text =

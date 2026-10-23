@@ -126,6 +126,7 @@
   "SParamFile.GroupDelayOfALinearPhase": "PASS",
   "SParamFile.LumericalBlocksPortsAndPhases": "PASS",
   "SParamFile.LumericalPortDeclarationsGiveTheOrder": "PASS",
+  "SParamFile.MixedInterpolationNearANull": "PASS",
   "SParamFile.PassivityReportsTheWorstInput": "PASS",
   "SParamFile.PchipIsExactAtNodesAndMonotone": "PASS",
   "SParamFile.TaylorPolynomialsAndDelay": "PASS",

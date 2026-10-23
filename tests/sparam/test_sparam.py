@@ -334,9 +334,9 @@ def test_round_trip(t):
     # against add_drop.cir swept at the same points
     shifted = (1.535025e-6, 1.564025e-6, 1e-9)
     path = os.path.join(HERE, 'data', 'add_drop_ring.sparam')
-    # Magnitude and phase are interpolated separately (doc/sparam.md): near the through-port null at
-    # 1.55 um (|S| = 0.03) the phase turns by almost pi between two grid points and the error is large;
-    # away from it (|E| >= 0.1) it is the interpolation error of a smooth function
+    # Magnitude and phase are interpolated where |S| is large, real and imaginary parts near a null
+    # (doc/sparam.md): at the through-port null at 1.55 um the phase turns by almost pi between two grid
+    # points, and magnitude/phase gave 0.020 (linear) and 0.015 (pchip) there; now <= 2e-3 everywhere
     for interp, tol in [('linear', 1e-3), ('pchip', 2e-4)]:
         orig = t.run(add_drop_with_spar(False).replace('.dc /cwsrc1/WL {lambda_min} {lambda_max} {dlambda}',
                                                        '.dc /cwsrc1/WL %r %r %r' % shifted), 'add_drop_shift')
@@ -353,9 +353,9 @@ def test_round_trip(t):
                 anywhere = max(anywhere, abs(ea - eb))
                 if abs(eb) >= 0.1:
                     smooth = max(smooth, abs(ea - eb))
-        t.check('round-trip/between-points/%s' % interp, r.status == 0 and n == 30 and smooth <= tol and anywhere <= 0.03,
+        t.check('round-trip/between-points/%s' % interp, r.status == 0 and n == 30 and smooth <= tol and anywhere <= 2e-3,
                 'max |E_SPAR - E_add_drop| over %d points between grid points: %.3g where |E| >= 0.1 (<= %g), '
-                '%.3g anywhere (<= 0.03)' % (n, smooth, tol, anywhere))
+                '%.3g anywhere (<= 2e-3)' % (n, smooth, tol, anywhere))
 
 
 TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_port_order, test_passivity,

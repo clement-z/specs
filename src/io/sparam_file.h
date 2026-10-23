@@ -26,6 +26,13 @@ public:
     static constexpr double c = 299792458.0;
     // The data range is extended by this relative tolerance at both ends, as wavelength matching (B-010)
     static constexpr double RANGE_RELATIVE_TOLERANCE = 1e-12;
+    // Interpolation between two grid points of a tabulated entry (doc/sparam.md): real and imaginary parts
+    // where |S| at either point is below this fraction of the entry's largest |S| (near a transmission
+    // null, where the phase turns quickly), magnitude and unwrapped phase elsewhere. Chosen from the
+    // error between grid points of three exported devices (PF03b report): 0.06 to 0.08 is best for both
+    // linear and PCHIP; lower leaves the nulls to magnitude/phase, higher cuts the phase rotation of
+    // delayed paths with chords
+    static constexpr double MIXED_INTERP_THRESHOLD = 0.07;
 
     // Reads a file (format AUTO: from its extension)
     static std::shared_ptr<SParamData> load(const std::string &path, Format format = FORMAT_AUTO,
@@ -82,8 +89,10 @@ private:
         std::vector<double> f_Hz; // ascending
         std::vector<double> mag;
         std::vector<double> phase; // unwrapped, SPECS convention
+        std::vector<double> re, im; // the same values as real and imaginary parts
         std::vector<double> tau_s; // group delay at the grid points
-        std::vector<double> dmag, dphase; // PCHIP slopes (INTERP_PCHIP)
+        std::vector<double> dmag, dphase, dre, dim; // PCHIP slopes (INTERP_PCHIP)
+        double max_mag = 0; // largest |S| over the grid
     };
     // One entry S(out, in) of the Taylor form: polynomials in d = lambda - lambda0
     struct Taylor {
@@ -130,6 +139,12 @@ private:
     // Wavelengths of passivity() and maxMagnitude()
     std::vector<double> checkWavelengths() const;
     static double evalTable(const std::vector<double> &x, const std::vector<double> &y, const std::vector<double> *slopes, double xi);
+    // Segment [x[k], x[k+1]] containing xi (n >= 2), and the linear or cubic Hermite interpolant on it
+    static size_t segment(const std::vector<double> &x, double xi);
+    static double evalSegment(const std::vector<double> &x, const std::vector<double> &y, const std::vector<double> *slopes,
+            size_t k, double xi);
+    // S of a tabulated entry at a frequency in its grid (mixed interpolation, MIXED_INTERP_THRESHOLD)
+    complex_type interpolate(const Table &t, double f_Hz) const;
     static std::vector<double> pchipSlopes(const std::vector<double> &x, const std::vector<double> &y);
     static double polyval(const std::vector<double> &coeffs, double d);
     static double polyder(const std::vector<double> &coeffs, double d);
