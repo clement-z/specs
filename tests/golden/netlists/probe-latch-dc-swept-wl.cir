@@ -1,0 +1,15 @@
+* PD5 (follow-up 2): in a .dc wavelength sweep, a PROBE latches the swept wavelength at each point when its net
+* carries it, also next to a smaller fixed wavelength; on a net without it, the smallest wavelength present.
+* cwsrc1 fixed at 1530 nm, cwsrc2 swept from 1541 to 1559 nm, merged into m; cwsrc1 and cwsrc3 (1520 nm) into n.
+*   probe1 (m): the swept wavelength at every point, also at the first one, where the smaller 1530 nm arrives too
+*   probe2 (n): 1520 nm at the first point (the smallest; n does not carry the swept wavelength), then no new
+*     sample: n is not written again (B-185)
+cwsrc1 a wl=1.53e-6 power=1e-3
+cwsrc2 b wl=1.541e-6 power=2e-3
+cwsrc3 c wl=1.52e-6 power=4e-3
+splitter1 a a1 a2
+merger1 a1 b m
+merger2 a2 c n
+probe1 m
+probe2 n
+.dc WL(cwsrc2) 1.541e-6 1.559e-6 6e-9

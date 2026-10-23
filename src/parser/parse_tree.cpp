@@ -850,6 +850,7 @@ void ParseTree::build_circuit()
                 if (!mod)
                 {
                     auto probe = make_shared<Probe>(probe_name.c_str(), false, false, false, false);
+                    probe->m_automatic = true;
                     probe->p_in(*dynamic_cast<spx::oa_signal_type *>(sig.get()));
                     mod = probe;
                 }

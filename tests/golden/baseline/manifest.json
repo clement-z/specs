@@ -170,6 +170,7 @@
   "regress/b156-many-includes",
   "regress/b159-crossing-backward",
   "regress/b180-numeric-net-names",
+  "regress/b184-mlprobe-tran-start-multilambda",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
@@ -213,6 +214,10 @@
   "regress/f15-wdm-crow-mlprobe",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
+  "regress/probe-latch-dc",
+  "regress/probe-latch-dc-swept-f",
+  "regress/probe-latch-dc-swept-wl",
+  "regress/probe-latch-tran",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -302,6 +307,36 @@
    "only": "^regress/f15-wdm-crow-mlprobe$",
    "gtest": false,
    "note": "PD3: new case regress/f15-wdm-crow-mlprobe, recorded with the build before the SC_METHOD conversion (39f1bf9, pixi gcc 15 release)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T00:55:25Z",
+   "only": "^(regress/b184-mlprobe-tran-start-multilambda|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-184: new case (MLPROBE traces every listed wavelength of the OP at .tran start); gtest list: MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T01:05:40Z",
+   "only": "^regress/(b033-crossing-two-lambda-tran|f15-stats-tran)$",
+   "gtest": false,
+   "note": "PD5 PROBE wavelength latch (D5 decision of 2026-10-23): PROBE1/PROBE2 on the two-wavelength nets trace 1550 nm only (= MLPROBE1/2@1550 of the same run), stderr warns once per probe"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T01:05:41Z",
+   "only": "^(regress/probe-latch-tran|regress/probe-latch-dc|err/probe-wl-invalid|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD5 PROBE wavelength latch: new cases regress/probe-latch-tran, regress/probe-latch-dc, err/probe-wl-invalid; gtest list (Probe.Latch*, Probe.SelectedWavelengthIsTheOnlyOneTraced, Probe.TestbenchProbeTracesEveryWavelength, TraceTable.DiscardDropsTheRowOfTheCurrentTimeStep)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T02:19:17Z",
+   "only": "^(regress/probe-latch-tran|regress/probe-latch-dc|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD5 follow-up (maintainer: no PROBE wavelength selection in v0.3.0): probe2 (wl=<wavelength>) removed from regress/probe-latch-tran and regress/probe-latch-dc (outputs = previous ones minus PROBE2); err/probe-wl-invalid removed; gtest list (Probe.SelectedWavelengthIsTheOnlyOneTraced removed)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T02:34:10Z",
+   "only": "^(regress/probe-latch-dc-swept-wl|regress/probe-latch-dc-swept-f|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD5 follow-up 2 (maintainer: .dc latch on the swept wavelength): new cases regress/probe-latch-dc-swept-wl and regress/probe-latch-dc-swept-f; gtest list (Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint)"
   }
  ]
 }

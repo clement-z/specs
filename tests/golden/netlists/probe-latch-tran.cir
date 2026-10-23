@@ -1,0 +1,22 @@
+* PD5: a PROBE traces one wavelength of a multi-wavelength net in a .tran; MLPROBEs give the reference.
+* m carries 1550 nm (cwsrc2) and 1560 nm (cwsrc1) from the operating point; m2 also gets 1540 nm from
+* vlsrc1 at 2 ps; c only carries 1540 nm (no operating-point value).
+*   probe1 (m): 1550 nm, the smallest wavelength at the enable (operating-point values), = mlprobe2@1550
+*   probe3 (m2): 1550 nm; the 1540 nm light, smaller but arriving later, is ignored, = mlprobe3@1550
+*   probe4 (c): 1540 nm, latched in the first time step that brings any, = mlprobe4@1540
+*   probe5 (c, wl=0): the wavelength is not traced
+* stderr: one warning per probe that ignores a wavelength, one line for the automatic probes (traceall).
+cwsrc1 a wl=1.56e-6 power=1e-3
+cwsrc2 b wl=1.55e-6 power=4e-3
+merger1 a b m
+vlsrc1 c values=[[2e-12, 2e-3, 1.54e-6], [6e-12, 0, 1.54e-6]]
+merger2 m c m2
+probe1 m
+probe3 m2
+probe4 c
+probe5 c wl=0
+mlprobe2 m wl=[1.55e-6, 1.56e-6]
+mlprobe3 m2 wl=[1.54e-6, 1.55e-6, 1.56e-6]
+mlprobe4 c wl=[1.54e-6]
+.options traceall=1
+.tran 10e-12

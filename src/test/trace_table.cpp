@@ -107,6 +107,40 @@ TEST(TraceTable, CsvOneRowPerTimeStepProbeAndWavelength)
     SPECS_TEST_FOOTER();
 }
 
+TEST(TraceTable, DiscardDropsTheRowOfTheCurrentTimeStep)
+{
+    SPECS_TEST_HEADER()
+    {
+        const std::string csv = tempName(".csv");
+        {
+            TraceTable table(csv, "");
+            const uint32_t a = table.signal_index("probe");
+            const uint32_t b = table.signal_index("other");
+            const uint32_t wl1560 = sig(0, 0, 1.56e-6).m_wavelength_id;
+
+            // time step 0: a at 1560 nm, then 1550 nm; a PROBE latching 1550 nm drops its 1560 nm row
+            // (PD5); b keeps its own 1560 nm row
+            table.append(0, a, sig(2, 0, 1.56e-6));
+            table.append(0, b, sig(0, 1, 1.56e-6));
+            table.append(0, a, sig(1, 0, 1.55e-6));
+            table.discard(0, a, wl1560);
+            // next time step: discarding a past time step, or a row that does not exist, does nothing
+            table.append(1e-13, a, sig(3, 0, 1.56e-6));
+            table.discard(0, a, wl1560);
+            table.discard(1e-13, b, wl1560);
+            EXPECT_TRUE(table.close());
+            EXPECT_EQ(table.rows(), 3u);
+        }
+        EXPECT_EQ(readFile(csv),
+                  "time_s,signal,wavelength_m,power_W,field_re,field_im\n"
+                  "0,other,1.56e-06,1,0,1\n"
+                  "0,probe,1.55e-06,1,1,0\n"
+                  "1e-13,probe,1.56e-06,9,3,0\n");
+        std::remove(csv.c_str());
+    }
+    SPECS_TEST_FOOTER();
+}
+
 TEST(TraceTable, NpzIsAStoredZipOfNpyArrays)
 {
     SPECS_TEST_HEADER()

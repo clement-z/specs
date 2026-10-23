@@ -154,6 +154,46 @@ void SPECSConfig::writeRunStats() const
         cout << json << flush;
 }
 
+namespace {
+
+void setProbeLatchMode(Probe::LatchMode mode)
+{
+    for (auto probe : sc_get_all_module_by_type<Probe>())
+        probe->m_latch_mode = mode;
+}
+
+// PD5: a plain probe traces one wavelength of its net. Once per run, in name order: one warning per
+// probe that ignored another wavelength, one line for all the automatic probes (PROBE{<net>}:
+// traceall, .save)
+void reportProbeWavelengthLatches()
+{
+    vector<const Probe *> automatic;
+    for (const Probe *probe : sc_get_all_module_by_type<Probe>())
+    {
+        if (isnan(probe->m_ignored_wavelength_m))
+            continue;
+        if (probe->m_automatic)
+        {
+            automatic.push_back(probe);
+            continue;
+        }
+        cerr << "Warning: " << probe->name() << " traces one wavelength of its net "
+             << port_channel_name(probe->p_in) << " (" << probe->m_traced_when_ignored_m * 1e9
+             << " nm) and ignores the others (" << probe->m_ignored_wavelength_m * 1e9
+             << " nm): use MLPROBE for per-wavelength values" << endl;
+    }
+    if (!automatic.empty())
+    {
+        const Probe *first = automatic.front();
+        cerr << "Warning: " << automatic.size() << " automatic probe(s) PROBE{<net>} trace one wavelength of "
+             << "their net and ignore the others (e.g. " << first->name() << " traces "
+             << first->m_traced_when_ignored_m * 1e9 << " nm and ignores " << first->m_ignored_wavelength_m * 1e9
+             << " nm): use MLPROBE for per-wavelength values" << endl;
+    }
+}
+
+}
+
 void SPECSConfig::runOPAnalysis()
 {
     auto all_probes = sc_get_all_module_by_type<Probe>();
@@ -161,6 +201,10 @@ void SPECSConfig::runOPAnalysis()
     auto all_photodetectors = sc_get_all_module_by_type<Detector>();
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
+
+    // .op: one analysis point (the probes of a .tran latch once, set by runTRANAnalysis(), PD5)
+    if (analysis_type != TIME_DOMAIN)
+        setProbeLatchMode(Probe::LATCH_PER_TIME_STEP);
 
     // Disable photodetectors before the first sc_start(): they are enabled by default
     // (testbenches, C++ users) but must not write their readout during the OP
@@ -225,6 +269,9 @@ void SPECSConfig::runDCAnalysis()
     auto all_sig = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Each sweep point (one time step) latches its own wavelength (PD5)
+    setProbeLatchMode(Probe::LATCH_PER_TIME_STEP);
+
     // Disable photodetectors before the first sc_start() (they are enabled by default)
     for (auto pdet: all_photodetectors) {
         // Remark: Photodetectors could in fact be left enabled ?
@@ -262,15 +309,23 @@ void SPECSConfig::runDCAnalysis()
         exit(1);
     }
     const auto &order = *cw_sweep_orders.begin();
-    wavelengths_vector.reserve(order.second.second.size());
+    wavelengths_vector.reserve(order.second.values.size());
     cout << "Starting sweep on " << order.first;
-    cout << " (" << order.second.second.size() << " points)" << endl;
+    cout << " (" << order.second.values.size() << " points)" << endl;
     size_t point = 0;
-    for (const auto &val : order.second.second)
+    for (const auto &val : order.second.values)
     {
         ++point;
         // Apply sweep param
-        order.second.first(val);
+        order.second.apply(val);
+
+        // A wavelength (or frequency) sweep: the probes latch the swept wavelength of this point
+        // when their net carries it (PD5)
+        const double swept_wavelength_m = order.second.sweeps_wavelength
+                                              ? order.second.source->m_signal_on.getWavelength()
+                                              : std::numeric_limits<double>::quiet_NaN();
+        for (auto probe: all_probes)
+            probe->setSweptWavelength(swept_wavelength_m);
 
         //cout << order.first << " = " << val << endl;
 
@@ -283,7 +338,7 @@ void SPECSConfig::runDCAnalysis()
         // run the fixed point (at most max_iterations delta cycles, F-28) and advance one tick
         const sc_dt::uint64 start_delta = sc_delta_count();
         stringstream what;
-        what << ".dc: sweep point " << point << " of " << order.second.second.size()
+        what << ".dc: sweep point " << point << " of " << order.second.values.size()
              << " (" << order.first << " = " << val << ")";
         if (!runFixedPoint())
             reportNonConvergence(what.str(), start_delta);
@@ -299,6 +354,7 @@ void SPECSConfig::runDCAnalysis()
 
         //printOPAnalysisResult();
     }
+    reportProbeWavelengthLatches();
 }
 
 void SPECSConfig::runTRANAnalysis()
@@ -317,6 +373,9 @@ void SPECSConfig::runTRANAnalysis()
     //     (and the photodetectors, which write their readout)
     // (b) must stay before (c), so that the probes trace the post-OP, post-IC state at t = 0
     // (B-048 maintainer condition, see TranStart.ProbesSampleAfterOperatingPointAndInitialConditions)
+
+    // The probes latch one wavelength for the whole transient, when they are enabled (PD5)
+    setProbeLatchMode(Probe::LATCH_ONCE);
 
     // (a) Run OP analysis
     runOPAnalysis();
@@ -361,6 +420,7 @@ void SPECSConfig::runTRANAnalysis()
         cerr << "Warning: .tran stopped at the event cap at " << sc_time_stamp() << ": " << event_cap->processed
              << " pending entries processed (.options maxevents=" << max_events << ")" << endl;
 
+    reportProbeWavelengthLatches();
     cout << "Simulated " << sc_time_stamp() << endl;
 }
 
@@ -510,6 +570,7 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
             //cout << signame << endl;
 
             auto p = make_shared<Probe>(("PROBE{" + signame + "}").c_str(), true, true, true, true);
+            p->m_automatic = true;
             p->setTraceFile(default_trace_file);
             p->setTraceTable(table);
             p->p_in(*sig);
