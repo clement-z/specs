@@ -9,8 +9,8 @@ Decision: "Follow-ups (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`; B-066.
 | 1. Prints behind `--vci`, stderr warning | done | baf872b | 6 gtests; the 37 predicted cases re-recorded in the same commit; proof OK (gcc, asan-clang, clang) |
 | 2. Golden: 2 new cases | done | 2fa468a | `regress/b066-vlsrc-vci`, `regress/b066-evlsrc-past`; strict 242/242 |
 | 3. Docs, CHANGELOG, B-066 | done | 7168885 | |
-| Gate: asan-gcc before/after, `meson test` clang/asan-gcc | running | | before builds in `/tmp/PJ-wt/before` (354c5e5) |
-| Report | pending | | |
+| Gate: clang, asan-gcc before/after, `meson test` clang/asan-gcc | done | — | proof OK for both; asan-gcc `unit` timeout under host load, also before (see report) |
+| Report | done | see PJ-REPORT.md | |
 
 ## Predicted golden impact (written before the change)
 stdout only, lines removed, nothing else: values, traces, stderr, exit codes, `.stats.json`, and every other file
