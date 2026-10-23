@@ -9,7 +9,7 @@ Base: 48e510f.
 |---|---|---|---|---|
 | 1 | Per-path delayed copies | done | 7e9e03b | clang/asan-gcc: same 2 cases; asan-clang clean |
 | 2 | Negative delay warning per path | todo | | |
-| 3 | Grid-adequacy warning | done | (see git log) | threshold 0.02 (leave-one-out); no existing case changed; new case regress/spar-grid-warning |
+| 3 | Grid-adequacy warning | done | 964b75a | threshold 0.02 (leave-one-out); no existing case changed; new case regress/spar-grid-warning |
 | 4 | Mixed interpolation near nulls | done | 368bf61 | threshold 0.07 x max|S|; measurements in the report |
 | 5 | Data files in the run manifest | done | 805dc8c | subagent (opus) in /tmp/PF03b-wt/manifest, reviewed, cherry-picked; ring manifests re-recorded for item 8's file |
 | 6 | SiEPIC BDC fixture + golden | todo | | |
