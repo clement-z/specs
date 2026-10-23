@@ -14,7 +14,7 @@ Base: 48e510f.
 | 5 | Data files in the run manifest | todo | | own commit |
 | 6 | SiEPIC BDC fixture + golden | todo | | |
 | 7 | Tests and docs | todo | | |
-| 8 | Re-export ring file at 0.05 nm | done | (this commit) | predictions above; counters: only spar-ring-tran drop last_emission |
+| 8 | Re-export ring file at 0.05 nm | done | 5e1b14f | predictions above; counters: only spar-ring-tran drop last_emission |
 
 ## Predictions (written before each re-record)
 
