@@ -9,9 +9,9 @@ used only for the prediction below).
 |---|---|---|---|---|
 | 0 | references (base e5d6c21): gcc test + strict golden, clang/asan-gcc recordings, counters, asan-clang; prediction | done | | gcc `meson test` 12/12, strict golden 229/229; recordings `/tmp/pd5/rec/base-{clang,asan-gcc}`; counters `/tmp/pd5/stats/base`; asan-clang 12/12 |
 | 1 | B-184: MLPROBE keeps listening while disabled, traces its per-wavelength memory when enabled; repro as a golden case | done | 5f62e0a | option (a); gcc strict 229/229 + new case `regress/b184-mlprobe-tran-start-multilambda` (0.5 W at both wavelengths from t = 0, VCD + CSV), gtest list re-recorded; counters 228 same + 1 new; clang and asan-gcc 228/228 identical to base, new case strict on both; asan-clang 12/12, no sanitizer message |
-| 2 | PROBE wavelength latch (`wl=`, per analysis point, warnings) | todo | | |
-| 3 | docs (netlist.md, cheatsheet, CHANGELOG, B-184, backlog.md) | todo | | |
-| 4 | checks (B-184 repro, 4-λ CROW PROBE vs MLPROBE, add_drop, bench), report | todo | | |
+| 2 | PROBE wavelength latch (`wl=`, per analysis point, warnings) | done | 822ef41, warning fix (see log) | as predicted: re-recorded `regress/b033-crossing-two-lambda-tran`, `regress/f15-stats-tran` (PROBE1/2 = MLPROBE1/2@1550 at every time point, + stderr warnings, nothing else); new cases `regress/probe-latch-tran`, `regress/probe-latch-dc`, `err/probe-wl-invalid`; gtest +6. At 822ef41: counters 228 same + 4 new; clang/asan-gcc vs base: only the 2 predicted cases differ, new/re-recorded cases strict on both; asan-clang 12/12 clean. `.dc`: a net whose value does not change between points is not written again, so a non-swept CW wavelength reaches the probe at the first point only (documented). Decisions: latch set by the analysis runners (testbenches unchanged); `wl=` takes a DOUBLE other than 0/1, `wl=0|1|true|false` keeps the old flag meaning; warnings at the end of the analysis, name order |
+| 3 | docs (netlist.md, cheatsheet, CHANGELOG, B-184, backlog.md) | done | 468b89a | cheatsheet is a PDF (`doc/resources/cheatsheet.pdf`): the element table of `doc/netlist.md` lists the PROBE arguments instead |
+| 4 | checks (B-184 repro, 4-λ CROW PROBE vs MLPROBE, add_drop, bench), report | in progress | | CROW 3 rings 4 λ, PROBE + MLPROBE on all 16 nets: 15 driven PROBEs = MLPROBE@1548.8 nm at every time point (45/45), MLPROBE 192/192 signals identical to base; found the warning naming an intermediate latch (fixed) |
 
 ## Predicted golden impact (written before any code change)
 
