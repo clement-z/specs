@@ -75,7 +75,8 @@ std::vector<T> read_column(const std::string &dir, const std::string &name)
 {
     const std::string raw = read_text(fs::path(dir) / (name + ".npy"));
     std::vector<T> v((raw.size() - 128) / sizeof(T));
-    std::memcpy(v.data(), raw.data() + 128, v.size() * sizeof(T));
+    if (!v.empty())
+        std::memcpy(v.data(), raw.data() + 128, v.size() * sizeof(T));
     return v;
 }
 

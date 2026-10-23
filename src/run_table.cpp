@@ -111,7 +111,9 @@ template <typename T>
 void put_array(string &b, const vector<T> &v)
 {
     put_u64(b, v.size());
-    b.append(reinterpret_cast<const char *>(v.data()), v.size() * sizeof(T));
+    // an empty vector may have no storage (data() == nullptr)
+    if (!v.empty())
+        b.append(reinterpret_cast<const char *>(v.data()), v.size() * sizeof(T));
 }
 
 struct Reader {
@@ -143,7 +145,8 @@ struct Reader {
         if (!get_u64(n) || n > (b.size() - pos) / sizeof(T))
             return ok = false;
         v.resize(n);
-        std::memcpy(v.data(), b.data() + pos, n * sizeof(T));
+        if (n > 0)
+            std::memcpy(v.data(), b.data() + pos, n * sizeof(T));
         pos += n * sizeof(T);
         return true;
     }
@@ -555,6 +558,8 @@ int32_t RunTable::name_index(const string &name, vector<string> &names, std::map
 
 bool RunTable::append(Column &c, const void *data, size_t n, uint64_t at)
 {
+    if (n == 0)
+        return true;
     return pwrite_all(c.fd, data, n * c.itemsize, NPY_HEADER_SIZE + at * c.itemsize);
 }
 
