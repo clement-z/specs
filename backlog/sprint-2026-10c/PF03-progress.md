@@ -23,8 +23,6 @@ Baseline before any change (cb3a5c3): `pixi run test gcc` OK, `pixi run golden g
 - Third-party fixture `EBeam_1550_TE_BDC.sparam`: not committed. Simphony is MIT but its LICENSE puts
   "resources" under other terms in a NOTICE.txt that no longer exists (404). Used only in /tmp as a local check.
 
-## Gate (in progress)
-- gcc: meson test 13/13, golden strict 256 (245 + 11 new) after recording.
-- asan-clang: meson test 13/13 OK. clang: meson test OK; golden strict: the same 7 cases fail before (cb3a5c3)
-  and after (last-bit clang differences), the 11 new cases pass.
-- Remaining: asan-gcc; before/after `compare` of the clang and asan-gcc recordings; report.
+## Gate
+Done: see `PF03-REPORT.md` (gcc 256/256 strict, asan-clang/clang/asan-gcc OK, before/after identical on existing
+cases, counters identical on 249). Heartbeat 388e4984 deleted after the report.
