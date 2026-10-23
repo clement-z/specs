@@ -1,5 +1,5 @@
 # B-069: Unreachable research devices with latent bugs: OCTANE composites, the GenericTransmissionDevice family, BitstreamSource
-severity: low | category: style/maintainability | effort: M | fix-class: needs-human | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: M | fix-class: needs-human | verdict: CONFIRMED | status: partly: GTD, Generic2x2Coupler, GenericWaveguide obsolete (removed in 54b15dc, D2b); OCTANE and BitstreamSource items stay open
 location: src/devices/octane_cell.*, src/devices/octane_segment.*, src/devices/octane_matrix.*, src/devices/generic_transmission_device.*, src/devices/generic_2x2_coupler.h, src/devices/generic_waveguide.h, src/devices/bitstream_source.*, src/specs.cpp:1,15
 ## Problem
 None of these classes is reachable from a netlist or a testbench. GTD users are commented out in tb/directional_coupler_tb.cpp:110 and tb/wg_tb.cpp:106, and `GenericWaveguide` `exit(1)`s in its constructor. They carry known bugs.

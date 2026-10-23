@@ -1,5 +1,5 @@
 # B-078: Wavelength merge in FD is fragile (`has_wl` never True); first probe on an unpowered net or without `wl` breaks the parse
-severity: med | category: python | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: python | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in 769a17f (sprint 2026-10c D6): a PROBE always traces its wavelength, so `wl=0` no longer gives a sweep without a wavelength trace (point 3 stays reachable with `.save P(net)` only); points 1 (has_wl merge) and 2 (wavelength as first signal) open in pyspecs
 location: pyspecs/specsparse.py:59-60, :70-84, :92, :100-101
 ## Problem
 Three related failures of the probe loop; one restructuring fixes all of them.

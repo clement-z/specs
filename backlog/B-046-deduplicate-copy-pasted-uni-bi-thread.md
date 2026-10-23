@@ -1,5 +1,5 @@
 # B-046: Deduplicate the copy-pasted Uni/Bi thread bodies (S-parameter setup)
-severity: low | category: style/maintainability | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: style/maintainability | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in bd92622 (sprint 2026-10c D3): waveguide and coupler compute once in the Base; phase shifter and crossing copies and pure-function unit tests stay open
 location: src/devices/waveguide.cpp:6-101, src/devices/waveguide.cpp:104-203, src/devices/waveguide.cpp:205-280, src/devices/directional_coupler.cpp:8-21, src/devices/directional_coupler.cpp:72-85, src/devices/directional_coupler.cpp:116-129, src/devices/directional_coupler.cpp:190-203, src/devices/directional_coupler.cpp:234-247, src/devices/directional_coupler.cpp:278-291, src/devices/phaseshifter.cpp:6-198, src/devices/crossing.cpp:6-128
 ## Problem
 The S-parameter and delay computation is repeated in several places:

@@ -1,5 +1,5 @@
 # B-084: No build/usage/licence documentation in the repo; mainpage introduction is "TODO"; README is a pointer to an external site
-severity: med | category: docs | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: docs | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly: README has Building, running, testing, pixi, citation (sprint 2026-10b/c); no licence line, no Python install section, `doc/mainpage.md` Introduction still TODO, stray emoji selector in Copyright remains
 location: README.md:1-17, doc/mainpage.md:3-5, doc/papers/, doc/resources/
 ## Problem
 `README.md` is one paragraph linking to `demo.zrounba.fr/specs/doc` (reachable, but its source is not versioned), a contributing hint and the citation. There is no build, run, test or Python section, no licence line, no list of dependencies; the only in-repo build knowledge is in `CLAUDE.md`/`discover/`. `doc/mainpage.md` (the Doxygen start page) has an empty "Introduction: TODO". The "Copyright" line contains a stray U+FE0F emoji variation selector (`©` + EF B8 8F) which makes some renderers show an emoji.

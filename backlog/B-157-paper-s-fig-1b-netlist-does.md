@@ -1,5 +1,5 @@
 # B-157: The paper's Fig. 1b netlist does not parse: `.save`, `dc1` coupler prefix, `.dc WL(cwsrc1)`
-severity: med | category: parser | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: parser | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed: `.dc WL(cwsrc1)` in b00b8ae (sprint 2026-10b P5), `.save` in 9feac83 (P6); `dc1` prefix, `{expr}`/negative bounds and subckt elements in `.dc` open
 location: src/parser/parser.l:461, src/parser/parser.y:82, src/parser/parser.y:786-807, src/parser/parser.l:387
 ## Problem
 - `.save` has a token but no grammar rule.

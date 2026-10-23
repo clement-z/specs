@@ -1,5 +1,5 @@
 # B-155: Error messages have wrong or no location (subckt bodies, included files, elaboration errors)
-severity: med | category: parser | effort: M | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: parser | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed: net-type mismatch no longer prints a null pointer (5912b6a, B-146); subckt-body locations are B-182; include file name, kwarg and elaboration locations stay open
 location: src/parser/parse_tree.cpp:322-330, src/parser/parser.l:247-256, src/parser/parse_element.cpp:121 (and every "Unknown keyword"), src/parser/parse_tree.h:695, src/parser/parse_tree.h:848,907,913, src/parser/parse_tree.cpp:714-720
 ## Problem
 - Errors in a subckt body print `(:N)`: an empty filename, a line relative to the body, and no instance name. The

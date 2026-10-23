@@ -1,5 +1,5 @@
 # B-108: Golden baseline is bit-exact only for -march=native (FMA) builds; planned CI uses native=false
-severity: med | category: build | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: build | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 676f915 (sprint 2026-10c, B-183): baseline re-recorded without -march=native, native off by default
 location: CMakeLists.txt:37, discover/meson/PLAN.md:26-30,62,64,101,119, tests/golden/run_golden.py (tolerances)
 ## Problem
 `-march=native` is added unconditionally (CMakeLists.txt:37) and the baseline was recorded on an AVX2+FMA CPU, so GCC contracts `a*b+c` into `vfmadd*`. A build without `-march=native` (what the planned GitHub Actions job does with `-Dnative=false`, PLAN.md:101) is NOT bit-identical to the baseline: 12 of 44 golden cases differ in the last printed digit at `--rtol 0 --atol 0`. They only pass with the default tolerance (rtol 1e-9). PLAN.md:119 asks for `check --atol 0` (rtol stays at its 1e-9 default), which works, but anyone who "tightens" CI to `--rtol 0` will get red CI on every non-FMA runner (and on aarch64 or older x86). obsoleted-by-meson: no (the Meson `native` option carries this over).

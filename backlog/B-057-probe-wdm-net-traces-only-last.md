@@ -1,5 +1,5 @@
 # B-057: A PROBE on a WDM net traces only the last event (arbitrary λ), not the net's state
-severity: med | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: med | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 822ef41 (sprint 2026-10c D5) and 769a17f (D6): a PROBE traces one latched wavelength, warns on the others; MLPROBE is per wavelength
 location: src/devices/probe.cpp:33-46, src/specs.cpp:280-298
 ## Problem
 `Probe::on_port_in_changed()` writes power, abs, phase and wavelength of whichever event arrived last. On a net that carries several wavelengths, the `power` trace is the power of one carrier, and the `wavelength` trace hops between carriers. Since VCD keeps one value per timestep, which carrier you see depends on delta ordering.
