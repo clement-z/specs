@@ -1,5 +1,5 @@
 # B-062: MLPROBE matches wavelengths with exact double `==` and prints on every unmatched event
-severity: low | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED
+severity: low | category: bug | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in 5b946f2 (sprint 2026-10c PG): the per-event stdout print is replaced by one warning per probe on stderr at the end of the run, with full precision; matching stays exact (tolerance: open, needs-design)
 location: src/devices/probe.cpp:150-162, src/parser/parse_element.cpp:1093-1130
 ## Problem
 `m_lambda_signals.find(s.getWavelength())` requires bit-exact equality between the MLPROBE list and the source wavelength. Any source wavelength computed by an expression (`{lambda0}+1.5e-9` = 1.5514999999999999e-06) or by `setFrequency` (c/f) misses.
