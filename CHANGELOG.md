@@ -27,7 +27,8 @@
   converted to SPECS's convention on import (Touchstone, written in the RF convention, is conjugated; a test
   shows that a waveguide written in each format gives the phase and delay of a `WG` of the same length).
   Magnitude and unwrapped phase are interpolated in frequency (`interp=linear|pchip`), real and imaginary
-  parts near transmission nulls; in `.tran` the S-matrix of the carrier wavelength applies with a group delay
+  parts of the entry with its median group delay taken out near transmission nulls (B-190: an unbalanced
+  MZI sampled 28 times per FSR is within 0.0016 between grid points instead of 0.023); in `.tran` the S-matrix of the carrier wavelength applies with a group delay
   per path (each path a delayed copy of its input; no dispersion within a pulse; negative delays become 0,
   reported per path), or with `delay_per="output"` one delay per output (that of its largest path). A grid too coarse for the device is reported when the file is loaded (leave-one-out
   check). Unidirectional or bidirectional like `COUPLER`; a wavelength outside the data range is an error;

@@ -29,18 +29,30 @@ convention and what the device does with the data.
   taken within (-pi, pi]), and as real and imaginary parts. Between two grid points it is interpolated in
   frequency, linearly (`interp=linear`, the default) or with a monotone cubic (`interp=pchip`,
   Fritsch-Carlson, on each quantity with its own slopes), and the quantities depend on the interval:
-  - magnitude and phase, separately (exact for a delay line, whose phase is linear in frequency), where |S|
-    at both ends of the interval is at least 0.07 times the largest |S| of that entry;
-  - real and imaginary parts where it is smaller at either end: near a transmission null the phase turns
+  - magnitude and phase, separately (exact for a delay line, whose phase is linear in frequency), away from
+    transmission nulls;
+  - near a null, real and imaginary parts **of the entry with its delay taken out** (B-190):
+    `S~(f) = S(f) exp(-j 2 pi (f - f_ref) tau0)`, the delay put back after the interpolation. `tau0` is the
+    median of the entry's group delays at the grid points (below), `f_ref` its first grid point; `tau0` is 0
+    when it would turn S by less than 1e-3 rad over the largest grid step. Near a null the phase turns
     quickly and S passes close to 0 along an almost straight line, which magnitude/phase interpolation
-    follows badly.
+    follows badly; on a path that also rotates fast (an unbalanced MZI: two delays), that line is straight
+    only once the common delay is taken out. An interval is "near a null" when |S| at either end, or the
+    segment between `S~` at its two ends, comes closer to 0 than 0.07 times the largest |S| of the entry
+    (the segment test catches a null between two points whose |S| is larger).
 
   The choice is made per interval, so S stays continuous; at a grid point the file's value is used as is.
   The threshold 0.07 was chosen from the error between grid points of exported devices (PF03b report): the
   add-drop ring of `circuits/add_drop.cir` on a 0.05 nm grid, evaluated between its points, is within 4e-4
-  (linear) or 1e-4 (pchip) of the circuit where |S| >= 0.1, and within 1e-3 (linear) or 6e-4 (pchip) at its
+  (linear) or 1e-4 (pchip) of the circuit where |S| >= 0.1, and within 6e-4 (linear and pchip) at its
   through-port null at 1.55 um, where magnitude/phase interpolation alone gave 0.020 and 0.015
-  (`tests/sparam/test_sparam.py`, round-trip/between-points). The grid must be fine enough for the phase to
+  (`tests/sparam/test_sparam.py`, round-trip/between-points); with the delay removed, the results are the same
+  for thresholds from 0.03 to 0.1. Measured between the grid points of exports (PF03c report), the delay
+  removal takes an unbalanced MZI sampled 28 times per free spectral range from 0.023 to 0.0016 (linear) and
+  the ring from 9.7e-4 to 5.4e-4; delay lines, the SiEPIC coupler and smooth dispersive paths are unchanged
+  (no interval near a null). With `interp=pchip` the magnitude/phase intervals are as without delay removal
+  (PCHIP on the detrended phase would help the MZI more, 0.0035 instead of 0.016, but degrades smooth
+  dispersive paths: PF03c report). The grid must be fine enough for the phase to
   change by less than pi between two points (else the unwrapping, and the group delay, are wrong), and to
   resolve the device's features: see "Grid check".
 - **Range.** A wavelength outside the data range is an error, with the range in the message (relative
@@ -57,9 +69,10 @@ convention and what the device does with the data.
   difference: the grid does not resolve a feature there (a resonance or a null narrower than the spacing),
   so the values between those points and the group delays near them are unreliable. Leaving a point out
   doubles the spacing, so 0.02 stands for about 0.005 between the points of the actual grid. A delay line
-  gives 1e-12, the SiEPIC broadband coupler (`tests/sparam/data/siepic`) 0.0026 and the add-drop ring on a
-  0.05 nm grid 0.0039 (no warning); the ring on a 1 nm grid gives 0.71 and an MZI sampled 28 times per
-  free spectral range 0.11 (warnings). The check tests S, not the group delay: the ring's through-port
+  gives 1e-12, the SiEPIC broadband coupler (`tests/sparam/data/siepic`) 0.0024, the add-drop ring on a
+  0.05 nm grid 0.0021 and an unbalanced MZI sampled 28 times per free spectral range 0.0064 (no warning;
+  0.043 with `interp=pchip`, a warning); the ring on a 1 nm grid gives 0.71 (a warning). Before the delay
+  removal (B-190) the MZI gave 0.11 and the ring 0.0039. The check tests S, not the group delay: the ring's through-port
   null, whose phase turns within about 4 pm, passes on the 0.05 nm grid (S between the points is within
   1e-3 there) while its group delay is not resolved (-37 ps instead of -621 ps). Not applicable to the
   Taylor form.

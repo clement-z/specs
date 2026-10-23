@@ -8,9 +8,9 @@
  "exit": 0,
  "files": {
   "traces/delete_me.csv": {
-   "bytes": 6995,
+   "bytes": 6996,
    "kind": "text",
-   "sha256": "7106422b50384f9867a4928d139b55c887e00a075c613667e9b9c4121e43c1ec",
+   "sha256": "69c03feceb499c6ddd5bd3631ca2e42aa1118f50d19f1a335465b58156c082b3",
    "stored": "files/traces/delete_me.csv"
   },
   "traces/delete_me.manifest.json": {

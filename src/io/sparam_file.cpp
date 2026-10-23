@@ -326,12 +326,13 @@ void SParamData::buildTables(vector<vector<Sample>> &raw, bool conjugate)
                              + h0 / (h1 * (h0 + h1)) * t.phase[s + 1];
             }
         }
+        removeDelay(t);
         if (m_interp == INTERP_PCHIP)
         {
             t.dmag = pchipSlopes(t.f_Hz, t.mag);
             t.dphase = pchipSlopes(t.f_Hz, t.phase);
-            t.dre = pchipSlopes(t.f_Hz, t.re);
-            t.dim = pchipSlopes(t.f_Hz, t.im);
+            t.dre = pchipSlopes(t.f_Hz, t.re_d);
+            t.dim = pchipSlopes(t.f_Hz, t.im_d);
         }
         t.loo_error = leaveOneOutErrors(t);
         m_active[k] = nonzero;
@@ -455,6 +456,56 @@ double SParamData::evalTable(const vector<double> &x, const vector<double> &y, c
     return evalSegment(x, y, slopes, segment(x, xi), xi);
 }
 
+void SParamData::removeDelay(Table &t)
+{
+    // B-190: the delay of the entry, the median of its group delays at the grid points (immune to the
+    // pi steps of the unwrapped phase at nulls, which bias a fit of the phase or its end-to-end slope)
+    const size_t m = t.f_Hz.size();
+    t.tau0_s = 0;
+    t.f_ref_Hz = m > 0 ? t.f_Hz[0] : 0;
+    if (m >= 2)
+    {
+        vector<double> sorted = t.tau_s;
+        std::sort(sorted.begin(), sorted.end());
+        t.tau0_s = m % 2 ? sorted[m / 2] : 0.5 * (sorted[m / 2 - 1] + sorted[m / 2]);
+        double max_step = 0;
+        for (size_t k = 0; k + 1 < m; ++k)
+            max_step = std::max(max_step, t.f_Hz[k + 1] - t.f_Hz[k]);
+        if (2 * M_PI * std::fabs(t.tau0_s) * max_step < DELAY_REMOVAL_MIN_ROTATION)
+            t.tau0_s = 0;
+    }
+    // S~ as a rotation of the file's value (tau0 = 0: the file's real and imaginary parts exactly)
+    t.re_d = t.re;
+    t.im_d = t.im;
+    if (t.tau0_s != 0)
+        for (size_t k = 0; k < m; ++k)
+        {
+            const complex_type v = complex_type(t.re[k], t.im[k]) * std::polar(1.0, -removedPhase(t, t.f_Hz[k]));
+            t.re_d[k] = v.real();
+            t.im_d[k] = v.imag();
+        }
+}
+
+double SParamData::removedPhase(const Table &t, double f_Hz)
+{
+    return 2 * M_PI * (f_Hz - t.f_ref_Hz) * t.tau0_s;
+}
+
+bool SParamData::realImaginaryInterval(const Table &t, size_t a, size_t b)
+{
+    const double limit = MIXED_INTERP_THRESHOLD * t.max_mag;
+    if (std::min(t.mag[a], t.mag[b]) < limit)
+        return true;
+    // a null between the two points: the segment from S~_a to S~_b passes close to 0 (the delay removed,
+    // S~ moves along that segment when the grid resolves the path)
+    const double dre = t.re_d[b] - t.re_d[a], dim = t.im_d[b] - t.im_d[a];
+    const double n2 = dre * dre + dim * dim;
+    if (n2 == 0)
+        return false;
+    const double u = -(t.re_d[a] * dre + t.im_d[a] * dim) / n2;
+    return u > 0 && u < 1 && std::abs(complex_type(t.re_d[a] + u * dre, t.im_d[a] + u * dim)) < limit;
+}
+
 SParamData::complex_type SParamData::interpolate(const Table &t, double f_Hz) const
 {
     const bool pchip = m_interp == INTERP_PCHIP;
@@ -462,12 +513,15 @@ SParamData::complex_type SParamData::interpolate(const Table &t, double f_Hz) co
         return std::polar(t.mag[0], t.phase[0]);
     const size_t k = segment(t.f_Hz, f_Hz);
     // at a grid point (and wherever |S| is not small) from magnitude and phase, as the file's value
-    if (f_Hz != t.f_Hz[k] && f_Hz != t.f_Hz[k + 1]
-            && std::min(t.mag[k], t.mag[k + 1]) < MIXED_INTERP_THRESHOLD * t.max_mag)
+    if (f_Hz != t.f_Hz[k] && f_Hz != t.f_Hz[k + 1] && realImaginaryInterval(t, k, k + 1))
     {
-        // near a null: real and imaginary parts (S is continuous at the grid points either way)
-        return complex_type(evalSegment(t.f_Hz, t.re, pchip ? &t.dre : nullptr, k, f_Hz),
-                            evalSegment(t.f_Hz, t.im, pchip ? &t.dim : nullptr, k, f_Hz));
+        // near a null: real and imaginary parts of S~, the delay put back (S is continuous at the grid
+        // points either way)
+        complex_type v(evalSegment(t.f_Hz, t.re_d, pchip ? &t.dre : nullptr, k, f_Hz),
+                       evalSegment(t.f_Hz, t.im_d, pchip ? &t.dim : nullptr, k, f_Hz));
+        if (t.tau0_s != 0)
+            v *= std::polar(1.0, removedPhase(t, f_Hz));
+        return v;
     }
     return std::polar(evalSegment(t.f_Hz, t.mag, pchip ? &t.dmag : nullptr, k, f_Hz),
                       evalSegment(t.f_Hz, t.phase, pchip ? &t.dphase : nullptr, k, f_Hz));
@@ -501,8 +555,12 @@ vector<double> SParamData::leaveOneOutErrors(const Table &t) const
             return evalSegment(x, y, &slopes, a, t.f_Hz[j]);
         };
         complex_type s;
-        if (std::min(t.mag[j - 1], t.mag[j + 1]) < MIXED_INTERP_THRESHOLD * t.max_mag)
-            s = complex_type(eval(t.re), eval(t.im));
+        if (realImaginaryInterval(t, j - 1, j + 1))
+        {
+            s = complex_type(eval(t.re_d), eval(t.im_d));
+            if (t.tau0_s != 0)
+                s *= std::polar(1.0, removedPhase(t, t.f_Hz[j]));
+        }
         else
             s = std::polar(eval(t.mag), eval(t.phase));
         errors[j] = std::abs(s - complex_type(t.re[j], t.im[j]));

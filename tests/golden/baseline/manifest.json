@@ -523,6 +523,12 @@
    "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
    "gtest": false,
    "note": "PF03c item 3: stale header comments of the two netlists corrected; run manifests change by the netlist hash only"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T18:13:44Z",
+   "only": "^(cir/spar-add-drop-ring|regress/spar-ring-tran|regress/spar-ring-tran-output|regress/spar-grid-warning|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-190 (PF03c item 2): delay-removed re/im interpolation near nulls; out at 1.55 um in the four ring cases (~1e-12); new gtest"
   }
  ]
 }

@@ -339,6 +339,58 @@ TEST(SParamFile, GridCheckFlagsANullNarrowerThanTheGrid)
     EXPECT_EQ(taylor->gridCheck(1, 0).error, 0);
 }
 
+TEST(SParamFile, DelayRemovedInterpolationOfARotatingPathWithNulls)
+{
+    // B-190: S(2 <- 1) = 0.5 exp(j w tau1) + 0.48 exp(j w tau2), an unbalanced MZI (arm delays 4.3 and 5.74 ps,
+    // free spectral range 694 GHz) sampled every 25 GHz (28 points per FSR): its phase turns by 0.8 rad per point
+    // and it has nulls (|S| = 0.02). Magnitude/phase cuts the nulls short and real/imaginary parts cut the
+    // rotation with chords (PF03b: 0.023 between grid points for an exported MZI); with the median group delay
+    // (5.02 ps) taken out before the real and imaginary parts are interpolated, S~ crosses each null along an
+    // almost straight line. S(1 <- 2) = 0.9 exp(j w 1.4 ps), a delay line: exact (magnitude and phase)
+    const double f0 = 1.9e14, df = 2.5e10, tau1 = 4.3e-12, tau2 = 5.74e-12;
+    auto mzi = [&](double f) { return std::polar(0.5, 2 * M_PI * f * tau1) + std::polar(0.48, 2 * M_PI * f * tau2); };
+    auto line = [&](double f) { return std::polar(0.9, 2 * M_PI * f * 1.4e-12); };
+    std::ostringstream text;
+    text.precision(17);
+    const int n = 81;
+    text << "('2','TE',1,'1',1,'transmission')\n(" << n << ",3)\n";
+    for (int k = 0; k < n; ++k)
+        text << f0 + k * df << " " << std::abs(mzi(f0 + k * df)) << " " << std::arg(mzi(f0 + k * df)) << "\n";
+    text << "('1','TE',1,'2',1,'transmission')\n(" << n << ",3)\n";
+    for (int k = 0; k < n; ++k)
+        text << f0 + k * df << " 0.9 " << std::arg(line(f0 + k * df)) << "\n";
+    for (auto interp : {SParamData::INTERP_LINEAR, SParamData::INTERP_PCHIP})
+    {
+        auto d = parse(text.str(), "x.sparam", SParamData::CONVENTION_AUTO, interp);
+        double worst = 0, worst_line = 0;
+        for (int k = 0; k + 1 < n; ++k)
+            for (double u : {0.25, 0.5, 0.75})
+            {
+                const double f = f0 + (k + u) * df;
+                worst = std::max(worst, std::abs(d->S(0, 1, c / f) - mzi(f)));
+                worst_line = std::max(worst_line, std::abs(d->S(1, 0, c / f) - line(f)));
+            }
+        // at the grid points: the file's values
+        for (int k : {0, 17, 40, 80})
+            expect_near(d->S(0, 1, c / (f0 + k * df)), mzi(f0 + k * df), 1e-12);
+        EXPECT_LT(worst_line, 1e-12);
+        EXPECT_LT(d->gridCheck(1, 0).error, 1e-12);
+        if (interp == SParamData::INTERP_LINEAR)
+        {
+            // between the points 0.0035 (0.022 without the delay removal); leaving a point out 0.0089, under
+            // the grid check's threshold (0.094 without: a warning)
+            EXPECT_LT(worst, 0.005) << "linear";
+            EXPECT_LT(d->gridCheck(0, 1).error, SParamData::GRID_CHECK_THRESHOLD);
+        }
+        else
+        {
+            // PCHIP keeps magnitude and phase away from the nulls as before: 0.0127 (0.018 without), leaving
+            // a point out 0.035 (0.092)
+            EXPECT_LT(worst, 0.015) << "pchip";
+        }
+    }
+}
+
 TEST(SParamFile, PassivityReportsTheWorstInput)
 {
     const std::string text =

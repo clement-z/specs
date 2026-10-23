@@ -11,8 +11,8 @@ strict golden 275 passed.
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | Per-path delays as an option | done | 7e044eb | `delay_per="path"|"output"`; vs 48e510f: same timing (below); stress cost below; asan-clang clean |
-| 2 | B-190: validate, then fix | validation running (Opus subagent, prototype in /tmp/PF03c-proto) | | |
-| 3 | Stale comments in two golden netlists | done | (this commit) | manifests: netlist hash only |
+| 2 | B-190: validate, then fix | done | (this commit) | variant Es (below); 4 ring cases ~1e-12 + gtest; asan-clang clean |
+| 3 | Stale comments in two golden netlists | done | 842d0fe | manifests: netlist hash only |
 | 4 | Docs | todo | | |
 
 ## Predictions (written before each re-record)
@@ -79,3 +79,10 @@ false warning); fits and the mean as tau0 (the pi steps at nulls bias them to on
 - gtest case: changes if a test is added (yes: new SParamFile tests).
 - Every other case bit-identical (wg, touchstone, BDC, passivity, uni-reflection, taylor, err cases). Counters
   unchanged (changes far below the gates).
+Result of the strict check: as predicted, `out` at 1.55 um in the four ring cases only (add-drop-ring: power
+5.194275359220189e-06 -> 5.194275354576741e-06; ring-tran(-output): out 0.00227909529401914-2.13e-13j ->
+0.002279095293000435-1.59e-13j; grid-warning: 4e-15). Re-recorded with the gtest case (new test). gcc 16 OK 1 skipped;
+strict golden 276 passed; asan-clang 16 OK 1 skipped, no sanitizer message; stats-compare vs base: 274 same, 1 new.
+Grid check from the C++ (a small program on `SParamData::gridCheck`, /tmp/PF03c-loo), before -> after, linear / PCHIP:
+ring 0.05 nm 0.00385 -> 0.00215 / 0.00374 -> 0.00185; BDC 0.00238 / 0.00225 (same); MZI 0.114 -> 0.0064 / 0.109 ->
+0.043; ring k=0.4 0.429 / 0.395 (same); ring 1 nm and the golden 11-point file 0.7075 / 0.7074 (same); wg 3.9e-13.

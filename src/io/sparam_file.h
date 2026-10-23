@@ -27,18 +27,24 @@ public:
     // The data range is extended by this relative tolerance at both ends, as wavelength matching (B-010)
     static constexpr double RANGE_RELATIVE_TOLERANCE = 1e-12;
     // Interpolation between two grid points of a tabulated entry (doc/sparam.md): real and imaginary parts
-    // where |S| at either point is below this fraction of the entry's largest |S| (near a transmission
-    // null, where the phase turns quickly), magnitude and unwrapped phase elsewhere. Chosen from the
-    // error between grid points of three exported devices (PF03b report): 0.06 to 0.08 is best for both
-    // linear and PCHIP; lower leaves the nulls to magnitude/phase, higher cuts the phase rotation of
-    // delayed paths with chords
+    // of the delay-removed S where |S| at either point, or the segment between the two delay-removed
+    // values, comes closer to 0 than this fraction of the entry's largest |S| (near a transmission null,
+    // where the phase turns quickly), magnitude and unwrapped phase elsewhere. Chosen from the error
+    // between grid points of three exported devices (PF03b report): 0.06 to 0.08 is best for both linear
+    // and PCHIP; lower leaves the nulls to magnitude/phase, higher cuts the phase rotation of delayed
+    // paths with chords. With the delay removed (B-190, PF03c report) the results are the same from 0.03
+    // to 0.1
     static constexpr double MIXED_INTERP_THRESHOLD = 0.07;
+    // B-190: the delay taken out of an entry before its real and imaginary parts are interpolated is 0
+    // when it would turn S by less than this (rad) over the largest grid step (a nearly flat phase:
+    // nothing to gain, and the re/im interpolation of S linear in frequency stays exact)
+    static constexpr double DELAY_REMOVAL_MIN_ROTATION = 1e-3;
     // Grid-adequacy check (doc/sparam.md): a grid point is flagged when S interpolated there from its
     // neighbours alone (leave-one-out, the device's own interpolant) differs from the file's value by
     // more than this (field). Leaving a point out doubles the spacing, so the error is about 4 times the
     // one between the points of the actual grid: 0.02 stands for about 0.005 between points. A delay
-    // line gives 1e-12; the SiEPIC BDC 0.0026, the add-drop ring on a 0.05 nm grid 0.0039 (both pass);
-    // the ring on a 1 nm grid 0.71, an MZI with 28 points per FSR 0.11 (both warn)
+    // line gives 1e-12; the SiEPIC BDC 0.0024, the add-drop ring on a 0.05 nm grid 0.0021, an MZI with
+    // 28 points per FSR 0.0064 (linear; 0.043 with PCHIP) (pass); the ring on a 1 nm grid 0.71 (warns)
     static constexpr double GRID_CHECK_THRESHOLD = 0.02;
 
     // Reads a file (format AUTO: from its extension)
@@ -109,7 +115,12 @@ private:
         std::vector<double> phase; // unwrapped, SPECS convention
         std::vector<double> re, im; // the same values as real and imaginary parts
         std::vector<double> tau_s; // group delay at the grid points
-        std::vector<double> dmag, dphase, dre, dim; // PCHIP slopes (INTERP_PCHIP)
+        // B-190: S~ = S exp(-j 2 pi (f - f_ref) tau0), the entry with a delay tau0 taken out (the median of
+        // tau_s; 0 below DELAY_REMOVAL_MIN_ROTATION), f_ref its first grid point: real and imaginary parts
+        double tau0_s = 0;
+        double f_ref_Hz = 0;
+        std::vector<double> re_d, im_d;
+        std::vector<double> dmag, dphase, dre, dim; // PCHIP slopes (INTERP_PCHIP); dre, dim: of re_d, im_d
         double max_mag = 0; // largest |S| over the grid
         std::vector<double> loo_error; // leave-one-out error at each grid point (0 at the ends)
     };
@@ -164,6 +175,11 @@ private:
             size_t k, double xi);
     // S of a tabulated entry at a frequency in its grid (mixed interpolation, MIXED_INTERP_THRESHOLD)
     complex_type interpolate(const Table &t, double f_Hz) const;
+    // B-190: the delay removal of an entry (tau0_s, f_ref_Hz, re_d, im_d), and its phase at a frequency
+    static void removeDelay(Table &t);
+    static double removedPhase(const Table &t, double f_Hz);
+    // The interval between grid points a and b is interpolated in real and imaginary parts (near a null)
+    static bool realImaginaryInterval(const Table &t, size_t a, size_t b);
     // Leave-one-out errors of a table (GRID_CHECK_THRESHOLD), with the same interpolant
     std::vector<double> leaveOneOutErrors(const Table &t) const;
     static std::vector<double> pchipSlopes(const std::vector<double> &x, const std::vector<double> &y);
