@@ -21,6 +21,11 @@ case $name in
     *-native) set -- -Dnative=true "$@" ;;
     asan-*) set -- -Dbuildtype=debug -Db_sanitize=address,undefined -Db_lundef=false "$@" ;;
 esac
+# gtest from its wrap too (the project default forces only systemc and args): the environment's
+# pkg-config also reads the host's /usr/lib/pkgconfig, and a host gtest.pc found there gives no
+# include path the environment's compilers search. First, so a -Dforce_fallback_for=... given
+# after `--` still wins.
+set -- -Dforce_fallback_for=systemc,args,gtest "$@"
 
 if [ -z "$CONDA_PREFIX" ]; then
     echo "pixi-setup.sh: run it through pixi (pixi run setup $name)" >&2

@@ -12,6 +12,10 @@
 
 * Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line
   in it, as for top-level lines, instead of an empty file name and an uninitialised line number (B-182)
+* pixi: `pixi run test` (and the other build tasks) failed with `gtest/gtest.h: No such file or directory` on a
+  host with googletest installed (e.g. Arch Linux's `gtest`): the environment's pkg-config found the host's
+  `gtest.pc`. The pixi builds now use the googletest wrap; remove a `build-pixi/<toolchain>` directory configured
+  before this fix
 
 ## [0.3.0] - 2026-10-23
 
