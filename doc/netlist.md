@@ -487,6 +487,12 @@ automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` tar
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
 name starts with `_` get no automatic probe.
 
+**PROBE is for single-wavelength nets.** A net holds one value, the last one written to it, of any wavelength. On
+a net that carries several wavelengths, a PROBE (and an automatic `PROBE{<net>}`) therefore shows, in each time
+step, one of the wavelengths written in that step, in an unspecified order (it depends on the order in which the
+simulation kernel runs the devices, which changed in v0.3, F-15). Use MLPROBE for per-wavelength values; they do
+not depend on that order.
+
 In `.tran`, the probes are disabled during the operating point. When the transient starts, after the operating
 point (`.nodeset` included) and after any initial conditions, every probe samples the current value of its net
 (B-048, sprint 2026-10b): a net set by a CW source shows its operating-point value from t = 0, as printed in the
