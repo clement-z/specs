@@ -12,6 +12,8 @@ Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 - phase convention, .tran: the same pulses leave SPAR and WG at the same times with the same fields
   (group delay L*ng/c, rounded to the time step like the waveguide's);
 - bidirectional: two sources on both sides of SPAR (nets with two writers) as on both sides of a WG;
+- per-path delays, .tran: two lit inputs whose paths into each output have different delays (two waveguides
+  into a coupler) give the transient of the explicit circuit;
 - port order: the asymmetric Touchstone 1 and 2 fixtures give S21 and, with ports= reversed, S12;
 - passivity: check warns, ignore does not, enforce scales the matrix;
 - range: a wavelength outside the data is an error with the range;
@@ -218,6 +220,57 @@ def test_bidirectional(t):
                 '%d samples, fields %s' % (len(got), 'equal' if got == exp else 'differ: %s vs %s' % (got, exp)))
 
 
+SKEW_SUBCKT = '\n'.join([
+    '* two waveguides of different lengths into a coupler: every path has its own delay',
+    '.subckt skew a b o1 o2',
+    'wg1 a x length=100e-6 neff=2.2 ng=4.2 att=10',
+    'wg2 b y length=300e-6 neff=2.2 ng=4.2 att=10',
+    'coupler1 x y o1 o2 k=0.5',
+    '.ends skew',
+    '']) + '\n'
+
+
+def test_per_path_tran(t):
+    # Each output receives a through 1.40 ps and b through 4.20 ps: with one delay per output, b's light
+    # would leave with a's delay. Steps on both inputs at the same wavelength (on the grid, then between grid
+    # points), while earlier values are still on their way: the outputs are coherent sums of both
+    netlist = os.path.join(t.work, 'skew.cir')
+    with open(netlist, 'w') as f:
+        f.write(SKEW_SUBCKT)
+    path = os.path.join(t.work, 'skew.sparam')
+    sparam_export.export(t.specs, netlist, 'skew', (1.54e-6, 1.56e-6, 0.5e-9), path, 'sparam')
+    def netlist_with(device):
+        return '\n'.join([
+            '* per-path delays, .tran',
+            'vlsrc1 a values=[[0, 0, 1.55e-6], [1e-12, 1, 1.55e-6], [3e-12, 0.4, 1.55e-6], [8e-12, 0, 1.55e-6], '
+            '[14e-12, 1, 1.5503e-6], [16e-12, 0.3, 1.5503e-6], [21e-12, 0, 1.5503e-6]]',
+            'vlsrc2 b values=[[0, 0, 1.55e-6], [2e-12, 0.5, 1.55e-6], [2.5e-12, 0.2, 1.55e-6], [6e-12, 0, 1.55e-6], '
+            '[13e-12, 0.6, 1.5503e-6], [15e-12, 0.1, 1.5503e-6], [19e-12, 0, 1.5503e-6]]',
+            device,
+            'mlprobe1 o1 wl=[1.55e-6, 1.5503e-6]',
+            'mlprobe2 o2 wl=[1.55e-6, 1.5503e-6]',
+            '.tran 40e-12',
+            '']) + '\n'
+    ref = t.run(SKEW_SUBCKT + netlist_with('x1 a b o1 o2 skew'), 'skew_explicit')
+    r = t.run(netlist_with('spar1 a b o1 o2 file="%s"' % path), 'skew_spar')
+    for probe in ('MLPROBE1', 'MLPROBE2'):
+        name = 'ROOT/' + probe
+        d = max_diff(sorted(r.signal(name)), sorted(ref.signal(name)))
+        t.check('per-path-tran/%s' % probe.lower(), ref.status == 0 and r.status == 0 and d <= 1e-9,
+                'same times, max |E_SPAR - E_explicit| = %.3g over %d samples' % (d, len(ref.signal(name))))
+    # CW sources: the operating point before the transient (no delays) gives the steady state at t = 0
+    def cw_netlist(device):
+        return '\n'.join(['* per-path delays, .tran from an operating point',
+                          'cwsrc1 a wl=1.55e-6 power=1', 'cwsrc2 b wl=1.55e-6 power=0.5 phi=1', device,
+                          '.save o1 o2', '.tran 10e-12', '']) + '\n'
+    ref = t.run(SKEW_SUBCKT + cw_netlist('x1 a b o1 o2 skew'), 'skew_cw_explicit')
+    r = t.run(cw_netlist('spar1 a b o1 o2 file="%s"' % path), 'skew_cw_spar')
+    d = max(max_diff(r.signal('PROBE{ROOT/%s}' % s), ref.signal('PROBE{ROOT/%s}' % s)) for s in ('o1', 'o2'))
+    t0 = sorted(set(tt for tt, _, _, _ in r.rows))
+    t.check('per-path-tran/operating-point', ref.status == 0 and r.status == 0 and d <= 1e-9 and t0 == [0.0],
+            'max |E_SPAR - E_explicit| = %.3g, sample times %s (only 0)' % (d, t0))
+
+
 def test_port_order(t):
     for fx in ['asym.s2p', 'asym_v2.ts']:
         for ports, expected in [('', 0.8j), (' ports="right,left"', 0.3)]:
@@ -304,7 +357,7 @@ def test_round_trip(t):
                 '%.3g anywhere (<= 0.03)' % (n, smooth, tol, anywhere))
 
 
-TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_port_order, test_passivity,
+TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_port_order, test_passivity,
          test_range, test_round_trip]
 
 

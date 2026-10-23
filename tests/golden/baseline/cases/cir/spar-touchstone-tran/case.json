@@ -10,7 +10,7 @@
   "traces/delete_me.csv": {
    "bytes": 722,
    "kind": "text",
-   "sha256": "c3f6c07ea765617d0190e8cf00ba48771f9d65dc60f0c710925bbccfea07ac1b",
+   "sha256": "bfd2c1181c939096506a5f85b5fe311f6eb18c6732de12c8f85363b82419fcf5",
    "stored": "files/traces/delete_me.csv"
   },
   "traces/delete_me.manifest.json": {

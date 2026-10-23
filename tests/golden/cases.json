@@ -4140,7 +4140,7 @@
     "-f",
     "tests/golden/netlists/spar-ring-tran.cir"
    ],
-   "note": "F-03: the exported ring as SPAR in .tran (delay=auto per output); --vci prints the device parameters"
+   "note": "F-03: the exported ring as SPAR in .tran; delay=auto per path (PF03b): out follows the in->out path, whose negative delay is clamped to 0, drop its own delay; --vci prints the device parameters"
   },
   {
    "id": "regress/spar-3port-taylor",

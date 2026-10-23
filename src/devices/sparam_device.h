@@ -3,6 +3,7 @@
 #include <systemc.h>
 
 #include <memory>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -15,10 +16,12 @@
 
 /** F-03: N-port device given by S-parameters read from a file (SParamData, doc/sparam.md).
  *
- * State-holding, per wavelength: the device keeps the last field of each input port and wavelength;
- * on an input event it recomputes, at that wavelength, every output the input reaches,
- * b_j = sum_i S(j, i) a_i, from those memories, and writes it (absolute value) after the delay of that
- * output. S(lambda) and the delays are computed once per wavelength (cache). The S-matrix is the
+ * State-holding, per wavelength and path: the device keeps a delayed copy m_ji of the field of each
+ * path (input i to output j) and wavelength. An input event at t with field a_i sets m_ji = a_i at
+ * t + tau_ji for every output j the input reaches (an arrival in the device's timed queue; at once for a
+ * path without delay); on an arrival the output is recomputed at that wavelength from the copies,
+ * b_j = sum_i S(j, i) m_ji, and written (absolute value) without delay, so the writes to an output are
+ * in time order. S(lambda) and the delays are computed once per wavelength (cache). The S-matrix is the
  * one of the carrier wavelength: no dispersion within a pulse's bandwidth.
  *
  * Nets are numbered 0..N-1 in the order of the netlist element; net k is port m_port_map[k] of the data.
@@ -27,7 +30,7 @@
 class SParamDeviceBase : public spx_module {
 public:
     enum DelayMode {
-        DELAY_AUTO,  // per output and wavelength: group delay of the largest path into the output
+        DELAY_AUTO,  // per path and wavelength: the group delay of the path (0 where negative)
         DELAY_NONE,  // 0
         DELAY_FIXED, // m_delay_s on every path
     };
@@ -53,8 +56,8 @@ public:
 
     virtual void start_of_simulation();
 
-    /** Main process: every input with an event in this delta cycle, in net order (an SC_METHOD
-     * sensitive to all the inputs) */
+    /** Main process (an SC_METHOD sensitive to all the inputs and to the timed queue): the arrivals due
+     * now, then every input with an event in this delta cycle, in net order */
     void on_inputs_changed();
     /** --vci only: prints the parameters at initialization */
     void print_initialization();
@@ -74,14 +77,33 @@ protected:
     /** Inputs (indices into p_in) that reach each output */
     std::vector<std::vector<size_t>> m_sources;
 
-    /** Per wavelength: S(output k, input i) at [k * inputs + i], and the delay of each output */
+    /** Per wavelength: S(output k, input i) and the delay of that path, at [k * inputs + i] (the path index) */
     struct WavelengthEntry {
         std::vector<OpticalSignal::field_type> S;
         std::vector<sc_time> delay;
     };
     WavelengthCache<WavelengthEntry> m_cache;
-    /** Last field of each input and wavelength id */
-    std::vector<std::vector<OpticalSignal::field_type>> m_memory;
+    /** Delayed copy of each path (index k * inputs + i) and wavelength id: the input field that has
+     * arrived at the end of the path */
+    std::vector<std::vector<OpticalSignal::field_type>> m_copy;
+
+    /** Timed queue of the delayed paths: the input field reaches the end of the path at t. Taken in
+     * the order (t, seq): arrivals at the same time in the order of their input events */
+    struct Arrival {
+        sc_time t;
+        uint64_t seq;
+        uint32_t path;
+        uint32_t wavelength_id;
+        OpticalSignal::field_type field;
+        bool operator>(const Arrival &other) const
+        {
+            return t != other.t ? t > other.t : seq > other.seq;
+        }
+    };
+    std::priority_queue<Arrival, std::vector<Arrival>, std::greater<Arrival>> m_arrivals;
+    uint64_t m_arrival_seq = 0;
+    /** Notified at the time of the first arrival */
+    sc_event m_arrival_event;
 
     sc_time m_fixed_delay;
     // One report per device (B-014 rounding, negative group delays)
@@ -89,6 +111,10 @@ protected:
     bool m_negative_delay_reported = false;
 
     void onInput(size_t input, const OpticalSignal &s);
+    /** Copies the arrivals due now and writes the outputs they change */
+    void processArrivals();
+    /** Writes output k at a wavelength, from the copies of its paths, without delay */
+    void writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e);
     WavelengthEntry computeEntry(const OpticalSignal &s);
     sc_time autoDelay(double tau_s);
 };

@@ -460,6 +460,12 @@
    "only": "^gtest/unit_tests$",
    "gtest": true,
    "note": "F-02: new gtest cases (ExpressionFunctions, RunPlan, RunTable)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:23:59Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-touchstone-tran)$",
+   "gtest": false,
+   "note": "F-03/PF03b item 1: per-path delayed copies replace the one delay per output (SPAR-discussion.md, decision 2026-10-23)"
   }
  ]
 }
