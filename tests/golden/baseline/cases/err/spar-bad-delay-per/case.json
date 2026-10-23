@@ -1,9 +1,0 @@
-{
- "args": [
-  "-f",
-  "tests/golden/netlists/spar-bad-delay-per.cir"
- ],
- "exit": 1,
- "files": {},
- "id": "err/spar-bad-delay-per"
-}

@@ -12,7 +12,7 @@ Prototype (Opus subagent): `/tmp/PF03d-proto` (outside the repository, not durab
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| 1 | Remove `delay_per` | in progress | | |
+| 1 | Remove `delay_per` | done | (this commit) | product code = reverse of 7e044eb's device/header/parser hunks (no later change to them); 2 golden cases removed; gcc 16 OK 1 skip, strict golden 275/275; asan-clang 16 OK 1 skip, no sanitizer message |
 | 2 | Grid check on the actual intervals | todo | | |
 | 3 | PCHIP slopes per run | todo | | |
 | 4 | Pulse-pair tau0 | todo | | |
@@ -43,4 +43,12 @@ largest step of the whole grid and f_ref = first grid point, unchanged.
 
 (written before each re-record)
 
+- Item 1 (before the change): no output of any remaining case changes (the default path mode is the code that
+  stays); `regress/spar-ring-tran-output` and `err/spar-bad-delay-per` disappear. Result: strict golden 275 passed
+  (274 + gtest), 0 new, 0 missing.
+
 ## Log
+
+- Item 1: manifest bookkeeping = the two ids removed from the `cases` list; the `rerecords` history is kept as is
+  (entries of past records stay true; no record was run for a removal), as the PD5 removal of
+  `err/probe-wl-invalid` (1f44df4) did for its case list.
