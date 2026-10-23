@@ -8,8 +8,8 @@ Heartbeat: `5e05ca80` (PF02-heartbeat, every 5 min, expires in 48 h). Delete it 
 | 1 | Expression functions (`gauss`, `uniform`, `lognormal`, `choice`, math), per-name draw streams, `shared=` | done | 1ac820a | 6 gtest, 5 golden (new); strict 261/261 |
 | 2 | `.step param` (linear, `list`, nested), `.mc N [seed=]`, run plan, `--run K`, `-n` plan listing | done | ef07d1e | items 2 and 3 in one commit (main.cpp couples them) |
 | 3 | Runner: one process per run, run table (appendable columns + index), failures recorded, resume | done | ef07d1e | 7 gtest, 11 golden new; 3 help cases re-recorded (new options); strict 272/272; asan-clang pending |
-| 4 | pyspecs reader | todo | | |
-| 5 | Docs, CHANGELOG, golden cases, unit tests | todo | | |
+| 4 | pyspecs reader | done | 9aa4624 | tests/tools/test_run_table.py (skips without pandas; passes with pixi -e py) |
+| 5 | Docs, CHANGELOG, golden cases, unit tests | in progress | 1ac820a, ef07d1e, docs commit | asan-clang fix 982bee5; remaining: gtest re-record, before/after compares, review |
 
 ## Output format: evaluation and choice (scope item 3, decided before implementing)
 
