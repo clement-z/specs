@@ -125,6 +125,7 @@
   "SPECSConfig.ZeroTolerancesWarnOnce": "PASS",
   "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",
   "SParamFile.CsvColumnsFromInputToOutput": "PASS",
+  "SParamFile.DelayRemovedInterpolationOfARotatingPathWithNulls": "PASS",
   "SParamFile.FormatFromExtension": "PASS",
   "SParamFile.GridCheckFlagsANullNarrowerThanTheGrid": "PASS",
   "SParamFile.GroupDelayOfALinearPhase": "PASS",

@@ -1546,6 +1546,7 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
     string passivity = "check";
     SParamDeviceBase::DelayMode delay_mode = SParamDeviceBase::DELAY_AUTO;
     double delay_s = 0;
+    bool per_path_delays = true;
     auto string_kw = [this](const pair<const string, Variable> &p) {
         if (p.second.type != Variable::STRING)
         {
@@ -1619,6 +1620,13 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
                 else if (strutils::iequals(v, "none")) delay_mode = SParamDeviceBase::DELAY_NONE;
                 else bad_value(p.first, v, "auto, none or a delay in seconds");
             }
+        }
+        else if (kw == "DELAY_PER")
+        {
+            const string v = string_kw(p);
+            if (strutils::iequals(v, "path")) per_path_delays = true;
+            else if (strutils::iequals(v, "output")) per_path_delays = false;
+            else bad_value(p.first, v, "path or output");
         }
         else {
             cerr << "Unknown keyword: " << p.first << endl;
@@ -1767,6 +1775,7 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
     obj->m_port_map = port_map;
     obj->m_delay_mode = delay_mode;
     obj->m_delay_s = delay_s;
+    obj->m_per_path_delays = per_path_delays;
     obj->m_enforce_passivity = strutils::iequals(passivity, "enforce");
     obj->m_from_netlist = true;
     return obj;

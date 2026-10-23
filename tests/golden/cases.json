@@ -4118,7 +4118,7 @@
     "-f",
     "tests/golden/netlists/spar-add-drop-ring.cir"
    ],
-   "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py (0.05 nm grid since PF03b); .dc, so no delay and no negative-delay warning (the netlist header predates that)"
+   "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py (0.05 nm grid since PF03b); .dc, so no delay and no negative-delay warning"
   },
   {
    "id": "cir/spar-siepic-bdc",
@@ -4162,6 +4162,28 @@
     "tests/golden/netlists/spar-ring-tran.cir"
    ],
    "note": "F-03: the exported ring as SPAR in .tran; delay=auto per path (PF03b): out follows the in->out path, whose negative delay is clamped to 0, drop its own delay; --vci prints the device parameters"
+  },
+  {
+   "id": "regress/spar-ring-tran-output",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "--vci",
+    "-f",
+    "tests/golden/netlists/spar-ring-tran-output.cir"
+   ],
+   "note": "PF03c: regress/spar-ring-tran with delay_per=\"output\" (per-output delays, the device before PF03b): out and drop both leave with the drop path's delay (+1.721 ps), no negative-delay warning; --vci prints delay_per"
   },
   {
    "id": "regress/spar-grid-warning",
@@ -4265,6 +4287,25 @@
     "tests/golden/netlists/spar-out-of-range.cir"
    ],
    "note": "F-03: a wavelength outside the data range is an error, with the range"
+  },
+  {
+   "id": "err/spar-bad-delay-per",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-bad-delay-per.cir"
+   ],
+   "note": "PF03c: delay_per=\"input\" is rejected (expected path or output)"
   },
   {
    "id": "err/spar-bad-ports",

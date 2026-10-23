@@ -124,6 +124,7 @@
   "err/f28-maxiter-small",
   "err/f28-options-maxiter-fraction",
   "err/f28-options-maxiter-negative",
+  "err/spar-bad-delay-per",
   "err/spar-bad-ports",
   "err/spar-missing-file",
   "err/spar-net-count",
@@ -258,6 +259,7 @@
   "regress/spar-grid-warning",
   "regress/spar-passivity",
   "regress/spar-ring-tran",
+  "regress/spar-ring-tran-output",
   "regress/spar-uni-reflection",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
@@ -510,6 +512,30 @@
    "only": "^cir/spar-siepic-bdc$",
    "gtest": false,
    "note": "PF03b item 6: SiEPIC BDC fixture (new case)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T17:50:21Z",
+   "only": "^regress/spar-ring-tran-output$",
+   "gtest": false,
+   "note": "PF03c item 1: new case, SPAR delay_per=\"output\" (per-output delays, F-03 phase 1)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T17:54:01Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
+   "gtest": false,
+   "note": "PF03c item 3: stale header comments of the two netlists corrected; run manifests change by the netlist hash only"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T18:13:44Z",
+   "only": "^(cir/spar-add-drop-ring|regress/spar-ring-tran|regress/spar-ring-tran-output|regress/spar-grid-warning|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-190 (PF03c item 2): delay-removed re/im interpolation near nulls; out at 1.55 um in the four ring cases (~1e-12); new gtest"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T18:19:41Z",
+   "only": "^err/spar-bad-delay-per$",
+   "gtest": false,
+   "note": "PF03c: new case, invalid delay_per value"
   }
  ]
 }

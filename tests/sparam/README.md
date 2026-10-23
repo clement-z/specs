@@ -65,10 +65,10 @@ delays of the drop path match the exact ones within 0.01 ps, those of the throug
 (1.35 instead of 1.44 ps at 0.1 nm); the through-port null itself (its phase turns within about 4 pm) stays
 unresolved (-37 ps instead of -621 ps), see doc/sparam.md.
 
-Grid-adequacy check (doc/sparam.md): the 0.05 nm file **passes** it (worst leave-one-out error 0.0039, on the
-through path next to a null, threshold 0.02), although its through-port null is narrower than the grid. With the
-mixed interpolation (real and imaginary parts near nulls) the field between its grid points is within 1e-3 of the
-circuit everywhere, also at the null; what the grid does not resolve there is the phase feature, hence the group
+Grid-adequacy check (doc/sparam.md): the 0.05 nm file **passes** it (worst leave-one-out error 0.0021, on the
+through path next to a null, threshold 0.02; 0.0039 before the delay removal of B-190), although its through-port
+null is narrower than the grid. With the mixed interpolation (real and imaginary parts of the delay-removed S near
+nulls) the field between its grid points is within 6e-4 of the circuit everywhere, also at the null; what the grid does not resolve there is the phase feature, hence the group
 delay (-37 ps), which the check does not test. With magnitude/phase interpolation the null would fail the check
 (0.067). The former 1 nm file fails it (0.71); `regress/spar-grid-warning` shows the warning on a 1 nm export.
 
@@ -78,7 +78,7 @@ delay (-37 ps), which the check does not test. With magnitude/phase interpolatio
 (Lumerical `.sparam`, 4 ports, 51 points from 1.5 to 1.6 um), a third-party file copied unchanged; source,
 commit, copyright and MIT licence in `data/siepic/NOTICE`. Used by the golden case `cir/spar-siepic-bdc` (`.dc`
 sweep of the split) and by `test_sparam.py` (`siepic-bdc/split`: 0.502 and 0.490 at 1.55 um, within 0.02 of 0.5
-over 1.54-1.56 um, passive). It passes the grid-adequacy check (worst 0.0026).
+over 1.54-1.56 um, passive). It passes the grid-adequacy check (worst 0.0024 with linear interpolation).
 
 `check_ring_export.py --specs build/specs` checks `utils/sparam_export.py` on `add_drop_ring.cir` (the ring of
 `circuits/add_drop.cir` as a subcircuit `ring in add out drop`): the export in every format reads back to the

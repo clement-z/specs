@@ -1,7 +1,7 @@
 * F-03: circuits/add_drop.cir with its ring (couplers and ring waveguides) replaced by one 4-port SPAR, the
 * ring's S-matrix exported by utils/sparam_export.py (tests/sparam/data/add_drop_ring.sparam, see
 * tests/sparam/README.md). Unidirectional: in, add are inputs, out, drop outputs (the backward paths of the
-* export are reported as unused); negative group delays of the through path near resonance are reported
+* export are reported as unused). .dc: no delays, so no negative-group-delay warning (only .tran reports them)
 .assign lambda0 = 1.55e-6
 .subckt test p1 p2 length=100e-6 att=1 neff=2.2 ng=4.3
 wg1 p1 0 length={length} att={att} neff={neff} ng={ng}

@@ -6,7 +6,7 @@
   "seed": 0,
   "command_line": ["specs", "--format", "csv", "--vci", "-f", "tests/golden/netlists/spar-ring-tran.cir"],
   "netlist_files": [
-    {"path": "tests/golden/netlists/spar-ring-tran.cir", "sha256": "b16b88d8575300cd905a22684282bc4a1f416dc1283e8b89e78ed93cbfdf3b99"}
+    {"path": "tests/golden/netlists/spar-ring-tran.cir", "sha256": "30394b0412126ccb678fd9153bd0ac18849e7fbeb7a4dc532aa2f776ad6ddfb8"}
   ],
   "data_files": [
     {"path": "tests/golden/netlists/../../sparam/data/add_drop_ring.sparam", "sha256": "cab9ef9ff5578939e1331dc65c44890058341f33ba5d283fcf4c6227747c64aa"}
