@@ -12,7 +12,7 @@ Base: 48e510f.
 | 3 | Grid-adequacy warning | done | 964b75a | threshold 0.02 (leave-one-out); no existing case changed; new case regress/spar-grid-warning |
 | 4 | Mixed interpolation near nulls | done | 368bf61 | threshold 0.07 x max|S|; measurements in the report |
 | 5 | Data files in the run manifest | done | 805dc8c | subagent (opus) in /tmp/PF03b-wt/manifest, reviewed, cherry-picked; ring manifests re-recorded for item 8's file |
-| 6 | SiEPIC BDC fixture + golden | todo | | |
+| 6 | SiEPIC BDC fixture + golden | done | (see git log) | new case cir/spar-siepic-bdc |
 | 7 | Tests and docs | todo | | |
 | 8 | Re-export ring file at 0.05 nm | done | 5e1b14f | predictions above; counters: only spar-ring-tran drop last_emission |
 
@@ -98,3 +98,8 @@ zero-delay-in-a-loop caveat. Only stderr can change; times, fields and counters 
 - `regress/spar-grid-warning`: line replaced: in->out, 1.55e-06 m, -6.775e-13 s, with the grid hint.
 - Every other case unchanged (no other .tran case has a negative delay).
 Result: as predicted (2 stderr lines).
+
+### Item 6 (SiEPIC BDC fixture)
+Prediction: only the new case `cir/spar-siepic-bdc` (51 points; 0.502 / 0.490 at 1.55 um; no warning: reflections
+below -40 dB, grid check 0.0026, passive); no other case changes.
+Result: as predicted.

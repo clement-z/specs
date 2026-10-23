@@ -4121,6 +4121,27 @@
    "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py; the negative through-port group delay near resonance is reported"
   },
   {
+   "id": "cir/spar-siepic-bdc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-siepic-bdc.cir"
+   ],
+   "note": "PF03b: the SiEPIC EBeam BDC (tests/sparam/data/siepic, MIT, NOTICE) as a 4-port SPAR, .dc sweep of the split over 1.5-1.6 um: about 0.5 per output near 1.55 um"
+  },
+  {
    "id": "regress/spar-ring-tran",
    "setup": {
     "copy": [

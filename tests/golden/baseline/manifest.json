@@ -16,6 +16,7 @@
   "cir/paul_3ring_puf",
   "cir/paul_simple_ring",
   "cir/spar-add-drop-ring",
+  "cir/spar-siepic-bdc",
   "cir/spar-touchstone-tran",
   "cir/spar-wg-dc",
   "cir/subckt_test",
@@ -503,6 +504,12 @@
    "only": "^(regress/spar-ring-tran|regress/spar-grid-warning)$",
    "gtest": false,
    "note": "PF03b item 2: negative group delay reported per path (port names, wavelength, grid hint, loop caveat)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T16:47:49Z",
+   "only": "^cir/spar-siepic-bdc$",
+   "gtest": false,
+   "note": "PF03b item 6: SiEPIC BDC fixture (new case)"
   }
  ]
 }

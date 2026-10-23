@@ -72,6 +72,14 @@ circuit everywhere, also at the null; what the grid does not resolve there is th
 delay (-37 ps), which the check does not test. With magnitude/phase interpolation the null would fail the check
 (0.067). The former 1 nm file fails it (0.71); `regress/spar-grid-warning` shows the warning on a 1 nm export.
 
+## SiEPIC BDC (`data/siepic/`)
+
+`EBeam_1550_TE_BDC.sparam`: the S-parameters of the SiEPIC EBeam PDK 50/50 broadband directional coupler
+(Lumerical `.sparam`, 4 ports, 51 points from 1.5 to 1.6 um), a third-party file copied unchanged; source,
+commit, copyright and MIT licence in `data/siepic/NOTICE`. Used by the golden case `cir/spar-siepic-bdc` (`.dc`
+sweep of the split) and by `test_sparam.py` (`siepic-bdc/split`: 0.502 and 0.490 at 1.55 um, within 0.02 of 0.5
+over 1.54-1.56 um, passive). It passes the grid-adequacy check (worst 0.0026).
+
 `check_ring_export.py --specs build/specs` checks `utils/sparam_export.py` on `add_drop_ring.cir` (the ring of
 `circuits/add_drop.cir` as a subcircuit `ring in add out drop`): the export in every format reads back to the
 same matrix (2e-16), and S[out][in], S[drop][in] match `circuits/add_drop.cir` without its access subcircuit

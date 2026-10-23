@@ -15,6 +15,7 @@ Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 - per-path delays, .tran: two lit inputs whose paths into each output have different delays (two waveguides
   into a coupler) give the transient of the explicit circuit;
 - negative group delays: reported once per path, when the path is first lit;
+- SiEPIC BDC: the third-party 4-port file splits 50/50 (+-0.02) near 1.55 um, passive, without warnings;
 - port order: the asymmetric Touchstone 1 and 2 fixtures give S21 and, with ports= reversed, S12;
 - passivity: check warns, ignore does not, enforce scales the matrix;
 - range: a wavelength outside the data is an error with the range;
@@ -295,6 +296,22 @@ def test_negative_delay_warning(t):
                 '%d warning(s): %s' % (len(found), '; '.join(line[:110] for line in found)))
 
 
+def test_siepic_bdc(t):
+    # the SiEPIC EBeam PDK broadband directional coupler (tests/sparam/data/siepic, MIT, see its NOTICE):
+    # a 50/50 splitter over its band, passive
+    bdc = os.path.join(HERE, 'data', 'siepic', 'EBeam_1550_TE_BDC.sparam')
+    r = t.run('\n'.join(['* SiEPIC BDC', 'cwsrc1 in wl=1.55e-6 power=1', 'spar1 in in2 out1 out2 file="%s"' % bdc,
+                         '.save out1 out2', '.dc /cwsrc1/WL 1.5e-6 1.6e-6 2e-9', '']) + '\n', 'siepic_bdc')
+    p1 = {round(wl * 1e12): abs(e) ** 2 for _, wl, e in r.signal('PROBE{ROOT/out1}')}
+    p2 = {round(wl * 1e12): abs(e) ** 2 for _, wl, e in r.signal('PROBE{ROOT/out2}')}
+    near = [k for k in p1 if 1540000 <= k <= 1560000]
+    split = max(max(abs(p1[k] - 0.5), abs(p2[k] - 0.5)) for k in near) if near and set(p1) == set(p2) else math.inf
+    total = max(p1[k] + p2[k] for k in p1) if set(p1) == set(p2) and p1 else math.inf
+    t.check('siepic-bdc/split', r.status == 0 and len(p1) == 51 and split <= 0.02 and total <= 1 and not r.stderr.strip(),
+            'max |P - 0.5| = %.3g over 1.54-1.56 um (<= 0.02), max P1 + P2 = %.4g (<= 1), %d points, stderr %r'
+            % (split, total, len(p1), r.stderr.strip()[:80]))
+
+
 def test_port_order(t):
     for fx in ['asym.s2p', 'asym_v2.ts']:
         for ports, expected in [('', 0.8j), (' ports="right,left"', 0.3)]:
@@ -381,7 +398,7 @@ def test_round_trip(t):
                 '%.3g anywhere (<= 2e-3)' % (n, smooth, tol, anywhere))
 
 
-TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_negative_delay_warning, test_port_order, test_passivity,
+TESTS = [test_fixtures, test_ring_data, test_phase_dc, test_phase_tran, test_bidirectional, test_per_path_tran, test_negative_delay_warning, test_siepic_bdc, test_port_order, test_passivity,
          test_range, test_round_trip]
 
 
