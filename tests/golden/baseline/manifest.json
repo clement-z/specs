@@ -15,6 +15,9 @@
   "cir/double_ring",
   "cir/paul_3ring_puf",
   "cir/paul_simple_ring",
+  "cir/spar-add-drop-ring",
+  "cir/spar-touchstone-tran",
+  "cir/spar-wg-dc",
   "cir/subckt_test",
   "cir/subckt_tests",
   "cir/triple_ring",
@@ -110,6 +113,10 @@
   "err/f28-maxiter-small",
   "err/f28-options-maxiter-fraction",
   "err/f28-options-maxiter-negative",
+  "err/spar-bad-ports",
+  "err/spar-missing-file",
+  "err/spar-net-count",
+  "err/spar-out-of-range",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -229,6 +236,10 @@
   "regress/probe-latch-dc-swept-wl",
   "regress/probe-latch-tran",
   "regress/probe-wl-ignored",
+  "regress/spar-3port-taylor",
+  "regress/spar-passivity",
+  "regress/spar-ring-tran",
+  "regress/spar-uni-reflection",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -396,6 +407,12 @@
    "only": "^(cir/add_drop|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|regress/b004-mode-td-dc|regress/f15-stats-dc|regress/f05-save-paper-fig1b|regress/f05-format-vcd-csv-dc|regress/b062-mlprobe-unlisted-wavelength|regress/b010-near-duplicate-lambda|regress/b062-mlprobe-computed-wavelength|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-010, B-062: wavelengths equal within a relative 1e-12 are one wavelength (registry: first registered value kept; MLPROBE lists). The .dc point accumulated to ~1550 nm (B-009) now takes the source's registered 1.55e-6 (bit-identical to a fresh point at 1.55e-6); b062 MLPROBE1 matches its computed wavelength; new cases b010-near-duplicate-lambda, b062-mlprobe-computed-wavelength; gtest: new tests of PH"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T12:48:10Z",
+   "only": "^(cir|regress|err)/spar-|^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-03: new cases of the S-parameter device SPAR (11) and the 13 loader unit tests (gtest)"
   }
  ]
 }

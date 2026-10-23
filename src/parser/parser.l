@@ -452,6 +452,12 @@ string convert_special_char(char c)
     return T_ELEM_SPLITTER;
 }
 
+^SPAR({ALPHA_PLUS_NUM})+ {
+    /* S-parameter device instance name (F-03) */
+    yylval_param->s_ptr = new string(yytext);
+    return T_ELEM_SPAR;
+}
+
 ^COUPLER({ALPHA_PLUS_NUM})+ {
     /* DC instance name */
     yylval_param->s_ptr = new string(yytext);

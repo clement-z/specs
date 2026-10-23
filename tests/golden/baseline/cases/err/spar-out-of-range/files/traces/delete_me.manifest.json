@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/spar-out-of-range.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-out-of-range.cir", "sha256": "39ceb5e6671c1199125e246b748cb2d227c6da1d0281244c01900b36709ad5c0"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

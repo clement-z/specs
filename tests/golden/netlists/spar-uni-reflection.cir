@@ -1,0 +1,8 @@
+* F-03: unidirectional SPAR (2 nets: left is the input, right the output) of a file with reflections:
+* S(left <- left) = 0.1 is not used, with one warning; ports= reversed uses S12 = 0.3 instead of S21 = 0.8j
+cwsrc1 in wl=1.55e-6 power=1
+splitter1 in a b
+spar1 a out_fwd file="../../sparam/fixtures/asym.s2p"
+spar2 b out_rev file="../../sparam/fixtures/asym_v2.ts" ports="right,left"
+.save out_fwd out_rev
+.dc /cwsrc1/WL 1.55e-6 1.56e-6 1e-8

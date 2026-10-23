@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "csv", "-f", "tests/golden/netlists/spar-touchstone-tran.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/spar-touchstone-tran.cir", "sha256": "7891f5f3f5e4241acad3970e9ca2f2e7c4942fe2919a1740f1b9bd3cafcdb956"}
+  ],
+  "trace_file": "traces/delete_me.csv"
+}

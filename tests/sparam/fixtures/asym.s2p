@@ -1,0 +1,12 @@
+! SPECS test fixture (tests/sparam/gen_fixtures.py): constant 2-port with 4 different entries.
+! SPECS-convention values: S11 = 0.1, S21 = 0.8j, S12 = 0.3, S22 = -0.2
+! (written conjugated, engineering convention: S21 is stored as 0 -0.8).
+! Version 1 order: S11 S21 S12 S22
+! Port[1] = left
+! Port[2] = right
+# MHz S RI R 50
+187370286.25 0.1 0.0 0.0 -0.8 0.3 0.0 -0.2 0.0
+190344417.7777778 0.1 0.0 0.0 -0.8 0.3 0.0 -0.2 0.0
+193414489.03225806 0.1 0.0 0.0 -0.8 0.3 0.0 -0.2 0.0
+196585218.36065575 0.1 0.0 0.0 -0.8 0.3 0.0 -0.2 0.0
+199861638.66666666 0.1 0.0 0.0 -0.8 0.3 0.0 -0.2 0.0

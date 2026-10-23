@@ -94,6 +94,34 @@ DECLARE_UNIDIR_ELEMENT(ProbeElement, "PROBE", Probe, 1);
 DECLARE_UNIDIR_ELEMENT(MLProbeElement, "MULTIWAVELENGTH PROBE", MLambdaProbe, 1);
 DECLARE_UNIDIR_ELEMENT(PowerMeterElement, "POWER METER", PowerMeter, 1);
 
+// S-parameter device (F-03): a free number of nets, so not declared with the macros above
+struct SPARElement : public ParseElement {
+    typedef SParamDeviceBase element_type_base;
+    typedef SParamDeviceUni element_type_uni;
+    typedef SParamDeviceBi element_type_bi;
+
+    // Directory of the netlist file that contains the element: a relative file= is looked up there
+    // first, then in the working directory (as .include, B-143)
+    string include_dir;
+
+    using ParseElement::ParseElement;
+
+    virtual ParseElement *clone() const
+    { return new SPARElement(*this); }
+    virtual sc_module *create(ParseTreeCreationHelper &pt_helper) const;
+    virtual element_type_base *instantiate_and_connect_uni(ParseTreeCreationHelper &pt_helper) const;
+    virtual element_type_base *instantiate_and_connect_bi(ParseTreeCreationHelper &pt_helper) const;
+
+    virtual string kind() const { return "S-PARAMETER DEVICE"; }
+
+    // Called by the parser once the line is read: counts the device as a reader of the first half of
+    // its nets and a writer of the second half (its unidirectional variant, as COUPLER); with an odd
+    // number of nets, as a reader and a writer of every net, made bidirectional
+    void set_net_roles(ParseTree &pt) const;
+    // Role of net k in the unidirectional variant
+    bool writes_net(size_t k) const { return k >= nets.size() / 2; }
+};
+
 // TODO: take care of subcircuit instance...
 DECLARE_UNIDIR_ELEMENT(XElement, "SUBCIRCUIT", SubcircuitInstance, 1);
 

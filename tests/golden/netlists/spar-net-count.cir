@@ -1,0 +1,4 @@
+* F-03: 3 nets for a 2-port file
+cwsrc1 in wl=1.55e-6 power=1
+spar1 in out other file="../../sparam/fixtures/wg.sparam"
+.op

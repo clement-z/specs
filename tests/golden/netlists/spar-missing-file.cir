@@ -1,0 +1,4 @@
+* F-03: an S-parameter file that does not exist
+cwsrc1 in wl=1.55e-6 power=1
+spar1 in out file="no-such-file.s2p"
+.op

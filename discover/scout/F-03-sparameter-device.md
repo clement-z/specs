@@ -3,6 +3,15 @@
 value 5 | effort M (frequency-domain semantics) / M+ needs-human (broadband time-domain) | risk med |
 prerequisites: none (the generic device it was to refactor is removed, decision 2026-10-23) | horizon 2
 
+> **Status 2026-10-23: phase 1 implemented (sprint 2026-10c, phase PF03, branch `ws/spar`, report
+> `backlog/sprint-2026-10c/PF03-REPORT.md`).** Design items 1-3 and 5 and the validation plan: element `SPAR`
+> (`doc/netlist.md`), loader `src/io/sparam_file.{h,cpp}` (+ the Taylor form, decision 2026-10-23), device
+> `src/devices/sparam_device.{h,cpp}`, export `utils/sparam_export.py`, formats and conventions
+> `doc/sparam.md`, tests `tests/sparam/` and 11 golden cases. Open questions answered by the decisions:
+> phases converted to SPECS's convention (Touchstone conjugated, `.sparam`/CSV kept), Taylor form yes, out of
+> range is an error. Not done: phase 2 (broadband time-domain realisation, needs-human), `.npz` export, the
+> SiEPIC BDC fixture (licence of the Simphony data unclear, not committed), reciprocity fill.
+
 > **Update 2026-10-23 (maintainer decision, phase D2b).** `GenericTransmissionDevice`, `Generic2x2Coupler`,
 > `GenericWaveguide` and the output ports' delta-write mode (`m_use_deltas`) are removed (54b15dc). F-03 is to be
 > written **from scratch** as a state-holding, per-wavelength device: one memory per input port and wavelength,

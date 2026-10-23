@@ -1,0 +1,4 @@
+* F-03: ports= names a port that the file does not have
+cwsrc1 in wl=1.55e-6 power=1
+spar1 in out file="../../sparam/fixtures/asym.s2p" ports="left,middle"
+.op

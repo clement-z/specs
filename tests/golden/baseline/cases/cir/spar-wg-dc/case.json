@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-wg-dc.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 5400,
+   "kind": "text",
+   "sha256": "68b0c82844eef4eec41788ea9b9440a0ec6d4aaf5cdcab5cf9477ecd9c35c809",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 436,
+   "kind": "json",
+   "sha256": "939398e2476ca55ea4fc2957dfee081d96ee36e33748e0b8f2411a73c1708f66",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "cir/spar-wg-dc"
+}

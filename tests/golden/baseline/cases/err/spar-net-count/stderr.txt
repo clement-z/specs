@@ -1,0 +1,2 @@
+Error (ROOT/SPAR1): 3 nets for 2 ports in tests/golden/netlists/../../sparam/fixtures/wg.sparam
+
