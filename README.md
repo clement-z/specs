@@ -70,6 +70,9 @@ pixi run -e docs docs              # Doxygen HTML in build-pixi/doc/html
 The pixi tasks only use `build-pixi/<toolchain>`, never `build/`. Extra Meson options go after `--`
 (`pixi run setup gcc -- -Dspx=true`). Binaries built there link the environment's libstdc++ through an rpath, so
 they run only while `.pixi/` exists; use the plain route for portable binaries. Only Linux is tested.
+The pixi tasks also build googletest from its wrap (`-Dforce_fallback_for=systemc,args,gtest`): the environment's
+pkg-config also reads the host's `/usr/lib/pkgconfig`, and an installed gtest found there does not compile with the
+environment's compilers. Pass the same option to a plain `meson setup` inside `pixi shell`.
 
 If you want to contribute with the project, check the `todo.txt` file for some inspiration on points to work on. We are also open for new ideas, so feel free to open an issue and discuss.
 
