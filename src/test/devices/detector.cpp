@@ -385,7 +385,9 @@ std::vector<double> run_in_child(const std::function<std::vector<double>()> &sce
     EXPECT_EQ(waitpid(pid, &status, 0), pid);
     EXPECT_TRUE(WIFEXITED(status) && WEXITSTATUS(status) == 0) << "scenario failed, status " << status;
     std::vector<double> values(bytes.size() / sizeof(double));
-    std::memcpy(values.data(), bytes.data(), values.size() * sizeof(double));
+    // nothing read (the scenario failed): values.data() may be null, which memcpy must not get
+    if (!values.empty())
+        std::memcpy(values.data(), bytes.data(), values.size() * sizeof(double));
     return values;
 }
 

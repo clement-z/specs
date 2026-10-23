@@ -361,6 +361,12 @@
    "only": "^err/b182-",
    "gtest": false,
    "note": "B-182: new cases, parse errors inside .subckt bodies give the defining file and line (PG item 4)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T09:32:17Z",
+   "only": "^err/b182-nested-subckt-body-error$",
+   "gtest": false,
+   "note": "B-182: the nested-body case uses a syntax error (exit 1, like every err case) instead of an unexpected character (exit 3, B-172) (PG item 5)"
   }
  ]
 }

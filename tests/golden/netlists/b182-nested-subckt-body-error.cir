@@ -1,4 +1,4 @@
-* B-182 regression: a parse error in the body of a nested subcircuit (parsed per instance of the inner one,
+* B-182 regression: a syntax error in the body of a nested subcircuit (parsed per instance of the inner one,
 * from the body of the outer one) points at line 11 of this file.
 cwsrc1 in wl=1.55e-6 power=1
 x1 in out OUTER
@@ -8,7 +8,7 @@ wg1 m b length=10e-6
 .subckt INNER c d
 
 wg1 c e length=10e-6
-wg2 e d length=10e-6 $
+wg2 e d length=10e-6 )
 .ends INNER
 .ends OUTER
 .op

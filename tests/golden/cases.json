@@ -2670,7 +2670,7 @@
     "stdout"
    ],
    "expect": "fail",
-   "note": "B-182: an unexpected character in the body of a nested subcircuit gives the defining file and line 11, exit 3 (was an empty file name and a wrong line)"
+   "note": "B-182: a syntax error in the body of a nested subcircuit gives the defining file and line 11, exit 1 (was an empty file name and a wrong line)"
   },
   {
    "id": "err/b180-int-literal-kwarg",
