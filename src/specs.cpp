@@ -590,7 +590,7 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
     if (!default_trace_file)
     {
         // the tables only hold the probes (F-05)
-        if (!all_pdets.empty() || !all_pwr_meters.empty())
+        if ((!all_pdets.empty() || !all_pwr_meters.empty()) && !plan_run)
             cerr << "Warning: photodetector and power meter readouts are only traced in the VCD "
                  << "(add --format vcd)" << endl;
         return;

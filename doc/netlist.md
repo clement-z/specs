@@ -279,6 +279,10 @@ and the results of all runs go to **one run table**.
   values are compared on the same draws). `seed=S` sets the master seed like `.options seed` (`--seed` wins).
   Without `.mc`, every run uses the master seed.
 
+A stepped or drawn top-level parameter cannot be named like a column of `runs.csv` (`run`, `status`, `exit_code`,
+`seed`, `mc_run`, `row_start`, `row_count`, `draw_start`, `draw_count`, `message`). The netlist itself (with its
+`.param` values) must parse and its `.options` must be valid: specs checks both once before the runs.
+
 Runs are numbered from 0 over the nested loops (above: run 0 is k=0.1 n2=2.35 Monte-Carlo run 0, run 1 is
 Monte-Carlo run 1, ...). `specs -n -f net.cir` lists them. `.step` and `.mc` in a subcircuit body are ignored with
 a warning.
@@ -294,7 +298,7 @@ reproducible on its own, and the run table holds the same values bit for bit.
 
 | file | content |
 | --- | --- |
-| `runs.csv` | one line per finished run: `run`, `status` (`ok`, `failed`, `crashed`), `exit_code`, `seed`, `mc_run` (empty without `.mc`), the stepped parameters, the top-level `.param` values that drew (one column each), `row_start`, `row_count`, `draw_start`, `draw_count`, `message` (the run's last `Error` line, else its last stderr line) |
+| `runs.csv` | one line per finished run: `run`, `status` (`ok`, `failed`, `crashed`), `exit_code`, `seed`, `mc_run` (empty without `.mc`), the stepped parameters, the top-level `.param` values that drew (one column each), `row_start`, `row_count`, `draw_start`, `draw_count`, `message` (the run's last `Error` or `Parsing error` line, else its last stderr line; an `ok` run can have one, e.g. the warning of a `.tran` stopped at `maxevents`) |
 | `run.npy`, `time_s.npy`, `signal.npy`, `wavelength_m.npy`, `power_W.npy`, `field_re.npy`, `field_im.npy` | the probe tables of all runs (the columns of `--format npz`, see "Tracing and output files", plus `run`): the rows of a run are `row_start` to `row_start + row_count - 1`, runs in run order |
 | `signal_names.txt` | the probe names, one per line (`signal` indexes them) |
 | `draw_run.npy`, `draw_name.npy`, `draw_value.npy`, `draw_names.txt` | every random draw of every run: its stream name (e.g. `ROOT/X3/.param/L#0`, the instance X3) and value |
@@ -303,13 +307,15 @@ reproducible on its own, and the run table holds the same values bit for bit.
 
 The `.npy` files are NumPy arrays: `np.load(path, mmap_mode="r")` reads only what is used, and
 `pyspecs/runtable.py` reads the table with pandas (selection by run or parameter value, run by run). The table
-holds what `--format npz` holds: the probes (no PDET or power meter), and nothing for an `.op` (its operating
+holds what `--format npz` holds: the probes (no PDET or power meter: specs warns once), and nothing for an `.op` (its operating
 point is the stdout listing, see `--run K`); use `.tran` or `.dc` to have rows.
 
 **Resuming.** Running the same command again resumes the table: the runs recorded `ok` are skipped, the others
 run again (their new line replaces the old one). A table made by another netlist, plan, build or command line
 (another `table.manifest.json`; `-j` does not count) is an error unless `--overwrite` replaces it. A directory
-that is not a run table is never overwritten. The table does not depend on `-j`.
+that is not a run table is never overwritten (one whose creation was cut short, holding only table files, is
+created again). The table does not depend on `-j`. The files are not synced to disk after each run: a resume
+repairs the table after a crash or a kill of specs, not after a power loss.
 
 `--format`, `--no-trace`, `--json`, `--stats`, `--progress` and `--print-manifest` apply to a single run: with a
 plan they are an error, except with `--run K`.

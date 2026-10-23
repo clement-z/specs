@@ -4573,6 +4573,23 @@
     "tests/golden/netlists/f02-functions.cir"
    ],
    "note": "F-02: --run on a netlist without .step/.mc: error, exit 1"
+  },
+  {
+   "id": "err/f02-step-reserved-name",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-reserved-name.cir"
+   ],
+   "note": "F-02: .step param seed: seed is a column of runs.csv, error naming the .step line, exit 1"
   }
  ]
 }

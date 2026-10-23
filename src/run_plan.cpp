@@ -169,7 +169,7 @@ string last_log_line(const string &log_path)
             line.pop_back();
         if (!line.empty())
             last = line;
-        if (line.rfind("Error", 0) == 0)
+        if (line.rfind("Error", 0) == 0 || line.rfind("Parsing error", 0) == 0)
             last_error = line;
     }
     // the error, rather than the explanations that may follow it
@@ -201,27 +201,43 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs)
     if (jobs < 1)
         jobs = 1;
 
-    // runs to do, in run order (a resumed plan skips the runs recorded ok)
-    vector<uint64_t> todo;
-    for (uint64_t run = 0; run < plan.size(); ++run)
-    {
-        if (!table.completed().count(run))
-            todo.push_back(run);
-    }
-    cout << "Run table: " << table.dir() << " (" << plan.size() << " runs, " << plan.size() - todo.size()
-         << " already done, " << todo.size() << " to run, " << jobs << " at a time)" << endl;
+    // runs to do, in run order (a resumed plan skips the runs recorded ok); not listed in memory,
+    // a plan may have up to 2^31 - 1 runs
+    const auto done = [&](uint64_t run) { return table.completed().count(run) != 0; };
+    const auto next_todo = [&](uint64_t run) {
+        while (run < plan.size() && done(run))
+            ++run;
+        return run;
+    };
+    uint64_t n_done = 0;
+    for (uint64_t run : table.completed())
+        n_done += run < plan.size();
+    const uint64_t n_todo = plan.size() - n_done;
+    cout << "Run table: " << table.dir() << " (" << plan.size() << " runs, " << n_done << " already done, "
+         << n_todo << " to run, " << jobs << " at a time)" << endl;
 
-    size_t next_start = 0;  // index in todo of the next run to start
-    size_t next_commit = 0; // index in todo of the next run to commit
+    uint64_t next_start = next_todo(0);  // next run to start
+    uint64_t next_commit = next_start;   // next run to commit
     std::map<pid_t, uint64_t> running;
     std::map<uint64_t, RunTable::Result> finished; // not committed yet
-    size_t n_ok = 0, n_failed = 0;
+    uint64_t n_ok = 0, n_failed = 0;
 
-    while (next_commit < todo.size())
+    // on an error of the parent: the runs still running are stopped, so that they do not hold the
+    // table's lock after specs exits
+    const auto stop_children = [&]() {
+        for (const auto &r : running)
+            ::kill(r.first, SIGKILL);
+        for (const auto &r : running)
+            ::waitpid(r.first, nullptr, 0);
+        running.clear();
+    };
+
+    while (next_commit < plan.size())
     {
-        while (running.size() < jobs && next_start < todo.size())
+        while (running.size() < jobs && next_start < plan.size())
         {
-            const uint64_t run = todo[next_start++];
+            const uint64_t run = next_start;
+            next_start = next_todo(next_start + 1);
             // nothing buffered may be written twice (by the parent and by the child)
             cout << std::flush;
             cerr << std::flush;
@@ -229,6 +245,7 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs)
             if (pid < 0)
             {
                 cerr << "Error: cannot start the process of run " << run << ": " << strerror(errno) << endl;
+                stop_children();
                 outcome.exit_code = 1;
                 return outcome;
             }
@@ -249,6 +266,7 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs)
             if (errno == EINTR)
                 continue;
             cerr << "Error: waitpid: " << strerror(errno) << endl;
+            stop_children();
             outcome.exit_code = 1;
             return outcome;
         }
@@ -282,9 +300,10 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs)
         finished.emplace(run, r);
 
         // commit in run order
-        while (next_commit < todo.size() && finished.count(todo[next_commit]))
+        while (next_commit < plan.size() && finished.count(next_commit))
         {
-            const uint64_t c = todo[next_commit++];
+            const uint64_t c = next_commit;
+            next_commit = next_todo(next_commit + 1);
             RunTable::Result &res = finished.at(c);
             RunChunk chunk;
             const string chunk_file = RunTable::chunk_path(table.dir(), c);
@@ -300,6 +319,7 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs)
             }
             if (!table.commit(res, has_chunk ? &chunk : nullptr))
             {
+                stop_children();
                 outcome.exit_code = 1;
                 return outcome;
             }
@@ -320,7 +340,6 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs)
         }
     }
 
-    const size_t n_done = plan.size() - todo.size();
     cout << "Runs: " << plan.size() << ", " << n_ok + n_done << " ok (" << n_done << " from before), " << n_failed
          << " failed" << endl;
     if (n_failed)

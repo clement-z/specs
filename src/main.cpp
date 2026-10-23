@@ -12,6 +12,7 @@
 
 #include "specs.h"
 #include "optical_output_port.h"
+#include "parser/parse_directive.h"
 #include "parser/parse_tree.h"
 #include "parser/parser_state.h"
 #include "run_manifest.h"
@@ -175,7 +176,10 @@ void build_circuit(ParseTree &pt)
     if (!pt.draw_seed_conflict.empty())
     {
         cerr << "Error: " << pt.draw_seed_conflict << "; put .options seed before the first random "
-             << "function, or give the seed with --seed" << endl;
+             << "function, or give the seed with --seed";
+        if (pt.first_draw_where.rfind("--param", 0) == 0)
+            cerr << " (a --param value is read before the netlist)";
+        cerr << endl;
         exit(1);
     }
 
@@ -728,6 +732,34 @@ int sc_main(int argc, char *argv[])
                 return 1;
             }
         }
+        // names of runs.csv columns
+        const set<string> reserved_columns = { "run", "status", "exit_code", "seed", "mc_run", "row_start",
+                                               "row_count", "draw_start", "draw_count", "message" };
+        for (const auto &s : pt.plan.steps)
+        {
+            if (reserved_columns.count(s.param))
+            {
+                cerr << "Error: .step param " << s.param << " (" << s.where << "): " << s.param
+                     << " is a column of the run table, rename the parameter" << endl;
+                return 1;
+            }
+        }
+        for (const auto &name : pt.drawn_params)
+        {
+            if (reserved_columns.count(name))
+            {
+                cerr << "Error: .param " << name << " draws a random value and " << name
+                     << " is a column of the run table of a .step/.mc plan, rename the parameter" << endl;
+                return 1;
+            }
+        }
+        // the .options of the netlist: their errors once here rather than in every run (each run applies
+        // them again)
+        for (const auto *d : pt.directives)
+        {
+            if (dynamic_cast<const OPTIONSDirective *>(d))
+                d->create();
+        }
         if (pt.plan.mc_seed_given && pt.options_seed_given && pt.plan.mc_seed != pt.options_seed)
         {
             cerr << "Error: .mc seed=" << pt.plan.mc_seed << " (" << pt.plan.mc_where << ") and .options seed="
@@ -809,6 +841,15 @@ int sc_main(int argc, char *argv[])
             cout.rdbuf(cout_buf);
             cout.clear();
         }
+        for (const auto *e : pt.elements)
+        {
+            if (e->kind() == "PHOTODETECTOR" || e->kind() == "POWER METER")
+            {
+                cerr << "Warning: photodetector and power meter readouts are not in the run table (it holds "
+                     << "the probes); use --run K to trace them in a VCD" << endl;
+                break;
+            }
+        }
         RunManifest manifest;
         manifest.specs_version = spx::version::full;
         manifest.systemc_version = sc_release();
@@ -835,6 +876,7 @@ int sc_main(int argc, char *argv[])
         parse_run_point(run_pt, point, param_overrides, file.Get(), footer.str());
         specsGlobalConfig.trace_filename = "";
         specsGlobalConfig.trace_vcd = false;
+        specsGlobalConfig.plan_run = true;
         specsGlobalConfig.default_trace_table = std::make_unique<TraceTable>("", "");
         specsGlobalConfig.default_trace_table->keepColumns();
         const int result = simulate(run_pt);

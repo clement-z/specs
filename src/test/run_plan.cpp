@@ -276,6 +276,17 @@ TEST(RunTableDeathTest, OtherManifestOrDirectory)
             EXPECT_EQ(t.rows(), 0u);
         }
         EXPECT_EQ(read_column<int32_t>(dir, "run").size(), 0u);
+        // a creation cut short before the manifest (written last): only table files, made a table again
+        const std::string cut = table_dir("cut");
+        {
+            RunTable t(cut, "{}\n", {}, {}, false);
+        }
+        fs::remove(fs::path(cut) / "table.manifest.json");
+        {
+            RunTable t(cut, "{}\n", {}, {}, false);
+            EXPECT_EQ(t.lines(), 0u);
+        }
+        EXPECT_TRUE(fs::exists(fs::path(cut) / "table.manifest.json"));
         // a directory that is not a run table is never touched
         const std::string not_table = table_dir("not_table");
         fs::create_directories(not_table);

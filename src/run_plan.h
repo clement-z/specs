@@ -65,6 +65,6 @@ RunnerOutcome run_plan(const RunPlan &plan, RunTable &table, unsigned jobs);
 struct RunManifest;
 std::string table_manifest_json(const RunManifest &m, const RunPlan &plan, const std::vector<std::string> &drawn);
 
-// Message of a run: the last line of its log (stderr) that starts with "Error", else its last non-empty
-// line, at most 500 characters
+// Message of a run: the last line of its log (stderr) that starts with "Error" or "Parsing error", else its
+// last non-empty line, at most 500 characters
 std::string last_log_line(const std::string &log_path);

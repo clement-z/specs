@@ -95,6 +95,7 @@
   "err/f02-run-without-plan",
   "err/f02-step-and-param",
   "err/f02-step-bad-range",
+  "err/f02-step-reserved-name",
   "err/f02-step-unknown-param",
   "err/f02-subckt-default-draw",
   "err/f02-unknown-function",
@@ -447,6 +448,12 @@
    "only": "^(regress/f02-step-.*|err/f02-step-.*|err/f02-plan-format|err/f02-run-.*)$",
    "gtest": false,
    "note": "F-02: new cases (.step, .mc, run table, --run, failures)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T14:09:06Z",
+   "only": "^err/f02-step-reserved-name$",
+   "gtest": false,
+   "note": "F-02: new case (reserved column name)"
   }
  ]
 }

@@ -558,9 +558,15 @@ bool ParseTree::add_step(const string &keyword_param, const string &name, const 
         if (values[0].type == Variable::INTEGER && values[1].type == Variable::INTEGER
             && values[2].type == Variable::INTEGER)
         {
-            // integers stay integers (e.g. a number of rings)
-            for (int64_t v = values[0].inum; v <= values[1].inum; v += values[2].inum)
+            // integers stay integers (e.g. a number of rings); the differences in unsigned arithmetic,
+            // where they cannot overflow (v <= stop)
+            const int64_t stop_i = values[1].inum, inc_i = values[2].inum;
+            for (int64_t v = values[0].inum;; v += inc_i)
+            {
                 step.values.emplace_back(v);
+                if (static_cast<uint64_t>(stop_i) - static_cast<uint64_t>(v) < static_cast<uint64_t>(inc_i))
+                    break;
+            }
         }
         else
         {

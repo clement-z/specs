@@ -683,10 +683,16 @@ struct ParseTree {
     // if its value drew and is not overridden (--param, .step)
     void note_assigned_param(const string &name)
     {
-        if (parent || is_subcircuit || root_tree()->draws.size() == draws_at_assignment
-            || param_overrides.count(name))
+        if (parent || is_subcircuit || param_overrides.count(name))
             return;
-        if (find(drawn_params.begin(), drawn_params.end(), name) == drawn_params.end())
+        const auto it = find(drawn_params.begin(), drawn_params.end(), name);
+        if (root_tree()->draws.size() == draws_at_assignment)
+        {
+            // assigned again without a draw: its value is not drawn
+            if (it != drawn_params.end())
+                drawn_params.erase(it);
+        }
+        else if (it == drawn_params.end())
             drawn_params.push_back(name);
     }
 

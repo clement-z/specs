@@ -396,10 +396,15 @@ void RunTable::open_or_create(const string &manifest_json, bool overwrite)
     }
     else
     {
-        // an empty directory (or one holding only the lock) becomes a table; nothing else is touched
+        // a directory holding only files of a run table (empty, or a creation cut short before its
+        // manifest, which is written last: no run was committed) becomes a table; nothing else is touched
+        std::set<string> own = { ".lock", INDEX_FILE, "signal_names.txt", "draw_names.txt", "logs", "chunks" };
+        for (const auto *columns : { &m_data, &m_draw })
+            for (const auto &c : *columns)
+                own.insert(c.name + ".npy");
         for (const auto &entry : fs::directory_iterator(d, ec))
         {
-            if (entry.path().filename() != ".lock")
+            if (!own.count(entry.path().filename().string()))
                 fail("\"" + m_dir + "\" exists and is not a run table (no " + MANIFEST_FILE + ")");
         }
     }
