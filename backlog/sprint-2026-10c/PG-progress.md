@@ -25,3 +25,7 @@ counters `/tmp/pg/stats-before-<tc>`. gcc strict golden: 235/235 pass. `meson te
 - Item 3 (SC_HAS_PROCESS): predicted none (bit-identical, counters identical). Result: as predicted. The before
   recordings predate item 2, so the comparisons show `regress/b062-...` only (item 2's change; that case equals
   the committed baseline on all four toolchains).
+- Item 4 (B-182): the 11 golden cases with a "Parsing error" all have the error at top level (file:line correct);
+  none has an error inside a `.subckt` body, so no existing case changes. New err cases: errors inside a body
+  (syntax error, B-180 integer literal, nested `.ends` name mismatch, error in a nested body) give the defining
+  file and the line in that file.
