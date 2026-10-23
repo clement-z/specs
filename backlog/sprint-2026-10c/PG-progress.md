@@ -7,7 +7,7 @@ Branch `ws/cleanup3`. Heartbeat id: `837055bd` (delete after the report is commi
 | 1 backlog statuses | done | 70fc144 | 3 Sonnet subagents (medium), diffs reviewed; 3 fixed, 13 partly, rest still open |
 | 2 MLPROBE per-event print | done | 5b946f2 | as predicted: no existing case changed; new case regress/b062-mlprobe-unlisted-wavelength; counters identical |
 | 3 SC_HAS_PROCESS | done | 9f31c11 | 38 uses removed; clang warnings 455 -> 4 (pre-existing), gcc 9 -> 9; bit-identical and counters identical on gcc, clang, asan-gcc, asan-clang |
-| 4 B-182 subckt line numbers | todo | | |
+| 4 B-182 subckt line numbers | done | 6561510 | as predicted: 4 new err cases, nothing else changed; counters identical |
 | 5 small items | todo | | |
 | 6 VLSource prints (look only) | todo | | |
 
