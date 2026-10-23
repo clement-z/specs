@@ -1,5 +1,5 @@
 # B-186: No per-wavelength probe in a `.dc` sweep (MLPROBE traces nothing there)
-severity: med | category: feature | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: fixed (sprint 2026-10c PL)
+severity: med | category: feature | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 314727a (sprint 2026-10c PL)
 location: src/devices/probe.cpp (`MLambdaProbe`), the `.dc` runner in src/specs.cpp
 
 ## Problem

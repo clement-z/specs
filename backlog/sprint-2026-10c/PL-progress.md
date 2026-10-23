@@ -5,8 +5,8 @@ Heartbeat: `a034057d` (PL-heartbeat, every 5 min, expires in 48 h).
 | Step | Status | Commit | Notes |
 | --- | --- | --- | --- |
 | Baseline builds (gcc, clang, asan-gcc, asan-clang) | done | 57fffc3 | all 16 OK; before binaries in /tmp/PL-before/{gcc,clang,asan-gcc}, asan-clang in the worktree /tmp/PL-wt/before (the first asan-clang build ran while the source was being edited) |
-| B-186 implementation + golden cases + docs | done, checks running | 314727a | repro output as predicted (CSV and VCD); gcc golden strict: 275 pass, 2 new |
-| Report | todo | | |
+| B-186 implementation + golden cases + docs | done | 314727a | as predicted; all toolchains OK; strict compares and stats-compare as in PL-REPORT.md |
+| Report | done | (this commit) | PL-REPORT.md |
 
 ## Findings before the change
 - No existing golden case runs a `.dc` with an MLPROBE: the 15 cases whose netlists contain an MLPROBE all run
