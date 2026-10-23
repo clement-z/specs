@@ -73,6 +73,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %token <s_ptr> T_ELEM_PSHIFT T_ELEM_MZI T_ELEM_CROSSING T_ELEM_PCMCELL
 %token <s_ptr> T_ELEM_PROBE T_ELEM_MLPROBE T_ELEM_PDET T_ELEM_PWR_METER
 %token <s_ptr> T_ELEM_X
+%token <s_ptr> T_ELEM_SPAR
 %token <i_val> T_ANALYSIS_OP T_ANALYSIS_DC T_ANALYSIS_TRAN
 %token <i_val> T_DIRECTIVE_OPTIONS T_DIRECTIVE_NODESET
 %token <i_val> T_DIRECTIVE_SUBCKT
@@ -99,6 +100,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <i_val> element.power_meter
 %type <i_val> element.pdet
 %type <i_val> element.x
+%type <i_val> element.spar element.spar.with_nets element.spar.with_kwargs
 
 // Available analysis
 %type <i_val> analysis.op
@@ -581,9 +583,53 @@ element.x.with_kwargs:
 | element.x.with_args
 ;
 
+/* SPARname n1 n2 ... nN [keyword=value ...] (F-03): the number of nets is free, so their roles are
+   set once the line is read (SPARElement::set_net_roles()) */
+element.spar: T_ELEM_SPAR
+            {
+                $$ = cur_pt->register_element(new SPARElement(*$1));
+                // directory of the file being read, for a relative file= (as .include, B-143)
+                static_cast<SPARElement *>(cur_pt->elements[$$])->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
+                delete $1;
+            }
+;
+
+element.spar.with_nets:
+  element.spar.with_nets net.oanalog
+            {
+                cur_pt->elements[$1]->nets.push_back(*$2);
+                $$ = $1;
+                delete $2;
+            }
+| element.spar.with_nets net.oanalog '&'
+            {
+                // explicitly bidirectional net (as net.oa.explicit_bidir; its role is counted later)
+                cur_pt->nets[*$2].m_bidirectional = true;
+                cur_pt->elements[$1]->nets.push_back(*$2);
+                $$ = $1;
+                delete $2;
+            }
+| element.spar { $$ = $1; }
+;
+
+element.spar.with_kwargs:
+  element.spar.with_kwargs assignment
+            {
+                cur_pt->elements[$1]->kwargs[$2->first] = $2->second;
+                $$ = $1;
+                delete $2;
+            }
+| element.spar.with_nets { $$ = $1; }
+;
+
 element:
   element.with_kwargs
 | element.x.with_kwargs
+| element.spar.with_kwargs
+            {
+                static_cast<SPARElement *>(cur_pt->elements[$1])->set_net_roles(*cur_pt);
+                $$ = $1;
+            }
 ;
 
 /* ---------- Analysis arguments parsing ----------- */

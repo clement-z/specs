@@ -9,6 +9,7 @@
 #include "devices/splitter.h"
 #include "devices/crossing.h"
 #include "devices/pcm_device.h"
+#include "devices/sparam_device.h"
 
 /** ******************************************* **/
 /**            Active devices                   **/

@@ -221,6 +221,7 @@ endif
 if get_option('golden')
   subdir('tests/golden')
 endif
+subdir('tests/sparam')
 
 # ---- Helper targets -----------------------------------------------------------------------------
 
