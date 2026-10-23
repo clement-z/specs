@@ -5,7 +5,9 @@ Test data and helpers for the `SPAR` element and `utils/sparam_export.py` (forma
 
 ## Fixtures (`fixtures/`)
 
-Written by `gen_fixtures.py`; regenerate them (byte-identical output, floats written with `repr()`) with
+Written by `gen_fixtures.py`; regenerate them (floats written with `repr()`: byte-identical output on one platform; across
+platforms the structure is identical and the numbers agree to ~1e-12 relative, the last bits depending on the
+libm, which is what `test_sparam.py` checks) with
 
     python3 -I tests/sparam/gen_fixtures.py            # or --out DIR
 

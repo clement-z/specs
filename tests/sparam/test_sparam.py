@@ -4,7 +4,8 @@
     python3 -I tests/sparam/test_sparam.py --specs build/specs [--keep DIR] [--only REGEX]
 
 Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
-- fixtures: tests/sparam/gen_fixtures.py rewrites tests/sparam/fixtures byte for byte, and exporting the
+- fixtures: tests/sparam/gen_fixtures.py rewrites tests/sparam/fixtures with the same structure and numbers
+  equal to 1e-12 relative (byte for byte on one platform; the last digits depend on the libm), and exporting the
   ring again (0.05 nm grid) gives tests/sparam/data/add_drop_ring.sparam (1e-12);
 - phase convention, .dc: each wg.* fixture (a 100 um waveguide written in each format's own convention)
   through SPAR gives the field of a WG of the same length, at the grid points and between them; read
@@ -27,7 +28,6 @@ Checks (each prints PASS/FAIL with its measured numbers; exit 1 if one fails):
 
 import argparse
 import cmath
-import filecmp
 import math
 import os
 import re
@@ -119,14 +119,75 @@ def max_diff(a, b):
 
 # ---------------------------------------------------------------------------------------------------------
 
+# A number of a fixture: float or integer, with sign and exponent
+NUMBER = re.compile(r'[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?')
+
+# The generator writes repr() of math/cmath results (cos, sin, exp, ...), whose last bits depend on the libm
+# of the platform: a regenerated file is not byte-identical across platforms. A libm is accurate to about 1 ulp
+# (1.1e-16 relative), so 1e-12 leaves four orders of margin above that noise (also through the few operations
+# done on a result) and stays far below any real change (a convention, format or model change moves values by
+# 1e-6 or more). Exact zeros (and anything below 1e-300) are compared absolutely.
+REL_TOL = 1e-12
+ABS_TOL = 1e-300
+
+
+def compare_fixture_text(a, b):
+    """Compares two fixture texts: None when equal in structure and in numbers within the tolerance, else
+    (line number, reason); the worst relative difference found is returned as the second item."""
+    la, lb = a.splitlines(), b.splitlines()
+    worst = 0.0
+    if len(la) != len(lb):
+        return (min(len(la), len(lb)) + 1, '%d lines instead of %d' % (len(la), len(lb))), worst
+    for i, (x, y) in enumerate(zip(la, lb), 1):
+        if x == y:
+            continue
+        if NUMBER.split(x) != NUMBER.split(y):
+            return (i, 'text differs: %r instead of %r' % (x[:60], y[:60])), worst
+        nx, ny = NUMBER.findall(x), NUMBER.findall(y)
+        for u, v in zip(nx, ny):
+            fu, fv = float(u), float(v)
+            if fu == fv:
+                continue
+            scale = max(abs(fu), abs(fv))
+            diff = abs(fu - fv)
+            if not diff <= REL_TOL * scale and not diff <= ABS_TOL:
+                return (i, '%s instead of %s' % (u, v)), math.inf if scale == 0 else max(worst, diff / scale)
+            worst = max(worst, diff / scale if scale else 0.0)
+    return None, worst
+
+
+def compare_fixture_dirs(out, ref):
+    """(list of 'file: line n: reason' for the files that differ, worst relative difference of the numbers)."""
+    problems, worst = [], 0.0
+    names = sorted(os.listdir(ref))
+    if sorted(os.listdir(out)) != names:
+        problems.append('file names differ: %s instead of %s' % (sorted(os.listdir(out)), names))
+    for n in names:
+        if not os.path.isfile(os.path.join(out, n)):
+            continue
+        with open(os.path.join(out, n), newline='') as f:
+            a = f.read()
+        with open(os.path.join(ref, n), newline='') as f:
+            b = f.read()
+        bad, w = compare_fixture_text(a, b)
+        worst = max(worst, w)
+        if bad:
+            problems.append('%s: line %d: %s' % (n, bad[0], bad[1]))
+    return problems, worst
+
+
 def test_fixtures(t):
     out = os.path.join(t.work, 'fixtures')
     p = subprocess.run([sys.executable, '-I', os.path.join(HERE, 'gen_fixtures.py'), '--out', out],
                        capture_output=True, text=True)
-    names = sorted(os.listdir(FIXTURES))
-    same = p.returncode == 0 and sorted(os.listdir(out)) == names and all(
-        filecmp.cmp(os.path.join(out, n), fixture(n), shallow=False) for n in names)
-    t.check('fixtures/regenerated-identical', same, '%d files' % len(names))
+    names = os.listdir(FIXTURES)
+    if p.returncode != 0 or not os.path.isdir(out):
+        t.check('fixtures/regenerated-identical', False, 'gen_fixtures.py failed: %s' % p.stderr.strip()[-300:])
+        return
+    problems, worst = compare_fixture_dirs(out, FIXTURES)
+    t.check('fixtures/regenerated-identical', not problems,
+            '%d files, worst relative difference %.3g (<= %g)%s'
+            % (len(names), worst, REL_TOL, ''.join('; ' + q for q in problems)))
 
 
 def test_ring_data(t):

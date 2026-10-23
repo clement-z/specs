@@ -4,7 +4,9 @@
     python3 -I tests/sparam/gen_fixtures.py [--out DIR]       (default DIR: fixtures/ next to this script)
 
 The output is deterministic (floats written with repr(), the shortest string that reads back to the same
-double): running it again gives byte-identical files. After writing, every file is read back with the
+double): running it again on one platform gives byte-identical files. Across platforms the structure is
+identical and the numbers agree to about 1e-12 relative (the last bits of math/cmath results depend on the
+libm); tests/sparam/test_sparam.py compares the regenerated files that way. After writing, every file is read back with the
 independent readers of sparam_io.py and compared with the reference model (exit status 1 on a mismatch).
 
 Reference model: a 2-port waveguide section computed exactly like SPECS's WG (src/devices/waveguide.cpp,
