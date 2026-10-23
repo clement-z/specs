@@ -1,0 +1,5 @@
+Warning: ROOT/PROBE1 traces one wavelength of its net ROOT/m (1550 nm) and ignores the others (1560 nm): use MLPROBE for per-wavelength values
+Warning: ROOT/PROBE2 traces one wavelength of its net ROOT/m (1560 nm) and ignores the others (1550 nm): use MLPROBE for per-wavelength values
+Warning: ROOT/PROBE3 traces one wavelength of its net ROOT/m2 (1550 nm) and ignores the others (1560 nm): use MLPROBE for per-wavelength values
+Warning: 2 automatic probe(s) PROBE{<net>} trace one wavelength of their net and ignore the others (e.g. PROBE{ROOT/m2} traces 1550 nm and ignores 1560 nm): use MLPROBE for per-wavelength values
+

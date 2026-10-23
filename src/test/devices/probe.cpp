@@ -4,17 +4,22 @@
 // test/tran_start.cpp.
 // B-184: an MLPROBE also traces, when it is enabled, the last value of every listed wavelength its
 // net carried while it was disabled.
+// PD5: the wavelength latch of a PROBE run by a netlist analysis (Probe::LatchMode, wl=).
 #include <gtest/gtest.h>
 #include <systemc.h>
 
 #include <cmath>
 #include <complex>
+#include <cstdio>
+#include <fstream>
+#include <sstream>
 #include <string>
 
 #include "devices/probe.h"
 #include "optical_output_port.h"
 #include "specs.h"
 #include "test/utils.h"
+#include "trace_table.h"
 
 namespace {
 
@@ -41,6 +46,26 @@ void expectProbeTracesZero(const Probe &probe)
     EXPECT_EQ(probe.m_trace_sig_modulus.read(), 0);
     EXPECT_EQ(probe.m_trace_sig_phase.read(), 0);
     EXPECT_EQ(probe.m_trace_sig_wavelength.read(), 0);
+}
+
+std::string readFile(const std::string &filename)
+{
+    std::ifstream f(filename);
+    std::stringstream ss;
+    ss << f.rdbuf();
+    return ss.str();
+}
+
+// Runs the delta cycles of the current time step, without advancing the time
+void settle()
+{
+    while (sc_pending_activity_at_current_time())
+        sc_start(SC_ZERO_TIME);
+}
+
+OpticalSignal sig(double re, double im, double wavelength)
+{
+    return OpticalSignal(OpticalSignal::field_type(re, im), wavelength);
 }
 
 // power, abs, phase traced by an MLPROBE at `wavelength`
@@ -295,6 +320,196 @@ TEST(MLambdaProbe, TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled)
         sc_start();
         expectMLProbeTraces(probe, 1.55e-6, 6e-3, 0.0);
         expectMLProbeTraces(probe, 1.56e-6, 5e-3, 1.0);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, LatchOnceKeepsTheSmallestWavelengthOfTheFirstTimeStep)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+        const std::string csv = testing::TempDir() + "specs_test_latch_" + std::to_string(getpid()) + ".csv";
+        {
+            TraceTable table(csv, "");
+            spx::oa_signal_type net{"net"};
+            Probe probe("probe");
+            probe.p_in(net);
+            probe.setTraceTable(&table);
+            probe.m_latch_mode = Probe::LATCH_ONCE; // .tran
+
+            sc_start(); // initialise the threads
+
+            // First time step that brings a wavelength: 1560 nm, then 1550 nm in the next delta cycle.
+            // The smallest is latched; the 1560 nm sample leaves the table
+            net.write(sig(2, 0, 1.56e-6));
+            settle();
+            expectProbeTraces(probe, 4, 0, 1.56e-6);
+            net.write(sig(1, 0, 1.55e-6));
+            settle();
+            expectProbeTraces(probe, 1, 0, 1.55e-6);
+            sc_start(1, SC_PS);
+
+            // Later time steps: other wavelengths, even smaller ones, are ignored
+            net.write(sig(3, 0, 1.54e-6));
+            sc_start(1, SC_PS);
+            net.write(sig(3, 0, 1.56e-6));
+            sc_start(1, SC_PS);
+            expectProbeTraces(probe, 1, 0, 1.55e-6);
+            net.write(sig(0, 2, 1.55e-6));
+            sc_start(1, SC_PS);
+            expectProbeTraces(probe, 4, M_PI / 2, 1.55e-6);
+
+            // The warning reports the first wavelength ignored
+            EXPECT_EQ(probe.m_ignored_wavelength_m, 1.56e-6);
+            EXPECT_EQ(probe.m_traced_when_ignored_m, 1.55e-6);
+            EXPECT_TRUE(table.close());
+        }
+        EXPECT_EQ(readFile(csv),
+                  "time_s,signal,wavelength_m,power_W,field_re,field_im\n"
+                  "0,probe,1.55e-06,1,1,0\n"
+                  "3e-12,probe,1.55e-06,4,0,2\n");
+        std::remove(csv.c_str());
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, LatchOnceAtEnableTakesTheSmallestWavelengthReceivedWhileDisabled)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        spx::oa_signal_type net{"net"};
+        Probe probe("probe");
+        probe.p_in(net);
+        probe.m_latch_mode = Probe::LATCH_ONCE; // .tran
+
+        sc_start(); // initialise the threads
+        probe.enable = sc_logic(0);
+        sc_start();
+
+        // While disabled (the OP): 1560 nm, 1550 nm, then 1560 nm again (the value the net holds)
+        net.write(OpticalSignal(std::polar(std::sqrt(4e-3), 0.25), 1.56e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(1e-3), 0.5), 1.55e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(5e-3), 0.0), 1.56e-6));
+        sc_start();
+        expectProbeTracesZero(probe);
+
+        // Enabled: the smallest wavelength, with its last value, not the net's current value
+        probe.enable = sc_logic(1);
+        sc_start();
+        expectProbeTraces(probe, 1e-3, 0.5, 1.55e-6);
+        EXPECT_EQ(probe.m_ignored_wavelength_m, 1.56e-6);
+
+        // Latched for the rest of the run, also against a smaller wavelength in the same time step
+        net.write(OpticalSignal(std::polar(std::sqrt(3e-3), 0.0), 1.54e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(6e-3), 0.0), 1.56e-6));
+        sc_start();
+        expectProbeTraces(probe, 1e-3, 0.5, 1.55e-6);
+        net.write(OpticalSignal(std::polar(std::sqrt(2e-3), -0.5), 1.55e-6));
+        sc_start();
+        expectProbeTraces(probe, 2e-3, -0.5, 1.55e-6);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, LatchPerTimeStepTakesTheSmallestWavelengthOfEachPoint)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        spx::oa_signal_type net{"net"};
+        Probe probe("probe");
+        probe.p_in(net);
+        probe.m_latch_mode = Probe::LATCH_PER_TIME_STEP; // .op, .dc
+
+        sc_start(); // initialise the threads
+
+        // Point 1: 1560 nm only
+        net.write(sig(2, 0, 1.56e-6));
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 4, 0, 1.56e-6);
+        EXPECT_TRUE(std::isnan(probe.m_ignored_wavelength_m));
+
+        // Point 2: 1560 nm, then 1550 nm: 1550 nm, whatever the order
+        net.write(sig(3, 0, 1.56e-6));
+        settle();
+        net.write(sig(1, 0, 1.55e-6));
+        settle();
+        net.write(sig(5, 0, 1.56e-6));
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 1, 0, 1.55e-6);
+        EXPECT_EQ(probe.m_ignored_wavelength_m, 1.56e-6);
+
+        // Point 3: 1560 nm only again (a wavelength sweep: each point has its own)
+        net.write(sig(0, 1, 1.56e-6));
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 1, M_PI / 2, 1.56e-6);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, SelectedWavelengthIsTheOnlyOneTraced)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        spx::oa_signal_type net{"net"};
+        Probe probe("probe");
+        probe.p_in(net);
+        probe.m_latch_mode = Probe::LATCH_ONCE; // .tran
+        probe.m_wavelength_m = 1.56e-6;         // wl=1.56e-6
+
+        sc_start(); // initialise the threads
+        probe.enable = sc_logic(0);
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(4e-3), 0.25), 1.56e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(1e-3), 0.5), 1.55e-6));
+        sc_start();
+
+        // Enabled: the selected wavelength's value from the OP, although 1550 nm is smaller and current
+        probe.enable = sc_logic(1);
+        sc_start();
+        expectProbeTraces(probe, 4e-3, 0.25, 1.56e-6);
+        EXPECT_EQ(probe.m_ignored_wavelength_m, 1.55e-6);
+        EXPECT_EQ(probe.m_traced_when_ignored_m, 1.56e-6);
+
+        net.write(OpticalSignal(std::polar(std::sqrt(2e-3), 0.0), 1.55e-6));
+        sc_start();
+        expectProbeTraces(probe, 4e-3, 0.25, 1.56e-6);
+        net.write(OpticalSignal(std::polar(std::sqrt(5e-3), -1.0), 1.56e-6));
+        sc_start();
+        expectProbeTraces(probe, 5e-3, -1.0, 1.56e-6);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(Probe, TestbenchProbeTracesEveryWavelength)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        // No analysis sets the latch (testbenches, C++ users): every event is traced, as before PD5
+        spx::oa_signal_type net{"net"};
+        Probe probe("probe");
+        probe.p_in(net);
+        EXPECT_EQ(probe.m_latch_mode, Probe::LATCH_OFF);
+
+        sc_start(); // initialise the threads
+        net.write(sig(1, 0, 1.55e-6));
+        sc_start(1, SC_PS);
+        net.write(sig(2, 0, 1.56e-6));
+        sc_start(1, SC_PS);
+        expectProbeTraces(probe, 4, 0, 1.56e-6);
+        EXPECT_TRUE(std::isnan(probe.m_ignored_wavelength_m));
     }
     SPECS_TEST_FOOTER();
 }

@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/probe-wl-invalid.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/probe-wl-invalid"
+}

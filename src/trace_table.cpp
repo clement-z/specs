@@ -135,10 +135,21 @@ void TraceTable::append(double time_s, uint32_t signal, const OpticalSignal &s)
         m_pending[it->second] = row; // the last sample of the time step wins
 }
 
+void TraceTable::discard(double time_s, uint32_t signal, uint32_t wavelength_id)
+{
+    if (m_closed || time_s != m_pending_time_s)
+        return;
+    const auto it = m_pending_index.find((uint64_t(signal) << 32) | wavelength_id);
+    if (it != m_pending_index.end())
+        m_pending[it->second].dropped = true;
+}
+
 void TraceTable::writePending()
 {
     for (const Row &row : m_pending)
     {
+        if (row.dropped)
+            continue;
         ++m_rows;
         if (m_csv.is_open())
         {

@@ -1,0 +1,12 @@
+* PD5: a PROBE traces one wavelength per .dc point: the smallest one written to its net at that point.
+* cwsrc1 stays at 1550 nm; cwsrc2 is swept from 1541 to 1559 nm (never at 1550 nm). At the first point both
+* sources write m. At the next ones only cwsrc2 does: cwsrc1 writes the same value to its net a, which is
+* therefore not written again (no event), so m is only written at cwsrc2's new wavelength (as before PD5).
+*   probe1 (m): 1541 nm at the first point (the smaller of the two), then cwsrc2's wavelength
+*   probe2 (m, wl=1.55e-6): 1550 nm only, i.e. its value of the first point (CSV: one row)
+cwsrc1 a wl=1.55e-6 power=1e-3
+cwsrc2 b wl=1.541e-6 power=2e-3
+merger1 a b m
+probe1 m
+probe2 m wl=1.55e-6
+.dc WL(cwsrc2) 1.541e-6 1.559e-6 6e-9

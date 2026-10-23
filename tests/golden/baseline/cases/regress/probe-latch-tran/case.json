@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/probe-latch-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 1285,
+   "kind": "text",
+   "sha256": "c14896c5e7685df0e7c3e47a3c2fd7c8ffc9c535ea5d613985bb07651a88b955",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 467,
+   "kind": "json",
+   "sha256": "e8f6ca0fbec04cc0e11768c6b9e4fa594314ea8873d02abb24655cf6bd0a7127",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 5113,
+   "kind": "vcd",
+   "sha256": "7c31a852f12c0f5a59860a3cc5e96b98bba93259ba223f366d3866edc9a7fc0f",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/probe-latch-tran"
+}

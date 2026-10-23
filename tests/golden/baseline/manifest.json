@@ -106,6 +106,7 @@
   "err/f28-maxiter-small",
   "err/f28-options-maxiter-fraction",
   "err/f28-options-maxiter-negative",
+  "err/probe-wl-invalid",
   "opt/mode-fd",
   "opt/mode-sampled-time",
   "opt/multi-file",
@@ -214,6 +215,8 @@
   "regress/f15-wdm-crow-mlprobe",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
+  "regress/probe-latch-dc",
+  "regress/probe-latch-tran",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
   "tb/ac_crow",
@@ -309,6 +312,18 @@
    "only": "^(regress/b184-mlprobe-tran-start-multilambda|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-184: new case (MLPROBE traces every listed wavelength of the OP at .tran start); gtest list: MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T01:05:40Z",
+   "only": "^regress/(b033-crossing-two-lambda-tran|f15-stats-tran)$",
+   "gtest": false,
+   "note": "PD5 PROBE wavelength latch (D5 decision of 2026-10-23): PROBE1/PROBE2 on the two-wavelength nets trace 1550 nm only (= MLPROBE1/2@1550 of the same run), stderr warns once per probe"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T01:05:41Z",
+   "only": "^(regress/probe-latch-tran|regress/probe-latch-dc|err/probe-wl-invalid|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "PD5 PROBE wavelength latch: new cases regress/probe-latch-tran, regress/probe-latch-dc, err/probe-wl-invalid; gtest list (Probe.Latch*, Probe.SelectedWavelengthIsTheOnlyOneTraced, Probe.TestbenchProbeTracesEveryWavelength, TraceTable.DiscardDropsTheRowOfTheCurrentTimeStep)"
   }
  ]
 }

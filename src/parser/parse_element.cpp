@@ -1107,7 +1107,22 @@ sc_module *ProbeElement::create(ParseTreeCreationHelper &pt_helper) const
         else if (kw == "PHASE" || kw == "PHI")
             obj->m_trace_phase = p.second.as_boolean();
         else if (kw == "WAVELENGTH" || kw == "WL")
-            obj->m_trace_wavelength = p.second.as_boolean();
+        {
+            // wl=<wavelength> (a real other than 0 and 1, e.g. 1.55e-6): the only wavelength traced
+            // (PD5); wl=0|1|true|false, as before: whether the wavelength is traced
+            if (p.second.type == Variable::DOUBLE && p.second.num != 0 && p.second.num != 1)
+            {
+                if (!(p.second.num > 0) || !isfinite(p.second.num))
+                {
+                    cerr << "Error (" << name << "): " << p.first << "=" << p.second.get_str()
+                         << " is not a wavelength (a positive value in m, e.g. 1.55e-6)" << endl;
+                    exit(1);
+                }
+                obj->m_wavelength_m = p.second.num;
+            }
+            else
+                obj->m_trace_wavelength = p.second.as_boolean();
+        }
         else {
             cerr << name << ": unknown keyword: " << p.first << endl;
             exit(1);

@@ -1,4 +1,5 @@
 #include <ios>
+#include <iterator>
 #include "devices/probe.h"
 #include "trace_table.h"
 
@@ -31,35 +32,137 @@ void Probe::on_port_in_changed()
         // Wait for a new input signal, or for the probe to be enabled
         wait();
 
-        // While disabled (e.g. during the OP of a .tran), ignore the input events. Once enabled,
-        // sample the current value of the net, whether or not it changed in the meantime (B-048)
+        auto &s = p_in->read();
+
+        // While disabled (e.g. during the OP of a .tran), ignore the input events; a latching probe
+        // keeps the last value of each wavelength, without tracing it (PD5, as MLPROBE: B-184)
         if (!enable.read().to_bool())
         {
-            wait(enable.posedge_event());
+            if (m_latch_mode != LATCH_OFF && p_in->event() && !isDefaultSignal(s))
+                m_disabled_samples[s.getWavelength()] = s;
+            continue;
         }
-
-        auto &s = p_in->read();
 
         // Sampled because the probe was enabled (the net did not change in this delta) and the
         // net was never written: nothing to trace (B-048)
-        if (!p_in->event() && isDefaultSignal(s))
-            continue;
+        const bool sampled = p_in->event() || !isDefaultSignal(s);
 
-        // cout << name() << ": " << s << endl;
-        if (!isnan(s.getWavelength()))
+        // Just enabled: sample the current value of the net, whether or not it changed in the
+        // meantime (B-048). A latching probe latches among the wavelengths kept while disabled, the
+        // current value of the net being the last one of its wavelength
+        if (enable.posedge() && m_latch_mode != LATCH_OFF)
         {
-            if (m_trace_power)
-                m_trace_sig_power.write(s.power());
-            if (m_trace_modulus)
-                m_trace_sig_modulus.write(s.modulus());
-            if (m_trace_phase)
-                m_trace_sig_phase.write(s.phase());
-            if (m_trace_wavelength)
-                m_trace_sig_wavelength.write(s.getWavelength());
-            if (m_table)
-                m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
+            if (sampled)
+                m_disabled_samples[s.getWavelength()] = s;
+            latchAtEnable();
+            continue;
+        }
+
+        if (sampled && accept(s))
+            traceSample(s);
+    }
+}
+
+void Probe::traceSample(const OpticalSignal &s)
+{
+    // cout << name() << ": " << s << endl;
+    if (!isnan(s.getWavelength()))
+    {
+        if (m_trace_power)
+            m_trace_sig_power.write(s.power());
+        if (m_trace_modulus)
+            m_trace_sig_modulus.write(s.modulus());
+        if (m_trace_phase)
+            m_trace_sig_phase.write(s.phase());
+        if (m_trace_wavelength)
+            m_trace_sig_wavelength.write(s.getWavelength());
+        if (m_table)
+            m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
+    }
+}
+
+void Probe::latch(const OpticalSignal &s)
+{
+    m_latched_wavelength_m = s.getWavelength();
+    m_latched_wavelength_id = s.m_wavelength_id;
+    m_latch_time = sc_time_stamp();
+    m_latch_final = false;
+}
+
+void Probe::noteIgnored(double wavelength_m, double traced_m)
+{
+    if (isnan(m_ignored_wavelength_m))
+    {
+        m_ignored_wavelength_m = wavelength_m;
+        m_traced_when_ignored_m = traced_m;
+    }
+}
+
+// The probe was just enabled: with wl=, trace that wavelength if the net carried it; else latch the
+// smallest wavelength the net carried while the probe was disabled (none: the first time step that
+// brings any decides, accept())
+void Probe::latchAtEnable()
+{
+    m_latched_wavelength_m = std::numeric_limits<double>::quiet_NaN();
+    m_latch_final = false;
+    if (!isnan(m_wavelength_m))
+    {
+        for (const auto &p : m_disabled_samples)
+        {
+            if (p.first == m_wavelength_m)
+                traceSample(p.second);
+            else
+                noteIgnored(p.first, m_wavelength_m);
         }
     }
+    else if (!m_disabled_samples.empty())
+    {
+        const auto first = m_disabled_samples.begin();
+        latch(first->second);
+        m_latch_final = true;
+        traceSample(first->second);
+        if (m_disabled_samples.size() > 1)
+            noteIgnored(std::next(first)->first, m_latched_wavelength_m);
+    }
+    m_disabled_samples.clear();
+}
+
+bool Probe::accept(const OpticalSignal &s)
+{
+    const double wl = s.getWavelength();
+    // wl=: that wavelength only
+    if (!isnan(m_wavelength_m))
+    {
+        if (wl == m_wavelength_m)
+            return true;
+        noteIgnored(wl, m_wavelength_m);
+        return false;
+    }
+    if (m_latch_mode == LATCH_OFF)
+        return true;
+
+    const sc_time now = sc_time_stamp();
+    // First sample (of the run, or of this analysis point): latched
+    if (isnan(m_latched_wavelength_m) || (m_latch_mode == LATCH_PER_TIME_STEP && now != m_latch_time))
+    {
+        latch(s);
+        return true;
+    }
+    if (wl == m_latched_wavelength_m)
+        return true;
+    // A smaller wavelength in the time step of the latch replaces the latched one, whose sample of
+    // this time step leaves the table (the VCD only records the end of the time step)
+    if (wl < m_latched_wavelength_m && now == m_latch_time && !m_latch_final)
+    {
+        const double previous = m_latched_wavelength_m;
+        if (m_table)
+            m_table->discard(now.to_seconds(), m_table_signal, m_latched_wavelength_id);
+        latch(s);
+        noteIgnored(previous, wl);
+        return true;
+    }
+    noteIgnored(wl, m_latched_wavelength_m);
+    return false;
 }
 
 void Probe::setTraceTable(TraceTable *table)
