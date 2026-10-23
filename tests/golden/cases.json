@@ -4289,6 +4289,25 @@
    "note": "F-03: a wavelength outside the data range is an error, with the range"
   },
   {
+   "id": "err/spar-bad-delay-per",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/spar-bad-delay-per.cir"
+   ],
+   "note": "PF03c: delay_per=\"input\" is rejected (expected path or output)"
+  },
+  {
    "id": "err/spar-bad-ports",
    "setup": {
     "copy": [

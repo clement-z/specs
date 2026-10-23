@@ -124,6 +124,7 @@
   "err/f28-maxiter-small",
   "err/f28-options-maxiter-fraction",
   "err/f28-options-maxiter-negative",
+  "err/spar-bad-delay-per",
   "err/spar-bad-ports",
   "err/spar-missing-file",
   "err/spar-net-count",
@@ -529,6 +530,12 @@
    "only": "^(cir/spar-add-drop-ring|regress/spar-ring-tran|regress/spar-ring-tran-output|regress/spar-grid-warning|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-190 (PF03c item 2): delay-removed re/im interpolation near nulls; out at 1.55 um in the four ring cases (~1e-12); new gtest"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T18:19:41Z",
+   "only": "^err/spar-bad-delay-per$",
+   "gtest": false,
+   "note": "PF03c: new case, invalid delay_per value"
   }
  ]
 }
