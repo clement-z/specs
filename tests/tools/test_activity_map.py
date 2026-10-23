@@ -32,6 +32,32 @@ def run(cmd, cwd):
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
 
 
+def check_field(tool):
+    """Background field: close to a device's activity next to it, 0 far from every device, and a point
+    between two close devices lies between the two activities."""
+    import importlib.util
+    import numpy as np
+    spec = importlib.util.spec_from_file_location("activity_map_tool", tool)
+    am = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(am)
+    width = 100.0
+    sigma = am.field_sigma([width, width, width], 0.5)
+    check(abs(sigma - 50.0) < 1e-9, "field_sigma(width 100, spread 0.5) = %g, expected 50" % sigma)
+    # Two devices (activities 10 and 0) 150 apart, a third (activity 10) 1500 further on.
+    centers, acts = [(0.0, 0.0), (150.0, 0.0), (1650.0, 0.0)], [10.0, 0.0, 10.0]
+    bbox = (-100.0, -50.0, 1750.0, 50.0)
+    grid = am.field_grid(centers, acts, bbox, sigma, 10.0, np)
+    ny, nx = grid.shape
+
+    def at(x):
+        return grid[ny // 2, int(round((x - bbox[0]) / (bbox[2] - bbox[0]) * (nx - 1)))]
+
+    check(at(0.0) > 0.8, "field next to a device is %.3f, expected close to 1" % at(0.0))
+    check(0.0 < at(75.0) < at(0.0), "field between close devices is %.3f" % at(75.0))
+    check(at(900.0) < 1e-6, "field far from every device is %.2g, expected 0" % at(900.0))
+    check(float(grid.max()) <= 1.0, "field above 1 on the colour scale")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--specs", required=True)
@@ -124,6 +150,13 @@ def main():
                 check("suppressed / processed" in text, "SVG has no suppression colorbar label")
             if os.path.exists(png):
                 check(open(png, "rb").read(8) == b"\x89PNG\r\n\x1a\n", "PNG signature wrong")
+            # Option --field-spread: accepted, and a non-positive value is a usage error (exit 2).
+            r = run([sys.executable, "-I", tool, cj, sj, "-o", "traces/spread", "--format", "png",
+                     "--field-spread", "1.5"], tmp)
+            check(r.returncode == 0, "--field-spread 1.5: exit code %d: %s" % (r.returncode, r.stderr))
+            r = run([sys.executable, "-I", tool, cj, sj, "-o", "traces/spread", "--field-spread", "0"], tmp)
+            check(r.returncode == 2, "--field-spread 0: exit code %d, expected 2" % r.returncode)
+            check_field(tool)
     return finish()
 
 
