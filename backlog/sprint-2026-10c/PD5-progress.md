@@ -56,8 +56,8 @@ Heartbeat: `abc26e04` (PD5F-heartbeat). Marker: `PD5-FOLLOWUP.md`.
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| F1 | remove the PROBE `wl=<wavelength>` selection (maintainer: no selection keyword in v0.3.0); `wl`/`wavelength` back to the e5d6c21 boolean parsing | todo | | |
-| F2 | backlog item for the `.dc` limit (unchanged nets are not rewritten between points) | todo | | |
+| F1 | remove the PROBE `wl=<wavelength>` selection (maintainer: no selection keyword in v0.3.0); `wl`/`wavelength` back to the e5d6c21 boolean parsing | done | 1f44df4 | as predicted (incl. the two own latch cases, probe2 removed, proof: outputs = old minus PROBE2); strict 232/232; counters same; clang/asan-gcc vs gated tip: only the 2 latch cases; asan-clang 12/12 |
+| F2 | backlog item for the `.dc` limit (unchanged nets are not rewritten between points) | done | ddd59de | B-185, open, needs-design |
 
 Predicted golden impact of F1 (written before the change):
 - `err/probe-wl-invalid` removed (netlist, case, baseline directory, manifest case list);

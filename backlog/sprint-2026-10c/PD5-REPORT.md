@@ -177,3 +177,51 @@ exited 0.
   `probe_vs_mlprobe.py`, `vcdcmp.py`, `bench.py`.
 - Worktrees `/tmp/pd5-wt/{base,instr,item1,item2,final}` (detached, local only): not needed for the merge, the
   coordinator can remove them (`git worktree remove`).
+
+## Follow-up (after the gate, maintainer decisions)
+
+Two decisions applied on `ws/probes` as separate commits. They supersede the parts above that describe the PROBE
+`wl=<wavelength>` selection (decision 2 of "Decisions I had to take", the `wl=` lines of item 2, the gtest
+`Probe.SelectedWavelengthIsTheOnlyOneTraced`, the golden case `err/probe-wl-invalid`). Prediction written first
+in `PD5-progress.md` (d145ceb).
+
+| # | Decision | Commit | Golden impact |
+|---|---|---|---|
+| F1 | No PROBE wavelength selection keyword in v0.3.0: `wl`/`wavelength` keeps only its boolean meaning | 1f44df4 | `err/probe-wl-invalid` removed; gtest list; `regress/probe-latch-tran`, `regress/probe-latch-dc` re-recorded (see below) |
+| F2 | The `.dc` limit as a backlog item: B-185 (open, needs-design) | ddd59de | none |
+
+### F1 (1f44df4)
+- **Parsing:** PROBE's `wl` / `wavelength` keyword is parsed exactly as on e5d6c21 (`as_boolean()`), so a value
+  other than 0/1 means "trace the wavelength". Checked: `wl=-1.55e-6`, `wl=1.56e-6` and `wl=0` give the same exit
+  status, stdout and traced variables as e5d6c21.
+- **Removed:** `Probe::m_wavelength_m` and its code paths (`accept()`, `latchAtEnable()`), the gtest
+  `Probe.SelectedWavelengthIsTheOnlyOneTraced`, and the golden case `err/probe-wl-invalid` (netlist, baseline
+  directory, manifest case list; its `rerecords` history entries are kept).
+- **Kept:** the latch, its warnings and B-184.
+- **Docs:** `doc/netlist.md` says to use MLPROBE for a given wavelength (no selection keyword on PROBE); the
+  CHANGELOG entry is reworded.
+- **Beyond the coordinator's predicted list** (stated before the change): my two new cases
+  `regress/probe-latch-tran` and `regress/probe-latch-dc` each had a `probe2 ... wl=<wavelength>` that only
+  exercised the selection. They change whatever is done, because `wl=1.56e-6` is "true" again. I removed
+  `probe2` from both netlists and re-recorded only these two cases. Proof (`/tmp/pd5/scripts/fuproof.py`, old vs
+  new recording):
+  - the VCD, CSV and stderr equal the previous ones minus every `PROBE2` signal (4), row and warning line;
+  - stdout differs only in the parse listing (PROBE2's line, the element count, the reader count of `m`);
+  - the run manifest differs only in the netlist hash.
+- **Results** (tip 1f44df4, snapshot `/tmp/pd5-wt/fu`):
+  - gcc: `meson test` 12/12; strict golden 232/232 (231 `specs` cases + gtest, 119 tests);
+  - counters: 228 same vs e5d6c21, 231 same vs the gated tip (15a36c3);
+  - clang and asan-gcc, strict recordings vs the gated tip: 229 identical, only `regress/probe-latch-tran` and
+    `regress/probe-latch-dc` differ. Vs e5d6c21: as at the gate, only the two predicted latch re-records. The 5
+    new or re-recorded cases are strict against the gcc baseline on both;
+  - `pixi run test asan-clang`: 12/12, no sanitizer message.
+
+### F2 (ddd59de)
+`backlog/B-185-dc-unchanged-nets-not-rewritten-between-points.md` and its `backlog.md` row (low, bug, M,
+needs-design, open). In a `.dc`, a net whose value does not change between points is not written again, so a
+probe sees a non-swept wavelength only at the first point. Evidence `regress/probe-latch-dc`, documented in
+`doc/netlist.md` (now pointing to B-185); fix options (a) to (c).
+
+### Found, not done (updated)
+- The "`wl` keyword overload" item above is resolved by F1.
+- The `.dc` limit is now B-185.
