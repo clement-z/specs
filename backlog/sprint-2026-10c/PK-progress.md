@@ -6,8 +6,8 @@ Decision: "Before v0.4.0 (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`.
 | Item | Status | Commit | Notes |
 |---|---|---|---|
 | 0. Baseline (before) | done | — | `pixi run test gcc` 16 OK, run-table SKIP (77); strict golden 275/275. Before binaries (gcc, clang, asan-gcc) built from 22714f2 in `/tmp/PK-wt/before` |
-| 1. B-189 negative/non-finite CWSRC power | done | 634c886 | new case `err/b189-cwsrc-negative-power` as predicted; strict 276/276; asan-clang: see below |
-| 2. B-193 run-table test in CI and pixi | todo | | |
+| 1. B-189 negative/non-finite CWSRC power | done | 634c886 | new case `err/b189-cwsrc-negative-power` as predicted; strict 276/276; asan-clang 17/17 OK, no sanitizer message |
+| 2. B-193 run-table test in CI and pixi | done | a8b4721 | numpy+pandas in the pixi default env (lock: additions only) and pip in CI; run-table OK in gcc and asan-clang; golden unchanged |
 | 3. B-191 long netlist lines | todo | | |
 | 4. B-192 value files resolved like `.include` | todo | | |
 | 5. Remove legacy CROW testbench | todo | | |
