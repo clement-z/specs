@@ -87,8 +87,6 @@ public:
         , m_trace_phase(trace_phase)
         , m_trace_wavelength(trace_wavelength)
     {
-        SC_HAS_PROCESS(Probe);
-
         SC_THREAD(on_port_in_changed);
         // Also woken when the probe is enabled, to sample the current value of its net (B-048)
         sensitive << p_in << enable.posedge_event();
@@ -169,8 +167,6 @@ public:
         , m_Tf(nullptr)
         , m_lambdas(lambdas)
     {
-        SC_HAS_PROCESS(MLambdaProbe);
-
         SC_THREAD(on_port_in_changed);
         // Also woken when the probe is enabled, to sample the current value of its net (B-048)
         sensitive << p_in << enable.posedge_event();

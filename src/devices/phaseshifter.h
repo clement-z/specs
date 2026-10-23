@@ -97,8 +97,6 @@ public:
         : PhaseShifterBase(name, attenuation_dB)
         , m_out_writer("out_delayed_writer", p_out)
     {
-        SC_HAS_PROCESS(PhaseShifterUni);
-
         SC_METHOD(on_port_in_changed);
         sensitive << p_in;
         dont_initialize();
@@ -181,8 +179,6 @@ public:
         , m_p0_writer("p0_out_delayed_writer", p0_out)
         , m_p1_writer("p1_out_delayed_writer", p1_out)
     {
-        SC_HAS_PROCESS(PhaseShifterBi);
-
         SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
         dont_initialize();

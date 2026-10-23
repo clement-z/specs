@@ -48,7 +48,6 @@ public:
     ReadoutRecorder(sc_module_name name)
         : sc_module(name)
     {
-        SC_HAS_PROCESS(ReadoutRecorder);
         SC_METHOD(on_change);
         sensitive << p_in;
         dont_initialize();

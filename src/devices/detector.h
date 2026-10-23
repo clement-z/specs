@@ -109,7 +109,6 @@ public:
         , m_noiseBypass(noiseBypass)
         , m_sampling_time(sampling_time)
     {
-        SC_HAS_PROCESS(Detector);
         enable = sc_logic(1);
 
         SC_THREAD(on_port_in_changed);

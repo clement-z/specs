@@ -138,8 +138,6 @@ public:
         : WaveguideBase(name, length_cm, attenuation_dB_cm, neff, ng, D)
         , m_out_writer("out_delayed_writer", p_out)
     {
-        SC_HAS_PROCESS(WaveguideUni);
-
         SC_METHOD(on_port_in_changed);
         sensitive << p_in;
         dont_initialize();
@@ -199,8 +197,6 @@ public:
         , m_p0_out_writer("p0_out_delayed_writer", p0_out)
         , m_p1_out_writer("p1_out_delayed_writer", p1_out)
     {
-        SC_HAS_PROCESS(WaveguideBi);
-
         SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
         dont_initialize();

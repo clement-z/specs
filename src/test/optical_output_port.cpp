@@ -532,7 +532,6 @@ public:
         : sc_module(name)
         , m_out_writer("out_writer", p_out)
     {
-        SC_HAS_PROCESS(PendingHarness);
         p_out(out);
         auto config = make_shared<OpticalOutputPortConfig>();
         m_out_writer.setConfig(config);
