@@ -44,15 +44,19 @@ convention and what the device does with the data.
   The choice is made per interval, so S stays continuous; at a grid point the file's value is used as is.
   The threshold 0.07 was chosen from the error between grid points of exported devices (PF03b report): the
   add-drop ring of `circuits/add_drop.cir` on a 0.05 nm grid, evaluated between its points, is within 4e-4
-  (linear) or 1e-4 (pchip) of the circuit where |S| >= 0.1, and within 6e-4 (linear and pchip) at its
+  (linear) or 1e-4 (pchip) of the circuit where |S| >= 0.1, and within 6e-4 (linear) or 1e-4 (pchip) at its
   through-port null at 1.55 um, where magnitude/phase interpolation alone gave 0.020 and 0.015
   (`tests/sparam/test_sparam.py`, round-trip/between-points); with the delay removed, the results are the same
   for thresholds from 0.03 to 0.1. Measured between the grid points of exports (PF03c report), the delay
   removal takes an unbalanced MZI sampled 28 times per free spectral range from 0.023 to 0.0016 (linear) and
   the ring from 9.7e-4 to 5.4e-4; delay lines, the SiEPIC coupler and smooth dispersive paths are unchanged
-  (no interval near a null). With `interp=pchip` the magnitude/phase intervals are as without delay removal
-  (PCHIP on the detrended phase would help the MZI more, 0.0035 instead of 0.016, but degrades smooth
-  dispersive paths: PF03c report). The grid must be fine enough for the phase to
+  (no interval near a null). With `interp=pchip` the slopes of magnitude and phase are computed per run of
+  consecutive magnitude/phase intervals, the runs broken at the real/imaginary ones (a run of two points
+  gets the secant): next to a null the phase's secant is large, and slopes taken across it bent the cubics
+  of the neighbouring intervals (the MZI: 0.0165 between points with slopes over the whole grid, 9.2e-4 per
+  run; the ring 6.3e-4 and 2.1e-4; an entry without real/imaginary intervals is unchanged; SPAR-discussion-2
+  in `backlog/sprint-2026-10c`). Linear stays the default, as in HSPICE, ADS and scikit-rf. The grid must be
+  fine enough for the phase to
   change by less than pi between two points (else the unwrapping, and the group delay, are wrong), and to
   resolve the device's features: see "Grid check".
 - **Range.** A wavelength outside the data range is an error, with the range in the message (relative
@@ -64,14 +68,19 @@ convention and what the device does with the data.
   form gives it or derives it from its phase polynomial.
 - **Grid check.** When a tabulated file is loaded, each entry the device uses (unidirectional: from an input
   to an output) is checked at each interior grid point: S interpolated there from the grid without that
-  point (leave-one-out, with the device's own interpolation above) is compared with the file's value. When
+  point (leave-one-out, with the device's own interpolation above; real and imaginary parts when the device
+  uses them on either of the two intervals around the point, so the check describes the interpolant of the
+  actual grid: deciding on the doubled interval would take the delay-removed rotation of two steps for a
+  null and warn on resolved dispersive paths, e.g. a group delay of 1 +- 4 ps on a 0.5 nm grid) is
+  compared with the file's value. When
   the largest difference exceeds 0.02 (field), one warning per device names the path, the wavelength and the
   difference: the grid does not resolve a feature there (a resonance or a null narrower than the spacing),
   so the values between those points and the group delays near them are unreliable. Leaving a point out
   doubles the spacing, so 0.02 stands for about 0.005 between the points of the actual grid. A delay line
   gives 1e-12, the SiEPIC broadband coupler (`tests/sparam/data/siepic`) 0.0024, the add-drop ring on a
   0.05 nm grid 0.0021 and an unbalanced MZI sampled 28 times per free spectral range 0.0064 (no warning;
-  0.043 with `interp=pchip`, a warning); the ring on a 1 nm grid gives 0.71 (a warning). Before the delay
+  with `interp=pchip` 0.0059, 0.043 before its slopes were taken per run); the ring on a 1 nm grid gives
+  0.71 (a warning). Before the delay
   removal (B-190) the MZI gave 0.11 and the ring 0.0039. The check tests S, not the group delay: the ring's
   through-port null, whose phase turns within about 4 pm, passes on the 0.05 nm grid (S between the points
   is within 6e-4 there) while its group delay is not resolved (-37 ps instead of -621 ps); so do the MZI's
@@ -169,19 +178,6 @@ or by 1-based index, in the order of the element's nets.
   delay that is rounded badly (B-014) gives one warning per device in `.tran`; a `delay=<seconds>` that
   rounds to 0 time steps is an error, like a waveguide's length. Cost: one entry in the device's timed queue
   per delayed path and input event.
-- **One delay per output** (`delay_per="output"`; default `"path"`, above): the device keeps no delayed
-  copies; an input event recomputes each output it reaches, `b_j = sum_i S[j][i] a_i` from the latest
-  inputs, and writes it after the delay of that output: with `delay=auto`, per output and wavelength, the
-  group delay of the path with the largest |S| into the output (the first one if several are equal), lit or
-  not. The steady state is the same; in a transient, the light of the other paths into an output leaves
-  with that path's delay (in the add-drop ring at its through-port null, `in`'s light leaves `out` with
-  the drop path's delay, 1.72 ps, instead of at once: golden cases `regress/spar-ring-tran` and
-  `regress/spar-ring-tran-output`). The output port's pending writes carry the delays. `delay=none` and
-  `delay=<seconds>` give the same outputs in both modes (with a fixed delay, a write leaves one delta cycle
-  earlier than with `"path"`, which can only change the order of the rows of one time in a trace). A
-  negative delay of the path that gives an output its delay is reported once, when the output is first
-  written, and makes every write to that output undelayed. Cost (PF03c report; ring, both inputs lit, 2 x
-  200000 events): user time 5-10 % lower than `"path"`, same memory.
 - Negative group delay (`delay=auto`): a passive device can have one (the through port of an undercoupled
   ring near resonance; the finite-difference noise of a constant phase), but it only describes pulses whose
   spectrum fits inside the phase feature, and the front of a signal is never advanced: it is **replaced by 0**

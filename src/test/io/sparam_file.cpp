@@ -333,6 +333,27 @@ TEST(SParamFile, GridCheckFlagsANullNarrowerThanTheGrid)
         EXPECT_LT(d->gridCheck(1, 0).error, 1e-12);
         EXPECT_FALSE(d->nearFlaggedGridPoint(1, 0, c / (f0 + 5.5 * df)));
     }
+    // PF03d: a dispersive line resolved by its grid (|S| 0.9, group delay 1 +- 4 ps over 1.5-1.6 um, 201 points,
+    // up to 1.8 rad per point; within 0.0018 between the points) passes: 0.0071. The re/im decision is taken on
+    // the two actual intervals around the point; on the doubled interval the segment test took the rotation
+    // of two steps (with the delay removed) for a null and gave 0.88 (linear), a false warning
+    {
+        const double f1 = c / 1.6e-6, band = c / 1.5e-6 - f1, fc = f1 + 0.5 * band;
+        auto line = [&](double f) {
+            const double x = f - fc;
+            return std::polar(0.9, 2 * M_PI * (1e-12 * x + 4e-12 * x * x / band));
+        };
+        std::ostringstream text;
+        text.precision(17);
+        text << "('2','TE',1,'1',1,'transmission')\n(201,3)\n";
+        for (int k = 0; k <= 200; ++k)
+        {
+            const double f = f1 + k * band / 200;
+            text << f << " " << std::abs(line(f)) << " " << std::arg(line(f)) << "\n";
+        }
+        for (auto interp : {SParamData::INTERP_LINEAR, SParamData::INTERP_PCHIP})
+            EXPECT_LT(parse(text.str(), "x.sparam", SParamData::CONVENTION_AUTO, interp)->gridCheck(0, 1).error, 0.01);
+    }
     // not applicable to the Taylor form
     auto taylor = parse("specs-taylor 1\nports in out\ncenter 1.55e-6\nrange 1.5e-6 1.6e-6\nS out in amp 0.9\n"
                         "S out in phase 0 1e9\n", "x.taylor");
@@ -384,9 +405,11 @@ TEST(SParamFile, DelayRemovedInterpolationOfARotatingPathWithNulls)
         }
         else
         {
-            // PCHIP keeps magnitude and phase away from the nulls as before: 0.0127 (0.018 without), leaving
-            // a point out 0.035 (0.092)
-            EXPECT_LT(worst, 0.015) << "pchip";
+            // PCHIP: magnitude/phase slopes per run between the re/im intervals (PF03d), 0.0019 (0.0127 with
+            // slopes over the whole grid, whose phase secants next to the nulls bent the neighbouring
+            // cubics; 0.018 without the delay removal); leaving a point out 0.0055 (0.035, 0.092)
+            EXPECT_LT(worst, 0.003) << "pchip";
+            EXPECT_LT(d->gridCheck(0, 1).error, 0.01) << "pchip";
         }
     }
 }

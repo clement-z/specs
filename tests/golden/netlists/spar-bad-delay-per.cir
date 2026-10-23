@@ -1,4 +1,0 @@
-* PF03c: delay_per accepts "path" or "output" only
-cwsrc1 in wl=1.55e-6 power=1
-spar1 in out file="../../sparam/fixtures/wg.sparam" delay_per="input"
-.op

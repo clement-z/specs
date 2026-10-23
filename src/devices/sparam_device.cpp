@@ -87,8 +87,6 @@ void SParamDeviceBase::print_initialization()
     else
         cout << m_delay_s << " s";
     cout << endl;
-    if (!m_per_path_delays)
-        cout << "delay_per = output" << endl;
     for (size_t i = 0; i < p_in.size(); ++i)
         cout << port_channel_name(*p_in[i]) << " --> port " << m_data->portNames()[m_port_map[m_input_nets[i]]] << endl;
     for (size_t k = 0; k < p_out.size(); ++k)
@@ -131,16 +129,11 @@ void SParamDeviceBase::reportNegativeDelay(size_t k, size_t i, double wavelength
     const size_t out = m_port_map[m_output_nets[k]], in = m_port_map[m_input_nets[i]];
     cerr << "Warning (" << name() << "): negative group delay " << tau_s << " s from port '"
          << m_data->portNames()[in] << "' to port '" << m_data->portNames()[out] << "' at " << wavelength_m
-         << " m in the S-parameters, 0 used";
-    if (!m_per_path_delays)
-        cerr << " for every path into port '" << m_data->portNames()[out] << "' (delay_per=\"output\": "
-             << "the delay of its largest path)";
-    cerr << " (reported once per path)";
+         << " m in the S-parameters, 0 used (reported once per path)";
     if (m_data->nearFlaggedGridPoint(out, in, wavelength_m))
         cerr << "; it comes from grid points where the grid is too coarse (see the grid warning): "
              << "probably an artefact of the grid";
-    cerr << (m_per_path_delays ? ". The path acts" : ". The output acts")
-         << " as a connection without delay, also inside a feedback loop (nothing else "
+    cerr << ". The path acts as a connection without delay, also inside a feedback loop (nothing else "
          << "reports a loop without delay)" << endl;
 }
 
@@ -183,23 +176,6 @@ SParamDeviceBase::WavelengthEntry SParamDeviceBase::computeEntry(const OpticalSi
     e.delay.assign(no * ni, SC_ZERO_TIME);
     e.negative_delay_s.assign(no * ni, 0);
     for (size_t k = 0; k < no; ++k)
-    {
-        if (m_delay_mode == DELAY_AUTO && !m_per_path_delays && !m_sources[k].empty())
-        {
-            // delay_per="output": the delay of the largest path into the output (the first one if several
-            // are equal), for every path into it
-            size_t best = m_sources[k][0];
-            for (size_t i : m_sources[k])
-                if (abs(e.S[k * ni + i]) > abs(e.S[k * ni + best]))
-                    best = i;
-            const double tau = m_data->groupDelay(m_port_map[m_output_nets[k]], m_port_map[m_input_nets[best]], wl);
-            const sc_time delay = autoDelay(tau);
-            for (size_t i : m_sources[k])
-                e.delay[k * ni + i] = delay;
-            if (tau < 0)
-                e.negative_delay_s[k * ni + best] = tau;
-            continue;
-        }
         for (size_t i : m_sources[k])
         {
             if (m_delay_mode == DELAY_FIXED)
@@ -212,17 +188,16 @@ SParamDeviceBase::WavelengthEntry SParamDeviceBase::computeEntry(const OpticalSi
                     e.negative_delay_s[k * ni + i] = tau;
             }
         }
-    }
     return e;
 }
 
-void SParamDeviceBase::writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e, const sc_time &delay)
+void SParamDeviceBase::writeOutput(size_t k, uint32_t wavelength_id, const WavelengthEntry &e)
 {
     const size_t ni = p_in.size();
     OpticalSignal::field_type out = 0;
     for (size_t i : m_sources[k])
         out += e.S[k * ni + i] * m_copy[k * ni + i][wavelength_id];
-    m_out_writers[k]->delayedWrite(OpticalSignal(out, wavelength_id), delay);
+    m_out_writers[k]->delayedWrite(OpticalSignal(out, wavelength_id), SC_ZERO_TIME);
 }
 
 void SParamDeviceBase::onInput(size_t input, const OpticalSignal &s)
@@ -238,20 +213,6 @@ void SParamDeviceBase::onInput(size_t input, const OpticalSignal &s)
     // once, as the ports would write at once anyway
     const bool timed = !m_out_writers.empty() && m_out_writers[0]->m_mode == OpticalOutputPortMode::EVENT_DRIVEN;
     const size_t ni = p_in.size();
-    if (!m_per_path_delays)
-    {
-        // delay_per="output": the copies are the inputs, each output this input reaches is recomputed and
-        // written after its delay (absolute writes; the port takes care of the delay and of NO_DELAY mode)
-        for (size_t k : m_reach[input])
-        {
-            for (size_t i : m_sources[k])
-                if (e.negative_delay_s[k * ni + i] < 0)
-                    reportNegativeDelay(k, i, s.getWavelength(), e.negative_delay_s[k * ni + i]);
-            m_copy[k * ni + input][wl_id] = s.m_field;
-            writeOutput(k, wl_id, e, e.delay[k * ni + input]);
-        }
-        return;
-    }
     for (size_t k : m_reach[input])
     {
         const size_t path = k * ni + input;
