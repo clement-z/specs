@@ -517,6 +517,12 @@
    "only": "^regress/spar-ring-tran-output$",
    "gtest": false,
    "note": "PF03c item 1: new case, SPAR delay_per=\"output\" (per-output delays, F-03 phase 1)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T17:54:01Z",
+   "only": "^(regress/spar-ring-tran|cir/spar-add-drop-ring)$",
+   "gtest": false,
+   "note": "PF03c item 3: stale header comments of the two netlists corrected; run manifests change by the netlist hash only"
   }
  ]
 }

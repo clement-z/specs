@@ -10,9 +10,9 @@ strict golden 275 passed.
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| 1 | Per-path delays as an option | done | (this commit) | `delay_per="path"|"output"`; vs 48e510f: same timing (below); stress cost below; asan-clang clean |
+| 1 | Per-path delays as an option | done | 7e044eb | `delay_per="path"|"output"`; vs 48e510f: same timing (below); stress cost below; asan-clang clean |
 | 2 | B-190: validate, then fix | validation running (Opus subagent, prototype in /tmp/PF03c-proto) | | |
-| 3 | Stale comments in two golden netlists | todo | | |
+| 3 | Stale comments in two golden netlists | done | (this commit) | manifests: netlist hash only |
 | 4 | Docs | todo | | |
 
 ## Predictions (written before each re-record)
@@ -42,3 +42,9 @@ Item 1 measurements (scripts and runs in /tmp/PF03c-item1):
   1.552 um (4 paths delayed) path 1.04 s, output 0.94 s. Peak RSS ~31 MB both. Port writes 1150033 both; emitted
   1070976 / 1070825 (1.55 um), 1125048 both (1.552 um); pending_max 1 (path) vs 14 / 5 (output). PF03b measured
   1.02 -> 1.63 s on its own stress case (not recorded); my stimulus repeats values more often.
+
+### Item 3 (stale netlist comments), written before the re-record
+- `regress/spar-ring-tran`, `cir/spar-add-drop-ring`: only the netlist's SHA-256 in `traces/delete_me.manifest.json`
+  (the run manifest records path and hash), hence that file's hash in `case.json`. Traces, stdout, stderr unchanged.
+  No other case. Counters unchanged.
+Result of the strict check: as predicted (the two cases, `netlist_files[0].sha256` only).
