@@ -135,6 +135,18 @@ void TraceTable::append(double time_s, uint32_t signal, const OpticalSignal &s)
         m_pending[it->second] = row; // the last sample of the time step wins
 }
 
+void TraceTable::appendZero(double time_s, uint32_t signal, double wavelength_m)
+{
+    if (m_closed)
+        return;
+    if (time_s != m_pending_time_s)
+    {
+        writePending();
+        m_pending_time_s = time_s;
+    }
+    m_pending.push_back({ time_s, signal, wavelength_m, 0.0, 0.0, 0.0 });
+}
+
 void TraceTable::discard(double time_s, uint32_t signal, uint32_t wavelength_id)
 {
     if (m_closed || time_s != m_pending_time_s)

@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/b186-mlprobe-dc-power-sweep-wdm.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 1512,
+   "kind": "text",
+   "sha256": "73769fba60c80fdf00660ce496e32ae41bcd1d8741e1f934060545e3aceaf237",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 517,
+   "kind": "json",
+   "sha256": "47d465bc909157ac9475a87abc71bfd1f257e5ae720a5e4bd56b9699299de0d0",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 2811,
+   "kind": "vcd",
+   "sha256": "b518a2561a267cb3d47fe00bb14c740465f5f3a92b52ee7593036f0d7d87e28d",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b186-mlprobe-dc-power-sweep-wdm"
+}

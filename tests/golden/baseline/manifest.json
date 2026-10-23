@@ -199,6 +199,8 @@
   "regress/b159-crossing-backward",
   "regress/b180-numeric-net-names",
   "regress/b184-mlprobe-tran-start-multilambda",
+  "regress/b186-mlprobe-dc-power-sweep-wdm",
+  "regress/b186-mlprobe-dc-wavelength-sweep",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
@@ -540,6 +542,12 @@
    "only": "^(cir/spar-add-drop-ring|regress/spar-ring-tran|regress/spar-grid-warning)$",
    "gtest": false,
    "note": "B-190 (PF03d item 4): pulse-pair tau0; out at 1.55 um moves by 1.7e-14 (0.05 nm ring) and 1.7e-13 (1 nm file); grid warning 0.707522 at 1.546 um -> 0.704106 at 1.554 um (with item 2's grid check rule)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T22:16:23Z",
+   "only": "^(regress/b186-|gtest/)",
+   "gtest": true,
+   "note": "B-186: MLPROBE records each .dc point (new cases: the repro, a WDM power sweep; new gtest MLambdaProbe.DcPointTracesEveryListedWavelengthOrZero)"
   }
  ]
 }

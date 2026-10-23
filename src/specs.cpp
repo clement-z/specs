@@ -298,9 +298,10 @@ void SPECSConfig::runDCAnalysis()
         probe->enable = sc_logic(1);
     }
 
-    // Disable ML probes
+    // Enable ML probes: each one traces every listed wavelength at each point (B-186)
     for (auto mlprobe: all_mlprobes) {
-        mlprobe->enable = sc_logic(0);
+        mlprobe->enable = sc_logic(1);
+        mlprobe->m_per_point = true;
     }
 
     // Set all ports mode to NO_DELAY. Each sweep point is a fresh steady state (B-003, B-185): after
@@ -356,6 +357,10 @@ void SPECSConfig::runDCAnalysis()
         if (!runFixedPoint())
             reportNonConvergence(what.str(), start_delta);
         checkEventCap(what.str());
+        // The converged value of each listed wavelength, 0 for one not carried at this point (B-186),
+        // traced in this time step: the next sc_start() updates the trace signals before advancing
+        for (auto mlprobe: all_mlprobes)
+            mlprobe->tracePoint();
         sc_start(sc_time::from_value(1));
         checkEventCap(what.str());
 
