@@ -1,0 +1,13 @@
+* The add-drop ring of circuits/add_drop.cir as a subcircuit, for utils/sparam_export.py
+* (tests/sparam/check_ring_export.py). Same couplers and ring waveguides, same parameters; the .assign lines
+* are in the body because top-level parameters are not visible in a subcircuit body.
+.subckt ring in add out drop
+.assign lambda0 = 1.55e-6
+.assign neff = 2.3
+.assign length_2pi = {lambda0}/{neff}
+.assign k = 0.85
+coupler1 in ring_bl out ring_br k={k}
+coupler2 add ring_tr drop ring_tl k={k}
+wg_ring_l ring_tl ring_bl att=2 length=101*{length_2pi} neff={neff} ng=4.3
+wg_ring_r ring_br ring_tr att=2 length=101*{length_2pi} neff={neff} ng=4.3
+.ends ring
