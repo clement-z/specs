@@ -6,7 +6,7 @@ Branch `ws/cleanup3`. Heartbeat id: `837055bd` (delete after the report is commi
 |---|---|---|---|
 | 1 backlog statuses | done | 70fc144 | 3 Sonnet subagents (medium), diffs reviewed; 3 fixed, 13 partly, rest still open |
 | 2 MLPROBE per-event print | done | 5b946f2 | as predicted: no existing case changed; new case regress/b062-mlprobe-unlisted-wavelength; counters identical |
-| 3 SC_HAS_PROCESS | todo | | |
+| 3 SC_HAS_PROCESS | done | 9f31c11 | 38 uses removed; clang warnings 455 -> 4 (pre-existing), gcc 9 -> 9; bit-identical and counters identical on gcc, clang, asan-gcc, asan-clang |
 | 4 B-182 subckt line numbers | todo | | |
 | 5 small items | todo | | |
 | 6 VLSource prints (look only) | todo | | |
@@ -22,3 +22,6 @@ counters `/tmp/pg/stats-before-<tc>`. gcc strict golden: 235/235 pass. `meson te
   Result: as predicted (gcc strict 236/236, counters identical gcc and asan-clang, asan-clang meson test OK).
 - Note: the saved before binaries need `subprojects/systemc-3.0.2/libsystemc.so*` next to them (rpath
   `$ORIGIN/...`); the first before recordings were invalid (exit 127) and were redone.
+- Item 3 (SC_HAS_PROCESS): predicted none (bit-identical, counters identical). Result: as predicted. The before
+  recordings predate item 2, so the comparisons show `regress/b062-...` only (item 2's change; that case equals
+  the committed baseline on all four toolchains).
