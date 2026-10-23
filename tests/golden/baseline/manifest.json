@@ -200,6 +200,7 @@
   "regress/b159-crossing-backward",
   "regress/b180-numeric-net-names",
   "regress/b184-mlprobe-tran-start-multilambda",
+  "regress/b191-long-line-vlsrc",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
@@ -547,6 +548,12 @@
    "only": "^err/b189-",
    "gtest": false,
    "note": "B-189: new case, negative CWSRC power is an error"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T22:21:47Z",
+   "only": "^regress/b191-",
+   "gtest": false,
+   "note": "B-191: new case, a 55 KB netlist line parses"
   }
  ]
 }

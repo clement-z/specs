@@ -96,6 +96,9 @@
 * The run-table test (`tests/tools/test_run_table.py`, `pyspecs/runtable.py`) was always skipped in the pixi builds
   and in CI: numpy and pandas are now in pixi's default environment and installed in the CI jobs that run
   `meson test`; it still skips (exit 77) where they are missing (B-193)
+* A netlist line longer than flex's buffer (16 KB, e.g. a `VLSRC` with 700 or more inline values) failed with
+  `input buffer overflow, can't enlarge buffer because scanner uses REJECT` (exit 2). The scanner no longer uses
+  flex's REJECT, so lines of any length parse; the tokens and error messages are otherwise unchanged (B-191)
 
 ## [0.3.0] - 2026-10-23
 

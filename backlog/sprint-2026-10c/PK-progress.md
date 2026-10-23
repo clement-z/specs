@@ -21,3 +21,14 @@ Decision: "Before v0.4.0 (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`.
   the only negative power, `circuits/subckt_tests.cir`, is a VLSRC value, B-063). Counters: unchanged.
 - B-063 (VLSRC negative power) not included: its fix has an open design question (`circuits/subckt_tests.cir`
   feeds `-2` W and `cir/subckt_tests`/`opt/vci` bake the NaN in; edit the example or clamp, B-135).
+
+### Item 3 (B-191), written before recording
+- Approach: flex's REJECT removed (it also came from the variable trailing contexts `/{EOL}` and `/{WS}*=`).
+  The line rule records the line, gives it back (`yyless(0)`) and the line is scanned again in a twin start
+  condition without that rule; the subcircuit-body REJECTs become appends; trailing contexts fixed-length.
+- Existing cases: none changes (strict 276/276 checked with the new scanner before recording). Differential
+  check of the before/after binaries on 35 edge netlists (CRLF, `.title` forms, continuation lines, no-break
+  spaces, nested subcircuits, last line without EOL, includes, unmatched quotes): identical stdout, stderr and
+  exit codes, except a 30 KB comment line (failed before, parses now).
+- New case `regress/b191-long-line-vlsrc`: exit 0, VCD with 2000 value changes of `PROBE{ROOT/out}`
+  (1 mW / 2 mW alternating every 10 ps), no stderr. Counters: unchanged for the existing cases.

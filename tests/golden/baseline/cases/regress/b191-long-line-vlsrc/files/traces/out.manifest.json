@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b191-long-line-vlsrc.cir", "-o", "traces/out"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b191-long-line-vlsrc.cir", "sha256": "b24bdab8e079b65c7984cdf69821088f4bafbe258d0ff2aef12181bd32a70805"}
+  ],
+  "data_files": [],
+  "trace_file": "traces/out.vcd"
+}

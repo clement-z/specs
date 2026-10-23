@@ -4650,6 +4650,25 @@
    ],
    "expect": "fail",
    "note": "B-189: cwsrc power=-1 is an error at element creation (Error (ROOT/CWSRC1): power must be >= 0 and finite (got -1 W)), exit 1. It reached std::polar(sqrt(-1), ...): SIGABRT with _GLIBCXX_ASSERTIONS (pixi builds), a NaN field otherwise"
+  },
+  {
+   "id": "regress/b191-long-line-vlsrc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b191-long-line-vlsrc.cir",
+    "-o",
+    "traces/out"
+   ],
+   "note": "B-191: a VLSRC with 2000 inline values on one 55 KB line parses (the scanner no longer uses flex's REJECT, so flex grows its buffer); it failed with \"input buffer overflow, can't enlarge buffer because scanner uses REJECT\", exit 2. The VCD has the 2000 values"
   }
  ]
 }
