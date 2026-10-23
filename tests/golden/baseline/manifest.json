@@ -534,6 +534,12 @@
    "only": "^err/spar-bad-delay-per$",
    "gtest": false,
    "note": "PF03c: new case, invalid delay_per value"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T20:48:09Z",
+   "only": "^(cir/spar-add-drop-ring|regress/spar-ring-tran|regress/spar-grid-warning)$",
+   "gtest": false,
+   "note": "B-190 (PF03d item 4): pulse-pair tau0; out at 1.55 um moves by 1.7e-14 (0.05 nm ring) and 1.7e-13 (1 nm file); grid warning 0.707522 at 1.546 um -> 0.704106 at 1.554 um (with item 2's grid check rule)"
   }
  ]
 }

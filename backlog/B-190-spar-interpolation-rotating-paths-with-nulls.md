@@ -35,14 +35,22 @@ devices (field error between grid points, all paths; leave-one-out = grid check)
 - under-resolved (ring k = 0.4 on 0.05 nm, ring on 1 nm): 0.21 -> 0.044 and 0.54 -> 0.54; all still warn.
 
 ## Fix
-`SParamData::removeDelay()`: per entry, tau0 = median of the finite-difference group delays at the grid points
-(immune to the pi steps of the unwrapped phase at nulls, which bias a phase fit or the end-to-end slope to one arm's
-delay), 0 when it turns S by less than 1e-3 rad over the largest step; f_ref = first grid point. Real and imaginary
+`SParamData::removeDelay()`: per entry, tau0 = the pulse-pair estimate arg(sum_k S(k+1) conj S(k)) / (2 pi mean
+step), refined by two Newton steps of g(tau) = sum_k |z_k| sin(arg z_k - 2 pi h_k tau) h_k for non-uniform grids,
+intervals with a step above 3 times the median step left out (PF03d, decision "SPAR second discussion"; it minimises
+the variation of the delay-removed entry and needs no unwrapping; until PF03d the median of the finite-difference
+group delays, which fails with 3 to 5 points around a null; a phase fit or the end-to-end slope is biased to one
+arm's delay by the pi steps of the unwrapped phase at nulls), 0 when it turns S by less than 1e-3 rad over the
+largest step; f_ref = first grid point. Real and imaginary
 parts of S exp(-j 2 pi (f - f_ref) tau0) are interpolated (linear or PCHIP) on the intervals near a null, the delay
 put back; an interval is near a null when |S| at either end (as before) **or the segment between the two
 delay-removed values** comes within 0.07 max|S| of 0. Magnitude/phase intervals unchanged (linear: mathematically
 the same with or without the delay; PCHIP on the detrended phase would give the MZI 0.0035 but degrades smooth
 dispersive paths, 6e-7 -> 1.9e-4: not done, a maintainer option). Grid points, group delays and the grid check's
 threshold unchanged; the grid check uses the same interpolant. Golden: `out` at 1.55 um in the four ring cases
-(~1e-12). Test: gtest `SParamFile.DelayRemovedInterpolationOfARotatingPathWithNulls`.
+(~1e-12). Test: gtest `SParamFile.DelayRemovedInterpolationOfARotatingPathWithNulls`. PF03d (pulse-pair tau0): ring
+0.05 nm through 0.762 -> 0.749 ps, drop 0.806 -> 1.124 ps, its grid check 0.00215 -> 0.00218; `out` at 1.55 um moves
+by 1.7e-14 (`cir/spar-add-drop-ring`, `regress/spar-ring-tran`) and 1.7e-13 on the 1 nm file
+(`regress/spar-grid-warning`, tau0 -0.015 -> 0.623 ps), whose grid warning becomes 0.704106 at 1.554 um (0.707522
+at 1.546 um: the mirror point of the null, with the grid check's re/im decision on the actual intervals).
 

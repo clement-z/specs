@@ -33,8 +33,13 @@ convention and what the device does with the data.
     transmission nulls;
   - near a null, real and imaginary parts **of the entry with its delay taken out** (B-190):
     `S~(f) = S(f) exp(-j 2 pi (f - f_ref) tau0)`, the delay put back after the interpolation. `tau0` is the
-    median of the entry's group delays at the grid points (below), `f_ref` its first grid point; `tau0` is 0
-    when it would turn S by less than 1e-3 rad over the largest grid step. Near a null the phase turns
+    pulse-pair estimate `arg(sum_k S(k+1) conj S(k)) / (2 pi mean step)`, the delay that minimises the
+    variation `sum_k |S~(k+1) - S~(k)|^2` (about the |S|^2-weighted mean group delay; no unwrapping, and the
+    points next to a null barely weigh), refined by two Newton steps for non-uniform grids; intervals whose
+    step exceeds 3 times the median step are left out (across a wide gap the product aliases). `f_ref` is the
+    first grid point; `tau0` is 0 when it would turn S by less than 1e-3 rad over the largest grid step. (Until
+    PF03d `tau0` was the median of the finite-difference group delays, which fails with 3 to 5 points around a
+    null: SPAR-discussion-2 in `backlog/sprint-2026-10c`.) Near a null the phase turns
     quickly and S passes close to 0 along an almost straight line, which magnitude/phase interpolation
     follows badly; on a path that also rotates fast (an unbalanced MZI: two delays), that line is straight
     only once the common delay is taken out. An interval is "near a null" when |S| at either end, or the
@@ -54,7 +59,7 @@ convention and what the device does with the data.
   consecutive magnitude/phase intervals, the runs broken at the real/imaginary ones (a run of two points
   gets the secant): next to a null the phase's secant is large, and slopes taken across it bent the cubics
   of the neighbouring intervals (the MZI: 0.0165 between points with slopes over the whole grid, 9.2e-4 per
-  run; the ring 6.3e-4 and 2.1e-4; an entry without real/imaginary intervals is unchanged; SPAR-discussion-2
+  run; the ring 6.3e-4 and 3.0e-4 at its through-port null, 9.7e-5 where |S| >= 0.1; an entry without real/imaginary intervals is unchanged; SPAR-discussion-2
   in `backlog/sprint-2026-10c`). Linear stays the default, as in HSPICE, ADS and scikit-rf. The grid must be
   fine enough for the phase to
   change by less than pi between two points (else the unwrapping, and the group delay, are wrong), and to
@@ -78,7 +83,7 @@ convention and what the device does with the data.
   so the values between those points and the group delays near them are unreliable. Leaving a point out
   doubles the spacing, so 0.02 stands for about 0.005 between the points of the actual grid. A delay line
   gives 1e-12, the SiEPIC broadband coupler (`tests/sparam/data/siepic`) 0.0024, the add-drop ring on a
-  0.05 nm grid 0.0021 and an unbalanced MZI sampled 28 times per free spectral range 0.0064 (no warning;
+  0.05 nm grid 0.0022 and an unbalanced MZI sampled 28 times per free spectral range 0.0064 (no warning;
   with `interp=pchip` 0.0059, 0.043 before its slopes were taken per run); the ring on a 1 nm grid gives
   0.71 (a warning). Before the delay
   removal (B-190) the MZI gave 0.11 and the ring 0.0039. The check tests S, not the group delay: the ring's
