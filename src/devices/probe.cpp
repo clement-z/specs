@@ -135,18 +135,37 @@ void MLambdaProbe::on_port_in_changed()
         // Wait for a new input signal, or for the probe to be enabled
         wait();
 
-        // While disabled (e.g. during the OP of a .tran), ignore the input events. Once enabled,
-        // sample the current value of the net, whether or not it changed in the meantime (B-048)
+        auto &s = p_in->read();
+
+        // While disabled (e.g. during the OP of a .tran), keep the last value of each listed
+        // wavelength without tracing it (B-184). Unlisted wavelengths are ignored silently
         if (!enable.read().to_bool())
         {
-            wait(enable.posedge_event());
+            if (p_in->event() && !isDefaultSignal(s) && m_lambdas.count(s.getWavelength()))
+                m_disabled_samples[s.getWavelength()] = s;
+            continue;
         }
-
-        auto &s = p_in->read();
 
         // Sampled because the probe was enabled (the net did not change in this delta) and the
         // net was never written: nothing to trace or to report (B-048)
-        if (!p_in->event() && isDefaultSignal(s))
+        const bool sampled = p_in->event() || !isDefaultSignal(s);
+
+        // Just enabled: trace the value of every listed wavelength the net carried while the probe
+        // was disabled (B-184), in wavelength order; the current value of the net (B-048) is the
+        // last one of its wavelength
+        if (enable.posedge())
+        {
+            if (sampled && m_lambdas.count(s.getWavelength()))
+                m_disabled_samples[s.getWavelength()] = s;
+            for (const auto &p : m_disabled_samples)
+                traceSample(p.second);
+            m_disabled_samples.clear();
+            if (sampled && !m_lambdas.count(s.getWavelength()))
+                cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;
+            continue;
+        }
+
+        if (!sampled)
             continue;
 
         // A listed wavelength (the VCD signals only exist with a trace file: without one, e.g. with
@@ -154,18 +173,23 @@ void MLambdaProbe::on_port_in_changed()
         if (m_lambdas.count(s.getWavelength()))
         {
             //cout << name() << " received supported signal (lambda = " << s.getWavelength() << "m)" << endl;
-            auto search = m_lambda_signals.find(s.getWavelength());
-            if (search != m_lambda_signals.end())
-            {
-                search->second[0]->write(s.power());
-                search->second[1]->write(s.modulus());
-                search->second[2]->write(s.phase());
-            }
-            if (m_table)
-                m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
+            traceSample(s);
         }
         else {
             cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;
         }
     }
+}
+
+void MLambdaProbe::traceSample(const OpticalSignal &s)
+{
+    auto search = m_lambda_signals.find(s.getWavelength());
+    if (search != m_lambda_signals.end())
+    {
+        search->second[0]->write(s.power());
+        search->second[1]->write(s.modulus());
+        search->second[2]->write(s.phase());
+    }
+    if (m_table)
+        m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
 }

@@ -107,9 +107,14 @@ public:
 
     std::set<double> m_lambdas;
     std::map< double, std::vector< unique_ptr<sc_signal<double> > > > m_lambda_signals;
+    // While disabled (the OP of a .tran), the last value of each listed wavelength, traced when the
+    // probe is enabled: the net only holds the last value written to it, of any wavelength (B-184)
+    std::map<double, OpticalSignal> m_disabled_samples;
 
     void setTraceFile(sc_trace_file *Tf);
     void setTraceTable(TraceTable *table);
+    // Traces s, of a listed wavelength
+    void traceSample(const OpticalSignal &s);
 
     // Constructor
     MLambdaProbe(sc_module_name name, set<double> lambdas = {})

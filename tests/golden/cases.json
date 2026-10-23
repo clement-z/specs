@@ -3739,6 +3739,27 @@
     "--stats=ports"
    ],
    "note": "F-15: --stats with a -t testbench: traces/crow_tb.stats.json next to its VCD; the two CROW ports bound to signals of the testbench function, destroyed when it returns, have \"net\": null (was a SIGSEGV while resolving them, found by stats-record)"
+  },
+  {
+   "id": "regress/b184-mlprobe-tran-start-multilambda",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b184-mlprobe-tran-start-multilambda.cir"
+   ],
+   "note": "B-184: an MLPROBE on a net that carries two wavelengths during the OP of a .tran traces both from t = 0 (0.5 W each; before: 1560 nm read 0 and had no CSV row)"
   }
  ]
 }

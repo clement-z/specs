@@ -43,6 +43,7 @@
   "IntegerLiteralsDeathTest.LexerRejectsBeyond64Bits": "PASS",
   "MLambdaProbe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "MLambdaProbe.SamplesUnchangedNetWhenEnabled": "PASS",
+  "MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled": "PASS",
   "MLambdaProbe.UndrivenNetPrintsNothingWhenEnabled": "PASS",
   "MergerModel.CoherentSum": "PASS",
   "OpticalOutputPort.DesyncStopsWithoutEmitting": "PASS",

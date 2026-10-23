@@ -1,0 +1,12 @@
+* B-184 regression (repro: backlog/repro/b184-mlprobe-tran-start-multilambda.cir): an MLPROBE traces, at the
+* start of a .tran, the operating-point value of every listed wavelength of its net.
+* Two CW sources at 1.55 and 1.56 um, 1 W each, into a merger (field x 1/sqrt(2) per input); MLPROBE on the
+* merger output for both wavelengths. Expected from t = 0: 0.5 W, 0.707107 sqrt(W) at each wavelength.
+* Before the fix: 1560 nm read 0 for the whole run (no CSV row at 1.56e-06): a net holds the last value
+* written to it, of any wavelength, and the probe sampled only that value when it was enabled.
+cwsrc1 a wl=1.55e-6 power=1
+cwsrc2 b wl=1.56e-6 power=1
+merger1 a b m
+mlprobe1 m wl=[1.55e-6, 1.56e-6]
+.options traceall=0
+.tran 1e-9

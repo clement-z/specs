@@ -2,6 +2,8 @@
 // whether or not the net changed while it was disabled (runTRANAnalysis() disables the probes
 // during the OP and enables them at TRAN start). The TRAN start sequence itself is tested in
 // test/tran_start.cpp.
+// B-184: an MLPROBE also traces, when it is enabled, the last value of every listed wavelength its
+// net carried while it was disabled.
 #include <gtest/gtest.h>
 #include <systemc.h>
 
@@ -233,6 +235,66 @@ TEST(MLambdaProbe, UndrivenNetPrintsNothingWhenEnabled)
         sc_start();
         std::cout << std::flush;
         EXPECT_EQ(testing::internal::GetCapturedStdout(), "mlprobe received unsupported signal (lambda = 1.3e-06m)\n");
+    }
+    SPECS_TEST_FOOTER();
+}
+
+TEST(MLambdaProbe, TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled)
+{
+    SPECS_TEST_HEADER()
+    {
+        setupConfig();
+
+        spx::oa_signal_type net{"net"};
+        MLambdaProbe probe("mlprobe", {1.55e-6, 1.56e-6});
+        probe.p_in(net);
+
+        specsGlobalConfig.prepareSimulation();
+        sc_start(); // initialise the threads
+        probe.enable = sc_logic(0);
+        sc_start();
+
+        // While disabled, the net carries both listed wavelengths, then an unlisted one: nothing
+        // is traced or printed (B-184)
+        testing::internal::CaptureStdout();
+        net.write(OpticalSignal(std::polar(std::sqrt(1e-3), 0.5), 1.55e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(4e-3), 0.25), 1.56e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(2e-3), -0.5), 1.55e-6));
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(3e-3), 0.0), 1.31e-6));
+        sc_start();
+        std::cout << std::flush;
+        EXPECT_EQ(testing::internal::GetCapturedStdout(), "");
+        expectMLProbeTraces(probe, 1.55e-6, 0, 0);
+        expectMLProbeTraces(probe, 1.56e-6, 0, 0);
+
+        // Enabled: the last value of each listed wavelength is traced; the current value of the
+        // net (unlisted) is reported as before (B-048)
+        testing::internal::CaptureStdout();
+        probe.enable = sc_logic(1);
+        sc_start();
+        std::cout << std::flush;
+        EXPECT_EQ(testing::internal::GetCapturedStdout(), "mlprobe received unsupported signal (lambda = 1.31e-06m)\n");
+        expectMLProbeTraces(probe, 1.55e-6, 2e-3, -0.5);
+        expectMLProbeTraces(probe, 1.56e-6, 4e-3, 0.25);
+
+        // ... and every event afterwards, as before
+        net.write(OpticalSignal(std::polar(std::sqrt(5e-3), 1.0), 1.56e-6));
+        sc_start();
+        expectMLProbeTraces(probe, 1.55e-6, 2e-3, -0.5);
+        expectMLProbeTraces(probe, 1.56e-6, 5e-3, 1.0);
+
+        // Disabled and enabled again: the values of the first disabled period are not traced again
+        probe.enable = sc_logic(0);
+        sc_start();
+        net.write(OpticalSignal(std::polar(std::sqrt(6e-3), 0.0), 1.55e-6));
+        sc_start();
+        probe.enable = sc_logic(1);
+        sc_start();
+        expectMLProbeTraces(probe, 1.55e-6, 6e-3, 0.0);
+        expectMLProbeTraces(probe, 1.56e-6, 5e-3, 1.0);
     }
     SPECS_TEST_FOOTER();
 }

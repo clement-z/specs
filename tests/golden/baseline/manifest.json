@@ -170,6 +170,7 @@
   "regress/b156-many-includes",
   "regress/b159-crossing-backward",
   "regress/b180-numeric-net-names",
+  "regress/b184-mlprobe-tran-start-multilambda",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
@@ -302,6 +303,12 @@
    "only": "^regress/f15-wdm-crow-mlprobe$",
    "gtest": false,
    "note": "PD3: new case regress/f15-wdm-crow-mlprobe, recorded with the build before the SC_METHOD conversion (39f1bf9, pixi gcc 15 release)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T00:55:25Z",
+   "only": "^(regress/b184-mlprobe-tran-start-multilambda|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-184: new case (MLPROBE traces every listed wavelength of the OP at .tran start); gtest list: MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled"
   }
  ]
 }
