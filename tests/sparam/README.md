@@ -67,7 +67,7 @@ delays of the drop path match the exact ones within 0.01 ps, those of the throug
 (1.35 instead of 1.44 ps at 0.1 nm); the through-port null itself (its phase turns within about 4 pm) stays
 unresolved (-37 ps instead of -621 ps), see doc/sparam.md.
 
-Grid-adequacy check (doc/sparam.md): the 0.05 nm file **passes** it (worst leave-one-out error 0.0021, on the
+Grid-adequacy check (doc/sparam.md): the 0.05 nm file **passes** it (worst leave-one-out error 0.0022, on the
 through path next to a null, threshold 0.02; 0.0039 before the delay removal of B-190), although its through-port
 null is narrower than the grid. With the mixed interpolation (real and imaginary parts of the delay-removed S near
 nulls) the field between its grid points is within 6e-4 of the circuit everywhere, also at the null; what the grid does not resolve there is the phase feature, hence the group

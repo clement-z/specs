@@ -329,8 +329,13 @@ void SParamData::buildTables(vector<vector<Sample>> &raw, bool conjugate)
         removeDelay(t);
         if (m_interp == INTERP_PCHIP)
         {
-            t.dmag = pchipSlopes(t.f_Hz, t.mag);
-            t.dphase = pchipSlopes(t.f_Hz, t.phase);
+            // magnitude and phase: slopes per run of magnitude/phase intervals, so that the large secants
+            // of the phase next to a null do not bend the cubics of the neighbouring intervals
+            vector<char> reim(m - 1);
+            for (size_t s = 0; s + 1 < m; ++s)
+                reim[s] = realImaginaryInterval(t, s, s + 1);
+            t.dmag = pchipSlopesPerRun(t.f_Hz, t.mag, reim);
+            t.dphase = pchipSlopesPerRun(t.f_Hz, t.phase, reim);
             t.dre = pchipSlopes(t.f_Hz, t.re_d);
             t.dim = pchipSlopes(t.f_Hz, t.im_d);
         }
@@ -421,6 +426,31 @@ vector<double> SParamData::pchipSlopes(const vector<double> &x, const vector<dou
     return d;
 }
 
+vector<double> SParamData::pchipSlopesPerRun(const vector<double> &x, const vector<double> &y, const vector<char> &reim)
+{
+    // each maximal run of consecutive intervals with reim[k] false (points a..b) gets the slopes of its
+    // points alone (two points: the secant); the other points keep 0, used by no interval
+    const size_t n = x.size();
+    vector<double> d(n, 0);
+    size_t a = 0;
+    while (a + 1 < n)
+    {
+        if (reim[a])
+        {
+            ++a;
+            continue;
+        }
+        size_t b = a + 1;
+        while (b + 1 < n && !reim[b])
+            ++b;
+        const vector<double> run = pchipSlopes(vector<double>(x.begin() + a, x.begin() + b + 1),
+                                               vector<double>(y.begin() + a, y.begin() + b + 1));
+        std::copy(run.begin(), run.end(), d.begin() + a);
+        a = b;
+    }
+    return d;
+}
+
 size_t SParamData::segment(const vector<double> &x, double xi)
 {
     const size_t n = x.size();
@@ -458,16 +488,60 @@ double SParamData::evalTable(const vector<double> &x, const vector<double> &y, c
 
 void SParamData::removeDelay(Table &t)
 {
-    // B-190: the delay of the entry, the median of its group delays at the grid points (immune to the
-    // pi steps of the unwrapped phase at nulls, which bias a fit of the phase or its end-to-end slope)
+    // B-190: the delay of the entry, the pulse-pair estimate (SPAR-discussion-2.md, topic 1): the tau that
+    // minimises the variation sum_k |S~(k+1) - S~(k)|^2 of the delay-removed entry, about the
+    // |S|^2-weighted mean of its group delay. It needs no unwrapping, and the products next to a null are
+    // small vectors that barely turn the sum (the pi steps of the unwrapped phase at nulls bias a fit of
+    // the phase; the median of the finite-difference delays failed with 3 to 5 points around a null)
     const size_t m = t.f_Hz.size();
     t.tau0_s = 0;
     t.f_ref_Hz = m > 0 ? t.f_Hz[0] : 0;
     if (m >= 2)
     {
-        vector<double> sorted = t.tau_s;
+        vector<double> steps(m - 1);
+        for (size_t k = 0; k + 1 < m; ++k)
+            steps[k] = t.f_Hz[k + 1] - t.f_Hz[k];
+        vector<double> sorted = steps;
         std::sort(sorted.begin(), sorted.end());
-        t.tau0_s = m % 2 ? sorted[m / 2] : 0.5 * (sorted[m / 2 - 1] + sorted[m / 2]);
+        const size_t n = sorted.size();
+        const double median_step = n % 2 ? sorted[n / 2] : 0.5 * (sorted[n / 2 - 1] + sorted[n / 2]);
+        // z_k = S(k+1) conj S(k) of the intervals used (a gap much wider than the usual step can turn by
+        // more than pi: its product would alias)
+        vector<size_t> used;
+        vector<complex_type> z;
+        complex_type sum = 0;
+        double step_sum = 0;
+        for (size_t k = 0; k + 1 < m; ++k)
+            if (steps[k] <= DELAY_REMOVAL_MAX_STEP_RATIO * median_step)
+            {
+                used.push_back(k);
+                z.push_back(complex_type(t.re[k + 1], t.im[k + 1]) * std::conj(complex_type(t.re[k], t.im[k])));
+                sum += z.back();
+                step_sum += steps[k];
+            }
+        if (sum != complex_type(0))
+        {
+            // the minimum on a uniform grid (with the mean step), then Newton steps on
+            // g(tau) = sum_k |z_k| sin(arg z_k - 2 pi h_k tau) h_k, the derivative of the variation up to a
+            // factor, for non-uniform grids
+            double tau = std::arg(sum) / (2 * M_PI * (step_sum / used.size()));
+            for (int iteration = 0; iteration < 2; ++iteration)
+            {
+                double g = 0, dg = 0;
+                for (size_t u = 0; u < used.size(); ++u)
+                {
+                    const double h = steps[used[u]];
+                    const double x = std::arg(z[u]) - 2 * M_PI * h * tau;
+                    g += std::abs(z[u]) * std::sin(x) * h;
+                    dg -= 2 * M_PI * std::abs(z[u]) * std::cos(x) * h * h;
+                }
+                const double next = tau - g / dg;
+                if (!(dg < 0) || !std::isfinite(next))
+                    break;
+                tau = next;
+            }
+            t.tau0_s = tau;
+        }
         double max_step = 0;
         for (size_t k = 0; k + 1 < m; ++k)
             max_step = std::max(max_step, t.f_Hz[k + 1] - t.f_Hz[k]);
@@ -545,17 +619,25 @@ vector<double> SParamData::leaveOneOutErrors(const Table &t) const
                 x.push_back(t.f_Hz[i]);
             }
         const size_t a = std::find(idx.begin(), idx.end(), j - 1) - idx.begin();
+        // re/im where the device uses them on either side of the point on the actual grid (the doubled
+        // interval would see the rotation of two steps as a null: SPAR-discussion-2.md, topic 2)
+        const bool reim_j = realImaginaryInterval(t, j - 1, j) || realImaginaryInterval(t, j, j + 1);
+        // PCHIP magnitude/phase slopes per run of the reduced grid, as buildTables() on the whole grid
+        vector<char> reim;
+        if (pchip && !reim_j)
+            for (size_t w = 0; w + 1 < idx.size(); ++w)
+                reim.push_back(w == a ? reim_j : realImaginaryInterval(t, idx[w], idx[w + 1]));
         auto eval = [&](const vector<double> &y_full) {
             vector<double> y;
             for (size_t i : idx)
                 y.push_back(y_full[i]);
             if (!pchip)
                 return evalSegment(x, y, nullptr, a, t.f_Hz[j]);
-            const vector<double> slopes = pchipSlopes(x, y);
+            const vector<double> slopes = reim_j ? pchipSlopes(x, y) : pchipSlopesPerRun(x, y, reim);
             return evalSegment(x, y, &slopes, a, t.f_Hz[j]);
         };
         complex_type s;
-        if (realImaginaryInterval(t, j - 1, j + 1))
+        if (reim_j)
         {
             s = complex_type(eval(t.re_d), eval(t.im_d));
             if (t.tau0_s != 0)

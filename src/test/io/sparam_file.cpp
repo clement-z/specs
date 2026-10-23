@@ -333,6 +333,27 @@ TEST(SParamFile, GridCheckFlagsANullNarrowerThanTheGrid)
         EXPECT_LT(d->gridCheck(1, 0).error, 1e-12);
         EXPECT_FALSE(d->nearFlaggedGridPoint(1, 0, c / (f0 + 5.5 * df)));
     }
+    // PF03d: a dispersive line resolved by its grid (|S| 0.9, group delay 1 +- 4 ps over 1.5-1.6 um, 201 points,
+    // up to 1.8 rad per point; within 0.0018 between the points) passes: 0.0071. The re/im decision is taken on
+    // the two actual intervals around the point; on the doubled interval the segment test took the rotation
+    // of two steps (with the delay removed) for a null and gave 0.88 (linear), a false warning
+    {
+        const double f1 = c / 1.6e-6, band = c / 1.5e-6 - f1, fc = f1 + 0.5 * band;
+        auto line = [&](double f) {
+            const double x = f - fc;
+            return std::polar(0.9, 2 * M_PI * (1e-12 * x + 4e-12 * x * x / band));
+        };
+        std::ostringstream text;
+        text.precision(17);
+        text << "('2','TE',1,'1',1,'transmission')\n(201,3)\n";
+        for (int k = 0; k <= 200; ++k)
+        {
+            const double f = f1 + k * band / 200;
+            text << f << " " << std::abs(line(f)) << " " << std::arg(line(f)) << "\n";
+        }
+        for (auto interp : {SParamData::INTERP_LINEAR, SParamData::INTERP_PCHIP})
+            EXPECT_LT(parse(text.str(), "x.sparam", SParamData::CONVENTION_AUTO, interp)->gridCheck(0, 1).error, 0.01);
+    }
     // not applicable to the Taylor form
     auto taylor = parse("specs-taylor 1\nports in out\ncenter 1.55e-6\nrange 1.5e-6 1.6e-6\nS out in amp 0.9\n"
                         "S out in phase 0 1e9\n", "x.taylor");
@@ -344,8 +365,8 @@ TEST(SParamFile, DelayRemovedInterpolationOfARotatingPathWithNulls)
     // B-190: S(2 <- 1) = 0.5 exp(j w tau1) + 0.48 exp(j w tau2), an unbalanced MZI (arm delays 4.3 and 5.74 ps,
     // free spectral range 694 GHz) sampled every 25 GHz (28 points per FSR): its phase turns by 0.8 rad per point
     // and it has nulls (|S| = 0.02). Magnitude/phase cuts the nulls short and real/imaginary parts cut the
-    // rotation with chords (PF03b: 0.023 between grid points for an exported MZI); with the median group delay
-    // (5.02 ps) taken out before the real and imaginary parts are interpolated, S~ crosses each null along an
+    // rotation with chords (PF03b: 0.023 between grid points for an exported MZI); with the entry's delay
+    // (pulse-pair estimate, 4.99 ps) taken out before the real and imaginary parts are interpolated, S~ crosses each null along an
     // almost straight line. S(1 <- 2) = 0.9 exp(j w 1.4 ps), a delay line: exact (magnitude and phase)
     const double f0 = 1.9e14, df = 2.5e10, tau1 = 4.3e-12, tau2 = 5.74e-12;
     auto mzi = [&](double f) { return std::polar(0.5, 2 * M_PI * f * tau1) + std::polar(0.48, 2 * M_PI * f * tau2); };
@@ -384,9 +405,11 @@ TEST(SParamFile, DelayRemovedInterpolationOfARotatingPathWithNulls)
         }
         else
         {
-            // PCHIP keeps magnitude and phase away from the nulls as before: 0.0127 (0.018 without), leaving
-            // a point out 0.035 (0.092)
-            EXPECT_LT(worst, 0.015) << "pchip";
+            // PCHIP: magnitude/phase slopes per run between the re/im intervals (PF03d), 0.0019 (0.0127 with
+            // slopes over the whole grid, whose phase secants next to the nulls bent the neighbouring
+            // cubics; 0.018 without the delay removal); leaving a point out 0.0055 (0.035, 0.092)
+            EXPECT_LT(worst, 0.003) << "pchip";
+            EXPECT_LT(d->gridCheck(0, 1).error, 0.01) << "pchip";
         }
     }
 }

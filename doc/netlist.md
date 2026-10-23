@@ -615,11 +615,10 @@ and the export of a SPECS subcircuit to a file: [doc/sparam.md](sparam.md).
 | `interp` | `"linear"`, `"pchip"` | `"linear"` | interpolation in frequency between grid points: magnitude and unwrapped phase, or near a transmission null real and imaginary parts with the entry's delay taken out ([doc/sparam.md](sparam.md)) |
 | `passivity` | `"check"`, `"ignore"`, `"enforce"` | `"check"` | warn when an input gives more than 1.03 times its power at the outputs; `enforce` also scales the matrix where it exceeds 1 |
 | `delay` | `"auto"`, `"none"`, a number (s) | `"auto"` | `.tran` delay of each path (input to output): `auto`, per path and wavelength the group delay of the data (0 where it is negative, with a warning per path); `none`, 0; a number, that delay on every path (rounding to 0 time steps is an error, as for `WG`) |
-| `delay_per` | `"path"`, `"output"` | `"path"` | `.tran`: `path`, each input's light reaches each output after its own path's delay (delayed copies per path); `output`, one delay per output and wavelength, the one of the path with the largest \|S\| into that output (`delay=auto`), used for every write to that output (cheaper; the light of a weaker path leaves with the largest path's delay) |
 
 - `.op`, `.dc`: the outputs are `S(lambda)` times the inputs at each wavelength. `.tran`: S of the carrier
-  wavelength and a group delay per path, each input's light reaching each output after its own path's delay
-  (`delay_per="output"`: after the delay of the output); **dispersion within a pulse's bandwidth is ignored**.
+  wavelength and a group delay per path, each input's light reaching each output after its own path's delay;
+  **dispersion within a pulse's bandwidth is ignored**.
 - Warnings when the file is loaded: passivity (above), unused reflections (unidirectional), and a grid too
   coarse for the device (a leave-one-out interpolation check, [doc/sparam.md](sparam.md) "Grid check").
 - A wavelength outside the range of the data is an error (the message gives the range).
