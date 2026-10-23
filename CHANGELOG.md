@@ -33,9 +33,25 @@
 * `utils/sparam_export.py`: writes the S-matrix of a subcircuit, from one `.dc` sweep per port, as
   `.sparam`, Touchstone or CSV (F-03)
 * KiCad symbols `SPAR_2PORT` and `SPAR_4PORT` (`utils/specs.kicad_sym`)
+* Parameter sweeps and Monte-Carlo (F-02, `doc/netlist.md` "Functions" and "`.step` and `.mc`"):
+  * functions in expressions: `sqrt exp log log10 sin cos tan asin acos atan abs floor ceil min max`, and the
+    random `gauss(mu, sigma)`, `uniform(a, b)`, `lognormal(mu, sigma)`, `choice(...)`. Each draw takes its own
+    stream of the master seed, named after where it is (instance path, element or `.param`, assigned name), so a
+    random parameter in a subcircuit body is drawn per instance; `shared=1` shares it between the instances of
+    the subcircuit, `shared="name"` between every use of the name
+  * `.step param NAME start stop step` (stop included, as `.dc`) and `.step param NAME list ...`, nested, and
+    `.mc N [seed=S]`: one run per point, each in its own process (`-j N` at a time). Monte-Carlo run k has a seed
+    derived from the master seed and k, the same at every step point
+  * one run table for all runs, `<output>.runs/`: `runs.csv` (status, exit code, seed, stepped and drawn values,
+    message of each run) and appendable NumPy columns of every run's probe samples and random draws, readable
+    without loading them (`np.load(..., mmap_mode="r")`, `pyspecs/runtable.py`). A failing or crashing run is
+    recorded and the others go on; running the same command again resumes (completed runs are skipped);
+    `--overwrite` starts over. `--run K` simulates one run alone with the outputs of a single run
 
 ### Changed
 
+* `.options seed` is applied when its line is read (so that the random functions after it use it); a seed that
+  changes after a random function drew is an error (F-02)
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
   the run, in name order and with every digit needed to tell them from the listed ones, instead of one
   "received unsupported signal" line on stdout per event (B-062)

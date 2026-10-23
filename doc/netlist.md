@@ -95,7 +95,7 @@ dB/cm. Optical fields are in sqrt(W).
 
 | Where | Accepted |
 | --- | --- |
-| `key=value`, `.param` | a free expression: numbers, `{name}`, `+ - * / ^`, parentheses, unary minus |
+| `key=value`, `.param` | a free expression: numbers, `{name}`, `+ - * / ^`, parentheses, unary minus, functions |
 | positional argument (elements, `.tran`) | one number, `{name}`, `"string"`, `[list]`, or a braced expression `{...}` |
 | `.dc` start, stop, step | a number or `{name}`; no expression |
 
@@ -109,10 +109,40 @@ dB/cm. Optical fields are in sqrt(W).
   `length={ {x}*2 }` is a syntax error, write `length={x}*2`. A positional argument does not take a free
   expression: `wg1 a b 2*3` and `cwsrc1 in 1.55u -3` are syntax errors, write `{2*3}` and `{-3}`.
 - `^` binds tighter than `*` and `/`, which bind tighter than `+` and `-`. `^` groups left to right (`2^3^2` is
-  64). `/` is a floating-point division (`1/2` is 0.5). `2*-3` is a syntax error. There are no functions.
+  64). `/` is a floating-point division (`1/2` is 0.5). `2*-3` is a syntax error. Functions: see below.
 - Constants: `{pi}` and `{c}` (299792458 m/s).
 - Strings are in double quotes and cannot contain a double quote. Lists are `[a, b, c]` and can be nested
   (`[[t0, p0], [t1, p1]]`).
+
+### Functions
+
+    .param w = sqrt(2)*1e-6 n = max(2.2, {neff})
+    .param L = gauss(100e-6, 1e-6)                 ; a random length (F-02)
+    wg1 a b length={L} att=uniform(0, 0.5)
+
+| Function | Value |
+| --- | --- |
+| `sqrt exp log log10 sin cos tan asin acos atan abs floor ceil` | of one number (`log` is the natural logarithm) |
+| `min(a, b, ...)`, `max(a, b, ...)` | of one or more numbers |
+| `gauss(mu, sigma)` | random, normal distribution (sigma >= 0) |
+| `uniform(a, b)` | random, uniform in [a, b) (a <= b) |
+| `lognormal(mu, sigma)` | random, `exp(gauss(mu, sigma))` |
+| `choice(v1, v2, ...)`, `choice([v1, v2, ...])` | random, one of the values (numbers or strings), each with the same probability |
+
+Names are case-insensitive. A result must be a finite number (`sqrt(-1) is not a finite number` stops the parse,
+like an unknown function or a wrong number of arguments: parse error with file and line, exit status 1).
+
+Random functions draw when their line is read, from the seeded streams of
+[reproducibility.md](reproducibility.md): the same seed gives the same values, and adding or removing other lines
+does not change a draw. A subcircuit body is read again for each instance, so a random function in the body
+draws once **per instance** (each ring of a CROW gets its own length). Keyword `shared` changes that:
+
+- `gauss(mu, sigma, shared=1)`: one draw for every instance of the subcircuit (the same value in all of them);
+- `gauss(mu, sigma, shared="wafer")`: one draw for every use of the name `wafer`, wherever it is.
+
+A random function in the parameter defaults of a `.subckt` line is an error (the defaults are read once for every
+instance): draw in the body (`.param`) or on the instance line. Every value drawn is listed in the run table of a
+plan (see "`.step` and `.mc`").
 
 ## Parameters
 
@@ -229,6 +259,61 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
   subcircuit instance cannot be named.
 - `.title text` and `.end`: ignored (KiCad netlists). `.end` does not stop the parsing.
 
+## `.step` and `.mc`: several runs
+
+    .param k=0.2 n2=2.35
+    .step param k 0.1 0.3 0.1            ; k = 0.1, 0.2, 0.3 (stop included, as .dc)
+    .step param n2 list 2.35 2.36        ; n2 = 2.35, 2.36
+    .mc 100 seed=1                       ; 100 Monte-Carlo runs at each step point
+
+A netlist with `.step` or `.mc` lines (F-02) is simulated once per **run** of its plan, each run in its own process,
+and the results of all runs go to **one run table**.
+
+- `.step param NAME start stop step`: values start, start+step, ... up to and including stop when
+  (stop-start)/step is an integer (accumulated as in `.dc`; three integers give integers). `.step param NAME
+  list v1 v2 ...`: these values. A value is a number, `-number` or `{expression}`. `NAME` must be a top-level
+  `.param` (it overrides it like `--param`; `--param` of the same name is an error). Several `.step` lines nest,
+  the first one being the outermost loop.
+- `.mc N [seed=S]`: N runs (the innermost loop). Monte-Carlo run k draws with its own seed, derived from the
+  master seed and k, so its random values differ from the other runs'; the same at every step point (the step
+  values are compared on the same draws). `seed=S` sets the master seed like `.options seed` (`--seed` wins).
+  Without `.mc`, every run uses the master seed.
+
+Runs are numbered from 0 over the nested loops (above: run 0 is k=0.1 n2=2.35 Monte-Carlo run 0, run 1 is
+Monte-Carlo run 1, ...). `specs -n -f net.cir` lists them. `.step` and `.mc` in a subcircuit body are ignored with
+a warning.
+
+**Runs.** specs parses the netlist, then starts one process per run (`-j N` at a time, default 1); each one
+parses the netlist again with the run's values and seed, simulates, and hands its results to specs. A run that
+fails (an error, a non-convergence, a crash) is recorded with its status and message, and the other runs go on;
+specs exits with status 1 at the end if a run failed. `specs --run K -f net.cir` simulates run K alone, in the
+same way as a netlist without a plan (stdout, VCD, `--format` tables, run manifest, `-o`): each run is
+reproducible on its own, and the run table holds the same values bit for bit.
+
+**Run table** `<name>.runs/` (`-o name`, default `traces/delete_me.runs/`):
+
+| file | content |
+| --- | --- |
+| `runs.csv` | one line per finished run: `run`, `status` (`ok`, `failed`, `crashed`), `exit_code`, `seed`, `mc_run` (empty without `.mc`), the stepped parameters, the top-level `.param` values that drew (one column each), `row_start`, `row_count`, `draw_start`, `draw_count`, `message` (the run's last `Error` line, else its last stderr line) |
+| `run.npy`, `time_s.npy`, `signal.npy`, `wavelength_m.npy`, `power_W.npy`, `field_re.npy`, `field_im.npy` | the probe tables of all runs (the columns of `--format npz`, see "Tracing and output files", plus `run`): the rows of a run are `row_start` to `row_start + row_count - 1`, runs in run order |
+| `signal_names.txt` | the probe names, one per line (`signal` indexes them) |
+| `draw_run.npy`, `draw_name.npy`, `draw_value.npy`, `draw_names.txt` | every random draw of every run: its stream name (e.g. `ROOT/X3/.param/L#0`, the instance X3) and value |
+| `table.manifest.json` | the run manifest (version, master seed, command line, netlist files and their SHA-256) and the plan |
+| `logs/run<k>.log` | stderr of run k, if it wrote anything (stdout of the runs is discarded: use `--run K`) |
+
+The `.npy` files are NumPy arrays: `np.load(path, mmap_mode="r")` reads only what is used, and
+`pyspecs/runtable.py` reads the table with pandas (selection by run or parameter value, run by run). The table
+holds what `--format npz` holds: the probes (no PDET or power meter), and nothing for an `.op` (its operating
+point is the stdout listing, see `--run K`); use `.tran` or `.dc` to have rows.
+
+**Resuming.** Running the same command again resumes the table: the runs recorded `ok` are skipped, the others
+run again (their new line replaces the old one). A table made by another netlist, plan, build or command line
+(another `table.manifest.json`; `-j` does not count) is an error unless `--overwrite` replaces it. A directory
+that is not a run table is never overwritten. The table does not depend on `-j`.
+
+`--format`, `--no-trace`, `--json`, `--stats`, `--progress` and `--print-manifest` apply to a single run: with a
+plan they are an error, except with `--run K`.
+
 ## Command line
 
 | Option | Meaning |
@@ -240,6 +325,9 @@ report and exit status 1. See "Convergence of `.op` and `.dc`" in [numerics.md](
 | `--format vcd\|csv\|npz` | output format(s) of the traces, repeatable (`--format vcd --format csv`); default `vcd` only; see "Tracing and output files" (F-05) |
 | `--no-trace` | write no trace file and no run manifest file, as `-o ""` (F-05); wins over `-o`. Netlists only: the `-t` testbenches choose their own trace files |
 | `--param name=value` | set a top-level parameter (see Parameters) |
+| `--run K` | simulate run K of the netlist's `.step`/`.mc` plan alone (see "`.step` and `.mc`") |
+| `-j N`, `--jobs N` | runs of a plan simulated at the same time (default 1) |
+| `--overwrite` | replace the run table of a plan instead of resuming it |
 | `--maxiter N` | `.options maxiter`, overrides the netlist |
 | `--stats[=ports,devices]`, `--stats-file path`, `--print-stats` | run statistics (event counters), `<name>.stats.json`; see "Run statistics" in [numerics.md](numerics.md) |
 | `--progress[=s]` | a progress line on stderr every s seconds of wall-clock time (default 1) |
