@@ -44,15 +44,19 @@ convention and what the device does with the data.
   The choice is made per interval, so S stays continuous; at a grid point the file's value is used as is.
   The threshold 0.07 was chosen from the error between grid points of exported devices (PF03b report): the
   add-drop ring of `circuits/add_drop.cir` on a 0.05 nm grid, evaluated between its points, is within 4e-4
-  (linear) or 1e-4 (pchip) of the circuit where |S| >= 0.1, and within 6e-4 (linear and pchip) at its
+  (linear) or 1e-4 (pchip) of the circuit where |S| >= 0.1, and within 6e-4 (linear) or 1e-4 (pchip) at its
   through-port null at 1.55 um, where magnitude/phase interpolation alone gave 0.020 and 0.015
   (`tests/sparam/test_sparam.py`, round-trip/between-points); with the delay removed, the results are the same
   for thresholds from 0.03 to 0.1. Measured between the grid points of exports (PF03c report), the delay
   removal takes an unbalanced MZI sampled 28 times per free spectral range from 0.023 to 0.0016 (linear) and
   the ring from 9.7e-4 to 5.4e-4; delay lines, the SiEPIC coupler and smooth dispersive paths are unchanged
-  (no interval near a null). With `interp=pchip` the magnitude/phase intervals are as without delay removal
-  (PCHIP on the detrended phase would help the MZI more, 0.0035 instead of 0.016, but degrades smooth
-  dispersive paths: PF03c report). The grid must be fine enough for the phase to
+  (no interval near a null). With `interp=pchip` the slopes of magnitude and phase are computed per run of
+  consecutive magnitude/phase intervals, the runs broken at the real/imaginary ones (a run of two points
+  gets the secant): next to a null the phase's secant is large, and slopes taken across it bent the cubics
+  of the neighbouring intervals (the MZI: 0.0165 between points with slopes over the whole grid, 9.2e-4 per
+  run; the ring 6.3e-4 and 2.1e-4; an entry without real/imaginary intervals is unchanged; SPAR-discussion-2
+  in `backlog/sprint-2026-10c`). Linear stays the default, as in HSPICE, ADS and scikit-rf. The grid must be
+  fine enough for the phase to
   change by less than pi between two points (else the unwrapping, and the group delay, are wrong), and to
   resolve the device's features: see "Grid check".
 - **Range.** A wavelength outside the data range is an error, with the range in the message (relative
@@ -75,7 +79,8 @@ convention and what the device does with the data.
   doubles the spacing, so 0.02 stands for about 0.005 between the points of the actual grid. A delay line
   gives 1e-12, the SiEPIC broadband coupler (`tests/sparam/data/siepic`) 0.0024, the add-drop ring on a
   0.05 nm grid 0.0021 and an unbalanced MZI sampled 28 times per free spectral range 0.0064 (no warning;
-  0.043 with `interp=pchip`, a warning); the ring on a 1 nm grid gives 0.71 (a warning). Before the delay
+  with `interp=pchip` 0.0059, 0.043 before its slopes were taken per run); the ring on a 1 nm grid gives
+  0.71 (a warning). Before the delay
   removal (B-190) the MZI gave 0.11 and the ring 0.0039. The check tests S, not the group delay: the ring's
   through-port null, whose phase turns within about 4 pm, passes on the 0.05 nm grid (S between the points
   is within 6e-4 there) while its group delay is not resolved (-37 ps instead of -621 ps); so do the MZI's

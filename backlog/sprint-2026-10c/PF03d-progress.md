@@ -14,7 +14,7 @@ Prototype (Opus subagent): `/tmp/PF03d-proto` (outside the repository, not durab
 |---|---|---|---|---|
 | 1 | Remove `delay_per` | done | (this commit) | product code = reverse of 7e044eb's device/header/parser hunks (no later change to them); 2 golden cases removed; gcc 16 OK 1 skip, strict golden 275/275; asan-clang 16 OK 1 skip, no sanitizer message |
 | 2 | Grid check on the actual intervals | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest numbers bit-identical (linear 0.00345946 / LOO 0.00892046, PCHIP 0.0127283 / 0.0348905) |
-| 3 | PCHIP slopes per run | todo | | |
+| 3 | PCHIP slopes per run | done | (this commit) | gcc 16 OK 1 skip, strict golden 275/275 (no change, as predicted); asan-clang 16 OK, no sanitizer message; B-190 gtest PCHIP 0.0127283 -> 0.00191221, LOO 0.0348905 -> 0.00553862 (linear bit-identical); test_sparam.py pchip between points 9.56e-5 where \|E\| >= 0.1 (same), 9.72e-5 anywhere (5.19e-4) |
 | 4 | Pulse-pair tau0 | todo | | |
 | 5 | Docs and report | todo | | |
 
@@ -49,8 +49,17 @@ largest step of the whole grid and f_ref = first grid point, unchanged.
 - Item 2 (before the change): no golden output changes (summary: identical worst values with linear on every
   fixture and on the golden 1 nm file, 0.707522 at 1.546 um; only the PCHIP 1 nm value moves, no golden case uses
   PCHIP); all `SParamFile` gtests pass (the B-190 gtest's linear LOO 0.0089 may move in its last digits).
+- Item 3 (before the change): no golden output changes (no golden case uses `interp=pchip`; the gtest case
+  records test names and results only). Linear: bit-identical everywhere. PCHIP: bit-identical on entries without
+  re/im intervals (delay lines, dispersive line, BDC, the B-190 gtest's delay line); the B-190 gtest's PCHIP
+  worst value drops from 0.0127 (summary's reference MZI: 0.0165 -> 9.2e-4; ring through 6.3e-4 -> 2.1e-4);
+  `test_sparam.py` PCHIP between-points bound (2e-4 where |E| >= 0.1) still holds with a changed value.
 
 ## Log
+
+- Item 3: the reference-MZI and ring numbers written in doc/sparam.md and the GRID_CHECK_THRESHOLD comment
+  (9.2e-4, 2.1e-4, LOO 0.0059) are the summary's; to be confirmed with the C++ through the prototype's driver
+  (item 5).
 
 - Item 1: manifest bookkeeping = the two ids removed from the `cases` list; the `rerecords` history is kept as is
   (entries of past records stay true; no record was run for a removal), as the PD5 removal of

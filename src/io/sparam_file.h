@@ -45,7 +45,7 @@ public:
     // more than this (field). Leaving a point out doubles the spacing, so the error is about 4 times the
     // one between the points of the actual grid: 0.02 stands for about 0.005 between points. A delay
     // line gives 1e-12; the SiEPIC BDC 0.0024, the add-drop ring on a 0.05 nm grid 0.0021, an MZI with
-    // 28 points per FSR 0.0064 (linear; 0.043 with PCHIP) (pass); the ring on a 1 nm grid 0.71 (warns)
+    // 28 points per FSR 0.0064 (linear; 0.0059 with PCHIP) (pass); the ring on a 1 nm grid 0.71 (warns)
     static constexpr double GRID_CHECK_THRESHOLD = 0.02;
 
     // Reads a file (format AUTO: from its extension)
@@ -121,7 +121,9 @@ private:
         double tau0_s = 0;
         double f_ref_Hz = 0;
         std::vector<double> re_d, im_d;
-        std::vector<double> dmag, dphase, dre, dim; // PCHIP slopes (INTERP_PCHIP); dre, dim: of re_d, im_d
+        // PCHIP slopes (INTERP_PCHIP): dmag, dphase per run of magnitude/phase intervals; dre, dim of re_d,
+        // im_d over the whole grid
+        std::vector<double> dmag, dphase, dre, dim;
         double max_mag = 0; // largest |S| over the grid
         std::vector<double> loo_error; // leave-one-out error at each grid point (0 at the ends)
     };
@@ -184,6 +186,10 @@ private:
     // Leave-one-out errors of a table (GRID_CHECK_THRESHOLD), with the same interpolant
     std::vector<double> leaveOneOutErrors(const Table &t) const;
     static std::vector<double> pchipSlopes(const std::vector<double> &x, const std::vector<double> &y);
+    // PCHIP slopes per run of consecutive intervals with reim[k] false ([x[k], x[k+1]] interpolated in
+    // magnitude and phase); 0 at the points of no run
+    static std::vector<double> pchipSlopesPerRun(const std::vector<double> &x, const std::vector<double> &y,
+            const std::vector<char> &reim);
     static double polyval(const std::vector<double> &coeffs, double d);
     static double polyder(const std::vector<double> &coeffs, double d);
 };

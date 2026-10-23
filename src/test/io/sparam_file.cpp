@@ -384,9 +384,11 @@ TEST(SParamFile, DelayRemovedInterpolationOfARotatingPathWithNulls)
         }
         else
         {
-            // PCHIP keeps magnitude and phase away from the nulls as before: 0.0127 (0.018 without), leaving
-            // a point out 0.035 (0.092)
-            EXPECT_LT(worst, 0.015) << "pchip";
+            // PCHIP: magnitude/phase slopes per run between the re/im intervals (PF03d), 0.0019 (0.0127 with
+            // slopes over the whole grid, whose phase secants next to the nulls bent the neighbouring
+            // cubics; 0.018 without the delay removal); leaving a point out 0.0055 (0.035, 0.092)
+            EXPECT_LT(worst, 0.003) << "pchip";
+            EXPECT_LT(d->gridCheck(0, 1).error, 0.01) << "pchip";
         }
     }
 }
