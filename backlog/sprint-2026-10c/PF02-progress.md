@@ -71,3 +71,13 @@ is built only for what is selected.
   draw made before a later `.options seed` that changes the seed is an error (not silently wrong).
 - `--run K`: runs plan point K alone, in-process, with the normal outputs (VCD, tables, manifest) and stdout:
   each run is reproducible on its own.
+
+## Checks (at 24070fc)
+- gcc: `pixi run test gcc` 16 OK + run-table skipped (no pandas in the default env); golden strict 272/272.
+- asan-clang: `pixi run test asan-clang` 16 OK (after 982bee5), no sanitizer message.
+- Before (92a4974) / after recordings, `compare --rtol 0 --atol 0 --print-slack 0`: clang, asan-gcc, asan-clang:
+  252 same, 16 new (F-02), 3 differ = cli/help, cli/no-args, err/f15-no-coalescing-removed (help text: the new
+  options), as in the gcc baseline re-record.
+- Counters (`stats-record` gcc before/after, `stats-compare`): 261 same; the 10 that differ are new F-02 cases
+  (the old binary rejects them).
+- pyspecs: `pixi run -e py python -I tests/tools/test_run_table.py --specs build-pixi/gcc/specs --repo .` OK.
