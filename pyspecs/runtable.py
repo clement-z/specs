@@ -28,13 +28,13 @@ RANGE_COLUMNS = ["row_start", "row_count", "draw_start", "draw_count", "message"
 def _numeric_or_text(col):
     """A column of runs.csv as numbers (empty cells, e.g. no .mc or a failed run, as NaN), unless it
     holds text (a choice() of strings)"""
-    if col.dtype != object:
+    if pd.api.types.is_numeric_dtype(col):
         return col
-    filled = col[col != ""]
-    num = pd.to_numeric(filled, errors="coerce")
-    if num.isna().any():
+    # float() reads back exactly the double that specs wrote (shortest round-trip form)
+    try:
+        return col.map(lambda v: float(v) if v != "" else np.nan).astype("float64")
+    except ValueError:
         return col
-    return pd.to_numeric(col.replace("", np.nan))
 
 
 class RunTable:
@@ -58,8 +58,11 @@ class RunTable:
         """The run index (runs.csv): one row per run (the last line of a run recorded twice, e.g.
         failed then resumed), sorted by run, indexed by run."""
         if self._runs is None:
+            # float_precision="round_trip": every value read back to the double written (the default
+            # parser can be 1 ulp off on 17-digit values); a message can hold non-UTF-8 bytes of a netlist
             df = pd.read_csv(os.path.join(self.path, "runs.csv"), keep_default_na=False,
-                             dtype={"status": str, "message": str, "seed": "uint64"})
+                             dtype={"status": str, "message": str, "seed": "uint64"},
+                             float_precision="round_trip", encoding_errors="replace")
             for name in ["mc_run"] + self.params + self.drawn:
                 df[name] = _numeric_or_text(df[name])
             df = df.drop_duplicates("run", keep="last").sort_values("run").set_index("run", drop=False)

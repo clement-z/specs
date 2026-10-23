@@ -75,6 +75,11 @@ def main():
         check(len(draws) == 2 and set(draws["name"]) == {"ROOT/.param/dL#0", "ROOT/X1/.param/Lr#0"},
               "draws of run 4: %r" % draws)
         check(draws["value"][0] == runs.loc[4, "dL"], "draw of dL == runs.csv dL")
+        # every drawn value of runs.csv is the double of the draw table, bit for bit
+        all_draws = t.draws()
+        dl = all_draws[all_draws["name"] == "ROOT/.param/dL#0"].set_index("run")["value"]
+        check((dl == runs["dL"]).all(), "runs.csv dL != draw_value.npy")
+        check(runs["dL"].dtype == np.float64, "dL dtype %s" % runs["dL"].dtype)
 
         # the rows of run 4 are those of `specs --run 4`, bit for bit
         r = run([specs, "--run", "4", "--format", "npz", "-o", "traces/r4", "-f", mc], tmp)
@@ -94,6 +99,10 @@ def main():
               "message %r" % tf.runs.loc[1, "message"])
         check(list(tf.select(status=None)["run"]) == [0, 1, 2], "select status=None")
         check(len(tf.data()) == 0, "an .op plan has no table rows")
+        # no .mc: mc_run is empty, read as NaN (numeric)
+        check(tf.runs["mc_run"].isna().all() and tf.runs["M"].dtype.kind in "iuf",
+              "mc_run %r M %s" % (list(tf.runs["mc_run"]), tf.runs["M"].dtype))
+        check(len(tf.select(M=2000)) == 2, "select M=2000")
         shutil.rmtree(os.path.join(tmp, "traces"))
 
     if FAILURES:
