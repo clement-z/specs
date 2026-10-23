@@ -20,6 +20,7 @@ if gtest_dep.found()
       'fixed_point.cpp',
       'general_utils.cpp',
       'integer_literals.cpp',
+      'io/sparam_file.cpp',
       'main.cpp',
       'optical_output_port.cpp',
       'optical_signal.cpp',

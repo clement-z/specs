@@ -1,5 +1,6 @@
 # Core sources, shared by `specs` and `libspx.so`. Keep the lists explicit and sorted.
 core_sources = files(
+  'io/sparam_file.cpp',
   'optical_output_port.cpp',
   'optical_signal.cpp',
   'run_manifest.cpp',
