@@ -2,7 +2,7 @@
 
 Prompt: `discover/orchestration/2026-10c/PF03b-spar-followups.md` (+ item 8 from the coordinator, 2026-10-23:
 re-export `tests/sparam/data/add_drop_ring.sparam` on a 0.05 nm grid, own commit, after item 1).
-Heartbeat: `94bb0c96` (PF03b-heartbeat), delete after the report is committed.
+Heartbeat: `94bb0c96` (PF03b-heartbeat), deleted after the report was committed.
 Base: 48e510f.
 
 | # | Item | Status | Commit | Notes |
