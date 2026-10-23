@@ -9,7 +9,7 @@ Heartbeat: `5e05ca80` (PF02-heartbeat, every 5 min, expires in 48 h). Delete it 
 | 2 | `.step param` (linear, `list`, nested), `.mc N [seed=]`, run plan, `--run K`, `-n` plan listing | done | ef07d1e | items 2 and 3 in one commit (main.cpp couples them) |
 | 3 | Runner: one process per run, run table (appendable columns + index), failures recorded, resume | done | ef07d1e | 7 gtest, 11 golden new; 3 help cases re-recorded (new options); strict 272/272; asan-clang pending |
 | 4 | pyspecs reader | done | 9aa4624 | tests/tools/test_run_table.py (skips without pandas; passes with pixi -e py) |
-| 5 | Docs, CHANGELOG, golden cases, unit tests | in progress | 1ac820a, ef07d1e, docs commit | asan-clang fix 982bee5; remaining: gtest re-record, before/after compares, review |
+| 5 | Docs, CHANGELOG, golden cases, unit tests | done | d6c680e, 24070fc, 1315d81, 4e2310b | review fixes 81576b7, 1315d81 |
 
 ## Output format: evaluation and choice (scope item 3, decided before implementing)
 
@@ -81,3 +81,6 @@ is built only for what is selected.
 - Counters (`stats-record` gcc before/after, `stats-compare`): 261 same; the 10 that differ are new F-02 cases
   (the old binary rejects them).
 - pyspecs: `pixi run -e py python -I tests/tools/test_run_table.py --specs build-pixi/gcc/specs --repo .` OK.
+
+## Done
+Report: `PF02-REPORT.md`. Heartbeat 5e05ca80 deleted after the report.
