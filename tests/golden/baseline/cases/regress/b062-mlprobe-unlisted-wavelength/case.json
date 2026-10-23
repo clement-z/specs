@@ -8,13 +8,13 @@
   "traces/delete_me.manifest.json": {
    "bytes": 461,
    "kind": "json",
-   "sha256": "5cf96769ad6b235049342cb8bda17bc5f64effc2358499617f7c2f836befdf7e",
+   "sha256": "66863b650055a34b204ed6d042fcd688a0544075727e77bb6c6e3c3c7299ff8b",
    "stored": "files/traces/delete_me.manifest.json"
   },
   "traces/delete_me.vcd": {
-   "bytes": 1441,
+   "bytes": 1775,
    "kind": "vcd",
-   "sha256": "c6175b6f54f76f84aaffe961241fbe435084ec54942eb48e8af77df8428d648b",
+   "sha256": "b9586ecda4cbd78cea1c6768fd5f800850cb09714611b575aa926cd54c1f9419",
    "stored": "files/traces/delete_me.vcd"
   }
  },

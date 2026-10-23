@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/b062-mlprobe-computed-wavelength.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 206,
+   "kind": "text",
+   "sha256": "1edc7987b4b928a65d379fce68f4eb4771ec9fc1084340148ebb5810f584ba69",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 499,
+   "kind": "json",
+   "sha256": "1db985e989a64641b8721425dd51010c5757cac242d4cf140ef85c411317ec7a",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1208,
+   "kind": "vcd",
+   "sha256": "328c84ff30a63148d5a88f5c3df21028721b9baf785d771043cc543c87c8e23a",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b062-mlprobe-computed-wavelength"
+}

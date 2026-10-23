@@ -2,6 +2,7 @@
 
 #include "utils/sysc_utils.h"
 #include "optical_signal.h"
+#include "optical_net.h"
 #include "optical_output_port.h"
 
 #include <systemc.h>
@@ -39,7 +40,7 @@ namespace spx {
     typedef sc_logic ed_value_type;
 
     // Signal types
-    typedef sc_signal<oa_value_type, SC_MANY_WRITERS> oa_signal_type;
+    typedef OpticalNet oa_signal_type; // sc_signal<oa_value_type, SC_MANY_WRITERS> (optical_net.h)
     typedef sc_signal<ea_value_type, SC_MANY_WRITERS> ea_signal_type;
     typedef sc_signal<ed_value_type, SC_MANY_WRITERS> ed_signal_type;
     typedef sc_signal<sc_lv_base, SC_MANY_WRITERS> ed_bus_type;

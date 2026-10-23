@@ -22,6 +22,7 @@ if gtest_dep.found()
       'integer_literals.cpp',
       'main.cpp',
       'optical_output_port.cpp',
+      'optical_signal.cpp',
       'parser_state.cpp',
       'rng.cpp',
       'run_manifest.cpp',

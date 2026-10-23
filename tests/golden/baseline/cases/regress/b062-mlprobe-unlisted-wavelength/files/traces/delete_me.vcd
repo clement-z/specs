@@ -3,28 +3,33 @@ $timescale
 $end
 
 $scope module SystemC $end
-$var real    1  aaaaj  abstol       $end
-$var real    1  aaaak  reltol       $end
-$var wire   32  aaaal  resolution_multiplier [31:0]  $end
-$var wire   32  aaaam  engine_timescale [31:0]  $end
-$var wire   32  aaaan  simulation_mode [31:0]  $end
-$var wire   32  aaaao  analysis_type [31:0]  $end
-$var wire    1  aaaap  trace_all_optical_nets       $end
-$var wire    1  aaaaq  verbose_component_initialization       $end
+$var real    1  aaaam  abstol       $end
+$var real    1  aaaan  reltol       $end
+$var wire   32  aaaao  resolution_multiplier [31:0]  $end
+$var wire   32  aaaap  engine_timescale [31:0]  $end
+$var wire   32  aaaaq  simulation_mode [31:0]  $end
+$var wire   32  aaaar  analysis_type [31:0]  $end
+$var wire    1  aaaas  trace_all_optical_nets       $end
+$var wire    1  aaaat  verbose_component_initialization       $end
+$scope module ROOT/MLPROBE0 $end
+$var real    1  aaaaa  power@1560_000000       $end
+$var real    1  aaaab  abs@1560_000000       $end
+$var real    1  aaaac  phase@1560_000000       $end
+$upscope $end
 $scope module ROOT/MLPROBE1 $end
-$var real    1  aaaaa  power@1551_500000       $end
-$var real    1  aaaab  abs@1551_500000       $end
-$var real    1  aaaac  phase@1551_500000       $end
+$var real    1  aaaad  power@1551_500000       $end
+$var real    1  aaaae  abs@1551_500000       $end
+$var real    1  aaaaf  phase@1551_500000       $end
 $upscope $end
 $scope module ROOT/MLPROBE2 $end
-$var real    1  aaaad  power@1560_000000       $end
-$var real    1  aaaae  abs@1560_000000       $end
-$var real    1  aaaaf  phase@1560_000000       $end
-$upscope $end
-$scope module ROOT/MLPROBE3 $end
 $var real    1  aaaag  power@1560_000000       $end
 $var real    1  aaaah  abs@1560_000000       $end
 $var real    1  aaaai  phase@1560_000000       $end
+$upscope $end
+$scope module ROOT/MLPROBE3 $end
+$var real    1  aaaaj  power@1560_000000       $end
+$var real    1  aaaak  abs@1560_000000       $end
+$var real    1  aaaal  phase@1560_000000       $end
 $upscope $end
 $upscope $end
 $enddefinitions  $end
@@ -37,19 +42,30 @@ $dumpvars
 r0 aaaaa
 r0 aaaab
 r0 aaaac
-r0.4999999999999999 aaaad
-r0.7071067811865475 aaaae
+r0 aaaad
+r0 aaaae
 r0 aaaaf
-r1 aaaag
-r1 aaaah
+r0.4999999999999999 aaaag
+r0.7071067811865475 aaaah
 r0 aaaai
-r1e-08 aaaaj
-r0.0001 aaaak
-b1 aaaal
-b11111111111111111111111111110011 aaaam
-b1 aaaan
-b10 aaaao
-0aaaap
-0aaaaq
+r1 aaaaj
+r1 aaaak
+r0 aaaal
+r1e-08 aaaam
+r0.0001 aaaan
+b1 aaaao
+b11111111111111111111111111110011 aaaap
+b1 aaaaq
+b10 aaaar
+0aaaas
+0aaaat
 $end
+
+#10
+r0.0009999999999999998 aaaad
+r0.03162277660168379 aaaae
+
+#20
+r0.002 aaaad
+r0.04472135954999579 aaaae
 

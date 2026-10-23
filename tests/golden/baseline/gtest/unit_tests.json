@@ -49,6 +49,8 @@
   "MLambdaProbe.TracesEveryListedWavelengthReceivedWhileDisabledWhenEnabled": "PASS",
   "MLambdaProbe.UndrivenNetPrintsNothingWhenEnabled": "PASS",
   "MergerModel.CoherentSum": "PASS",
+  "OpticalNet.WriteWithEventNotifiesAnUnchangedValue": "PASS",
+  "OpticalOutputPort.DcPointWritesFirstValueOfEachWavelengthWithAnEvent": "PASS",
   "OpticalOutputPort.DesyncStopsWithoutEmitting": "PASS",
   "OpticalOutputPort.EmissionGateWithZeroLast": "PASS",
   "OpticalOutputPort.EmissionGateWithZeroTolerances": "PASS",
@@ -129,6 +131,8 @@
   "WaveguideDeathTest.DelayRoundingReportedOncePerDevice": "PASS",
   "WaveguideDeathTest.DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides": "PASS",
   "WaveguideModel.GroupDelay": "PASS",
-  "WaveguideModel.LossAndPhaseZeroSlope": "PASS"
+  "WaveguideModel.LossAndPhaseZeroSlope": "PASS",
+  "WavelengthMatching.RegistryGivesTheIdOfTheFirstMatchingWavelength": "PASS",
+  "WavelengthMatching.SameWavelengthIsRelativeWithinTheTolerance": "PASS"
  }
 }

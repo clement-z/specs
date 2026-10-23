@@ -664,3 +664,110 @@ TEST(OpticalOutputPort, PendingResetCancelsNotification)
     }
     SPECS_TEST_FOOTER();
 }
+
+// A .dc point (B-003, B-185): after reset(), a port with m_emit_each_wavelength writes the first
+// value of each wavelength with an event, also when it is below abstol (written as 0, snapped) or
+// equal to the value its net holds; the later values of the point go through the gate. Without the
+// flag (.op, .tran), the gate compares the first value with 0 and an unchanged value wakes nothing
+TEST(OpticalOutputPort, DcPointWritesFirstValueOfEachWavelengthWithAnEvent)
+{
+    for (const bool each_wavelength : {false, true})
+    {
+        SCOPED_TRACE(each_wavelength ? "m_emit_each_wavelength" : "default");
+        SPECS_TEST_HEADER()
+        {
+            PendingHarness h("h");
+            auto &oop = h.m_out_writer;
+            sc_start(SC_ZERO_TIME);
+            oop.m_mode = OpticalOutputPortMode::NO_DELAY;
+            oop.m_emit_each_wavelength = each_wavelength;
+            auto write = [&oop](double field, double wavelength)
+            {
+                oop.delayedWrite(OpticalSignal(OpticalSignal::field_type(field, 0), wavelength), SC_ZERO_TIME);
+            };
+
+            // first point: two wavelengths (1.56 um, the larger |E|, is taken first)
+            oop.reset();
+            write(1, 1.55e-6);
+            write(2, 1.56e-6);
+            sc_start(1, SC_NS);
+            ASSERT_EQ(h.seen.size(), 2u);
+            EXPECT_EQ(h.out.read(), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
+
+            // next point: the same values (the net holds the first one), and one below abstol (1e-8)
+            h.seen.clear();
+            oop.reset();
+            write(1, 1.55e-6);
+            write(2, 1.56e-6);
+            write(1e-9, 1.57e-6);
+            sc_start(1, SC_NS);
+            std::set<std::pair<double, double>> seen; // (field, wavelength)
+            for (const auto &w : h.seen)
+                seen.insert({w.field.real(), OpticalSignal::getWavelength(w.wavelength_id)});
+            if (each_wavelength)
+            {
+                EXPECT_EQ(h.seen.size(), 3u);
+                EXPECT_EQ(seen, (std::set<std::pair<double, double>>{{1, 1.55e-6}, {2, 1.56e-6}, {0, 1.57e-6}}));
+            }
+            else
+            {
+                // 1.56 um changes the net, then 1.55 um changes it back; 1.57 um is gated
+                EXPECT_EQ(h.seen.size(), 2u);
+                EXPECT_EQ(seen, (std::set<std::pair<double, double>>{{1, 1.55e-6}, {2, 1.56e-6}}));
+            }
+
+            // in the same point, an unchanged value of a wavelength already written is gated
+            h.seen.clear();
+            write(2, 1.56e-6);
+            sc_start(1, SC_NS);
+            EXPECT_TRUE(h.seen.empty());
+        }
+        SPECS_TEST_FOOTER();
+    }
+}
+
+// OpticalNet::writeWithEvent(): a value-change event also when the value does not change; a
+// plain write of the current value notifies nothing (sc_signal)
+class NetEventHarness : public sc_module {
+public:
+    spx::oa_signal_type net{"net"};
+    int events = 0;
+
+    NetEventHarness(sc_module_name name)
+        : sc_module(name)
+    {
+        SC_METHOD(on_net_changed);
+        sensitive << net;
+        dont_initialize();
+    }
+
+    void on_net_changed()
+    {
+        ++events;
+    }
+};
+
+TEST(OpticalNet, WriteWithEventNotifiesAnUnchangedValue)
+{
+    SPECS_TEST_HEADER()
+    {
+        NetEventHarness h("h");
+        const OpticalSignal s(OpticalSignal::field_type(1, 0), 1.55e-6);
+        sc_start(SC_ZERO_TIME);
+        h.net.write(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 1);
+        h.net.write(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 1);
+        h.net.writeWithEvent(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 2);
+        EXPECT_TRUE(h.net.read() == s);
+        // the next plain write of the same value notifies nothing again
+        h.net.write(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 2);
+    }
+    SPECS_TEST_FOOTER();
+}

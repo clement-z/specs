@@ -188,6 +188,14 @@ without duration. `-n` skips the analysis.
   The values are accumulated, so the last digits can differ from start + i*step (the last point above is
   1.5650000000000022e-06, backlog B-009). Needs start < stop, step > 0 and at least 2 points
   (`Invalid range parameters`, `Sweep order must contain at least 2 point.`). One sweep per `.dc`.
+
+  Each point is a fresh steady state (B-003, B-185): at each point every output port writes each of its
+  wavelengths at least once, also a value below `abstol` (written as 0, see `snapfactor`) and a value that did
+  not change since the previous point. A null of the transmission therefore reads 0 at its point (before, the
+  net kept the previous point's value and wavelength), and the wavelength of a source that is not swept reaches
+  the nets and probes after it at every point (before, at the first point only). The devices keep their state
+  between points: each point iterates from the previous point's values ("Convergence of `.op` and `.dc`" in
+  [numerics.md](numerics.md)).
 - `.tran [duration]`: transient (time domain), after an operating point. The duration is in s (number, `{name}`
   or `{expression}`; `.tran 2*5n` is a syntax error). Without it the run goes on until no event is left.
 
@@ -499,10 +507,12 @@ value changes nothing, and a false one (`wl=0`, `probe1 out 1 1 1 0`) is ignored
 all such probes (`Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th
 argument) ignored for ROOT/PROBE1, ROOT/PROBE5`). The automatic probes `PROBE{<net>}` also trace it (all four
 quantities). `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
-phase per listed wavelength (the wavelength must match exactly: `{lambda0}+1.5e-9` is 1.5514999999999999e-06,
-not 1.5515e-06). It ignores the other wavelengths of its net, with one warning per MLPROBE on stderr at the end
-of the run, in name order (`Warning: ROOT/MLPROBE1 ignored the wavelengths of its net ROOT/a that it does not
-list (1.5514999999999999e-06 m; listed: 1.5515e-06 m)`; before, one line on stdout per event, B-062). A netlist without any probe or `.save` traces every optical net through
+phase per listed wavelength. A wavelength matches a listed one when they are equal within a relative 1e-12
+(`{lambda0}+1.5e-9` is 1.5514999999999999e-06 and matches 1.5515e-06; before PH the match was exact; see
+"Wavelength matching" in [numerics.md](numerics.md)); the CSV/npz rows keep the net's wavelength. It ignores
+the other wavelengths of its net, with one warning per MLPROBE on stderr at the end of the run, in name order
+(`Warning: ROOT/MLPROBE0 ignored the wavelengths of its net ROOT/b that it does not list (1.56e-06 m; listed:
+1.5600000001e-06 m)`; before, one line on stdout per event, B-062). A netlist without any probe or `.save` traces every optical net through
 automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
 name starts with `_` get no automatic probe.
@@ -510,7 +520,7 @@ name starts with `_` get no automatic probe.
 **A PROBE traces one wavelength.** A net holds one value, the last one written to it, of any wavelength, so on a
 net that carries several wavelengths a probe sees each of them as a separate event. A PROBE (also an automatic
 `PROBE{<net>}` and a `.save` target) traces one of them and ignores the others. To trace a given wavelength,
-or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to select one.
+or several, use MLPROBE (`wl=[...]`, matched within a relative 1e-12); a PROBE has no keyword to select one.
 - The probe latches one wavelength per analysis point:
   - in `.op` and at each `.dc` point, the smallest wavelength written to its net at that point;
   - in a `.dc` that sweeps the wavelength or the frequency of a source (`WL(src)`, `F(src)`, `/src/WL`,
@@ -520,9 +530,9 @@ or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to sel
   - in `.tran`, the smallest wavelength its net carried when the probe is enabled (the operating-point values),
     or, if none, the smallest one arriving in the first time step that brings any. It keeps that one until the
     end of the transient.
-- In a `.dc`, a net whose value does not change from one point to the next is not written again: a CW source
-  that is not swept writes its net at the first point only, and its wavelength reaches the probes at that point
-  only (B-185).
+- In a `.dc`, every wavelength of a net is written again at every point, also when its value does not change
+  (B-185): the wavelength of a CW source that is not swept is a candidate at every point. Before, such a net was
+  written at the first point only.
 - When a probe ignores another wavelength, a warning on stderr says so once, at the end of the analysis (the
   probe, its net, the wavelength traced and the first one ignored); the automatic and `.save` probes share one
   summary line.

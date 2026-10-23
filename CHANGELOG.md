@@ -6,15 +6,28 @@
 
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
   the run, in name order and with every digit needed to tell them from the listed ones, instead of one
-  "received unsupported signal" line on stdout per event (B-062; matching stays exact)
+  "received unsupported signal" line on stdout per event (B-062)
 * VLSRC and EVLSRC are quiet by default: the values read from a value file (and its skipped lines),
   "`<name> was enabled`" and the "`@<t>, <name> emitted: <value>`" line of every emission are only printed with
   `--vci`. The values whose time is already past when the source reaches them are reported in one warning per
   source on stderr, with their count, instead of one "invalid time for signal emission !" line on stdout per
   value (VLSRC; EVLSRC skipped them silently). The emitted values are unchanged (B-066)
+* Wavelengths equal within a relative 1e-12 are one wavelength (compile-time constant, `doc/numerics.md`): in the
+  wavelength registry (the first registered value is kept), so sources at "the same" wavelength written
+  differently (`1550*1e-9`, `1.55e-6`, c/f) add coherently instead of as two wavelengths, and in MLPROBE's
+  wavelength list, so a computed wavelength is traced (B-010, B-062). A `.dc` point that drifted to within 1e-12
+  of a registered wavelength takes that value (e.g. 1.550000000000001e-06 -> 1.55e-06 in `circuits/add_drop.cir`,
+  values at that point change by about 1e-13 relative)
+* `.dc`: each sweep point is a fresh steady state: every output port writes each of its wavelengths at least
+  once per point, also when its value did not change since the previous point, so the wavelength of a source
+  that is not swept reaches the nets and probes after it at every point (before, at the first point only); a
+  PROBE on such a net now has a sample at every point. More events per point in such circuits (`--stats`);
+  `.op` and `.tran` are unchanged (B-185)
 
 ### Fixed
 
+* `.dc`: a sweep point whose output falls below `abstol` (e.g. a null of an MZI) is written (0 after the snap)
+  instead of keeping the previous point's value and wavelength (B-003)
 * Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line
   in it, as for top-level lines, instead of an empty file name and an uninitialised line number (B-182)
 * pixi: `pixi run test` (and the other build tasks) failed with `gtest/gtest.h: No such file or directory` on a

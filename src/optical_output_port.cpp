@@ -138,6 +138,7 @@ void OpticalOutputPort::applyConfig() {
 
 void OpticalOutputPort::start_of_simulation() {
     applyConfig();
+    m_net = dynamic_cast<OpticalNet *>(m_port.get_interface());
 }
 
 // F-15: m_pending_event fired: emit the entry that is due, then notify the next one. The kernel
@@ -188,7 +189,12 @@ void OpticalOutputPort::emit_due_entry()
 
     uint32_t wlid = s.m_wavelength_id;
 
-    auto &emitted = m_emitted_fields[wlid];
+    // (a new wavelength starts at 0)
+    const auto emitted_it = m_emitted_fields.try_emplace(wlid);
+    auto &emitted = emitted_it.first->second;
+
+    // .dc: the first entry of each wavelength after a reset() is written (m_emit_each_wavelength)
+    const bool force = m_skip_next_convergence_check || (m_emit_each_wavelength && emitted_it.second);
 
     // Store the desired output value which we know is valid
     desired = s.m_field;
@@ -201,9 +207,10 @@ void OpticalOutputPort::emit_due_entry()
     emit_signal = pass_abstol && pass_reltol;
 
     // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
-    // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
+    // the paper benchmarks; .options snapfactor, 0 disables it, B-021). Also for a forced
+    // emission (the null of a .dc point is written as 0)
     bool snapped = false;
-    if (emit_signal && check_snap_to_zero(desired))
+    if ((emit_signal || force) && check_snap_to_zero(desired))
     {
         desired = complex<double>(0,0);
         snapped = true;
@@ -214,14 +221,14 @@ void OpticalOutputPort::emit_due_entry()
     {
         ++m_stats.processed;
         m_stats.wavelength_ids.insert(wlid);
-        if (!emit_signal && !m_skip_next_convergence_check)
+        if (!emit_signal && !force)
         {
             if (!pass_abstol)
                 ++m_stats.suppressed_abstol;
             else
                 ++m_stats.suppressed_reltol;
         }
-        else if (snapped && desired == emitted)
+        else if (snapped && !force && desired == emitted)
             ++m_stats.suppressed_snap;
         else
         {
@@ -242,7 +249,7 @@ void OpticalOutputPort::emit_due_entry()
 
     // cout << "emit: " << emit_signal << endl;
     // Emit the desired output value if its stars are aligned
-    if (emit_signal || m_skip_next_convergence_check)
+    if (emit_signal || force)
     {
         // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
         // cout << " emitting " << desired << endl;
@@ -259,8 +266,11 @@ void OpticalOutputPort::emit_due_entry()
         // Replace the stored emitted output value at that wavelength
         emitted = desired;
 
-        // Write the value to the port
-        m_port->write(spx::oa_value_type(desired, wlid));
+        // Write the value to the port (forced: with an event, also if the net holds that value)
+        if (force && m_net)
+            m_net->writeWithEvent(spx::oa_value_type(desired, wlid));
+        else
+            m_port->write(spx::oa_value_type(desired, wlid));
     }
 }
 

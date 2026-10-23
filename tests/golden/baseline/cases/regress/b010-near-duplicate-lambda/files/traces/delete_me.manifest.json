@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b010-near-duplicate-lambda.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b010-near-duplicate-lambda.cir", "sha256": "45d98391bf11cd13c4d5db5e456649b799749b9f5792bb29f1414d8082da6e75"}
+  ],
+  "trace_file": "traces/delete_me.vcd"
+}

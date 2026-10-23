@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/b003-dc-dark-point.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 2147,
+   "kind": "text",
+   "sha256": "0583476de2c1f972da1403dfe28a69d94d15db65e9c0e625d0ac2b922fa06c6b",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 471,
+   "kind": "json",
+   "sha256": "147709b343fb81bcbe036b095e8355ed4c102d62b8bedc1e8683ea43fbd3e50b",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 3410,
+   "kind": "vcd",
+   "sha256": "2dbf4a79c637d56fd18960b389b0fc41f94d85ffac5084cc407d684b6a3883f1",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b003-dc-dark-point"
+}

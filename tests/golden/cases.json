@@ -3839,7 +3839,7 @@
     "-f",
     "tests/golden/netlists/b062-mlprobe-unlisted-wavelength.cir"
    ],
-   "note": "B-062: MLPROBEs ignore the wavelengths they do not list (exact match): one warning per probe on stderr at the end of the run, in name order, with full precision (before: one 'received unsupported signal' line per event on stdout)"
+   "note": "B-062: MLPROBEs ignore the wavelengths they do not list (matched within a relative 1e-12 since PH: MLPROBE1 traces a computed wavelength, MLPROBE0 misses one by 6.4e-11): one warning per probe on stderr at the end of the run, in name order, with full precision (before: one 'received unsupported signal' line per event on stdout)"
   },
   {
    "id": "regress/b184-mlprobe-tran-start-multilambda",
@@ -3902,7 +3902,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-dc.cir"
    ],
-   "note": "PD5: PROBE wavelength latch in a .dc: per point, the smallest wavelength written to the net at that point (both sources at the first point, then the swept one only: B-185)"
+   "note": "PD5: PROBE wavelength latch in a .dc: per point, the swept wavelength (both sources write the net at every point since B-185; before, only at the first point)"
   },
   {
    "id": "regress/probe-latch-dc-swept-wl",
@@ -3923,7 +3923,7 @@
     "-f",
     "tests/golden/netlists/probe-latch-dc-swept-wl.cir"
    ],
-   "note": "PD5 follow-up 2: .dc WL(src) sweep: a PROBE latches the swept wavelength at each point when its net carries it, also at the first point next to a smaller fixed wavelength; a net without it latches the smallest one"
+   "note": "PD5 follow-up 2: .dc WL(src) sweep: a PROBE latches the swept wavelength at each point when its net carries it, also at the first point next to a smaller fixed wavelength; a net without it latches the smallest one, at every point since B-185 (before: the first point only)"
   },
   {
    "id": "regress/probe-latch-dc-swept-f",
@@ -3945,6 +3945,65 @@
     "tests/golden/netlists/probe-latch-dc-swept-f.cir"
    ],
    "note": "PD5 follow-up 2: .dc /src/F frequency sweep (long form): a PROBE latches the swept wavelength (c/f) at each point, also at the first point next to a smaller fixed wavelength"
+  },
+  {
+   "id": "regress/b003-dc-dark-point",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b003-dc-dark-point.cir"
+   ],
+   "note": "B-003: a .dc point whose output falls below abstol (an MZI null) is written (0 W, snapped) instead of keeping the previous point's value and wavelength"
+  },
+  {
+   "id": "regress/b010-near-duplicate-lambda",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b010-near-duplicate-lambda.cir"
+   ],
+   "note": "B-010: two sources at 1.55e-6 and 1550*1e-9 (equal within a relative 1e-12) share one wavelength id and add coherently: m = 2 W (before: two ids, 0.5 W shown)"
+  },
+  {
+   "id": "regress/b062-mlprobe-computed-wavelength",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b062-mlprobe-computed-wavelength.cir"
+   ],
+   "note": "B-062: a wavelength computed from a frequency (c/f = 1.5499999999999998e-06) matches the 1.55e-6 an MLPROBE lists (within a relative 1e-12): traced, no warning"
   },
   {
    "id": "regress/probe-wl-ignored",
