@@ -42,3 +42,6 @@ builddir/
 # pixi (pixi.toml): environments, and the build directories of its tasks
 /.pixi/
 /build-pixi/
+
+# F-06: local benchmark history (tests/bench/bench.py; absolute times are machine-dependent)
+/tests/bench/history.jsonl

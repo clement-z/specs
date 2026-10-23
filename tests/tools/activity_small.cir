@@ -1,0 +1,20 @@
+* Small netlist for the activity-map test: a subcircuit instantiated twice, one nested instance
+.assign lambda0 = 1.55e-6
+
+.subckt outer a b
+.subckt inner a b
+wg1 a b length=1e-3
+.ends
+x1 a m inner
+x2 m b inner
+.ends
+
+cwsrc1 in wl={lambda0} power=1
+wg0 in n1 length=2e-3
+x1 n1 n2 outer
+x2 n2 out outer
+wg2 out o2 length=1e-3
+probe1 o2
+
+.options abstol=1e-12 reltol=1e-6
+.tran 1e-10

@@ -14,5 +14,6 @@ For now, you can have a look at:
 * [Tolerances and time resolution](numerics.md) for `abstol`, `reltol`, `snapfactor`, `timescale` and `resolution`,
   and the `.op`/`.dc` iteration cap (`maxiter`), run statistics (`--stats`), `--progress`
 * [Reproducible runs](reproducibility.md): `--seed` and `.options seed`, output order, the run manifest (`--print-manifest`)
+* [Activity map](activity_map.md): a picture of the events per device from `--json` and `--stats=ports`
 
 And refer to the auto-generated code documentation.

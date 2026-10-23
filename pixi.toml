@@ -103,6 +103,7 @@ numpy = "*"
 pandas = "*"
 matplotlib-base = "*"     # matplotlib without the Qt backend (Tk and Jupyter backends work)
 jupyterlab = "*"
+graphviz = "*"           # dot, for utils/activity_map.py (layout of the circuit graph)
 
 [feature.py.pypi-dependencies]
 pyDigitalWaveTools = ">=1.2"

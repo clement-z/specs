@@ -222,6 +222,11 @@ if get_option('golden')
   subdir('tests/golden')
 endif
 
+# Accuracy suite (oracles) and benchmark ratios (F-06)
+subdir('tests/bench')
+# Tests of the Python tools in utils/ (activity map, F-31)
+subdir('tests/tools')
+
 # ---- Helper targets -----------------------------------------------------------------------------
 
 doxygen = find_program('doxygen', required: get_option('docs'))

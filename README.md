@@ -25,7 +25,7 @@ or by hand:
 ```sh
 meson setup build                  # release build by default; downloads SystemC, args and googletest
 meson compile -C build             # builds SystemC 3.0.2 as C++20, then specs
-meson test -C build                # unit tests, testbench smoke tests, golden-output regression
+meson test -C build                # unit tests, testbench smoke tests, golden outputs, analytic oracles
 build/specs -f circuits/add_drop.cir -o traces/out               # needs a traces/ directory
 build/specs -f circuits/add_drop.cir -o traces/out --format csv  # traces/out.csv instead of traces/out.vcd
 ```
@@ -73,6 +73,15 @@ they run only while `.pixi/` exists; use the plain route for portable binaries. 
 The pixi tasks also build googletest from its wrap (`-Dforce_fallback_for=systemc,args,gtest`): the environment's
 pkg-config also reads the host's `/usr/lib/pkgconfig`, and an installed gtest found there does not compile with the
 environment's compilers. Pass the same option to a plain `meson setup` inside `pixi shell`.
+
+### Accuracy suite, benchmark and activity map
+
+`meson test` also runs the accuracy suite of [`tests/bench/`](tests/bench/README.md): SPECS against closed-form
+ring and CROW responses (suite `oracle`), and ratio checks on the paper's CROW benchmark (suite `bench`). The
+CROW generator (`tests/bench/crow_gen.py`) and the benchmark (`tests/bench/bench.py`, absolute times kept in a
+local history file) are there too. [`utils/activity_map.py`](doc/activity_map.md) draws a circuit with each device
+coloured by the events it processed in a run (`specs --json` and `--stats=ports,devices`; rendering with
+`pixi run -e py`).
 
 If you want to contribute with the project, check the `todo.txt` file for some inspiration on points to work on. We are also open for new ideas, so feel free to open an issue and discuss.
 
