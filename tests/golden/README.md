@@ -134,6 +134,8 @@ For every case the harness records:
     An undecodable file or entry becomes a `npz...: cannot decode: <reason>` line. The
     baseline stores this text, not the binary; the SHA-256 and size of the raw bytes are
     kept in `case.json` but never compared (the last bits of floats differ between compilers);
+  * NumPy `.npy` (the columns of a run table `<trace>.runs/`, F-02): decoded the same way, under a
+    `npy: descr=... shape=...` line, and compared as text (`npy: cannot decode: <reason>` if it cannot be);
   * anything else: compared as text, or as bytes if binary.
 
 The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=DISABLE`.
@@ -179,17 +181,17 @@ The environment is inherited, with `LC_ALL=C LANG=C TZ=UTC SC_COPYRIGHT_MESSAGE=
   * `rlimit_nofile`: soft open-files limit of the `specs` process (set with `ulimit -S -n`);
   * `expect` and `note` are documentation only.
 
-## Case list (244 `specs` cases + 1 gtest case)
+## Case list (271 `specs` cases + 1 gtest case)
 
 | group | cases | what it covers |
 |---|---|---|
-| `cir/*` (9) | every `circuits/*.cir` and `circuits/legacy/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
+| `cir/*` (12) | every `circuits/*.cir` and `circuits/legacy/*.cir`, run with `-f` | parser + elaboration + OP/DC/TRAN analysis, default trace `traces/delete_me.vcd` |
 | `cir-json/*` (4) | `-n --json flat.json -f` on the 4 netlists that parse | flattened-netlist JSON export, dry run |
 | `opt/*` (6) | `-o`, `--abstol/--reltol/-R`, `-m sampled-time` (rejected, B-002), `-m fd`, two `-f` files, `--vci` | CLI option handling (options become a `.options` footer) |
 | `tb/*` (20) | every name in `tb_map` (`src/tb/alltestbenches.cpp`, `specs -p`): 13 testbench functions, aliases included; plus `tb/ac_add_drop-fd` (`-m fd`) | legacy device testbenches (`BUILD_OLD_TB`) |
 | `cli/*` (6) | `-h`, no args, `-p`, unknown testbench, missing netlist, bad `-m` | CLI and error paths |
-| `err/bNNN-*`, `err/fNN-*` (86) | bad inputs from the 2026-10, 2026-10b and 2026-10c fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
-| `regress/bNNN-*`, `regress/fNN-*` (110) | regression cases of the 2026-10, 2026-10b and 2026-10c fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, tracing only the probes of a netlist that has some, `.save`, `--no-trace`, CSV and `.npz` tables, subcircuit instances sharing a net, 64-bit integer literals, zero tolerances, run statistics, the event cap `maxevents`, value-list source prints only with `--vci`, per-wavelength values that must not depend on the order of evaluation within a time step, ...); hand-computed expected values are in the netlist headers |
+| `err/bNNN-*`, `err/fNN-*` (99) | bad inputs from the 2026-10, 2026-10b and 2026-10c fix phases and features (`tests/golden/netlists/` or CLI options), and the `.op`/`.dc` fixed points that do not converge (F-28) | each must be rejected with a clean message and exit 1 (was a crash, abort, hang or silent acceptance); the backlog or feature ID is in the name |
+| `regress/bNNN-*`, `regress/fNN-*` (124) | regression cases of the 2026-10, 2026-10b and 2026-10c fix phases and features | behaviour that a fix made work (bidirectional MZI and nets, `--vci` on CROW, many includes, multi-wavelength `.op`, positional arguments, `-m` with an analysis, passive and bidirectional crossings, event-driven photodetectors, probes tracing the operating point from t = 0 in `.tran`, `snapfactor`, delay-rounding warnings, resonator error vs reltol, seeds and per-device random streams, the PDET dark field, the run manifest, the `.op`/`.dc` iteration cap, SI suffixes, `.ends NAME`, `.dc WL(src)`, `--param`, `.include` relative to the including file, tracing only the probes of a netlist that has some, `.save`, `--no-trace`, CSV and `.npz` tables, subcircuit instances sharing a net, 64-bit integer literals, zero tolerances, run statistics, the event cap `maxevents`, value-list source prints only with `--vci`, per-wavelength values that must not depend on the order of evaluation within a time step, functions and random draws in expressions, `.step`/`.mc` plans and their run table, `--run K`, a plan with a failing run, ...); hand-computed expected values are in the netlist headers |
 | `gtest/unit_tests` | `unit_tests --gtest_output=json:…` | GoogleTest suite (only with `--unit-tests`) |
 
 Cases that are **expected to fail**. They are kept so that any behaviour change
