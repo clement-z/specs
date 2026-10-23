@@ -819,6 +819,20 @@ void ParseTree::build_circuit()
         // move on to the next one
         next_net = pt_helper.next_fresh_net();
     }
+    // PD6: the wavelength of a PROBE is always traced; once per run, for all the probes that asked otherwise
+    if (!pt_helper.probes_ignoring_wavelength_off.empty())
+    {
+        cerr << "Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th argument) "
+             << "ignored for ";
+        const char *sep = "";
+        for (const auto &probe_name : pt_helper.probes_ignoring_wavelength_off)
+        {
+            cerr << sep << probe_name;
+            sep = ", ";
+        }
+        cerr << endl;
+    }
+
     // .save (F-05): one probe per signal of each listed net (two on a bidirectional net), named and
     // traced like the automatic probes (PROBE{<signal>}); the targets on one net share its probe
     bool has_save = false;
@@ -850,6 +864,7 @@ void ParseTree::build_circuit()
                 if (!mod)
                 {
                     auto probe = make_shared<Probe>(probe_name.c_str(), false, false, false, false);
+                    probe->m_automatic = true;
                     probe->p_in(*dynamic_cast<spx::oa_signal_type *>(sig.get()));
                     mod = probe;
                 }

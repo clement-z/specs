@@ -6,7 +6,7 @@
   "seed": 0,
   "command_line": ["specs", "-f", "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"],
   "netlist_files": [
-    {"path": "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir", "sha256": "fd832034ad06e8d398712bf10f5b7482d3c11fb9ad637753709c9795b3e21a5a"}
+    {"path": "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir", "sha256": "bd47dbe20b2b00bf3243a2097d25514ad899e2a75594f226b6d1c023735e3cee"}
   ],
   "trace_file": "traces/delete_me.vcd"
 }

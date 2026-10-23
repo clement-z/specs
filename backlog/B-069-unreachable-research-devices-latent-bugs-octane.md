@@ -37,3 +37,5 @@ B-051, B-065, B-068, B-075.
 - Review ids: F-A3-23.
 ## Verification
 Code reading and grep.
+
+**2026-10-23 (PD2b):** the GTD family (`GenericTransmissionDevice`, `Generic2x2Coupler`, `GenericWaveguide`) and the delta-write mode of the output ports were removed in 54b15dc (maintainer decision 2026-10-23), with the include at specs.cpp:15; the GTD bullets above are obsolete. OCTANE and BitstreamSource stay open.

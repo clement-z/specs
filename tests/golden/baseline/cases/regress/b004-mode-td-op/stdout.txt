@@ -58,15 +58,15 @@ Current SPECS config:
 - trace all optical nets: 0
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
-ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 ╔═══════════════════╗
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/in (OPTICAL) = [#2]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-║ - ROOT/out (OPTICAL) = [#3]  @ 1550 nm (0.997546 √W, 0.995098 W, -3.1416 rad)
-║ - ROOT/ring_bl (OPTICAL) = [#4]  @ 1550 nm (4.956128 √W, 24.563207 W, 1.5708 rad)
-║ - ROOT/ring_br (OPTICAL) = [#5]  @ 1550 nm (4.956128 √W, 24.563207 W, 1.5708 rad)
+║ - ROOT/in (OPTICAL) = @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+║ - ROOT/out (OPTICAL) = @ 1550 nm (0.997546 √W, 0.995098 W, -3.1416 rad)
+║ - ROOT/ring_bl (OPTICAL) = @ 1550 nm (4.956128 √W, 24.563207 W, 1.5708 rad)
+║ - ROOT/ring_br (OPTICAL) = @ 1550 nm (4.956128 √W, 24.563207 W, 1.5708 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ╔═══════════════════╗

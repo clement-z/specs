@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/b184-mlprobe-tran-start-multilambda.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 183,
+   "kind": "text",
+   "sha256": "5291c009823db932e35dc5e1427e0f50b83dc85f6cd229ac2067c37ffa91206b",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 505,
+   "kind": "json",
+   "sha256": "59ae978bf3aa7d4832bf8aad59258ee56473b1ad34c589d85981279cd76e7aee",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1200,
+   "kind": "vcd",
+   "sha256": "368df5ce79ef5e2ea7ef741775958f8543a55a7cc38d89b44313f4efc3fb4043",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b184-mlprobe-tran-start-multilambda"
+}

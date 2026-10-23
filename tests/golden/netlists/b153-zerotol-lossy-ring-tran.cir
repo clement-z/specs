@@ -9,7 +9,8 @@
 * 1 ps long) has |E| = k * 0.0316228 * a * k * r^(n-1) = 0.00158114 * 0.0707107^(n-1) sqrt(W).
 * It underflows after about ln(0.00158114 / 2.47e-324) / ln(1 / r) + 1 = 280 round trips:
 * n = 279 gives 2.3e-323 (1.97626e-323 = 4 x 4.94e-324 after the subnormal rounding), n = 280 gives 0.
-* Expected: exit 0; stderr exactly one line (the warning); probe1 traces |E| only: 0.0316228 from 0 to
+* Expected: exit 0; stderr: the PD6 line (probe1's false 4th argument is ignored, it also traces its
+* wavelength, 1.55e-6), then the zero-tolerance warning; probe1 traces |E|: 0.0316228 from 0 to
 * 1 ps, then 0.00158114 at 10 ps, 0.000111803 at 20 ps, 7.90569e-06 at 30 ps, ..., 1.97626e-323 at
 * 2790 ps, each back to 0 1 ps later (279 pulses); "Simulated 2801 ps": the values scheduled at 2800
 * and 2801 ps have underflowed to 0, equal to the last emitted value, and are not emitted.

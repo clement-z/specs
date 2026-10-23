@@ -1,0 +1,12 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 1,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--stats=devices", "--stats-file", "traces/custom.stats.json", "--print-stats", "-o", "traces/x", "-f", "tests/golden/netlists/b001-fd-multilambda-stale.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b001-fd-multilambda-stale.cir", "sha256": "eeb344271e12ca8229198edb2b4d02e69a1f7a69a8152290d1b08e42cc45a4b5"}
+  ],
+  "trace_file": "traces/x.vcd"
+}

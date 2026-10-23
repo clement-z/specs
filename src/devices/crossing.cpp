@@ -18,6 +18,12 @@ void CrossingBase::s_parameters(OpticalSignal::field_type &through, OpticalSigna
     cross = polar(crosstalk_field_lin, M_PI / 2); // in quadrature, as in the directional coupler
 }
 
+void CrossingBase::start_of_simulation()
+{
+    // Pre-calculate S-parameters
+    s_parameters(m_through, m_cross);
+}
+
 void CrossingUni::write_outputs(uint32_t wavelength_id,
                                 const OpticalSignal::field_type &through,
                                 const OpticalSignal::field_type &cross)
@@ -34,63 +40,44 @@ void CrossingUni::write_outputs(uint32_t wavelength_id,
     m_out2_writer.delayedWrite(s4, sc_time(0, SC_NS));
 }
 
+void CrossingUni::print_initialization()
+{
+    const OpticalSignal::field_type &through = m_through;
+    const OpticalSignal::field_type &cross = m_cross;
+
+    cout << name() << ":" << endl;
+    cout << "transmission_power = " << norm(through) << " W/W" << endl;
+    cout << "crosstalk_power = " << norm(cross)<< " W/W" << endl;
+    cout << port_channel_name(p_in1);
+    cout << " ---   ---> ";
+    cout << port_channel_name(p_out1);
+    cout << endl;
+    cout << port_channel_name(p_in2);
+    cout << " ---   ---> ";
+    cout << port_channel_name(p_out2);
+    cout << endl;
+
+    cout << endl;
+}
+
 void CrossingUni::on_port_in1_changed()
 {
-    // Pre-calculate S-parameters
-    OpticalSignal::field_type through, cross;
-    s_parameters(through, cross);
+    // Read current input and update the field memory at its wavelength
+    OpticalSignal p_in1_read = p_in1->read();
+    auto cur_wavelength_id = p_in1_read.m_wavelength_id;
+    m_memory_in1[cur_wavelength_id] = p_in1_read.m_field;
 
-    if (specsGlobalConfig.verbose_component_initialization)
-    {
-        cout << name() << ":" << endl;
-        cout << "transmission_power = " << norm(through) << " W/W" << endl;
-        cout << "crosstalk_power = " << norm(cross)<< " W/W" << endl;
-        cout << port_channel_name(p_in1);
-        cout << " ---   ---> ";
-        cout << port_channel_name(p_out1);
-        cout << endl;
-        cout << port_channel_name(p_in2);
-        cout << " ---   ---> ";
-        cout << port_channel_name(p_out2);
-        cout << endl;
-
-        cout << endl;
-    }
-
-    OpticalSignal p_in1_read;
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-
-        // Read current input and update the field memory at its wavelength
-        p_in1_read = p_in1->read();
-        auto cur_wavelength_id = p_in1_read.m_wavelength_id;
-        m_memory_in1[cur_wavelength_id] = p_in1_read.m_field;
-
-        write_outputs(cur_wavelength_id, through, cross);
-    }
+    write_outputs(cur_wavelength_id, m_through, m_cross);
 }
 
 void CrossingUni::on_port_in2_changed()
 {
-    // Pre-calculate S-parameters
-    OpticalSignal::field_type through, cross;
-    s_parameters(through, cross);
+    // Read current input and update the field memory at its wavelength
+    OpticalSignal p_in2_read = p_in2->read();
+    auto cur_wavelength_id = p_in2_read.m_wavelength_id;
+    m_memory_in2[cur_wavelength_id] = p_in2_read.m_field;
 
-    OpticalSignal p_in2_read;
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-
-        // Read current input and update the field memory at its wavelength
-        p_in2_read = p_in2->read();
-        auto cur_wavelength_id = p_in2_read.m_wavelength_id;
-        m_memory_in2[cur_wavelength_id] = p_in2_read.m_field;
-
-        write_outputs(cur_wavelength_id, through, cross);
-    }
+    write_outputs(cur_wavelength_id, m_through, m_cross);
 }
 
 void CrossingBi::write_forward_outputs(uint32_t wavelength_id,
@@ -127,111 +114,70 @@ void CrossingBi::write_backward_outputs(uint32_t wavelength_id,
     m_p1_out_writer.delayedWrite(s1_out, sc_time(0, SC_NS));
 }
 
+void CrossingBi::print_initialization()
+{
+    const OpticalSignal::field_type &through = m_through;
+    const OpticalSignal::field_type &cross = m_cross;
+
+    cout << name() << ":" << endl;
+    cout << "transmission_power = " << norm(through) << " W/W" << endl;
+    cout << "crosstalk_power = " << norm(cross)<< " W/W" << endl;
+    cout << port_channel_name(p0_in);
+    cout << " ---   ---> ";
+    cout << port_channel_name(p2_out);
+    cout << endl;
+    cout << port_channel_name(p1_in);
+    cout << " ---   ---> ";
+    cout << port_channel_name(p3_out);
+    cout << endl;
+    cout << port_channel_name(p2_in);
+    cout << " ---   ---> ";
+    cout << port_channel_name(p0_out);
+    cout << endl;
+    cout << port_channel_name(p3_in);
+    cout << " ---   ---> ";
+    cout << port_channel_name(p1_out);
+    cout << endl;
+
+    cout << endl;
+}
+
 void CrossingBi::on_p0_in_changed()
 {
-    // Pre-calculate S-parameters
-    OpticalSignal::field_type through, cross;
-    s_parameters(through, cross);
+    // Read current input and update the field memory at its wavelength
+    OpticalSignal p0_in_read = p0_in->read();
+    auto cur_wavelength_id = p0_in_read.m_wavelength_id;
+    m_memory_in0[cur_wavelength_id] = p0_in_read.m_field;
 
-    if (specsGlobalConfig.verbose_component_initialization)
-    {
-        cout << name() << ":" << endl;
-        cout << "transmission_power = " << norm(through) << " W/W" << endl;
-        cout << "crosstalk_power = " << norm(cross)<< " W/W" << endl;
-        cout << port_channel_name(p0_in);
-        cout << " ---   ---> ";
-        cout << port_channel_name(p2_out);
-        cout << endl;
-        cout << port_channel_name(p1_in);
-        cout << " ---   ---> ";
-        cout << port_channel_name(p3_out);
-        cout << endl;
-        cout << port_channel_name(p2_in);
-        cout << " ---   ---> ";
-        cout << port_channel_name(p0_out);
-        cout << endl;
-        cout << port_channel_name(p3_in);
-        cout << " ---   ---> ";
-        cout << port_channel_name(p1_out);
-        cout << endl;
-
-        cout << endl;
-    }
-
-    OpticalSignal p0_in_read;
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-
-        // Read current input and update the field memory at its wavelength
-        p0_in_read = p0_in->read();
-        auto cur_wavelength_id = p0_in_read.m_wavelength_id;
-        m_memory_in0[cur_wavelength_id] = p0_in_read.m_field;
-
-        write_forward_outputs(cur_wavelength_id, through, cross);
-    }
+    write_forward_outputs(cur_wavelength_id, m_through, m_cross);
 }
 
 void CrossingBi::on_p1_in_changed()
 {
-    // Pre-calculate S-parameters
-    OpticalSignal::field_type through, cross;
-    s_parameters(through, cross);
+    // Read current input and update the field memory at its wavelength
+    OpticalSignal p1_in_read = p1_in->read();
+    auto cur_wavelength_id = p1_in_read.m_wavelength_id;
+    m_memory_in1[cur_wavelength_id] = p1_in_read.m_field;
 
-    OpticalSignal p1_in_read;
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-
-        // Read current input and update the field memory at its wavelength
-        p1_in_read = p1_in->read();
-        auto cur_wavelength_id = p1_in_read.m_wavelength_id;
-        m_memory_in1[cur_wavelength_id] = p1_in_read.m_field;
-
-        write_forward_outputs(cur_wavelength_id, through, cross);
-    }
+    write_forward_outputs(cur_wavelength_id, m_through, m_cross);
 }
 
 void CrossingBi::on_p2_in_changed()
 {
-    // Pre-calculate S-parameters
-    OpticalSignal::field_type through, cross;
-    s_parameters(through, cross);
+    // Read current input and update the field memory at its wavelength
+    OpticalSignal p2_in_read = p2_in->read();
+    auto cur_wavelength_id = p2_in_read.m_wavelength_id;
+    m_memory_in2[cur_wavelength_id] = p2_in_read.m_field;
 
-    OpticalSignal p2_in_read;
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-
-        // Read current input and update the field memory at its wavelength
-        p2_in_read = p2_in->read();
-        auto cur_wavelength_id = p2_in_read.m_wavelength_id;
-        m_memory_in2[cur_wavelength_id] = p2_in_read.m_field;
-
-        write_backward_outputs(cur_wavelength_id, through, cross);
-    }
+    write_backward_outputs(cur_wavelength_id, m_through, m_cross);
 }
 
 void CrossingBi::on_p3_in_changed()
 {
-    // Pre-calculate S-parameters
-    OpticalSignal::field_type through, cross;
-    s_parameters(through, cross);
+    // Read current input and update the field memory at its wavelength
+    OpticalSignal p3_in_read = p3_in->read();
+    auto cur_wavelength_id = p3_in_read.m_wavelength_id;
+    m_memory_in3[cur_wavelength_id] = p3_in_read.m_field;
 
-    OpticalSignal p3_in_read;
-
-    while (true) {
-        // Wait for a new input signal
-        wait();
-
-        // Read current input and update the field memory at its wavelength
-        p3_in_read = p3_in->read();
-        auto cur_wavelength_id = p3_in_read.m_wavelength_id;
-        m_memory_in3[cur_wavelength_id] = p3_in_read.m_field;
-
-        write_backward_outputs(cur_wavelength_id, through, cross);
-    }
+    write_backward_outputs(cur_wavelength_id, m_through, m_cross);
 }

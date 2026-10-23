@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f15-options-coalesce-removed.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f15-options-coalesce-removed"
+}

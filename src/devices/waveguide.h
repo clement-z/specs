@@ -2,10 +2,13 @@
 
 #include <systemc.h>
 
+#include <utility>
+
 #include "optical_output_port.h"
 #include "optical_signal.h"
 #include "specs.h"
 #include "devices/spx_module.h"
+#include "utils/transmission_cache.h"
 
 /** The base class for the waveguide module */
 class WaveguideBase : public spx_module {
@@ -64,6 +67,31 @@ public:
         // => delay = L / vg = (L * ng) / c
         return 1e9 * m_length_cm * 1e-2 / (c / m_ng);
     }
+
+protected:
+    // F-15: constants of the transmission, computed once before the simulation by
+    // prepareTransmission() (the device threads computed them when they started)
+    /** Field transmission 10^(-dB/20) */
+    double m_transmission = 1;
+    /** 2 * pi * L (L in m) */
+    double m_phase_delay_factor = 0;
+    /** dneff/dlambda = (neff - ng) / 1.55 um */
+    double m_dneff_dlambda = 0;
+    /** Dispersion terms (used when m_D != 0) */
+    double m_d2neff_dlambda2_over_2 = 0;
+    double m_dng_dlambda = 0;
+    /** Group delay at the reference wavelength (used when m_D == 0) */
+    sc_time m_group_delay;
+    /** m_D != 0 when the simulation started */
+    bool m_dispersive = false;
+    /** Per-wavelength transmission (and group delay with dispersion), same arithmetic as per
+     * event (F-15). Shared by both directions of a bidirectional waveguide (same values) */
+    WavelengthCache<OpticalSignal::field_type> m_S12_cache;
+    WavelengthCache<std::pair<OpticalSignal::field_type, sc_time>> m_S12_delay_cache;
+
+    void prepareTransmission();
+    /** Writes the input signal s, transmitted, to out after the group delay */
+    void propagate(OpticalSignal s, OpticalOutputPort &out);
 };
 
 
@@ -88,11 +116,14 @@ public:
      *
      * It copies the input to the output, after attenuation and delay.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** p_in
      * */
     void on_port_in_changed();
+    /** --vci only: prints the parameters at initialization (a thread, so that the devices
+     * print in the order their threads used to) */
+    void print_initialization();
 
     virtual void start_of_simulation();
 
@@ -109,8 +140,11 @@ public:
     {
         SC_HAS_PROCESS(WaveguideUni);
 
-        SC_THREAD(on_port_in_changed);
+        SC_METHOD(on_port_in_changed);
         sensitive << p_in;
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
     }
 };
 
@@ -137,16 +171,19 @@ public:
     OpticalOutputPort m_p1_out_writer;
 
     // Processes
-    /** Main process of the module.
+    /** Main processes of the module.
      *
-     * It copies the input to the output, after attenuation and delay.
+     * They copy the input to the output, after attenuation and delay.
      *
-     *   **SystemC type:** thread
+     *   **SystemC type:** method
      *
      *   **Sensitivity list:** p0_in or p1_in
      * */
     void on_p0_in_changed();
     void on_p1_in_changed();
+    /** --vci only: prints the parameters at initialization (a thread, so that the devices
+     * print in the order their threads used to) */
+    void print_initialization();
 
     virtual void start_of_simulation();
 
@@ -164,9 +201,13 @@ public:
     {
         SC_HAS_PROCESS(WaveguideBi);
 
-        SC_THREAD(on_p0_in_changed);
+        SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
-        SC_THREAD(on_p1_in_changed);
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
+        SC_METHOD(on_p1_in_changed);
         sensitive << p1_in;
+        dont_initialize();
     }
 };

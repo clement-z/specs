@@ -1,0 +1,22 @@
+* PD6: a PROBE always traces its wavelength. A false wavelength flag (wl=0, wavelength=0, a false 4th
+* positional argument) is accepted and ignored, with one warning on stderr for all the probes, in name
+* order: ROOT/PROBE1, ROOT/PROBE2, ROOT/PROBE3, ROOT/X1/PROBE1. A true value (PROBE4, PROBE5) changes
+* nothing and is not listed. .save E(b) traces exactly what it asks for (SPICE semantics): abs only.
+* Expected (.tran, CW 1 mW at 1550 nm, values of the operating point from t = 0):
+*   every PROBE traces wavelength 1.55e-6, plus the quantities its other arguments select:
+*   PROBE1, PROBE4 on a: power, abs, phase; PROBE3 on a: power, abs, phase (4th argument 0);
+*   PROBE2 on b: power, abs, phase; PROBE5 on a: abs; X1/PROBE1 on b: the wavelength only;
+*   PROBE{ROOT/b}: abs only, no wavelength.
+.subckt tap in
+probe1 in 0 0 0 0
+.ends tap
+cwsrc1 a wl=1.55e-6 power=1e-3
+wg1 a b length=100e-6 neff=2.2 ng=4.2
+probe3 a 1 1 1 0
+probe1 a wl=0
+probe2 b wavelength=0
+probe4 a wl=1
+probe5 a 0 1 0 1
+x1 b tap
+.save E(b)
+.tran 1e-12

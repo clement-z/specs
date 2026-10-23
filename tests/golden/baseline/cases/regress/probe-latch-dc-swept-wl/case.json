@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/probe-latch-dc-swept-wl.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 421,
+   "kind": "text",
+   "sha256": "cee8d892b84595e751b969845d5bc35155499104f310af6776af4420e0ed2868",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 481,
+   "kind": "json",
+   "sha256": "0e8b4bde8b1062514ef468600254eb1d911a4c7c7437f3c4dbaa72013501034c",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1349,
+   "kind": "vcd",
+   "sha256": "35a82f9a25c65e96a229c2ec0e3e8225a7fafa6f7c974df528769d72cb3123a1",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/probe-latch-dc-swept-wl"
+}

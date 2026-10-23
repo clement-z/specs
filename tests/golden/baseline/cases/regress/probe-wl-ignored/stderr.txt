@@ -1,0 +1,2 @@
+Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th argument) ignored for ROOT/PROBE1, ROOT/PROBE2, ROOT/PROBE3, ROOT/X1/PROBE1
+

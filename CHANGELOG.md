@@ -2,12 +2,33 @@
 
 ## [unreleased]
 
+## [0.3.0] - 2026-10-23
+
 ### New
 
 * Optional pixi development environment (`pixi.toml`, `pixi.lock`): gcc 15 and clang 21 toolchains with `setup`,
   `build`, `test` and `golden` tasks in `build-pixi/<toolchain>` (also ASan+UBSan), a `py` and a `docs`
   environment. CI: pixi job on Ubuntu (blocking) and macOS (non-blocking), next to the apt jobs
 * Agent instructions moved from `CLAUDE.md` to `AGENTS.md` (read by all coding agents); `CLAUDE.md` imports it
+* Run statistics (F-15): `specs --stats` writes `<trace>.stats.json` with the counters of the optical output
+  ports (values scheduled, coalesced, processed, emitted, suppressed by abstol/reltol/snap, pending entries,
+  last emission) and the wall time; `--stats=ports,devices` adds one row per output port and per device type,
+  `--stats-file` and `--print-stats` choose where it goes (stdout without a trace file); also for the `-t`
+  testbenches. Off by default, no change to the outputs (`doc/numerics.md`)
+* Golden harness: `run_golden.py stats-record` / `stats-compare` record the event counters of every case for
+  two builds and compare them exactly (gate of the F-15 engine refactors)
+* `specs --progress[=seconds]`: a periodic progress line on stderr (wall time, simulated time, delta cycles),
+  without effect on the simulation
+* Expert option (F-15, `doc/numerics.md`): an event cap (`.options maxevents=N`, `--max-events N`: a `.tran`
+  ends there with a warning, an `.op`/`.dc` stops with an error). Default unchanged (no cap)
+* A plain `PROBE` (also the automatic `PROBE{<net>}` probes and the `.save` targets) traces one wavelength of a
+  net that carries several: it latches the smallest one per analysis point (each `.op`/`.dc` point; in a `.dc`
+  that sweeps a source's wavelength or frequency, the swept wavelength when the net carries it; in a `.tran`,
+  the smallest at the start of the transient, or of its first time step that brings any) and ignores the others,
+  with one warning on stderr per probe (one line for all the automatic probes). Before, it traced every event, so
+  it showed one of the wavelengths of each time step, in an unspecified order. For a given
+  wavelength, use MLPROBE. Single-wavelength nets, `.dc` wavelength sweeps and the `-t` testbenches are
+  unchanged (`doc/netlist.md`)
 
 ### Changed
 
@@ -15,6 +36,34 @@
   build machine's CPU. `-Dnative=true` (pixi: `pixi run build-native`, toolchains `gcc-native`/`clang-native`) gives
   host-tuned binaries, whose results differ in the last bits (B-183). The golden baseline is re-recorded without
   `-march=native`: 28 cases change in the last one or two digits of floats (within 1e-12 relative)
+* Signal listings (`.op`/`.dc` net listings, source and testbench prints) no longer start with the `[NNNN]`
+  debug id of the signal: the id is a build option, `-Dsignal_ids=true`, off by default (F-15). Values unchanged
+* Faster engine (F-15): emission gate on squared norms, waveguide transmissions and delays computed once per
+  wavelength, the output ports' event notifications without an allocation per event, and the output ports and
+  stateless device reactions (waveguide, coupler, splitter, merger, crossing, phase shifter) run as SystemC
+  methods instead of threads. CROW benchmark (30 rings, no tracing): about 2.5x less CPU time than v0.2.0.
+  Results are the same bit for bit, except that on a net that carries several wavelengths, a plain `PROBE` (the
+  last write of each time step) could show another of the wavelengths written in a step; the per-wavelength
+  values (`MLPROBE`) were unchanged in every circuit checked. The PROBE wavelength latch (New) removes this
+  dependency on the kernel order
+* A `PROBE` always traces its wavelength (the `wavelength` signal says which wavelength the latch chose, and is
+  the x-axis of a transmission sweep), and so do the automatic `PROBE{<net>}` probes. A 4th positional argument and
+  `wl=`/`wavelength=` are still accepted: a true value changes nothing, a false one (`wl=0`, `probe1 out 0 1 0 0`)
+  is ignored, with one warning on stderr for all such probes. `.save QTY(net)` traces exactly the quantity asked
+  for (`WL(net)` adds the wavelength). C++: the `Probe` constructor keeps its `trace_wavelength` parameter
+  (`doc/netlist.md`)
+
+### Fixed
+
+* B-184: at the start of a `.tran`, an MLPROBE on a net that carries several wavelengths traces the
+  operating-point value of every listed wavelength. Before, only the wavelength written last to the net during
+  the operating point; the others read 0 until written again (never, with CW sources)
+
+### Removed
+
+* Unused code (decision 2026-10-23): the delta-write mode of the optical output ports and the single-wavelength
+  generic transmission devices (`GenericTransmissionDevice`, `Generic2x2Coupler`, `GenericWaveguide`), which no
+  netlist or testbench could reach. A generic N-port device stays planned (scout F-03), written from scratch
 
 ## [0.2.0] - 2026-10-21
 

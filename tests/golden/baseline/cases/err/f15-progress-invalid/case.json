@@ -1,0 +1,10 @@
+{
+ "args": [
+  "--progress=0",
+  "-f",
+  "circuits/add_drop.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f15-progress-invalid"
+}

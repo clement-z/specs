@@ -8,7 +8,6 @@ core_sources += files(
   'detector.cpp',
   'directional_coupler.cpp',
   'electrical_value_list_source.cpp',
-  'generic_transmission_device.cpp',
   'merger.cpp',
   'mesh_col.cpp',
   'mzi.cpp',

@@ -53,6 +53,32 @@
                                         point, per operating point or sweep
                                         point (decimal integer, default 1000000,
                                         0: no limit); overrides .options maxiter
+      --stats=[sections]                Write run statistics: counters of the
+                                        optical output ports (values scheduled,
+                                        coalesced, processed, emitted,
+                                        suppressed by abstol/reltol/snap,
+                                        pending entries, last emission) and the
+                                        wall time, as JSON in
+                                        <output>.stats.json. Sections: summary
+                                        (default), ports (one row per output
+                                        port), devices (per device type),
+                                        comma-separated (--stats=ports,devices)
+      --stats-file=[file]               Write the run statistics to this file
+                                        instead (implies --stats); without it,
+                                        --no-trace or -o "" print them to stdout
+      --print-stats                     Also print the run statistics (JSON) to
+                                        stdout (implies --stats)
+      --progress=[seconds]              Print a progress line (wall time,
+                                        simulated time, delta cycles) on stderr
+                                        every <seconds> of wall-clock time
+                                        (default 1); it never changes the
+                                        simulation; netlists only
+      --max-events=[set_max_events]     Expert option: stop the run once the
+                                        optical output ports have processed this
+                                        many pending entries (decimal integer,
+                                        default 0: no cap); a .tran ends there
+                                        with a warning, an .op/.dc stops with an
+                                        error; overrides .options maxevents
       --nrings_crow=[set_nrings_crow]   temporary
       --vci, --verbose_ci               Print components detail before starting
                                         simulation

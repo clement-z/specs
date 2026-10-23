@@ -1,0 +1,6 @@
+* F-15: .options maxevents takes an integer (as maxiter). Expected: "Error: .options: MAXEVENTS must be an
+* integer between 0 and 2^53 (got 2.5)", exit 1.
+cwsrc1 in wl=1.55e-6 power=1
+wg1 in out
+.options maxevents=2.5
+.op

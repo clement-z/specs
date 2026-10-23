@@ -1,0 +1,2 @@
+Warning: .tran stopped at the event cap at 30 ps: 21 pending entries processed (.options maxevents=20)
+

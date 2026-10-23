@@ -1,0 +1,2 @@
+Invalid --progress value: '0' (expected a period in seconds > 0)
+

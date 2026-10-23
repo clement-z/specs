@@ -35,6 +35,9 @@ public:
     uint32_t signal_index(const std::string &name);
     // One sample of a signal (time_s: the current simulation time, never decreasing)
     void append(double time_s, uint32_t signal, const OpticalSignal &s);
+    // Drops the sample of (signal, wavelength id) of the current time step, if any: a PROBE that
+    // latches a smaller wavelength within the time step of its latch (PD5)
+    void discard(double time_s, uint32_t signal, uint32_t wavelength_id);
     // Writes the .npz and closes the files; the samples appended afterwards are dropped. Returns
     // false (with a message on stderr) if a file could not be written
     bool close();
@@ -69,6 +72,7 @@ private:
         double power_W;
         double field_re;
         double field_im;
+        bool dropped = false; // discard(): not written
     };
     double m_pending_time_s = -1;
     std::vector<Row> m_pending;

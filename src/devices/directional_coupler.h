@@ -5,6 +5,7 @@
 #include "optical_output_port.h"
 #include "optical_signal.h"
 #include "devices/spx_module.h"
+#include "specs.h"
 
 
 class DirectionalCouplerBase : public spx_module {
@@ -29,6 +30,15 @@ public:
     {
         // nothing to do
     }
+
+    virtual void start_of_simulation();
+
+protected:
+    // F-15: computed once before the simulation (the device threads computed them when they
+    // started): S-parameters of the through and cross paths, delay
+    OpticalSignal::field_type m_S_through;
+    OpticalSignal::field_type m_S_cross;
+    sc_time m_delay;
 };
 
 class DirectionalCouplerUni : public DirectionalCouplerBase {
@@ -48,9 +58,12 @@ public:
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
 
-    // Processes
+    // Processes (methods)
     void on_port_in1_changed();
     void on_port_in2_changed();
+    // --vci only: prints the parameters at initialization (a thread, so that the devices print
+    // in the order their threads used to)
+    void print_initialization();
 
     // Constructor
     DirectionalCouplerUni(sc_module_name name,
@@ -62,11 +75,15 @@ public:
     {
         SC_HAS_PROCESS(DirectionalCouplerUni);
 
-        SC_THREAD(on_port_in1_changed);
+        SC_METHOD(on_port_in1_changed);
         sensitive << p_in1;
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
 
-        SC_THREAD(on_port_in2_changed);
+        SC_METHOD(on_port_in2_changed);
         sensitive << p_in2;
+        dont_initialize();
     }
 };
 
@@ -100,11 +117,14 @@ public:
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in3;
 
-    // Processes
+    // Processes (methods)
     void on_p0_in_changed();
     void on_p1_in_changed();
     void on_p2_in_changed();
     void on_p3_in_changed();
+    // --vci only: prints the parameters at initialization (a thread, so that the devices print
+    // in the order their threads used to)
+    void print_initialization();
 
     // Constructor
     DirectionalCouplerBi(sc_module_name name,
@@ -118,16 +138,22 @@ public:
     {
         SC_HAS_PROCESS(DirectionalCouplerBi);
 
-        SC_THREAD(on_p0_in_changed);
+        SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
 
-        SC_THREAD(on_p1_in_changed);
+        SC_METHOD(on_p1_in_changed);
         sensitive << p1_in;
+        dont_initialize();
 
-        SC_THREAD(on_p2_in_changed);
+        SC_METHOD(on_p2_in_changed);
         sensitive << p2_in;
+        dont_initialize();
 
-        SC_THREAD(on_p3_in_changed);
+        SC_METHOD(on_p3_in_changed);
         sensitive << p3_in;
+        dont_initialize();
     }
 };

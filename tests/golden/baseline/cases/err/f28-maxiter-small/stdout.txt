@@ -57,5 +57,5 @@ Current SPECS config:
 - trace all optical nets: 0
 
 Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
-ROOT/CWSRC1 emitted: [#1]  @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 

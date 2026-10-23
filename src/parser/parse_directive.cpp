@@ -15,7 +15,7 @@ using spx::ea_signal_type;
 using spx::ed_signal_type;
 using spx::ed_bus_type;
 
-// Value of an .options keyword stored as an unsigned 64-bit integer (seed, maxiter). An integer
+// Value of an .options keyword stored as an unsigned 64-bit integer (seed, maxiter, maxevents). An integer
 // literal is exact over its whole range, 0 to 2^63 - 1 (B-180); other netlist numbers are doubles,
 // whose integers are exact up to 2^53 only.
 static uint64_t unsigned_integer_option(const string &kw, const Variable &val)
@@ -131,6 +131,14 @@ void OPTIONSDirective::create() const
             // specs --maxiter takes priority over the netlist
             if (!specsGlobalConfig.max_iterations_explicit)
                 specsGlobalConfig.max_iterations = max_iterations;
+        }
+        else if (kw == "MAXEVENTS")
+        {
+            // F-15 expert option: the run stops after this many processed pending entries (0: no cap)
+            const uint64_t max_events = unsigned_integer_option(kw, p.second);
+            // specs --max-events takes priority over the netlist
+            if (!specsGlobalConfig.max_events_explicit)
+                specsGlobalConfig.max_events = max_events;
         }
         else if (kw == "TEST_VARIABLE")
             cout << kw << "(" << p.second.kind() << "): " << p.second.get_str() << endl;

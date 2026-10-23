@@ -72,21 +72,21 @@ Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
 ║  OPERATING POINT  ║
 ╠═══════════════════╣
 ║                   ╨───┄┄
-║ - ROOT/in (OPTICAL) = [#1]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/mid (OPTICAL) = [#2]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out1 (OPTICAL) = [#3]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/out2 (OPTICAL) = [#4]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-║ - ROOT/unused (OPTICAL) = [#5]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/mid (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out1 (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/out2 (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/unused (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 ROOT/VLSRC1 was enabled
 ROOT/VLSRC2 was enabled
-@0 s, ROOT/VLSRC2 emitted: [#6]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@0 s, ROOT/VLSRC1 emitted: [#7]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@10 ps, ROOT/VLSRC1 emitted: [#8]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@20 ps, ROOT/VLSRC1 emitted: [#9]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@30 ps, ROOT/VLSRC1 emitted: [#10]  @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@50 ps, ROOT/VLSRC2 emitted: [#11]  @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC2 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@10 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+@20 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@30 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@50 ps, ROOT/VLSRC2 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
 Simulated 50 ps
 ╔═══════════════════╗
 ║        DONE       ║

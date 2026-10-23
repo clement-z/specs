@@ -4,6 +4,7 @@
 #include <map>
 
 #include "devices/spx_module.h"
+#include "specs.h"
 
 #include "optical_output_port.h"
 #include "optical_signal.h"
@@ -59,6 +60,14 @@ public:
     // Field coefficients of the S-matrix (see above), the same in both directions:
     // through = t, cross = j*x
     void s_parameters(OpticalSignal::field_type &through, OpticalSignal::field_type &cross) const;
+
+    virtual void start_of_simulation();
+
+protected:
+    // F-15: s_parameters(), computed once before the simulation (the device threads computed
+    // them when they started)
+    OpticalSignal::field_type m_through;
+    OpticalSignal::field_type m_cross;
 };
 
 class CrossingUni : public CrossingBase {
@@ -77,9 +86,12 @@ public:
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
 
-    // Processes
+    // Processes (methods)
     void on_port_in1_changed();
     void on_port_in2_changed();
+    // --vci only: prints the parameters at initialization (a thread, so that the devices print
+    // in the order their threads used to)
+    void print_initialization();
 
     // Write both outputs at one wavelength, from the input memories
     void write_outputs(uint32_t wavelength_id,
@@ -99,11 +111,15 @@ public:
     {
         SC_HAS_PROCESS(CrossingUni);
 
-        SC_THREAD(on_port_in1_changed);
+        SC_METHOD(on_port_in1_changed);
         sensitive << p_in1;
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
 
-        SC_THREAD(on_port_in2_changed);
+        SC_METHOD(on_port_in2_changed);
         sensitive << p_in2;
+        dont_initialize();
     }
 };
 
@@ -133,11 +149,14 @@ public:
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
     std::map<uint32_t,OpticalSignal::field_type> m_memory_in3;
 
-    // Processes
+    // Processes (methods)
     void on_p0_in_changed();
     void on_p1_in_changed();
     void on_p2_in_changed();
     void on_p3_in_changed();
+    // --vci only: prints the parameters at initialization (a thread, so that the devices print
+    // in the order their threads used to)
+    void print_initialization();
 
     // Write the forward (p2, p3) or backward (p0, p1) outputs at one wavelength,
     // from the input memories
@@ -163,16 +182,22 @@ public:
     {
         SC_HAS_PROCESS(CrossingBi);
 
-        SC_THREAD(on_p0_in_changed);
+        SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
+        dont_initialize();
+        if (specsGlobalConfig.verbose_component_initialization)
+            SC_THREAD(print_initialization);
 
-        SC_THREAD(on_p1_in_changed);
+        SC_METHOD(on_p1_in_changed);
         sensitive << p1_in;
+        dont_initialize();
 
-        SC_THREAD(on_p2_in_changed);
+        SC_METHOD(on_p2_in_changed);
         sensitive << p2_in;
+        dont_initialize();
 
-        SC_THREAD(on_p3_in_changed);
+        SC_METHOD(on_p3_in_changed);
         sensitive << p3_in;
+        dont_initialize();
     }
 };

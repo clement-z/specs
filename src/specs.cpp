@@ -12,12 +12,14 @@
 #include "devices/probe.h"
 #include "devices/detector.h"
 #include "devices/power_meter.h"
-#include "devices/generic_transmission_device.h"
 #include "run_manifest.h"
+#include "run_progress.h"
+#include "run_stats.h"
 #include "trace_table.h"
 
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <limits>
 
 using std::string;
@@ -50,9 +52,20 @@ SPECSConfig::~SPECSConfig() {}
 
 void SPECSConfig::runAnalysis()
 {
+    run_start = std::chrono::steady_clock::now();
     verifyConfig();
     applyEngineResolution();
     prepareSimulation();
+
+    // F-15 --progress: passive, from the first sc_start() to the end of the analysis
+    std::unique_ptr<RunProgress> progress;
+    if (progress_period_s > 0)
+    {
+        progress = std::make_unique<RunProgress>(progress_period_s,
+                                                 analysis_type == TIME_DOMAIN ? tran_duration
+                                                                              : std::numeric_limits<double>::infinity());
+        progress->start();
+    }
 
     switch (analysis_type) {
         case CW_OPERATING_POINT:
@@ -68,10 +81,117 @@ void SPECSConfig::runAnalysis()
             cerr << "Undefined Analysis type";
             sc_stop();
     }
+    if (progress)
+        progress->stop();
 
     // F-05: write the .npz table, close the CSV
     if (default_trace_table && !default_trace_table->close())
         exit(1);
+
+    writeRunStats();
+}
+
+// F-15 event cap reached during an .op/.dc fixed point (also the operating point of a .tran): the
+// fixed point was cut short, so its values are not a result. Error (exit 1), after writing the
+// run statistics
+void SPECSConfig::checkEventCap(const string &what) const
+{
+    if (!eventCapReached())
+        return;
+    cerr << "Error: " << what << " stopped at the event cap: " << event_cap->processed
+         << " pending entries processed (.options maxevents=" << max_events << ")" << endl;
+    writeRunStats();
+    exit(1);
+}
+
+// F-15 --stats: the counters of every optical output port, summed (src/run_stats.h)
+void SPECSConfig::writeRunStats() const
+{
+    if (!stats_sections)
+        return;
+    RunStats stats;
+    stats.sections = stats_sections;
+    switch (analysis_type) {
+        case CW_OPERATING_POINT:
+            stats.analysis = "OP";
+            break;
+        case CW_SWEEP:
+            stats.analysis = "DC";
+            break;
+        case TIME_DOMAIN:
+            stats.analysis = "TRAN";
+            break;
+        default:
+            stats.analysis = "UNDEFINED";
+    }
+    stats.abstol = default_abstol;
+    stats.reltol = default_reltol;
+    stats.snap_factor = default_snap_factor;
+    stats.max_events = max_events;
+    stats.event_cap_reached = eventCapReached();
+    stats.end_time_s = sc_time_stamp().to_seconds();
+    stats.collect(sc_get_all_module_by_type<OpticalOutputPort>());
+    stats.wall_time_s = std::chrono::duration<double>(std::chrono::steady_clock::now() - run_start).count();
+    const string json = stats.to_json();
+
+    // an explicit file, else next to the default trace file, else (no trace file) on stdout
+    const string filename = !stats_filename.empty() ? stats_filename
+                          : !trace_filename.empty() ? trace_filename + ".stats.json" : "";
+    if (!filename.empty())
+    {
+        std::ofstream outfile(filename, std::ios::out | std::ios::trunc);
+        if (outfile)
+            outfile << json;
+        outfile.close();
+        if (!outfile)
+        {
+            cerr << "Error: cannot write run statistics file \"" << filename << "\"" << endl;
+            exit(1);
+        }
+        cout << "Run statistics written to " << filename << endl;
+    }
+    if (filename.empty() || print_stats)
+        cout << json << flush;
+}
+
+namespace {
+
+void setProbeLatchMode(Probe::LatchMode mode)
+{
+    for (auto probe : sc_get_all_module_by_type<Probe>())
+        probe->m_latch_mode = mode;
+}
+
+// PD5: a plain probe traces one wavelength of its net. Once per run, in name order: one warning per
+// probe that ignored another wavelength, one line for all the automatic probes (PROBE{<net>}:
+// traceall, .save)
+void reportProbeWavelengthLatches()
+{
+    vector<const Probe *> automatic;
+    for (const Probe *probe : sc_get_all_module_by_type<Probe>())
+    {
+        if (isnan(probe->m_ignored_wavelength_m))
+            continue;
+        if (probe->m_automatic)
+        {
+            automatic.push_back(probe);
+            continue;
+        }
+        cerr << "Warning: " << probe->name() << " traces one wavelength of its net "
+             << port_channel_name(probe->p_in) << " (" << probe->m_traced_when_ignored_m * 1e9
+             << " nm) and ignores the others (" << probe->m_ignored_wavelength_m * 1e9
+             << " nm): use MLPROBE for per-wavelength values" << endl;
+    }
+    if (!automatic.empty())
+    {
+        const Probe *first = automatic.front();
+        cerr << "Warning: " << automatic.size() << " automatic probe(s) PROBE{<net>} trace one wavelength of "
+             << "their net and ignore the others (e.g. " << first->name() << " traces "
+             << first->m_traced_when_ignored_m * 1e9 << " nm and ignores " << first->m_ignored_wavelength_m * 1e9
+             << " nm): use MLPROBE for per-wavelength values" << endl;
+    }
+}
+
 }
 
 void SPECSConfig::runOPAnalysis()
@@ -82,6 +202,10 @@ void SPECSConfig::runOPAnalysis()
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // .op: one analysis point (the probes of a .tran latch once, set by runTRANAnalysis(), PD5)
+    if (analysis_type != TIME_DOMAIN)
+        setProbeLatchMode(Probe::LATCH_PER_TIME_STEP);
+
     // Disable photodetectors before the first sc_start(): they are enabled by default
     // (testbenches, C++ users) but must not write their readout during the OP
     for (auto pdet: all_photodetectors) {
@@ -90,6 +214,8 @@ void SPECSConfig::runOPAnalysis()
 
     // Run to initialize all threads and register first values
     sc_start();
+    checkEventCap(analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
+                                               : ".op: the operating point");
 
     // Set values of signals according to NODESET directive
     for (auto &nodeset_order : nodeset_orders)
@@ -120,12 +246,15 @@ void SPECSConfig::runOPAnalysis()
     // delta cycles (F-28), then what is left at later times, as sc_start() did (nothing in FD)
     const sc_dt::uint64 start_delta = sc_delta_count();
     const bool idle = !sc_pending_activity_at_current_time();
+    const string what = analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
+                                                     : ".op: the operating point";
     if (!runFixedPoint())
-        reportNonConvergence(analysis_type == TIME_DOMAIN ? ".tran: the operating point before the transient"
-                                                          : ".op: the operating point", start_delta);
+        reportNonConvergence(what, start_delta);
+    checkEventCap(what);
     // (an idle circuit keeps the SystemC warning W571, no activity, that this sc_start() gave)
     if (idle || sc_pending_activity())
         sc_start();
+    checkEventCap(what);
 
     // Print results on the command line
     printOPAnalysisResult();
@@ -140,6 +269,9 @@ void SPECSConfig::runDCAnalysis()
     auto all_sig = sc_get_all_object_by_type<sc_signal<OpticalSignal, SC_MANY_WRITERS>>();
     auto all_cws = sc_get_all_module_by_type<CWSource>();
 
+    // Each sweep point (one time step) latches its own wavelength (PD5)
+    setProbeLatchMode(Probe::LATCH_PER_TIME_STEP);
+
     // Disable photodetectors before the first sc_start() (they are enabled by default)
     for (auto pdet: all_photodetectors) {
         // Remark: Photodetectors could in fact be left enabled ?
@@ -149,6 +281,7 @@ void SPECSConfig::runDCAnalysis()
 
     // Run to initialize all threads and register first values
     sc_start();
+    checkEventCap(".dc: the initialisation");
 
     // Enable normal probes
     for (auto probe: all_probes) {
@@ -176,15 +309,23 @@ void SPECSConfig::runDCAnalysis()
         exit(1);
     }
     const auto &order = *cw_sweep_orders.begin();
-    wavelengths_vector.reserve(order.second.second.size());
+    wavelengths_vector.reserve(order.second.values.size());
     cout << "Starting sweep on " << order.first;
-    cout << " (" << order.second.second.size() << " points)" << endl;
+    cout << " (" << order.second.values.size() << " points)" << endl;
     size_t point = 0;
-    for (const auto &val : order.second.second)
+    for (const auto &val : order.second.values)
     {
         ++point;
         // Apply sweep param
-        order.second.first(val);
+        order.second.apply(val);
+
+        // A wavelength (or frequency) sweep: the probes latch the swept wavelength of this point
+        // when their net carries it (PD5)
+        const double swept_wavelength_m = order.second.sweeps_wavelength
+                                              ? order.second.source->m_signal_on.getWavelength()
+                                              : std::numeric_limits<double>::quiet_NaN();
+        for (auto probe: all_probes)
+            probe->setSweptWavelength(swept_wavelength_m);
 
         //cout << order.first << " = " << val << endl;
 
@@ -196,14 +337,14 @@ void SPECSConfig::runDCAnalysis()
 
         // run the fixed point (at most max_iterations delta cycles, F-28) and advance one tick
         const sc_dt::uint64 start_delta = sc_delta_count();
+        stringstream what;
+        what << ".dc: sweep point " << point << " of " << order.second.values.size()
+             << " (" << order.first << " = " << val << ")";
         if (!runFixedPoint())
-        {
-            stringstream what;
-            what << ".dc: sweep point " << point << " of " << order.second.second.size()
-                 << " (" << order.first << " = " << val << ")";
             reportNonConvergence(what.str(), start_delta);
-        }
+        checkEventCap(what.str());
         sc_start(sc_time::from_value(1));
+        checkEventCap(what.str());
 
         // Reset CW sources
         for (auto cws: all_cws)
@@ -213,6 +354,7 @@ void SPECSConfig::runDCAnalysis()
 
         //printOPAnalysisResult();
     }
+    reportProbeWavelengthLatches();
 }
 
 void SPECSConfig::runTRANAnalysis()
@@ -231,6 +373,9 @@ void SPECSConfig::runTRANAnalysis()
     //     (and the photodetectors, which write their readout)
     // (b) must stay before (c), so that the probes trace the post-OP, post-IC state at t = 0
     // (B-048 maintainer condition, see TranStart.ProbesSampleAfterOperatingPointAndInitialConditions)
+
+    // The probes latch one wavelength for the whole transient, when they are enabled (PD5)
+    setProbeLatchMode(Probe::LATCH_ONCE);
 
     // (a) Run OP analysis
     runOPAnalysis();
@@ -270,6 +415,12 @@ void SPECSConfig::runTRANAnalysis()
     else
         sc_start();
 
+    // F-15 event cap: the transient ends there (its traces stop at that time)
+    if (eventCapReached())
+        cerr << "Warning: .tran stopped at the event cap at " << sc_time_stamp() << ": " << event_cap->processed
+             << " pending entries processed (.options maxevents=" << max_events << ")" << endl;
+
+    reportProbeWavelengthLatches();
     cout << "Simulated " << sc_time_stamp() << endl;
 }
 
@@ -308,9 +459,9 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
     {
         // zero threshold (abstol = 0, and reltol = 0 or |E_last| = 0, B-153): any change is
         // infinitely above it (said explicitly rather than divided by 0)
-        if (oop->m_last_emission_threshold == 0)
+        if (oop->lastEmissionThreshold() == 0)
             return std::numeric_limits<double>::infinity();
-        return oop->m_last_emission_change / oop->m_last_emission_threshold;
+        return oop->lastEmissionChange() / oop->lastEmissionThreshold();
     };
     // largest change relative to its threshold first, by order of magnitude, then in name order:
     // the ratios of a loop's ports differ only in the last bits, which differ between compilers
@@ -333,13 +484,14 @@ void SPECSConfig::reportNonConvergence(const string &what, sc_dt::uint64 start_d
         if (device)
             cerr << " (" << device->name() << ")";
         cerr << " @ " << OpticalSignal::getWavelength(oop->m_last_emission_wlid) * 1e9 << " nm: |dE| = "
-             << oop->m_last_emission_change << " > " << oop->m_last_emission_threshold
+             << oop->lastEmissionChange() << " > " << oop->lastEmissionThreshold()
              << " (" << ratio(oop) << " x)" << endl;
     }
     if (changing.size() > max_listed)
         cerr << "  ... and " << changing.size() - max_listed << " more" << endl;
     cerr << "A feedback loop with a round-trip transmission close to 1 (lossless or weakly coupled) converges "
          << "slowly or never: raise .options maxiter (0: no limit), loosen reltol/abstol, or add loss" << endl;
+    writeRunStats();
     exit(1);
 }
 
@@ -364,6 +516,11 @@ void SPECSConfig::applyDefaultOpticalOutputPortConfig() {
     oop_default_config->m_reltol = default_reltol;
     oop_default_config->m_snap_factor = default_snap_factor;
     oop_default_config->m_timestep_value = default_resolution_multiplier; // relative to systemc timestep
+    // F-15: event cap and --stats
+    oop_default_config->m_collect_stats = stats_sections != 0;
+    if (max_events && !event_cap)
+        event_cap = make_shared<OpticalOutputPortEventCap>(max_events);
+    oop_default_config->m_event_cap = event_cap;
 
     // apply default config to all optical output ports which don't have one
     auto all_oop = sc_get_all_module_by_type<OpticalOutputPort>();
@@ -413,6 +570,7 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
             //cout << signame << endl;
 
             auto p = make_shared<Probe>(("PROBE{" + signame + "}").c_str(), true, true, true, true);
+            p->m_automatic = true;
             p->setTraceFile(default_trace_file);
             p->setTraceTable(table);
             p->p_in(*sig);

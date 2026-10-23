@@ -653,7 +653,7 @@
     "tests/golden/netlists/b153-zerotol-lossy-ring-tran.cir"
    ],
    "timeout": 30,
-   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| only; stderr: one warning. Short timeout so that a regression (never quiescing) fails fast"
+   "note": "B-153: 1 ps pulse into a lossy all-pass ring (round-trip field transmission 0.0707) at abstol = reltol = 0, open-ended .tran: the ring field decays geometrically until it underflows to exactly 0 after 280 round trips (last non-zero out pulse 1.97626e-323 sqrt(W) at 2790 ps), so the run ends: 'Simulated 2801 ps'; probe traces |E| and, since PD6, the wavelength (its false 4th argument is ignored); stderr: the PD6 warning for ROOT/PROBE1, then the zero-tolerance warning. Short timeout so that a regression (never quiescing) fails fast"
   },
   {
    "id": "err/b153-zerotol-lossless-ring-op",
@@ -3467,6 +3467,400 @@
    ],
    "expect": "fail",
    "note": "F-05: the CSV cannot be created (no such directory): 'Error: cannot open trace file \"no_such_dir/t.csv\"', exit 1"
+  },
+  {
+   "id": "regress/f15-stats-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=ports,devices",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/b033-crossing-two-lambda-tran.cir"
+   ],
+   "note": "F-15: --stats=ports,devices on a two-wavelength .tran: traces/x.stats.json next to the VCD (run totals, one row per output port, per device type; wall_time_s masked), 'Run statistics written to traces/x.stats.json' on stdout"
+  },
+  {
+   "id": "regress/f15-stats-op-no-trace",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--no-trace",
+    "--stats",
+    "-f",
+    "tests/golden/netlists/b021-snapfactor.cir"
+   ],
+   "note": "F-15: --stats without a trace file: the JSON (summary) is printed to stdout; out_a passes the gate from 0 but is snapped to 0 again (suppressed.snap = 1)"
+  },
+  {
+   "id": "regress/f15-stats-file-print",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=devices",
+    "--stats-file",
+    "traces/custom.stats.json",
+    "--print-stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/b001-fd-multilambda-stale.cir"
+   ],
+   "note": "F-15: --stats-file writes the run statistics there (not next to the trace), --print-stats also prints them; multi-wavelength .op, devices section"
+  },
+  {
+   "id": "regress/f15-stats-dc",
+   "args": [
+    "--stats",
+    "-o",
+    "traces/ad",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "note": "F-15: --stats on a .dc wavelength sweep: counters kept over every sweep point (reset() keeps them)"
+  },
+  {
+   "id": "err/f15-stats-bad-section",
+   "args": [
+    "--stats=port",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: unknown --stats section: 'Invalid --stats value', exit 1"
+  },
+  {
+   "id": "regress/f15-dispersive-waveguide",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats=ports",
+    "-f",
+    "tests/golden/netlists/f15-dispersive-waveguide.cir"
+   ],
+   "note": "F-15 (PD2): waveguides with dispersion (D != 0, no other case has one): wavelength-dependent transmission and group delay, cached per wavelength since F-15; uni (two wavelengths on one net) and bidirectional; arrival times and powers in the netlist header"
+  },
+  {
+   "id": "regress/f15-wdm-crow-mlprobe",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f15-wdm-crow-mlprobe.cir"
+   ],
+   "note": "F-15 (PD3): per-wavelength values (MLPROBE) of a 4-wavelength 3-ring CROW, recorded with the build before the SC_METHOD conversion (39f1bf9); they must not depend on the order of evaluation within a time step (the PD2 time-only queue order changes 1551.2 nm by 4e-5 relative). No plain PROBE (it shows the last write of a time step on a multi-wavelength net)"
+  },
+  {
+   "id": "regress/f15-maxevents-options-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/f15-maxevents-tran.cir"
+   ],
+   "note": "F-15 expert option .options maxevents=20: the .tran stops at 30 ps with a warning (21 entries processed: the rest of the delta cycle), exit 0; stats: event_cap_reached true"
+  },
+  {
+   "id": "regress/f15-max-events-cli-priority",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--max-events",
+    "0",
+    "--stats",
+    "-o",
+    "traces/x",
+    "-f",
+    "tests/golden/netlists/f15-maxevents-tran.cir"
+   ],
+   "note": "F-15: --max-events 0 overrides .options maxevents=20 (no cap): the ring runs until its activity stops (51 ps)"
+  },
+  {
+   "id": "err/f15-max-events-op",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--max-events",
+    "10",
+    "--no-trace",
+    "--stats",
+    "-f",
+    "tests/golden/netlists/b124-allpass-ring-default-reltol.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: the event cap reached in an .op: 'Error: .op: the operating point stopped at the event cap: 10 pending entries processed (.options maxevents=10)', the stats on stdout (event_cap_reached true), exit 1"
+  },
+  {
+   "id": "err/f15-max-events-invalid",
+   "args": [
+    "--max-events",
+    "-1",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: 'Invalid max-events value', exit 1"
+  },
+  {
+   "id": "err/f15-options-maxevents-fraction",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/f15-options-maxevents-fraction.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: .options maxevents=2.5: 'Error: .options: MAXEVENTS must be an integer between 0 and 2^53 (got 2.5)', exit 1"
+  },
+  {
+   "id": "err/f15-options-coalesce-removed",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f15-options-coalesce-removed.cir"
+   ],
+   "expect": "fail",
+   "note": "PD2b (decision 2026-10-23): .options coalesce was removed with --no-coalescing and is an unknown option like any other: 'Unknown keyword: coalesce (value: 0 (INTEGER))', exit 1"
+  },
+  {
+   "id": "err/f15-no-coalescing-removed",
+   "args": [
+    "--no-coalescing",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "PD2b (decision 2026-10-23): specs --no-coalescing was removed: an unknown option, exit 1"
+  },
+  {
+   "id": "regress/f15-progress-quiet",
+   "args": [
+    "--progress=3600",
+    "-o",
+    "traces/x",
+    "-f",
+    "circuits/add_drop_pyspecs.cir"
+   ],
+   "note": "F-15: --progress with a period longer than the run prints nothing (the line itself is wall-clock dependent; gtest RunProgress.*); outputs as cir/add_drop_pyspecs"
+  },
+  {
+   "id": "err/f15-progress-invalid",
+   "args": [
+    "--progress=0",
+    "-f",
+    "circuits/add_drop.cir"
+   ],
+   "expect": "fail",
+   "note": "F-15: --progress needs a period > 0: 'Invalid --progress value', exit 1"
+  },
+  {
+   "id": "regress/f15-stats-testbench",
+   "args": [
+    "-t",
+    "ac_crow",
+    "--nrings_crow",
+    "2",
+    "--stats=ports"
+   ],
+   "note": "F-15: --stats with a -t testbench: traces/crow_tb.stats.json next to its VCD; the two CROW ports bound to signals of the testbench function, destroyed when it returns, have \"net\": null (was a SIGSEGV while resolving them, found by stats-record)"
+  },
+  {
+   "id": "regress/b184-mlprobe-tran-start-multilambda",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/b184-mlprobe-tran-start-multilambda.cir"
+   ],
+   "note": "B-184: an MLPROBE on a net that carries two wavelengths during the OP of a .tran traces both from t = 0 (0.5 W each; before: 1560 nm read 0 and had no CSV row)"
+  },
+  {
+   "id": "regress/probe-latch-tran",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/probe-latch-tran.cir"
+   ],
+   "note": "PD5: PROBE wavelength latch in a .tran: the smallest wavelength at the enable (OP values), a smaller wavelength arriving later ignored, a VL-only net latched in its first time step, wl=0 ignored since PD6 (PROBE5 traces its wavelength, with the PD6 warning first on stderr); warnings (one per probe, one line for the automatic probes); each PROBE trace equals an MLPROBE trace of the same run"
+  },
+  {
+   "id": "regress/probe-latch-dc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/probe-latch-dc.cir"
+   ],
+   "note": "PD5: PROBE wavelength latch in a .dc: per point, the smallest wavelength written to the net at that point (both sources at the first point, then the swept one only: B-185)"
+  },
+  {
+   "id": "regress/probe-latch-dc-swept-wl",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/probe-latch-dc-swept-wl.cir"
+   ],
+   "note": "PD5 follow-up 2: .dc WL(src) sweep: a PROBE latches the swept wavelength at each point when its net carries it, also at the first point next to a smaller fixed wavelength; a net without it latches the smallest one"
+  },
+  {
+   "id": "regress/probe-latch-dc-swept-f",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "vcd",
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/probe-latch-dc-swept-f.cir"
+   ],
+   "note": "PD5 follow-up 2: .dc /src/F frequency sweep (long form): a PROBE latches the swept wavelength (c/f) at each point, also at the first point next to a smaller fixed wavelength"
+  },
+  {
+   "id": "regress/probe-wl-ignored",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/probe-wl-ignored.cir"
+   ],
+   "note": "PD6: a PROBE always traces its wavelength: wl=0, wavelength=0 and a false 4th argument (also in a subcircuit) are ignored with one warning for all, in name order; a true value changes nothing; .save E(b) traces abs only"
   }
  ]
 }

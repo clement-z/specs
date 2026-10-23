@@ -27,14 +27,15 @@ The paper's benchmarks used abstol 1e-8 (written V m⁻¹ there, 0.1 fW) and rel
 | `resolution` | 1 | port time step = `resolution` × engine step | >= 1 | none |
 | `seed` | 0 | master seed of the random numbers (see below) | integer: a literal 0 to 9223372036854775807 (2^63 - 1), exponent form 0 to 2^53 | `--seed` (0 to 2^64 - 1) |
 | `maxiter` | 1000000 | iterations (delta cycles) of the `.op`/`.dc` fixed point, per operating point and per sweep point (see below) | integer: a literal 0 to 2^63 - 1, exponent form 0 to 2^53 (0: no limit) | `--maxiter` (0 to 2^64 - 1) |
+| `maxevents` | 0 | expert: stop the run after this many processed entries (0: no cap, see [Event cap](#event-cap-expert-option)) | integer, as `maxiter` | `--max-events` (0 to 2^64 - 1) |
 
 Example: `.options abstol=1e-6 reltol=1e-8 timescale=-12` (as in `circuits/add_drop_pyspecs.cir`).
 
 - An invalid value is an error and the simulation does not start.
 - With `-f`, the CLI values are appended to the netlist as `.options` lines, so they override the netlist.
   They are ignored by the legacy testbenches (`-t`), except `--seed`, which is applied directly: it also
-  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter` is
-  applied directly too and takes priority over `.options maxiter`.
+  sets the seed of the testbenches and takes priority over a netlist's `.options seed`. `--maxiter`
+  and `--max-events` are applied directly too and take priority over `.options maxiter` and `maxevents`.
 - `seed`: every random draw (today the photodetector noise and dark field, see `doc/netlist.md`) comes
   from a stream derived from the master seed and the hierarchical name of the device, so a run is
   reproducible: the default seed is 0, and the same netlist and seed give the same values. An integer
@@ -235,3 +236,97 @@ name: the parser marks the waveguides it creates from netlist lines.
 
 In the paper's CROW benchmark (N = 3, L ≈ 350 µm), Interconnect differed from Photontorch and SPECS at 100 fs.
 At 1 fs all three agreed, with pairwise RMS errors below about 3 µW.
+
+## Event cap (expert option)
+
+An expert option, not meant for normal runs: outputs with it are not covered by the compatibility of the
+defaults.
+
+**Event cap** (`.options maxevents=N`, `specs --max-events N`; 0, the default: no cap). The run stops once the
+output ports have processed N pending entries in total (the `processed` counter of `--stats`), at the end of
+that delta cycle, so a few more entries of the same delta cycle are processed too. In a `.tran` the
+transient ends there: traces up to that time, `Simulated <t>`, exit status 0, and on stderr
+
+    Warning: .tran stopped at the event cap at 30 ps: 21 pending entries processed (.options maxevents=20)
+
+In an `.op`, a `.dc` or the operating point before a `.tran`, a fixed point cut short is not a result: error
+`Error: .op: the operating point stopped at the event cap: ...` and exit status 1. With `--stats`, the
+statistics are written in both cases (`"event_cap_reached": true`). Use it to bound a run whose activity may
+not die out (zero tolerances, a lossless loop) or to time a fixed number of events.
+
+## Run statistics (`--stats`)
+
+`specs --stats` counts what the optical output ports did during the run and writes it as JSON next to the
+trace file, `<name>.stats.json` (`-o name`, default `traces/delete_me`). It shows where the events went: how
+many values the devices produced, how many the emission gate dropped and why, how long the queues got. The
+counters are kept per output port (no global state) and summed at the end; they cost nothing when `--stats`
+is off. With `-t`, a testbench's statistics are written next to its trace file when it returns (a port whose
+net the testbench has already destroyed shows `"net": null`).
+
+| Option | Effect |
+| --- | --- |
+| `--stats` | run totals (section `summary`) |
+| `--stats=ports` | also one row per output port: port, net, writer (the device), wavelengths, counters |
+| `--stats=devices` | also one row per device type (the C++ class of the device that owns the port) |
+| `--stats=ports,devices` | both |
+| `--stats-file path` | write the JSON there instead (implies `--stats`) |
+| `--print-stats` | also print the JSON on stdout (implies `--stats`) |
+
+Without a trace file (`--no-trace`, `-o ""`) and without `--stats-file`, the JSON is printed on stdout. When
+it is written to a file, stdout shows `Run statistics written to <file>`. It is written at the end of the
+analysis, and also when the run stops on a non-convergence error or at the event cap (below).
+
+Counters (per port, summed in `totals` and per device type):
+
+| Key | Counts |
+| --- | --- |
+| `scheduled` | values written to the port by its device (`delayedWrite()`), at a time and wavelength |
+| `coalesced` | of which merged into the entry already pending for the same time and wavelength (the later value replaces the earlier one) |
+| `processed` | pending entries taken at their time |
+| `emitted` | of which written to the net with a new value (the gate passed) |
+| `suppressed.abstol` | not written: \|E - E_last\| <= abstol |
+| `suppressed.reltol` | not written: above abstol, \|E - E_last\| <= reltol·\|E_last\| |
+| `suppressed.snap` | the gate passed, but the value was snapped to 0 and 0 was already the last value emitted at that wavelength: written again, no change |
+| `pending_max`, `pending_mean` | entries pending in the port after each scheduled value: largest, mean |
+| `pending_end` | entries still pending at the end of the run (scheduled after its end) |
+| `last_emission_s` | time of the last emitted value (`null` if none); simulated time, 0 for `.op` |
+
+Every value is accounted for: `scheduled = coalesced + processed + pending_end` (plus the entries a `.dc`
+drops between two points, normally none) and `processed = emitted + suppressed.abstol + suppressed.reltol
++ suppressed.snap`. The other keys: `analysis` (`OP`, `DC`, `TRAN`), `sections`, `options` (the tolerances,
+`snapfactor` and `maxevents`, see [Event cap](#event-cap-expert-option)), `event_cap_reached`, `end_time_s` (simulated time at the end), and
+`wall_time_s`, the wall-clock time from the start of the analysis (elaboration excluded), the only value that
+changes from one run to the next. In a `.dc` sweep, the counters cover every point (and the wavelengths of
+every point); in a `.tran`, the operating point before it too. Example (`--stats` on
+`tests/golden/netlists/b021-snapfactor.cir`, an `.op`):
+
+    {
+      "format": "specs-run-stats",
+      "format_version": 1,
+      "analysis": "OP",
+      "sections": ["summary"],
+      "options": {"abstol": 0.01, "reltol": 1e-04, "snapfactor": 4, "maxevents": 0},
+      "event_cap_reached": false,
+      "end_time_s": 0,
+      "wall_time_s": 0.000218417,
+      "totals": {"output_ports": 6, "scheduled": 6, "coalesced": 0, "processed": 6, "emitted": 5, "suppressed": {"abstol": 0, "reltol": 0, "snap": 1}, "pending_max": 1, "pending_mean": 1, "pending_end": 0, "last_emission_s": 0}
+    }
+
+Numbers are written in the shortest form that reads back to the same double. The rows of `ports` are in name
+order, those of `devices` in type order; one row per line. A port that carries several wavelengths lists them
+all (a `.dc` wavelength sweep lists every swept wavelength).
+
+The golden harness (`tests/golden/run_golden.py`) masks `wall_time_s` in files named `*.stats.json` and on
+stdout. Its `stats-record` and `stats-compare` commands record the counters of every golden case for two builds
+and compare them exactly (`tests/golden/README.md`).
+
+### Progress (`--progress`)
+
+`specs --progress` prints a line on stderr every second of wall-clock time (`--progress=0.2`: every 0.2 s):
+
+    Progress: 12.0 s wall, simulated 1234500 ps (41.2 % of 3 us), 8812431 delta cycles
+
+The share of the duration is shown for a `.tran` with a duration. The line is printed from a SystemC stage
+callback after a delta cycle; it only reads the simulation time and the delta count, so it never changes the
+results, advances time or stops the run. A long `.op` iteration shows the delta cycles going up at a fixed
+simulated time.
