@@ -1,6 +1,6 @@
 # PH — `.dc` points as fresh steady states, wavelength matching: progress
 
-Branch `ws/dcnum`. Heartbeat id: `57fc614b` (delete after the report is committed).
+Branch `ws/dcnum`. Heartbeat id: `57fc614b` (delete after the report is committed). Report: `PH-REPORT.md` (done).
 
 | Item | Status | Commit | Notes |
 |---|---|---|---|
