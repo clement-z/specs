@@ -1,0 +1,55 @@
+# S-parameter tests (F-03)
+
+Test data and helpers for the `SPAR` element and `utils/sparam_export.py` (formats and conventions:
+[doc/sparam.md](../../doc/sparam.md)). Standard library only; every script runs as `python3 -I <script>`.
+
+## Fixtures (`fixtures/`)
+
+Written by `gen_fixtures.py`; regenerate them (byte-identical output, floats written with `repr()`) with
+
+    python3 -I tests/sparam/gen_fixtures.py            # or --out DIR
+
+The script then reads every file back with `sparam_io.py` and checks it against the model (exit status 1 on a
+mismatch), and prints the truncation error of the Taylor fixture and the finite-difference group delay.
+
+Reference model: a 2-port waveguide section computed with the operations of SPECS's `WG`
+(`src/devices/waveguide.cpp`, non-dispersive): L = 100 um, neff = 2.2, ng = 4.2, att = 10 dB/cm, so
+`S21 = S12 = polar(10^(-0.1/20), 2 pi L neff(lambda)/lambda)` (SPECS convention, phase +beta L) and
+`S11 = S22 = 0`. The phase is linear in frequency: the group delay is exactly `L ng / c` = 1.40097 ps.
+Grid: `lambda_k = (3000 + k) / 2e9` (1.5 to 1.6 um by 0.5 nm, 201 points, each the double nearest to its decimal
+value); frequency formats are written in ascending frequency, `f_k = c / lambda_k`.
+
+| File | Format | Convention in the file | Notes |
+| --- | --- | --- | --- |
+| `wg.sparam` | Lumerical `.sparam` | physics (as SPECS) | port declarations `in`, `out`; all four blocks (the reflections as modulus 0); phases wrapped into (-pi, pi] (exercise the unwrapping) |
+| `wg.s2p` | Touchstone 1, `# GHz S DB R 50` | engineering (conjugate) | `! Port[1] = in`; zero reflections written as -400 dB (DB cannot express 0) |
+| `wg_v2.ts` | Touchstone 2.0, `# Hz S RI R 50` | engineering | `[Two-Port Data Order] 12_21`, `[Number of Frequencies] 201` |
+| `wg.csv` | CSV | physics | only the two transmissions (absent pairs are 0) |
+| `wg.taylor` | Taylor form | SPECS | center 1.55e-6, range 1.5e-6 1.6e-6, amp constant, phase of order 9 (truncation error 2.2e-12 rad over the range), no `delay` line |
+| `gain.s2p` | Touchstone 1, `# Hz S MA R 50` | engineering | modulus of S21 and S12 1.05 (power 1.1025 > 1.03: passivity warning), waveguide phase |
+| `asym.s2p` | Touchstone 1, `# MHz S RI R 50` | engineering | constant, 5 points (1.5 to 1.6 um by 25 nm), v1 order S11 S21 S12 S22 |
+| `asym_v2.ts` | Touchstone 2.0, `# Hz S RI R 50` | engineering | same values, `[Two-Port Data Order] 21_12` |
+
+The `asym` files hold, in the SPECS convention, S11 = 0.1, S21 = 0.8j, S12 = 0.3, S22 = -0.2 (S21 is
+stored as `0 -0.8`): reading them with the wrong port order or without the conjugation gives different values.
+Their ports are named `left` and `right`.
+
+## Tests that use them
+
+`test_sparam.py` (with the `SPAR` element):
+
+- Phase and delay: each `wg.*` fixture through `SPAR` gives the transmission (modulus and phase) of a `WG` of
+  the same length at the grid points and between them (the phase is linear in frequency, so the linear
+  interpolation is exact), and the group delay `L ng / c`. The Touchstone files only match after the
+  conjugation, `wg.sparam` only after unwrapping; `wg.taylor` checks the derived delay.
+- Port order: `asym.s2p` and `asym_v2.ts` give the four values above.
+- Passivity: `gain.s2p` warns with `passivity=check`, scales with `passivity=enforce`.
+
+`sparam_io.py` is a minimal reader per format (`read_sparam`, `read_touchstone`, `read_csv`, `read_taylor`
+and `eval_taylor`), written from doc/sparam.md independently of the writers: it returns the port names and
+`{(out, in): [(f_Hz, S), ...]}` (1-based ports, S in the SPECS convention), and serves as the test oracle.
+
+`check_ring_export.py --specs build/specs` checks `utils/sparam_export.py` on `add_drop_ring.cir` (the ring of
+`circuits/add_drop.cir` as a subcircuit `ring in add out drop`): the export in every format reads back to the
+same matrix (2e-16), and S[out][in], S[drop][in] match `circuits/add_drop.cir` without its access subcircuit
+`x1` within 1.4e-12 with the same tolerances (7.2e-7 with the netlist's own reltol 1e-6).
