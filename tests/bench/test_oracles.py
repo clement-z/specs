@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""test_oracles.py: SPECS against closed forms (oracles.py), and the CROW generator against the legacy
-CROW testbench. Fails on a physics regression; stdlib only (Meson suite `oracle`).
+"""test_oracles.py: SPECS against closed forms (oracles.py). Fails on a physics regression; stdlib only
+(Meson suite `oracle`).
 
 Checks (each one runs specs in a fresh temporary directory and reads the CSV trace table):
     add-drop     circuits/add_drop.cir (.dc, 31 points): through/in and drop/in, complex, vs the
@@ -9,13 +9,11 @@ Checks (each one runs specs in a fresh temporary directory and reads the CSV tra
                  around 1550 nm: through/in and drop/in vs the transfer matrices (Poon 2004)
     crow-tran    paper-style CROW, 5 rings with random lengths (seed 2), CW source at 1552 nm, .tran: the field at
                  the end of the run vs the transfer-matrix steady state at the source wavelength
-    crow-tb      (--legacy-tb) `specs -t ac_crow [--nrings_crow N]` vs the generated crow_tb preset, N = 3
-                 and 2: same event times on through and drop, powers within 1e-9 W
 Every oracle check also runs its comparison against mutated models (k read as a power ratio, no
 dispersion slope, cross coupling without its pi/2 phase) and requires each of them to miss SPECS by more than 10x
 the tolerance, so the tolerance is known to catch such a regression.
 
-Usage: python3 -I test_oracles.py --specs build/specs --repo . [--legacy-tb] [--only crow-dc] [-v]
+Usage: python3 -I test_oracles.py --specs build/specs --repo . [--only crow-dc] [-v]
 """
 import argparse
 import csv
@@ -153,60 +151,13 @@ def check_crow_tran(a):
     check_with_mutants("crow-tran", points, crow_model(p), a.tol_tran, a.verbose)
 
 
-def vcd_module(repo):
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("run_golden", os.path.join(repo, "tests", "golden",
-                                                                             "run_golden.py"))
-    m = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(m)
-    return m
-
-
-def check_crow_tb(a):
-    g = vcd_module(a.repo)
-    for n in (3, 2):
-        with tempfile.TemporaryDirectory(prefix="specs-crowtb-") as td:
-            os.mkdir(os.path.join(td, "traces"))
-            run_specs(a.specs, td, ["-t", "ac_crow", "--nrings_crow", str(n)])
-            with open(os.path.join(td, "traces", "crow_tb.vcd")) as f:
-                vcd = g.parse_vcd(f.read())
-        tl = g.timelines(vcd)
-        # The testbench's VCD counts time in units of the engine timescale (100 fs here)
-        tb = {}
-        for probe in ("pthrough", "pcross"):
-            tb[probe] = {round(t): float(v[1:] if v[:1] in "rR" else v)
-                         for t, v in tl["SystemC.%s.power" % probe].items()}
-        p = crow_gen.parse_args([str(n), "--preset", "crow_tb"])
-        rows = run_netlist(a.specs, a.repo, netlist_text=crow_gen.generate(p))
-        gen = {"ROOT/PROBE1": {}, "ROOT/PROBE2": {}}
-        for r in rows:
-            gen[r["signal"]][round(float(r["time_s"]) * 1e13)] = float(r["power_W"])
-        for probe, sig in (("pthrough", "ROOT/PROBE1"), ("pcross", "ROOT/PROBE2")):
-            t_tb, t_gen = tb[probe], gen[sig]
-            # The testbench traces the initial 0 of the drop port at t = 0; the netlist probe has no event there
-            extra = sorted(set(t_tb) - set(t_gen))
-            if extra and not (extra == [0] and t_tb[0] == 0.0):
-                raise Failure("crow-tb N=%d %s: event times only in the testbench: %s" % (n, probe, extra[:5]))
-            if set(t_gen) - set(t_tb):
-                raise Failure("crow-tb N=%d %s: event times only in the netlist: %s"
-                              % (n, probe, sorted(set(t_gen) - set(t_tb))[:5]))
-            err = max(abs(t_gen[t] - t_tb[t]) for t in t_gen)
-            line = "crow-tb N=%d %s: %d events, same times, max |dP| = %.3e W (tolerance 1e-9)" % (
-                n, probe, len(t_gen), err)
-            if err > 1e-9:
-                raise Failure(line)
-            print("PASS " + line)
-
-
-CHECKS = [("add-drop", check_add_drop), ("crow-dc", check_crow_dc), ("crow-tran", check_crow_tran),
-          ("crow-tb", check_crow_tb)]
+CHECKS = [("add-drop", check_add_drop), ("crow-dc", check_crow_dc), ("crow-tran", check_crow_tran)]
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--specs", required=True)
     ap.add_argument("--repo", required=True)
-    ap.add_argument("--legacy-tb", action="store_true", help="also compare with `specs -t ac_crow`")
     ap.add_argument("--only", action="append", choices=[c for c, _ in CHECKS])
     ap.add_argument("--tol-dc", type=float, default=1e-5, help="max |H_specs - H_model| of .dc checks")
     ap.add_argument("--tol-tran", type=float, default=1e-5, help="same for the end of a .tran")
@@ -217,8 +168,6 @@ def main():
     failed = 0
     for name, fn in CHECKS:
         if a.only and name not in a.only:
-            continue
-        if name == "crow-tb" and not a.legacy_tb and not a.only:
             continue
         try:
             fn(a)

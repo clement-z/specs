@@ -48,7 +48,6 @@
   "err/b060-pcmcell-n-negative",
   "err/b060-pcmcell-n-zero",
   "err/b064-evlsrc-missing-file",
-  "err/b131-nrings-crow-zero",
   "err/b146-x-net-type-mismatch",
   "err/b148-crossing-args",
   "err/b148-mlprobe-args",
@@ -152,7 +151,6 @@
   "regress/b032-crossing-passive",
   "regress/b033-crossing-two-lambda",
   "regress/b033-crossing-two-lambda-tran",
-  "regress/b036-vci-crow",
   "regress/b048-mlprobe-cw-tran",
   "regress/b048-probe-cw-tran",
   "regress/b048-undriven-tran",
@@ -171,7 +169,6 @@
   "regress/b066-vlsrc-vci",
   "regress/b124-allpass-ring-default-reltol",
   "regress/b124-allpass-ring-tight-reltol",
-  "regress/b131-nrings-crow",
   "regress/b144-bidir-source-first",
   "regress/b144-three-writers",
   "regress/b144-two-sources-one-net",
@@ -202,6 +199,8 @@
   "regress/b184-mlprobe-tran-start-multilambda",
   "regress/b191-long-line-vlsrc",
   "regress/b192-value-files-next-to-netlist",
+  "regress/crow-tb-preset-n3",
+  "regress/crow-tb-preset-n8-vci",
   "regress/f01-manifest",
   "regress/f01-options-seed",
   "regress/f01-options-seed-cli-priority",
@@ -247,7 +246,7 @@
   "regress/f15-stats-dc",
   "regress/f15-stats-file-print",
   "regress/f15-stats-op-no-trace",
-  "regress/f15-stats-testbench",
+  "regress/f15-stats-testbench-wg",
   "regress/f15-stats-tran",
   "regress/f15-wdm-crow-mlprobe",
   "regress/f28-maxiter-cli-priority",
@@ -264,7 +263,6 @@
   "regress/spar-uni-reflection",
   "tb/ac_add_drop",
   "tb/ac_add_drop-fd",
-  "tb/ac_crow",
   "tb/dc",
   "tb/det",
   "tb/detector",
@@ -561,6 +559,18 @@
    "only": "^(regress/b192-value-files-next-to-netlist|gtest/unit_tests)$",
    "gtest": true,
    "note": "B-192: new case (value files next to the netlist), new gtest"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T22:36:37Z",
+   "only": "^(cli/help|cli/no-args|cli/list-testbenches|err/f15-no-coalescing-removed|regress/crow-tb-preset-n3|regress/crow-tb-preset-n8-vci|regress/f15-stats-testbench-wg)$",
+   "gtest": false,
+   "note": "PK item 5: legacy CROW testbench removed (decision 'Before v0.4.0'): help and testbench list lose --nrings_crow and ac_crow; crow_tb circuit as generated netlists (n3, n8 with --vci); --stats on -t wg"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T22:38:19Z",
+   "only": "^regress/crow-tb-preset-",
+   "gtest": false,
+   "note": "PK item 5: netlist headers (the preset was checked against the testbench for 3 and 2 rings)"
   }
  ]
 }

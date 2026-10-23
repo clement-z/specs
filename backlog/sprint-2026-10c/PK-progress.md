@@ -43,3 +43,17 @@ Decision: "Before v0.4.0 (2026-10-23)" in `backlog/DECISIONS-2026-10-21.md`.
   `.../lib/values.csv`, `.../evlsrc-values.csv` (element order); VCD with the three sources' values.
 - `gtest/unit_tests`: one new test, `ParserStateDeathTest.ValueFilesResolvedAsIncludes` (re-record of that case
   only if the harness requires it for a new test name).
+
+### Item 5 (legacy CROW testbench), written before recording
+- Deleted (cases.json, baseline directories, manifest case list; rerecords history kept): `tb/ac_crow`,
+  `regress/b036-vci-crow`, `regress/b131-nrings-crow`, `err/b131-nrings-crow-zero`, `regress/f15-stats-testbench`
+  (every case that runs `-t ac_crow`).
+- Re-recorded, one line removed each, nothing else: `cli/help`, `cli/no-args`, `err/f15-no-coalescing-removed`
+  (help text: `--nrings_crow=[set_nrings_crow]   temporary`), `cli/list-testbenches` (`\tac_crow`).
+- New, written by the generator: `regress/crow-tb-preset-n3` (`crow_gen.py 3 --preset crow_tb`: the circuit of
+  `tb/ac_crow`), `regress/crow-tb-preset-n8-vci` (`--vci`, 8 rings: `--vci` on a CROW and many rings, which
+  `b036-vci-crow` and `b131-nrings-crow` covered with the testbench). New `regress/f15-stats-testbench-wg`
+  (`-t wg --stats=ports`: the stats file next to a testbench's VCD; VCD ignored, it is that of `tb/wg`). The
+  `"net": null` of ports bound to destroyed signals has no other testbench: the gtest
+  `RunStats.PortOfADestroyedSignalHasNoNet` covers it.
+- Every other case bit-identical; counters unchanged (stats-compare: deleted cases MISSING on the after side).

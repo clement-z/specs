@@ -9,8 +9,8 @@ Optional WDM: --nwl channels on a 100 GHz grid, all pulsed together.
 Other forms:
     --source cw                   a CW source (wavelength --wl) instead of the pulses
     --analysis dc                 a .dc wavelength sweep of the CW source (--dc-start/--dc-stop/--dc-step)
-    --preset crow_tb              the circuit of the legacy testbench `specs -t ac_crow`
-                                  (src/tb/crow_tb.cpp): identical rings, kp = 0.2, neff 1, ng 2,
+    --preset crow_tb              the circuit of the former testbench `specs -t ac_crow` (removed in
+                                  v0.4.0): identical rings, kp = 0.2, neff 1, ng 2,
                                   4 pulses of 1 ns at 1553 nm, .tran 50 ns; explicit options override it
 
 Usage:
@@ -22,7 +22,7 @@ Topology (coupler i: in1 in2 out1 out2; through in1->out1, in2->out2; cross in1-
     coupler i : in1 = ring i forward, out1 = ring i return, in2 = ring i+1 return, out2 = ring i+1 forward
     coupler N : in2 = add (unused), out2 = drop
     ring i    : WG{i}a (coupler i-1 out2 -> coupler i in1), WG{i}b (coupler i out1 -> coupler i-1 in2)
-This is the topology of the CROW device of the testbench (src/devices/crow.cpp).
+This is the topology of the CROW class (src/devices/crow.cpp), which the former testbench used.
 
 As a module: `parse_args(argv)` gives the parameters, `ring_lengths(p)` the 2N waveguide lengths exactly
 as written in the netlist, `generate(p)` the netlist text (tests/bench/oracles.py uses all three).
@@ -33,7 +33,7 @@ import sys
 
 C0 = 299792458.0
 
-# The legacy testbench (src/tb/crow_tb.cpp, crow_tb_run): ring length 500 * 1.55 um + 1.55 um / 2,
+# The former testbench (src/tb/crow_tb.cpp, crow_tb_run): ring length 500 * 1.55 um + 1.55 um / 2,
 # split in two equal halves (src/devices/crow.cpp); through power 0.8 per coupler.
 PRESETS = {
     "crow_tb": dict(N=3, lmean=(500.0 * 1.55e-6 + 1.55e-6 / 2.0) / 2.0, lstd=0.0, kp=0.2, neff=1.0, ng=2.0,

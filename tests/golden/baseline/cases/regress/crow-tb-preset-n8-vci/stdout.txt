@@ -1,0 +1,463 @@
+Using trace file: traces/out
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+28 elements
+ - ROOT/VLSRC1 (VALUE LIST SOURCE (OPTICAL)) ROOT/in {} {values (LIST) = [{"type":"LIST","value":[{"type":"INTEGER","value":0}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":1.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":2.000000e-09}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":3.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":4.000000e-09}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":5.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":6.000000e-09}, {"type":"INTEGER","value":1}, {"type":"DOUBLE","value":1.553000e-06}]}, {"type":"LIST","value":[{"type":"DOUBLE","value":7.000000e-09}, {"type":"INTEGER","value":0}, {"type":"DOUBLE","value":1.553000e-06}]}], }
+ - ROOT/COUPLER0 (DIRECTIONAL COUPLER (bidir)) ROOT/in ROOT/r1b_out ROOT/through ROOT/r1a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER1 (DIRECTIONAL COUPLER (bidir)) ROOT/r1a_out ROOT/r2b_out ROOT/r1b_in ROOT/r2a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER2 (DIRECTIONAL COUPLER (bidir)) ROOT/r2a_out ROOT/r3b_out ROOT/r2b_in ROOT/r3a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER3 (DIRECTIONAL COUPLER (bidir)) ROOT/r3a_out ROOT/r4b_out ROOT/r3b_in ROOT/r4a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER4 (DIRECTIONAL COUPLER (bidir)) ROOT/r4a_out ROOT/r5b_out ROOT/r4b_in ROOT/r5a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER5 (DIRECTIONAL COUPLER (bidir)) ROOT/r5a_out ROOT/r6b_out ROOT/r5b_in ROOT/r6a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER6 (DIRECTIONAL COUPLER (bidir)) ROOT/r6a_out ROOT/r7b_out ROOT/r6b_in ROOT/r7a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER7 (DIRECTIONAL COUPLER (bidir)) ROOT/r7a_out ROOT/r8b_out ROOT/r7b_in ROOT/r8a_in {} {kp (DOUBLE) = 0.2, }
+ - ROOT/COUPLER8 (DIRECTIONAL COUPLER (bidir)) ROOT/r8a_out ROOT/add ROOT/r8b_in ROOT/drop {} {kp (DOUBLE) = 0.2, }
+ - ROOT/WG1A (WAVEGUIDE (bidir)) ROOT/r1a_in ROOT/r1a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG1B (WAVEGUIDE (bidir)) ROOT/r1b_in ROOT/r1b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG2A (WAVEGUIDE (bidir)) ROOT/r2a_in ROOT/r2a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG2B (WAVEGUIDE (bidir)) ROOT/r2b_in ROOT/r2b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG3A (WAVEGUIDE (bidir)) ROOT/r3a_in ROOT/r3a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG3B (WAVEGUIDE (bidir)) ROOT/r3b_in ROOT/r3b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG4A (WAVEGUIDE (bidir)) ROOT/r4a_in ROOT/r4a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG4B (WAVEGUIDE (bidir)) ROOT/r4b_in ROOT/r4b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG5A (WAVEGUIDE (bidir)) ROOT/r5a_in ROOT/r5a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG5B (WAVEGUIDE (bidir)) ROOT/r5b_in ROOT/r5b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG6A (WAVEGUIDE (bidir)) ROOT/r6a_in ROOT/r6a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG6B (WAVEGUIDE (bidir)) ROOT/r6b_in ROOT/r6b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG7A (WAVEGUIDE (bidir)) ROOT/r7a_in ROOT/r7a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG7B (WAVEGUIDE (bidir)) ROOT/r7b_in ROOT/r7b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG8A (WAVEGUIDE (bidir)) ROOT/r8a_in ROOT/r8a_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/WG8B (WAVEGUIDE (bidir)) ROOT/r8b_in ROOT/r8b_out {} {L (DOUBLE) = 0.000387888, att (INTEGER) = 2, neff (INTEGER) = 1, ng (INTEGER) = 2, }
+ - ROOT/PROBE1 (PROBE) ROOT/through {} {}
+ - ROOT/PROBE2 (PROBE) ROOT/drop {} {}
+-----------
+36 named nets
+ - ROOT/add: OANALOG<1>u (0|1)
+ - ROOT/drop: OANALOG<1>u (1|1)
+ - ROOT/in: OANALOG<1>u (1|1)
+ - ROOT/r1a_in: OANALOG<1>u (1|1)
+ - ROOT/r1a_out: OANALOG<1>u (1|1)
+ - ROOT/r1b_in: OANALOG<1>u (1|1)
+ - ROOT/r1b_out: OANALOG<1>u (1|1)
+ - ROOT/r2a_in: OANALOG<1>u (1|1)
+ - ROOT/r2a_out: OANALOG<1>u (1|1)
+ - ROOT/r2b_in: OANALOG<1>u (1|1)
+ - ROOT/r2b_out: OANALOG<1>u (1|1)
+ - ROOT/r3a_in: OANALOG<1>u (1|1)
+ - ROOT/r3a_out: OANALOG<1>u (1|1)
+ - ROOT/r3b_in: OANALOG<1>u (1|1)
+ - ROOT/r3b_out: OANALOG<1>u (1|1)
+ - ROOT/r4a_in: OANALOG<1>u (1|1)
+ - ROOT/r4a_out: OANALOG<1>u (1|1)
+ - ROOT/r4b_in: OANALOG<1>u (1|1)
+ - ROOT/r4b_out: OANALOG<1>u (1|1)
+ - ROOT/r5a_in: OANALOG<1>u (1|1)
+ - ROOT/r5a_out: OANALOG<1>u (1|1)
+ - ROOT/r5b_in: OANALOG<1>u (1|1)
+ - ROOT/r5b_out: OANALOG<1>u (1|1)
+ - ROOT/r6a_in: OANALOG<1>u (1|1)
+ - ROOT/r6a_out: OANALOG<1>u (1|1)
+ - ROOT/r6b_in: OANALOG<1>u (1|1)
+ - ROOT/r6b_out: OANALOG<1>u (1|1)
+ - ROOT/r7a_in: OANALOG<1>u (1|1)
+ - ROOT/r7a_out: OANALOG<1>u (1|1)
+ - ROOT/r7b_in: OANALOG<1>u (1|1)
+ - ROOT/r7b_out: OANALOG<1>u (1|1)
+ - ROOT/r8a_in: OANALOG<1>u (1|1)
+ - ROOT/r8a_out: OANALOG<1>u (1|1)
+ - ROOT/r8b_in: OANALOG<1>u (1|1)
+ - ROOT/r8b_out: OANALOG<1>u (1|1)
+ - ROOT/through: OANALOG<1>u (1|1)
+-----------
+1 directives
+ - DIRECTIVE[OPTIONS] {} {abstol (DOUBLE) = 1e-08, reltol (DOUBLE) = 0.0001, timescale (DOUBLE) = -13, traceall (INTEGER) = 0, }
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[TRAN] {5e-08 (DOUBLE), } {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/add...
+Creating ROOT/COUPLER8 (reason: connection to unidir net)
+Done creating ROOT/COUPLER8
+Creating ROOT/WG8A (reason: unidir backlog)
+Done creating ROOT/WG8A
+Creating ROOT/COUPLER7 (reason: unidir backlog)
+Done creating ROOT/COUPLER7
+Creating ROOT/WG7A (reason: unidir backlog)
+Done creating ROOT/WG7A
+Creating ROOT/COUPLER6 (reason: unidir backlog)
+Done creating ROOT/COUPLER6
+Creating ROOT/WG6A (reason: unidir backlog)
+Done creating ROOT/WG6A
+Creating ROOT/COUPLER5 (reason: unidir backlog)
+Done creating ROOT/COUPLER5
+Creating ROOT/WG5A (reason: unidir backlog)
+Done creating ROOT/WG5A
+Creating ROOT/COUPLER4 (reason: unidir backlog)
+Done creating ROOT/COUPLER4
+Creating ROOT/WG4A (reason: unidir backlog)
+Done creating ROOT/WG4A
+Creating ROOT/COUPLER3 (reason: unidir backlog)
+Done creating ROOT/COUPLER3
+Creating ROOT/WG3A (reason: unidir backlog)
+Done creating ROOT/WG3A
+Creating ROOT/COUPLER2 (reason: unidir backlog)
+Done creating ROOT/COUPLER2
+Creating ROOT/WG2A (reason: unidir backlog)
+Done creating ROOT/WG2A
+Creating ROOT/COUPLER1 (reason: unidir backlog)
+Done creating ROOT/COUPLER1
+Creating ROOT/WG1A (reason: unidir backlog)
+Done creating ROOT/WG1A
+Creating ROOT/COUPLER0 (reason: unidir backlog)
+Done creating ROOT/COUPLER0
+Creating ROOT/VLSRC1 (reason: unidir backlog)
+Done creating ROOT/VLSRC1
+Creating ROOT/WG1B (reason: unidir backlog)
+Done creating ROOT/WG1B
+Creating ROOT/WG2B (reason: unidir backlog)
+Done creating ROOT/WG2B
+Creating ROOT/WG3B (reason: unidir backlog)
+Done creating ROOT/WG3B
+Creating ROOT/WG4B (reason: unidir backlog)
+Done creating ROOT/WG4B
+Creating ROOT/WG5B (reason: unidir backlog)
+Done creating ROOT/WG5B
+Creating ROOT/WG6B (reason: unidir backlog)
+Done creating ROOT/WG6B
+Creating ROOT/WG7B (reason: unidir backlog)
+Done creating ROOT/WG7B
+Creating ROOT/WG8B (reason: unidir backlog)
+Done creating ROOT/WG8B
+Creating ROOT/PROBE1 (reason: unidir backlog)
+Done creating ROOT/PROBE1
+Creating ROOT/PROBE2 (reason: unidir backlog)
+Done creating ROOT/PROBE2
+Done (elaborating network of ROOT/add)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven time-domain
+- analysis type: TIME DOMAIN
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/out.vcd)
+ROOT/COUPLER8:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r8a_out --,__,-> ROOT/r8b_in
+ROOT/add --'  '-> ROOT/drop
+
+ROOT/WG8A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r8a_in --> ROOT/r8a_out
+
+ROOT/COUPLER7:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r7a_out --,__,-> ROOT/r7b_in
+ROOT/r8b_out --'  '-> ROOT/r8a_in
+
+ROOT/WG7A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r7a_in --> ROOT/r7a_out
+
+ROOT/COUPLER6:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r6a_out --,__,-> ROOT/r6b_in
+ROOT/r7b_out --'  '-> ROOT/r7a_in
+
+ROOT/WG6A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r6a_in --> ROOT/r6a_out
+
+ROOT/COUPLER5:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r5a_out --,__,-> ROOT/r5b_in
+ROOT/r6b_out --'  '-> ROOT/r6a_in
+
+ROOT/WG5A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r5a_in --> ROOT/r5a_out
+
+ROOT/COUPLER4:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r4a_out --,__,-> ROOT/r4b_in
+ROOT/r5b_out --'  '-> ROOT/r5a_in
+
+ROOT/WG4A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r4a_in --> ROOT/r4a_out
+
+ROOT/COUPLER3:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r3a_out --,__,-> ROOT/r3b_in
+ROOT/r4b_out --'  '-> ROOT/r4a_in
+
+ROOT/WG3A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r3a_in --> ROOT/r3a_out
+
+ROOT/COUPLER2:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r2a_out --,__,-> ROOT/r2b_in
+ROOT/r3b_out --'  '-> ROOT/r3a_in
+
+ROOT/WG2A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r2a_in --> ROOT/r2a_out
+
+ROOT/COUPLER1:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/r1a_out --,__,-> ROOT/r1b_in
+ROOT/r2b_out --'  '-> ROOT/r2a_in
+
+ROOT/WG1A:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r1a_in --> ROOT/r1a_out
+
+ROOT/COUPLER0:
+through_power = 0.8 W/W
+cross_power = 0.2 W/W
+through_field = 0.894427
+cross_field = 0.447214
+insertion loss = 0dB
+ROOT/in --,__,-> ROOT/through
+ROOT/r1b_out --'  '-> ROOT/r1a_in
+
+ROOT/VLSRC1:
+value list (8 values)
+--> ROOT/in
+
+ROOT/WG1B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r1b_in --> ROOT/r1b_out
+
+ROOT/WG2B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r2b_in --> ROOT/r2b_out
+
+ROOT/WG3B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r3b_in --> ROOT/r3b_out
+
+ROOT/WG4B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r4b_in --> ROOT/r4b_out
+
+ROOT/WG5B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r5b_in --> ROOT/r5b_out
+
+ROOT/WG6B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r6b_in --> ROOT/r6b_out
+
+ROOT/WG7B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r7b_in --> ROOT/r7b_out
+
+ROOT/WG8B:
+length = 0.000387888 m
+neff = 1
+ng = 2
+transmission_power = 0.982296 W/W
+group delay = 0.00258771 ns
+phase delay = 0.00129385 ns (1.5708rad @1.55)
+ROOT/r8b_in --> ROOT/r8b_out
+
+ROOT/PROBE1:
+Signal: ROOT/through
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+ROOT/PROBE2:
+Signal: ROOT/drop
+trace power: 1
+trace modulus: 1
+trace phase: 1
+trace wavelength: 1
+
+╔═══════════════════╗
+║  OPERATING POINT  ║
+╠═══════════════════╣
+║                   ╨───┄┄
+║ - ROOT/add (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/drop (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r1b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r2b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r3b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r4a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r4a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r4b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r4b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r5a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r5a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r5b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r5b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r6a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r6a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r6b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r6b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r7a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r7a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r7b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r7b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r8a_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r8a_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r8b_in (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/r8b_out (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║ - ROOT/through (OPTICAL) = @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+║                   ╥───┄┄
+╚═══════════════════╝
+ROOT/VLSRC1 was enabled
+@0 s, ROOT/VLSRC1 emitted: @ 1553 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@1 ns, ROOT/VLSRC1 emitted: @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@2 ns, ROOT/VLSRC1 emitted: @ 1553 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@3 ns, ROOT/VLSRC1 emitted: @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@4 ns, ROOT/VLSRC1 emitted: @ 1553 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@5 ns, ROOT/VLSRC1 emitted: @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+@6 ns, ROOT/VLSRC1 emitted: @ 1553 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
+@7 ns, ROOT/VLSRC1 emitted: @ 1553 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
+Simulated 50 ns
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

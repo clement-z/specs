@@ -9,8 +9,8 @@
   lengths (Poon transfer matrices), complex through/drop responses within 1e-5; each check also proves that
   three injected physics errors (k read as a power ratio, no dispersion slope, a real cross coupling) would
   fail it. The CROW generator (`crow_gen.py`, from the feature scout) gains CW and `.dc` forms and a
-  `crow_tb` preset that reproduces `specs -t ac_crow` (same event times, powers within 1e-12 W, checked by
-  the suite)
+  `crow_tb` preset that reproduces the former `specs -t ac_crow` (same event times, powers within 1e-12 W;
+  see Removed)
 * Benchmark (`tests/bench/bench.py`): the CROW case matrix with per-run user time, peak RSS, VCD size and
   `--stats` counters, appended to a local `tests/bench/history.jsonl` (not versioned); the Meson suite
   `bench` checks only ratios (event plateau from 30 to 300 rings, WDM linearity, and the user-time plateau on
@@ -84,6 +84,14 @@
   that is not swept reaches the nets and probes after it at every point (before, at the first point only); a
   PROBE on such a net now has a sample at every point. More events per point in such circuits (`--stats`);
   `.op` and `.tran` are unchanged (B-185)
+
+### Removed
+
+* The legacy CROW testbench `specs -t ac_crow` (`src/tb/crow_tb.cpp`) and its option `--nrings_crow`: its circuit,
+  with any number of rings, is written as a netlist by `tests/bench/crow_gen.py N --preset crow_tb` (same event
+  times, powers within 7e-13 W), which the golden cases `regress/crow-tb-preset-n3` and
+  `regress/crow-tb-preset-n8-vci` run. The `CROW` class stays. The accuracy suite's `--legacy-tb` comparison is
+  removed with it
 
 ### Fixed
 

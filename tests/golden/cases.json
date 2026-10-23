@@ -907,18 +907,6 @@
    "note": "B-031: MZIActiveBi (MZI on a bidirectional net) used to abort at elaboration (E107); it must match MZIActiveUni forward and be reciprocal backward. B-014: stderr has one delay-rounding warning per MZI-internal waveguide (arms of 43 fs round to 0, 88 fs to 100 fs at the default 100 fs); they are created by the MZI init() calls, in name order since F-01 (B-016)"
   },
   {
-   "id": "regress/b036-vci-crow",
-   "args": [
-    "--vci",
-    "-t",
-    "ac_crow"
-   ],
-   "ignore_files": [
-    "traces/crow_tb.vcd"
-   ],
-   "note": "B-036: --vci printing used to segfault (exit 139) on ports bound to a channel that is not an spx::oa_signal_type (CROW uses sc_signal<OpticalSignal>). The VCD is that of tb/ac_crow (apart from verbose_component_initialization), so it is not stored"
-  },
-  {
    "id": "tb/wg",
    "args": [
     "-t",
@@ -1029,14 +1017,6 @@
     "ac_add_drop"
    ],
    "note": "src/tb/alltestbenches.cpp: freqsweep_tb_run_add_drop"
-  },
-  {
-   "id": "tb/ac_crow",
-   "args": [
-    "-t",
-    "ac_crow"
-   ],
-   "note": "src/tb/alltestbenches.cpp: crow_tb_run"
   },
   {
    "id": "tb/ac_add_drop-fd",
@@ -1174,27 +1154,6 @@
    ],
    "expect": "fail",
    "note": "B-018: -R below -15 (1 fs) is rejected by the CLI (was: assert abort, or E705 with NDEBUG)"
-  },
-  {
-   "id": "regress/b131-nrings-crow",
-   "args": [
-    "-t",
-    "ac_crow",
-    "--nrings_crow",
-    "2"
-   ],
-   "note": "B-131: --nrings_crow sets the number of rings of the ac_crow testbench (was ignored: always 3)"
-  },
-  {
-   "id": "err/b131-nrings-crow-zero",
-   "args": [
-    "-t",
-    "ac_crow",
-    "--nrings_crow",
-    "0"
-   ],
-   "expect": "fail",
-   "note": "B-131: --nrings_crow outside 1..1024 is rejected"
   },
   {
    "id": "regress/b001-fd-multilambda-stale",
@@ -3814,17 +3773,6 @@
    "note": "F-15: --progress needs a period > 0: 'Invalid --progress value', exit 1"
   },
   {
-   "id": "regress/f15-stats-testbench",
-   "args": [
-    "-t",
-    "ac_crow",
-    "--nrings_crow",
-    "2",
-    "--stats=ports"
-   ],
-   "note": "F-15: --stats with a -t testbench: traces/crow_tb.stats.json next to its VCD; the two CROW ports bound to signals of the testbench function, destroyed when it returns, have \"net\": null (was a SIGSEGV while resolving them, found by stats-record)"
-  },
-  {
    "id": "regress/b062-mlprobe-unlisted-wavelength",
    "setup": {
     "copy": [
@@ -4688,6 +4636,57 @@
     "traces/out"
    ],
    "note": "B-192: VLSRC/EVLSRC value files next to the netlist that names them (the -f netlist in a subdirectory, and an included file that defines a subcircuit) are found first, as .include and SPAR files; they were opened relative to the working directory only (Error: Cannot open the file \"vlsrc-values.csv\", exit 1). The run manifest lists the paths used to open them"
+  },
+  {
+   "id": "regress/crow-tb-preset-n3",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/crow-tb-preset-n3.cir",
+    "-o",
+    "traces/out"
+   ],
+   "note": "Replaces tb/ac_crow (the legacy testbench src/tb/crow_tb.cpp, removed in PK): its circuit, 3 identical rings, 4 pulses at 1553 nm, as a netlist written by tests/bench/crow_gen.py 3 --preset crow_tb (same event times as the testbench, powers within 7e-13 W: PF06)"
+  },
+  {
+   "id": "regress/crow-tb-preset-n8-vci",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--vci",
+    "-f",
+    "tests/golden/netlists/crow-tb-preset-n8.cir",
+    "-o",
+    "traces/out"
+   ],
+   "note": "Replaces regress/b036-vci-crow (--vci on the CROW testbench) and regress/b131-nrings-crow (--nrings_crow): --vci on the crow_tb circuit with 8 rings (crow_gen.py 8 --preset crow_tb)"
+  },
+  {
+   "id": "regress/f15-stats-testbench-wg",
+   "args": [
+    "-t",
+    "wg",
+    "--stats=ports"
+   ],
+   "ignore_files": [
+    "traces/waveguide_tb.vcd"
+   ],
+   "note": "Replaces regress/f15-stats-testbench (-t ac_crow, removed): --stats with a -t testbench writes traces/waveguide_tb.stats.json next to its VCD (the VCD is that of tb/wg, not stored). The \"net\": null of ports bound to signals destroyed with the testbench function (only crow_tb had them) is covered by the gtest RunStats.PortOfADestroyedSignalHasNoNet"
   }
  ]
 }

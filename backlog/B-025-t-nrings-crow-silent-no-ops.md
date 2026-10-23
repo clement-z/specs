@@ -23,3 +23,6 @@ B-007, B-026.
 - Review ids: F-A1-25.
 ## Verification
 Ran them.
+
+Note (sprint 2026-10c, PK): `--nrings_crow` was removed with the CROW testbench (`-t ac_crow`). `-T`, `-f` vs
+`-t` and the help strings are still open.

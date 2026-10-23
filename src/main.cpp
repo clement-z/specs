@@ -391,11 +391,6 @@ int sc_main(int argc, char *argv[])
                           "with a warning, an .op/.dc stops with an error; overrides .options maxevents",
                           { "max-events" });
 
-    args::ValueFlag<size_t> set_nrings_crow(parser,
-                          "set_nrings_crow",
-                          "temporary",
-                          { "nrings_crow" });
-
     args::Flag set_verbose_component_initialization(parser,
                           "set_verbose_component_initialization",
                           "Print components detail before starting simulation",
@@ -574,16 +569,6 @@ int sc_main(int argc, char *argv[])
     }
     if (set_verbose_component_initialization) {
         specsGlobalConfig.verbose_component_initialization = set_verbose_component_initialization.Get();
-    }
-    if (set_nrings_crow) {
-        #if BUILD_TB == 1
-        if (set_nrings_crow.Get() < 1 || set_nrings_crow.Get() > 1024)
-        {
-            cerr << "Invalid --nrings_crow value (expected 1..1024)" << endl;
-            return 1;
-        }
-        nrings_crow = set_nrings_crow.Get();
-        #endif
     }
     if (set_timescale) {
         int timescale_val;
