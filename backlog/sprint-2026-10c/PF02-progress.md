@@ -4,8 +4,8 @@ Heartbeat: `5e05ca80` (PF02-heartbeat, every 5 min, expires in 48 h). Delete it 
 
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
-| 0 | Baseline, output format evaluation and design (this file) | in progress | | |
-| 1 | Expression functions (`gauss`, `uniform`, `lognormal`, `choice`, math), per-name draw streams, `shared=` | todo | | |
+| 0 | Baseline, output format evaluation and design (this file) | done | 5c9f98f | baseline 92a4974: gcc 16/16, golden strict 256/256; before-recordings clang/asan-gcc/asan-clang in /tmp/pf02-before |
+| 1 | Expression functions (`gauss`, `uniform`, `lognormal`, `choice`, math), per-name draw streams, `shared=` | done | 1ac820a | 6 gtest, 5 golden (new); strict 261/261 |
 | 2 | `.step param` (linear, `list`, nested), `.mc N [seed=]`, run plan, `--run K`, `-n` plan listing | todo | | |
 | 3 | Runner: one process per run, run table (appendable columns + index), failures recorded, resume | todo | | |
 | 4 | pyspecs reader | todo | | |
