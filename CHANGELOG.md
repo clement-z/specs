@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+## [0.3.0] - 2026-10-23
+
 ### New
 
 * Optional pixi development environment (`pixi.toml`, `pixi.lock`): gcc 15 and clang 21 toolchains with `setup`,
@@ -22,8 +24,9 @@
 * A plain `PROBE` (also the automatic `PROBE{<net>}` probes and the `.save` targets) traces one wavelength of a
   net that carries several: it latches the smallest one per analysis point (each `.op`/`.dc` point; in a `.dc`
   that sweeps a source's wavelength or frequency, the swept wavelength when the net carries it; in a `.tran`,
-  the smallest at the start of the transient, or of its first time step that brings any) and ignores the others, with one warning on stderr per probe (one line for all the automatic probes). Before, it traced
-  every event, so it showed one of the wavelengths of each time step, in an unspecified order. For a given
+  the smallest at the start of the transient, or of its first time step that brings any) and ignores the others,
+  with one warning on stderr per probe (one line for all the automatic probes). Before, it traced every event, so
+  it showed one of the wavelengths of each time step, in an unspecified order. For a given
   wavelength, use MLPROBE. Single-wavelength nets, `.dc` wavelength sweeps and the `-t` testbenches are
   unchanged (`doc/netlist.md`)
 
