@@ -30,3 +30,8 @@ in a wavelength sweep) and MLPROBE in `.dc` and frequency/transmission sweeps.
 
 ## Related
 B-184 (MLPROBE at `.tran` start), B-185 (`.dc` and unchanged nets), PD5 report (PROBE latch).
+
+## Update (sprint 2026-10c PH)
+B-185 is fixed (b6488a3): every wavelength of a net is written again at every `.dc` point, so the interaction
+mentioned above is gone; an MLPROBE enabled in `.dc` would see each of its wavelengths at every point. MLPROBE
+stays disabled in `.dc` (separate decision); the repro's evidence is unchanged.

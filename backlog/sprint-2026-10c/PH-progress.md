@@ -6,7 +6,7 @@ Branch `ws/dcnum`. Heartbeat id: `57fc614b` (delete after the report is committe
 |---|---|---|---|
 | 1 `.dc` point = fresh steady state (B-003, B-185) | done | (see git log) | as predicted; gcc strict 241/241 |
 | 2 wavelength matching tolerance (B-010, B-062) | done | (see git log) | as predicted (9 cases + gtest); gcc strict 243/243; B-187 created |
-| 3 statuses (B-003, B-010, B-062, B-185, backlog.md) | todo | | |
+| 3 statuses (B-003, B-010, B-062, B-185, backlog.md) | done | (see git log) | B-186 annotated (B-185 interaction gone; evidence unchanged) |
 
 ## Before references (tip c975167)
 gcc build copied to `/tmp/ph-before/gcc` (whole build dir: rpath `$ORIGIN/...`), counters

@@ -1,5 +1,5 @@
 # B-003: DC sweep: a point whose output falls below abstol keeps the previous point's value and λ
-severity: med | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED
+severity: med | category: bug | effort: XS | fix-class: needs-human | verdict: CONFIRMED | status: fixed in b6488a3 (sprint 2026-10c PH)
 location: src/specs.cpp:161-175, src/optical_output_port.cpp:149,161-175
 ## Problem
 Before each sweep point `runDCAnalysis` calls `oop->reset()`, which clears `m_emitted_fields`. The first value of
@@ -29,3 +29,13 @@ B-021 (tolerance gate), A3 S1.08 (GTD deltas across DC points), A6 (pyspecs read
 - Review ids: F-A1-03.
 ## Verification
 Ran the repro (stale point) and relinked with the env-gated one-line fix (correct point). Ran the golden check with the fix active.
+
+## Fix (sprint 2026-10c PH, b6488a3)
+Maintainer decision (2026-10-23, third round): each `.dc` point is a fresh steady state. Per wavelength, not per
+port (the one-line fix above forced only the first pop of a port): `runDCAnalysis()` sets
+`OpticalOutputPort::m_emit_each_wavelength`, so after the per-point reset the first entry of each wavelength is
+written whatever the gate says, snapped like any emitted value, and with a value-change event even if the net
+already holds that value (`OpticalNet::writeWithEvent()`, `src/optical_net.h`). The repro's point 1 now reads
+0 W (snapped) at 1557.63 nm. `m_skip_next_convergence_check` is still never set (B-027). Golden case
+`regress/b003-dc-dark-point`; gtest `OpticalOutputPort.DcPointWritesFirstValueOfEachWavelengthWithAnEvent`. No
+existing golden case had such a point (their outputs are unchanged by this part).
