@@ -86,6 +86,20 @@ public:
 
     static double getWavelength(const uint32_t &wavelength_id);
 
+    // Wavelength matching (B-010, B-062): two wavelengths equal within this relative tolerance,
+    // |a - b| <= WAVELENGTH_MATCH_RTOL * max(|a|, |b|), are one wavelength, so that values written
+    // differently (1550*1e-9 and 1.55e-6), computed (c/f, {expression}) or accumulated by a .dc sweep
+    // (B-009) match. Used by the wavelength registry (getIDFromWavelength(), the first registered value
+    // is kept) and by MLPROBE's wavelength list. A compile-time constant (doc/numerics.md); it can merge
+    // two wavelengths that are really different but closer than that, or miss values that drift more
+    static constexpr double WAVELENGTH_MATCH_RTOL = 1e-12;
+    static bool sameWavelength(double a, double b)
+    {
+        return a == b || std::abs(a - b) <= WAVELENGTH_MATCH_RTOL * std::max(std::abs(a), std::abs(b));
+    }
+
+    // The id of a wavelength: the first registered one that matches it (sameWavelength()), else a new
+    // one. Called when sources are set up and at each .dc point, not per event
     uint32_t getIDFromWavelength(const double &wavelength);
 
     inline static complex<double> amplitudePhaseToField(double amplitude, double phase)

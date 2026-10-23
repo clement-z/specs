@@ -199,6 +199,26 @@ the gate off no event is dropped, so the differences left come from the models, 
 floating-point rounding, not from the tolerances. Keep non-zero tolerances for normal runs: they bound the
 number of events and make feedback circuits quiesce.
 
+## Wavelength matching
+
+Wavelengths equal within a relative 1e-12, |a - b| <= 1e-12 · max(|a|, |b|), are one wavelength (B-010, B-062):
+
+- The wavelength registry gives each wavelength an id; the devices keep their values per id, and only fields of
+  the same id add coherently. A wavelength that matches one already registered gets its id, and the **first
+  registered value is kept**: `wl=1550*1e-9` (1.5500000000000002e-06) next to `wl=1.55e-6` is 1.55e-6, so the two
+  sources interfere (before, they were two wavelengths that only looked alike, both printed "@ 1550 nm"). The same
+  holds for wavelengths computed from a frequency (c/f) or by an expression, and for `.dc` points that drift
+  from start + i·step (B-009): in `circuits/add_drop.cir` the point 1.550000000000001e-06 takes the source's
+  registered 1.55e-6.
+- An MLPROBE traces a wavelength of its net that matches one of its list (`doc/netlist.md`).
+
+The tolerance is the compile-time constant `OpticalSignal::WAVELENGTH_MATCH_RTOL` (`src/optical_signal.h`),
+not an option. 1e-12 is far below any physical spacing (1 pm at 1550 nm is 6.5e-7) and above the rounding of
+a few operations (1e-16 each). It is a possible source of error, not studied further (B-187): two
+wavelengths that really differ by less than 1e-12 relative are merged, and a computed value that drifts by more
+(a long accumulation, a `.dc` sweep with many points) is not matched. The registry is looked up when the sources
+are set up and once per `.dc` point, never per event.
+
 ## Time resolution
 
 The engine time step is 10^timescale s (default 100 fs). It is the SystemC time resolution and the time unit

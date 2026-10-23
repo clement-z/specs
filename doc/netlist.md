@@ -499,10 +499,12 @@ value changes nothing, and a false one (`wl=0`, `probe1 out 1 1 1 0`) is ignored
 all such probes (`Warning: the wavelength of a PROBE is always traced since v0.3: wl=0 (or a false 4th
 argument) ignored for ROOT/PROBE1, ROOT/PROBE5`). The automatic probes `PROBE{<net>}` also trace it (all four
 quantities). `MLPROBE<name> <net> wl=[wl1, wl2, ...]` traces power, modulus and
-phase per listed wavelength (the wavelength must match exactly: `{lambda0}+1.5e-9` is 1.5514999999999999e-06,
-not 1.5515e-06). It ignores the other wavelengths of its net, with one warning per MLPROBE on stderr at the end
-of the run, in name order (`Warning: ROOT/MLPROBE1 ignored the wavelengths of its net ROOT/a that it does not
-list (1.5514999999999999e-06 m; listed: 1.5515e-06 m)`; before, one line on stdout per event, B-062). A netlist without any probe or `.save` traces every optical net through
+phase per listed wavelength. A wavelength matches a listed one when they are equal within a relative 1e-12
+(`{lambda0}+1.5e-9` is 1.5514999999999999e-06 and matches 1.5515e-06; before PH the match was exact; see
+"Wavelength matching" in [numerics.md](numerics.md)); the CSV/npz rows keep the net's wavelength. It ignores
+the other wavelengths of its net, with one warning per MLPROBE on stderr at the end of the run, in name order
+(`Warning: ROOT/MLPROBE0 ignored the wavelengths of its net ROOT/b that it does not list (1.56e-06 m; listed:
+1.5600000001e-06 m)`; before, one line on stdout per event, B-062). A netlist without any probe or `.save` traces every optical net through
 automatic probes, traced as `PROBE{<net>}`; a netlist with probes or `.save` targets traces only those, unless
 `.options traceall=1` asks for the automatic probes too (F-05; before, `traceall` defaulted to 1 and every net was always traced). Nets whose
 name starts with `_` get no automatic probe.
@@ -510,7 +512,7 @@ name starts with `_` get no automatic probe.
 **A PROBE traces one wavelength.** A net holds one value, the last one written to it, of any wavelength, so on a
 net that carries several wavelengths a probe sees each of them as a separate event. A PROBE (also an automatic
 `PROBE{<net>}` and a `.save` target) traces one of them and ignores the others. To trace a given wavelength,
-or several, use MLPROBE (`wl=[...]`, exact match); a PROBE has no keyword to select one.
+or several, use MLPROBE (`wl=[...]`, matched within a relative 1e-12); a PROBE has no keyword to select one.
 - The probe latches one wavelength per analysis point:
   - in `.op` and at each `.dc` point, the smallest wavelength written to its net at that point;
   - in a `.dc` that sweeps the wavelength or the frequency of a source (`WL(src)`, `F(src)`, `/src/WL`,

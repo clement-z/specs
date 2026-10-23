@@ -145,16 +145,22 @@ public:
     std::set<double> m_lambdas;
     std::map< double, std::vector< unique_ptr<sc_signal<double> > > > m_lambda_signals;
     // While disabled (the OP of a .tran), the last value of each listed wavelength, traced when the
-    // probe is enabled: the net only holds the last value written to it, of any wavelength (B-184)
+    // probe is enabled: the net only holds the last value written to it, of any wavelength (B-184).
+    // Keyed by the listed wavelength
     std::map<double, OpticalSignal> m_disabled_samples;
-    // The wavelengths of the events received while enabled that the probe does not list (exact match,
-    // B-062): reported once, at the end of the run, instead of a line per event
+    // The wavelengths of the events received while enabled that the probe does not list (B-062):
+    // reported once, at the end of the run, instead of a line per event
     std::set<double> m_ignored_wavelengths_m;
+    // Wavelength id -> the listed wavelength it matches within OpticalSignal::WAVELENGTH_MATCH_RTOL (NaN:
+    // none), filled at the first event of each wavelength (listedWavelength(), B-062)
+    std::map<uint32_t, double> m_listed_by_id;
 
     void setTraceFile(sc_trace_file *Tf);
     void setTraceTable(TraceTable *table);
-    // Traces s, of a listed wavelength
-    void traceSample(const OpticalSignal &s);
+    // The listed wavelength that the wavelength of s matches, NaN if none
+    double listedWavelength(const OpticalSignal &s);
+    // Traces s, of the listed wavelength listed_m
+    void traceSample(const OpticalSignal &s, double listed_m);
     // One warning on stderr if the probe ignored wavelengths, then forgets them. Called for every
     // MLPROBE in name order at the end of a netlist run (SPECSConfig::runAnalysis()), and by the
     // destructor for the probes of testbenches and C++ users

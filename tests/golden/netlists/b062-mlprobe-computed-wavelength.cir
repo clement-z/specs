@@ -1,0 +1,12 @@
+* B-062: an MLPROBE matches its listed wavelengths within a relative 1e-12. cwsrc1's wavelength is computed
+* from a frequency, c/f = 1.5499999999999998e-06, not the double 1.55e-6 that mlprobe1 lists; cwsrc2 is at
+* the listed 1.56e-6 exactly. Expected: mlprobe1 traces both wavelengths (1 mW at 1550 nm, 2 mW at 1560 nm,
+* from the operating point, at t = 0) and no "ignored the wavelengths" warning. Before: 1550 nm was ignored.
+.param c=299792458
+.param f=193.4144890322581e12
+cwsrc1 a wl={c}/{f} power=1e-3
+cwsrc2 b wl=1.56e-6 power=2e-3
+merger1 a b m
+mlprobe1 m wl=[1.55e-6, 1.56e-6]
+.options traceall=0
+.tran 1e-12

@@ -122,6 +122,7 @@
   "regress/b004-mode-td-dc",
   "regress/b004-mode-td-op",
   "regress/b006-empty-output",
+  "regress/b010-near-duplicate-lambda",
   "regress/b014-delay-rounding-warning",
   "regress/b014-device-internal-rounds-to-zero",
   "regress/b021-snapfactor",
@@ -145,6 +146,7 @@
   "regress/b052-pcmcell-positional",
   "regress/b052-vlsrc-positional",
   "regress/b060-pcmcell-k-eq-n",
+  "regress/b062-mlprobe-computed-wavelength",
   "regress/b062-mlprobe-unlisted-wavelength",
   "regress/b124-allpass-ring-default-reltol",
   "regress/b124-allpass-ring-tight-reltol",
@@ -374,6 +376,12 @@
    "only": "^regress/(probe-latch-dc|probe-latch-dc-swept-wl|b003-dc-dark-point)$",
    "gtest": false,
    "note": "B-003, B-185: each .dc point is a fresh steady state (every port writes each of its wavelengths, with an event): probe2 of probe-latch-dc-swept-wl samples its fixed-wavelength net at every point (CSV rows), new case b003-dc-dark-point (null point written as 0 W); probe-latch-dc: netlist comment only (manifest sha256)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T11:37:45Z",
+   "only": "^(cir/add_drop|opt/tol-resolution-overrides|opt/mode-fd|opt/multi-file|regress/b004-mode-td-dc|regress/f15-stats-dc|regress/f05-save-paper-fig1b|regress/f05-format-vcd-csv-dc|regress/b062-mlprobe-unlisted-wavelength|regress/b010-near-duplicate-lambda|regress/b062-mlprobe-computed-wavelength|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "B-010, B-062: wavelengths equal within a relative 1e-12 are one wavelength (registry: first registered value kept; MLPROBE lists). The .dc point accumulated to ~1550 nm (B-009) now takes the source's registered 1.55e-6 (bit-identical to a fresh point at 1.55e-6); b062 MLPROBE1 matches its computed wavelength; new cases b010-near-duplicate-lambda, b062-mlprobe-computed-wavelength; gtest: new tests of PH"
   }
  ]
 }
