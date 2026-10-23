@@ -454,6 +454,12 @@
    "only": "^err/f02-step-reserved-name$",
    "gtest": false,
    "note": "F-02: new case (reserved column name)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T14:09:21Z",
+   "only": "^gtest/unit_tests$",
+   "gtest": true,
+   "note": "F-02: new gtest cases (ExpressionFunctions, RunPlan, RunTable)"
   }
  ]
 }
