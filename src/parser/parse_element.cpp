@@ -1731,6 +1731,35 @@ sc_module *SPARElement::create(ParseTreeCreationHelper &pt_helper) const
         }
     }
 
+    // Grid adequacy (doc/sparam.md): the worst leave-one-out error of the paths the device uses (unidirectional:
+    // from an input to an output), one warning per device
+    {
+        SParamData::GridReport worst;
+        size_t worst_out = 0, worst_in = 0;
+        for (size_t o = 0; o < nets.size(); ++o)
+            for (size_t i = 0; i < nets.size(); ++i)
+            {
+                if (!bidirectional && (!writes_net(o) || writes_net(i)))
+                    continue;
+                const auto r = data->gridCheck(port_map[o], port_map[i]);
+                if (r.error > worst.error)
+                {
+                    worst = r;
+                    worst_out = o;
+                    worst_in = i;
+                }
+            }
+        if (worst.error > SParamData::GRID_CHECK_THRESHOLD)
+        {
+            cerr << "Warning (" << name << "): the frequency grid of " << path << " may be too coarse: at "
+                 << worst.wavelength_m << " m, S from port '" << data->portNames()[port_map[worst_in]] << "' to port '"
+                 << data->portNames()[port_map[worst_out]] << "' interpolated from the neighbouring grid points differs "
+                 << "from the file by " << worst.error << " (field; more than " << SParamData::GRID_CHECK_THRESHOLD
+                 << "): features narrower than the grid spacing are not resolved, and the interpolated values and "
+                 << "group delays near there are unreliable" << endl;
+        }
+    }
+
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, bidirectional);
 

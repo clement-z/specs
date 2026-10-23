@@ -303,6 +303,42 @@ TEST(SParamFile, MixedInterpolationNearANull)
     }
 }
 
+TEST(SParamFile, GridCheckFlagsANullNarrowerThanTheGrid)
+{
+    // S(2 <- 1): an all-pass ring (t = 0.95, round trip a = 0.94) sampled 10 times per FSR: its nulls (at
+    // points 5 and 15) are about 0.03 FSR wide, narrower than the grid. S(1 <- 2): a delay line turning
+    // by 1 rad per point, which the interpolation follows exactly
+    const double f0 = 1.9e14, df = 1e10, t = 0.95, a = 0.94;
+    auto ring = [&](double f) {
+        const cplx e = std::polar(a, 2 * M_PI * (f - f0) / (10 * df) - M_PI);
+        return (t - e) / (1.0 - t * e);
+    };
+    std::ostringstream text;
+    text.precision(17);
+    text << "('2','TE',1,'1',1,'transmission')\n(21,3)\n";
+    for (int k = 0; k <= 20; ++k)
+        text << f0 + k * df << " " << std::abs(ring(f0 + k * df)) << " " << std::arg(ring(f0 + k * df)) << "\n";
+    text << "('1','TE',1,'2',1,'transmission')\n(21,3)\n";
+    for (int k = 0; k <= 20; ++k)
+        text << f0 + k * df << " 0.9 " << std::remainder(static_cast<double>(k), 2 * M_PI) << "\n";
+    for (auto interp : {SParamData::INTERP_LINEAR, SParamData::INTERP_PCHIP})
+    {
+        auto d = parse(text.str(), "x.sparam", SParamData::CONVENTION_AUTO, interp);
+        const auto r = d->gridCheck(0, 1);
+        EXPECT_GT(r.error, 0.5);
+        EXPECT_TRUE(std::fabs(r.wavelength_m - c / (f0 + 5 * df)) < 1e-15 || std::fabs(r.wavelength_m - c / (f0 + 15 * df)) < 1e-15)
+            << r.wavelength_m;
+        EXPECT_TRUE(d->nearFlaggedGridPoint(0, 1, c / (f0 + 5.5 * df)));
+        EXPECT_FALSE(d->nearFlaggedGridPoint(0, 1, c / (f0 + 10 * df)));
+        EXPECT_LT(d->gridCheck(1, 0).error, 1e-12);
+        EXPECT_FALSE(d->nearFlaggedGridPoint(1, 0, c / (f0 + 5.5 * df)));
+    }
+    // not applicable to the Taylor form
+    auto taylor = parse("specs-taylor 1\nports in out\ncenter 1.55e-6\nrange 1.5e-6 1.6e-6\nS out in amp 0.9\n"
+                        "S out in phase 0 1e9\n", "x.taylor");
+    EXPECT_EQ(taylor->gridCheck(1, 0).error, 0);
+}
+
 TEST(SParamFile, PassivityReportsTheWorstInput)
 {
     const std::string text =

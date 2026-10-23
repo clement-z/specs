@@ -4143,6 +4143,27 @@
    "note": "F-03: the exported ring as SPAR in .tran; delay=auto per path (PF03b): out follows the in->out path, whose negative delay is clamped to 0, drop its own delay; --vci prints the device parameters"
   },
   {
+   "id": "regress/spar-grid-warning",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists",
+     "tests/sparam/fixtures",
+     "tests/sparam/data"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "csv",
+    "-f",
+    "tests/golden/netlists/spar-grid-warning.cir"
+   ],
+   "note": "PF03b: SPAR on a 1 nm export of the add-drop ring (too coarse for its through null): the grid-adequacy warning at load time, the clamped negative delay of the through path in .tran"
+  },
+  {
    "id": "regress/spar-3port-taylor",
    "setup": {
     "copy": [

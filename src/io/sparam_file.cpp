@@ -333,6 +333,7 @@ void SParamData::buildTables(vector<vector<Sample>> &raw, bool conjugate)
             t.dre = pchipSlopes(t.f_Hz, t.re);
             t.dim = pchipSlopes(t.f_Hz, t.im);
         }
+        t.loo_error = leaveOneOutErrors(t);
         m_active[k] = nonzero;
     }
 }
@@ -470,6 +471,76 @@ SParamData::complex_type SParamData::interpolate(const Table &t, double f_Hz) co
     }
     return std::polar(evalSegment(t.f_Hz, t.mag, pchip ? &t.dmag : nullptr, k, f_Hz),
                       evalSegment(t.f_Hz, t.phase, pchip ? &t.dphase : nullptr, k, f_Hz));
+}
+
+vector<double> SParamData::leaveOneOutErrors(const Table &t) const
+{
+    const size_t m = t.f_Hz.size();
+    vector<double> errors(m, 0);
+    const bool pchip = m_interp == INTERP_PCHIP;
+    for (size_t j = 1; j + 1 < m; ++j)
+    {
+        // the grid without point j: interval [j - 1, j + 1]; PCHIP slopes from the points around it
+        // (j - 2 .. j + 2 without j), as the whole grid without j would give them
+        vector<double> x;
+        vector<size_t> idx;
+        for (size_t i = (j >= 2 ? j - 2 : 0); i <= std::min(m - 1, j + 2); ++i)
+            if (i != j)
+            {
+                idx.push_back(i);
+                x.push_back(t.f_Hz[i]);
+            }
+        const size_t a = std::find(idx.begin(), idx.end(), j - 1) - idx.begin();
+        auto eval = [&](const vector<double> &y_full) {
+            vector<double> y;
+            for (size_t i : idx)
+                y.push_back(y_full[i]);
+            if (!pchip)
+                return evalSegment(x, y, nullptr, a, t.f_Hz[j]);
+            const vector<double> slopes = pchipSlopes(x, y);
+            return evalSegment(x, y, &slopes, a, t.f_Hz[j]);
+        };
+        complex_type s;
+        if (std::min(t.mag[j - 1], t.mag[j + 1]) < MIXED_INTERP_THRESHOLD * t.max_mag)
+            s = complex_type(eval(t.re), eval(t.im));
+        else
+            s = std::polar(eval(t.mag), eval(t.phase));
+        errors[j] = std::abs(s - complex_type(t.re[j], t.im[j]));
+    }
+    return errors;
+}
+
+SParamData::GridReport SParamData::gridCheck(size_t out, size_t in) const
+{
+    GridReport report;
+    const size_t k = out * m_nports + in;
+    if (m_is_taylor || !m_active[k])
+        return report;
+    const Table &t = m_tables[k];
+    for (size_t j = 0; j < t.loo_error.size(); ++j)
+        if (t.loo_error[j] > report.error)
+        {
+            report.error = t.loo_error[j];
+            report.wavelength_m = c / t.f_Hz[j];
+        }
+    return report;
+}
+
+bool SParamData::nearFlaggedGridPoint(size_t out, size_t in, double wavelength_m) const
+{
+    const size_t k = out * m_nports + in;
+    if (m_is_taylor || !m_active[k])
+        return false;
+    const Table &t = m_tables[k];
+    const size_t m = t.f_Hz.size();
+    if (m < 2)
+        return false;
+    // the delay between grid points k and k + 1 comes from points k - 1 .. k + 2
+    const size_t seg = segment(t.f_Hz, clampFrequency(c / wavelength_m));
+    for (size_t j = (seg >= 1 ? seg - 1 : 0); j <= std::min(m - 1, seg + 2); ++j)
+        if (t.loo_error[j] > GRID_CHECK_THRESHOLD)
+            return true;
+    return false;
 }
 
 double SParamData::polyval(const vector<double> &coeffs, double d)

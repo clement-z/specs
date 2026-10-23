@@ -65,6 +65,13 @@ delays of the drop path match the exact ones within 0.01 ps, those of the throug
 (1.35 instead of 1.44 ps at 0.1 nm); the through-port null itself (its phase turns within about 4 pm) stays
 unresolved (-37 ps instead of -621 ps), see doc/sparam.md.
 
+Grid-adequacy check (doc/sparam.md): the 0.05 nm file **passes** it (worst leave-one-out error 0.0039, on the
+through path next to a null, threshold 0.02), although its through-port null is narrower than the grid. With the
+mixed interpolation (real and imaginary parts near nulls) the field between its grid points is within 1e-3 of the
+circuit everywhere, also at the null; what the grid does not resolve there is the phase feature, hence the group
+delay (-37 ps), which the check does not test. With magnitude/phase interpolation the null would fail the check
+(0.067). The former 1 nm file fails it (0.71); `regress/spar-grid-warning` shows the warning on a 1 nm export.
+
 `check_ring_export.py --specs build/specs` checks `utils/sparam_export.py` on `add_drop_ring.cir` (the ring of
 `circuits/add_drop.cir` as a subcircuit `ring in add out drop`): the export in every format reads back to the
 same matrix (2e-16), and S[out][in], S[drop][in] match `circuits/add_drop.cir` without its access subcircuit

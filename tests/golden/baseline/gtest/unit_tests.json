@@ -126,6 +126,7 @@
   "SPECSConfigDeathTest.VerifyConfigRejectsInvalidValues": "PASS",
   "SParamFile.CsvColumnsFromInputToOutput": "PASS",
   "SParamFile.FormatFromExtension": "PASS",
+  "SParamFile.GridCheckFlagsANullNarrowerThanTheGrid": "PASS",
   "SParamFile.GroupDelayOfALinearPhase": "PASS",
   "SParamFile.LumericalBlocksPortsAndPhases": "PASS",
   "SParamFile.LumericalPortDeclarationsGiveTheOrder": "PASS",

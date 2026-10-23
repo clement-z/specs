@@ -9,7 +9,7 @@ Base: 48e510f.
 |---|---|---|---|---|
 | 1 | Per-path delayed copies | done | 7e9e03b | clang/asan-gcc: same 2 cases; asan-clang clean |
 | 2 | Negative delay warning per path | todo | | |
-| 3 | Grid-adequacy warning | todo | | |
+| 3 | Grid-adequacy warning | done | (see git log) | threshold 0.02 (leave-one-out); no existing case changed; new case regress/spar-grid-warning |
 | 4 | Mixed interpolation near nulls | done | 368bf61 | threshold 0.07 x max|S|; measurements in the report |
 | 5 | Data files in the run manifest | done | 805dc8c | subagent (opus) in /tmp/PF03b-wt/manifest, reviewed, cherry-picked; ring manifests re-recorded for item 8's file |
 | 6 | SiEPIC BDC fixture + golden | todo | | |
@@ -80,3 +80,11 @@ The gtest case also changes (one new test, SParamFile.MixedInterpolationNearANul
 Decisions: key `data_files` always present (`[]`), right after `netlist_files`; `format_version` 1 -> 2 in the run
 manifest and the run table manifest. Every recorded manifest changes in those two places only (160 cases); the
 non-empty lists: the 8 SPAR cases and b052-vlsrc/evlsrc-positional, b066-vlsrc-vci. Checked mechanically.
+
+### Item 3 (grid-adequacy warning, threshold 0.02)
+Prediction (from the prototype's leave-one-out values of every committed fixture: <= 0.0039): no existing case
+changes. (The strict run was made right after the code change, before this note was written: 273 passed.)
+Re-recorded: the gtest case (new test SParamFile.GridCheckFlagsANullNarrowerThanTheGrid) and the new case
+`regress/spar-grid-warning` (1 nm ring export, 11 points: expected warning on the worst used path, from the
+prototype on the 31-point file: ~0.7 at the through null near 1.55 um or 1.546 um; .tran: out at +0 with the old
+negative-delay message, drop at the 1 nm grid's in->drop delay).
