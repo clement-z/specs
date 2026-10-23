@@ -1,5 +1,5 @@
 # B-192: Data file paths resolve differently for VLSRC and SPAR
-severity: low | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: open
+severity: low | category: parser | effort: S | fix-class: needs-design | verdict: CONFIRMED | status: fixed in dd822d7 (sprint 2026-10c PK)
 location: src/devices/value_list_source.h, src/devices/electrical_value_list_source.h (`setValues`), SPAR path resolution in src/parser/parse_element.cpp
 
 ## Problem
