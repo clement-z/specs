@@ -6,8 +6,8 @@ Heartbeat: `5e05ca80` (PF02-heartbeat, every 5 min, expires in 48 h). Delete it 
 |---|---|---|---|---|
 | 0 | Baseline, output format evaluation and design (this file) | done | 5c9f98f | baseline 92a4974: gcc 16/16, golden strict 256/256; before-recordings clang/asan-gcc/asan-clang in /tmp/pf02-before |
 | 1 | Expression functions (`gauss`, `uniform`, `lognormal`, `choice`, math), per-name draw streams, `shared=` | done | 1ac820a | 6 gtest, 5 golden (new); strict 261/261 |
-| 2 | `.step param` (linear, `list`, nested), `.mc N [seed=]`, run plan, `--run K`, `-n` plan listing | todo | | |
-| 3 | Runner: one process per run, run table (appendable columns + index), failures recorded, resume | todo | | |
+| 2 | `.step param` (linear, `list`, nested), `.mc N [seed=]`, run plan, `--run K`, `-n` plan listing | done | ef07d1e | items 2 and 3 in one commit (main.cpp couples them) |
+| 3 | Runner: one process per run, run table (appendable columns + index), failures recorded, resume | done | ef07d1e | 7 gtest, 11 golden new; 3 help cases re-recorded (new options); strict 272/272; asan-clang pending |
 | 4 | pyspecs reader | todo | | |
 | 5 | Docs, CHANGELOG, golden cases, unit tests | todo | | |
 
@@ -27,7 +27,7 @@ a failing run and resumable.
 | **Directory of appendable `.npy` columns + a run index (chosen)** | yes: binary, 8 bytes per float | yes: rows appended run by run; the index is the commit record, a crash is repaired by truncating to it | yes: `np.load(..., mmap_mode="r")`, rows of a run = a slice | none (NPY 1.0 is the format the `.npz` writer already produces) |
 
 Choice: `<trace>.runs/`, a column store in NumPy's own format:
-- `data_<column>.npy`: one 1-D array per column of the probe table (F-05 columns plus `run`): `run` (int32),
+- `<column>.npy`: one 1-D array per column of the probe table (F-05 columns plus `run`): `run` (int32),
   `time_s`, `signal` (int32, index into `signal_names.txt`), `wavelength_m`, `power_W`, `field_re`, `field_im`.
   The NPY header is written with a fixed size (128 bytes), so the row count in it is rewritten in place after
   each append.
