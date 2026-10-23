@@ -1,0 +1,22 @@
+* F-02: a .step and an .mc plan: 2 values of the lower arm's effective index x 3 Monte-Carlo runs = 6 runs, one process each
+* (run with -j 2: the table does not depend on -j). Unbalanced MZI whose upper arm (subcircuit ARM)
+* draws its length per instance (.param Lr in the body) and whose lower arm length is a drawn
+* top-level parameter (dL, a column of runs.csv). Monte-Carlo run k uses the seed of ".mc/k" from the
+* master seed 7, the same at both step points: the drawn values of runs 0-2 equal those of runs 3-5.
+* Expected: traces/delete_me.runs/ with runs.csv (6 ok runs), one table row per run (the output probe
+* at t = 0), 2 draws per run, table.manifest.json.
+.param n2=2.35
+.param dL=gauss(0, 2e-6)
+.subckt ARM a b L=100e-6
+.param Lr=gauss({L}, 1e-6)
+wg1 a b length={Lr} neff=2.35 ng=4.2
+.ends
+.step param n2 list 2.35 2.36
+.mc 3 seed=7
+cwsrc1 in wl=1.55e-6 power=1e-3
+splitter1 in a b
+X1 a c ARM L=110e-6
+wg2 b d length=100e-6+{dL} neff={n2} ng=4.2
+merger1 c d out
+probe1 out
+.tran 1p

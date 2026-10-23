@@ -4371,6 +4371,208 @@
     "tests/golden/netlists/f02-unknown-function.cir"
    ],
    "note": "F-02: unknown function gaussian(): parse error with file:line, exit 1"
+  },
+  {
+   "id": "regress/f02-step-mc",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-j",
+    "2",
+    "-f",
+    "tests/golden/netlists/f02-step-mc.cir"
+   ],
+   "note": "F-02: .step param n2 list (2 values) x .mc 3 seed=7 = 6 runs, 2 processes at a time: runs.csv (seeds of Monte-Carlo runs 0-2 repeat at both step points, the drawn top-level dL is a column), the table columns (one row per run, the output probe at t = 0) in run order whatever -j, the draws (dL and the per-instance length of X1/.param Lr), table.manifest.json (plan, seed 7)"
+  },
+  {
+   "id": "regress/f02-step-mc-dry-run",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-n",
+    "-f",
+    "tests/golden/netlists/f02-step-mc.cir"
+   ],
+   "note": "F-02: -n lists the 6 runs of the plan (stepped values, Monte-Carlo run, seed) and writes nothing"
+  },
+  {
+   "id": "regress/f02-step-mc-run",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--run",
+    "4",
+    "-f",
+    "tests/golden/netlists/f02-step-mc.cir"
+   ],
+   "note": "F-02: --run 4 simulates run 4 alone (n2=2.36, Monte-Carlo run 1 and its seed) with the outputs of a single run: its VCD holds the power_W of row 4 of regress/f02-step-mc's table (checked bit for bit, and equal to --seed <seed> --param n2=2.36 on the netlist without .step/.mc)"
+  },
+  {
+   "id": "regress/f02-step-linear",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-o",
+    "traces/lin",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: .step param L 100e-6 120e-6 10e-6 (stop included): 3 ok runs in traces/lin.runs/, master seed 0, no draws"
+  },
+  {
+   "id": "regress/f02-step-failures",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-failures.cir"
+   ],
+   "note": "F-02: run 1 (maxiter=100) fails with the .op non-convergence error: recorded as failed (exit 1, the Error line as message, logs/run1.log), runs 0 and 2 still run (ok); specs exits 1 at the end"
+  },
+  {
+   "id": "err/f02-step-unknown-param",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-unknown-param.cir"
+   ],
+   "note": "F-02: .step param W without a .param W: error naming the .step line, exit 1"
+  },
+  {
+   "id": "err/f02-step-bad-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/f02-step-bad-range.cir"
+   ],
+   "note": "F-02: .step param L with stop < start: parse error at the .step line, exit 1"
+  },
+  {
+   "id": "err/f02-step-and-param",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--param",
+    "L=1e-6",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: --param L and .step param L set the same parameter: error, exit 1"
+  },
+  {
+   "id": "err/f02-plan-format",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--format",
+    "npz",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: --format does not apply to the runs of a plan (they write the run table): error, exit 1"
+  },
+  {
+   "id": "err/f02-run-out-of-range",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--run",
+    "3",
+    "-f",
+    "tests/golden/netlists/f02-step-linear.cir"
+   ],
+   "note": "F-02: --run 3 of a 3-run plan: error, exit 1"
+  },
+  {
+   "id": "err/f02-run-without-plan",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "--run",
+    "0",
+    "-f",
+    "tests/golden/netlists/f02-functions.cir"
+   ],
+   "note": "F-02: --run on a netlist without .step/.mc: error, exit 1"
   }
  ]
 }

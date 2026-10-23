@@ -709,5 +709,38 @@ class Npz(unittest.TestCase):
             self.assertEqual((f["raw_sha256"], f["raw_bytes"]), (rg.sha256(raw), len(raw)))
 
 
+class Npy(unittest.TestCase):
+    """.npy outputs (the columns of a run table, F-02) are decoded to text like the .npz members."""
+
+    def test_file_kind(self):
+        self.assertEqual(rg.file_kind("traces/x.runs/time_s.npy"), "npy")
+        self.assertEqual(rg.file_kind("traces/x.NPY"), "npy")
+
+    def test_decode(self):
+        self.assertEqual(rg.decode_npy_file(f8(0.5, 1e-16)), "npy: descr=<f8 shape=(2,)\n0.5\n1e-16\n")
+        # a header padded to 128 bytes, as the run table writes it
+        dict_ = "{'descr': '<i4', 'fortran_order': False, 'shape': (2,), }"
+        header = dict_ + " " * (128 - 10 - 1 - len(dict_)) + "\n"
+        raw = b"\x93NUMPY\x01\x00" + struct.pack("<H", len(header)) + header.encode() + struct.pack("<2i", 3, -4)
+        self.assertEqual(rg.decode_npy_file(raw), "npy: descr=<i4 shape=(2,)\n3\n-4\n")
+        self.assertTrue(rg.decode_npy_file(b"").startswith("npy: cannot decode: "))
+        self.assertTrue(rg.decode_npy_file(f8(1.0)[:-1]).startswith("npy: cannot decode: data size"))
+
+    def test_ulp_difference_equal(self):
+        x = 1.2345678901234567e-3
+        ulp = struct.unpack("<d", struct.pack("<Q", struct.unpack("<Q", struct.pack("<d", x))[0] + 1))[0]
+
+        def stored_npy(raw):
+            content = rg.decode_npy_file(raw)
+            return {"args": [], "exit": 0, "stdout": "", "stderr": "",
+                    "files": {"t/x.npy": {"kind": "npy", "content": content, "bytes": len(content),
+                                          "sha256": rg.sha256(content)}}}
+        case = {"id": "npy/x"}
+        diffs, _ = rg.compare_case(stored_npy(f8(x)), stored_npy(f8(ulp)), case, DEFAULT_TOL)
+        self.assertEqual(diffs, [])
+        diffs, _ = rg.compare_case(stored_npy(f8(x)), stored_npy(f8(x * 2)), case, DEFAULT_TOL)
+        self.assertEqual(len(diffs), 1, diffs)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

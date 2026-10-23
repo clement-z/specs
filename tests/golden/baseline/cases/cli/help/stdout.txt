@@ -48,6 +48,16 @@
                                         as in .param name=value; overrides the
                                         netlist's .param/.assign of the same
                                         name (repeatable)
+      --run=[K]                         Run only run K of the netlist's
+                                        .step/.mc plan, in this process, with
+                                        the outputs of a single run (trace,
+                                        tables, manifest, stdout): each run is
+                                        reproducible on its own
+      -j[N], --jobs=[N]                 Runs of a .step/.mc plan simulated at
+                                        the same time, one process each (default
+                                        1)
+      --overwrite                       Replace the run table <output>.runs/ of
+                                        a .step/.mc plan instead of resuming it
       --maxiter=[set_maxiter]           Set the maximum number of iterations
                                         (delta cycles) of the .op/.dc fixed
                                         point, per operating point or sweep

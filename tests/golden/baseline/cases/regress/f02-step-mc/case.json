@@ -1,0 +1,122 @@
+{
+ "args": [
+  "-j",
+  "2",
+  "-f",
+  "tests/golden/netlists/f02-step-mc.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.runs/.lock": {
+   "bytes": 0,
+   "kind": "text",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stored": "files/traces/delete_me.runs/.lock"
+  },
+  "traces/delete_me.runs/draw_name.npy": {
+   "bytes": 51,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "abfb6e51dc92eb7ab12ea40b79521b2a92f66d2e760c1c509bd5d299c7d415a9",
+   "sha256": "991418e53bbe15390648694ffba044958e635446b488911a387409839675e720",
+   "stored": "files/traces/delete_me.runs/draw_name.npy.txt"
+  },
+  "traces/delete_me.runs/draw_names.txt": {
+   "bytes": 37,
+   "kind": "text",
+   "sha256": "d0ddee29395284ff34de7514fe4f4fae6d1cd45922a4eba533c10961737bcabb",
+   "stored": "files/traces/delete_me.runs/draw_names.txt"
+  },
+  "traces/delete_me.runs/draw_run.npy": {
+   "bytes": 51,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "7b96f2702118675fd68e4d6d06a95fd1edbf23bc36a92e6f20fb89f7ea962ae5",
+   "sha256": "f44ff60497dac5016127a173d567c85e3ad94332228cadf3de8c514c41deb14c",
+   "stored": "files/traces/delete_me.runs/draw_run.npy.txt"
+  },
+  "traces/delete_me.runs/draw_value.npy": {
+   "bytes": 303,
+   "kind": "npy",
+   "raw_bytes": 224,
+   "raw_sha256": "20f6183410601b939d2dd8bdb100e1768a504821502977b1efbdc82b15deb87d",
+   "sha256": "edffdce046aabc13653cb5456ff93297f61e41ad70d0bc6967feb886542d339d",
+   "stored": "files/traces/delete_me.runs/draw_value.npy.txt"
+  },
+  "traces/delete_me.runs/field_im.npy": {
+   "bytes": 155,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "a79452b13023f59169af1b5d3b7bb35d68c5401d6e974711ef8a95eab7556880",
+   "sha256": "b6332926584c02024427522625abaf79b1a14645672a409bf7ed273a00b7c78e",
+   "stored": "files/traces/delete_me.runs/field_im.npy.txt"
+  },
+  "traces/delete_me.runs/field_re.npy": {
+   "bytes": 158,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "0d1a07697d9730d8069835ff6d5afdab24159d9da1bd97f3f012b0fbbc1c7d89",
+   "sha256": "eacd43996ce05f06ca9f354ced99b551bcf5a22f8bb80a4b307725531cdac0e4",
+   "stored": "files/traces/delete_me.runs/field_re.npy.txt"
+  },
+  "traces/delete_me.runs/power_W.npy": {
+   "bytes": 159,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "40d5c67765d79bcc48ee10012e5132dde89e9229f958190f1b983b05b8c1b389",
+   "sha256": "b810443edc27d522993986976ac6db825f8c4f12ca7c075fbbf8e0cc51ec354f",
+   "stored": "files/traces/delete_me.runs/power_W.npy.txt"
+  },
+  "traces/delete_me.runs/run.npy": {
+   "bytes": 38,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "7631a0b68229b1971c0c928f2b8ad40cc1a96172f614d902e23d96a1238cc255",
+   "sha256": "6b7d58b12691baa14c6e51d29f8af9fb08614183e29bef504ac6623b8cce684b",
+   "stored": "files/traces/delete_me.runs/run.npy.txt"
+  },
+  "traces/delete_me.runs/runs.csv": {
+   "bytes": 490,
+   "kind": "text",
+   "sha256": "31704925d82aa38d9208fca924d3439e58740c54fcf74b5c3cfa1c0f641e9144",
+   "stored": "files/traces/delete_me.runs/runs.csv"
+  },
+  "traces/delete_me.runs/signal.npy": {
+   "bytes": 38,
+   "kind": "npy",
+   "raw_bytes": 152,
+   "raw_sha256": "cde1d14bbeaf53a6a170fbf95e380fd81c18ac054ade97099f3d1ad0624b92b4",
+   "sha256": "05ed0f47be33f5de594dfd004b024ac2216c41e16721d57cae993f312e4fb1c2",
+   "stored": "files/traces/delete_me.runs/signal.npy.txt"
+  },
+  "traces/delete_me.runs/signal_names.txt": {
+   "bytes": 12,
+   "kind": "text",
+   "sha256": "5b18e84cd6bf9a38758c020d11ffaf88d38329f1f27df23d1d41242ca870c6af",
+   "stored": "files/traces/delete_me.runs/signal_names.txt"
+  },
+  "traces/delete_me.runs/table.manifest.json": {
+   "bytes": 497,
+   "kind": "json",
+   "sha256": "7e2ba12db9b1cdc2cce24e40ab1e97890dd51fc8e0f9757c6214efe652085900",
+   "stored": "files/traces/delete_me.runs/table.manifest.json"
+  },
+  "traces/delete_me.runs/time_s.npy": {
+   "bytes": 50,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "c7d731dfce4fcd0ab48c5656daaa4cc7616b887c52931c9556fd748f0cad5058",
+   "sha256": "3fa48b96e81e1c960c04c324ae60321e5bf9e3ce8a608498e9b5e00f54b26f40",
+   "stored": "files/traces/delete_me.runs/time_s.npy.txt"
+  },
+  "traces/delete_me.runs/wavelength_m.npy": {
+   "bytes": 80,
+   "kind": "npy",
+   "raw_bytes": 176,
+   "raw_sha256": "2fe2654df983901bcea84fde79c452018ea1b068d463d9967b9722fbf6409aaf",
+   "sha256": "95ba261fb43ac672b3d7fd0f64f608f730fe2035fd97613d7f49db963e3528f4",
+   "stored": "files/traces/delete_me.runs/wavelength_m.npy.txt"
+  }
+ },
+ "id": "regress/f02-step-mc"
+}

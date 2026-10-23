@@ -541,6 +541,8 @@ string convert_special_char(char c)
 ^\.TRAN { return T_ANALYSIS_TRAN; }
 
 ^\.OPTIONS { return T_DIRECTIVE_OPTIONS; }
+^\.STEP { return T_DIRECTIVE_STEP; }
+^\.MC { return T_DIRECTIVE_MC; }
 ^\.NODESET { return T_DIRECTIVE_NODESET; }
 ^\.IC { yylerror(yyscanner, "the .ic directive is not supported"); exit(1); }
 ^\.SUBCKT {

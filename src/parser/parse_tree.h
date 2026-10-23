@@ -294,6 +294,26 @@ struct Variable {
     operator string() const { return get_str(); }
 };
 
+// F-02: a .step line of the root netlist: the values of a parameter, one run per value (src/run_plan.h)
+struct ParseStep {
+    string param;
+    vector<Variable> values;
+    string where; // file:line
+};
+
+// F-02: the run plan of the root netlist, its .step lines (in netlist order, the first one is the
+// outermost loop) and its .mc line
+struct ParsePlan {
+    vector<ParseStep> steps;
+    bool mc = false;
+    uint64_t mc_runs = 0;
+    bool mc_seed_given = false;
+    uint64_t mc_seed = 0;
+    string mc_where;
+
+    bool empty() const { return steps.empty() && !mc; }
+};
+
 /* Dummy circuit directive struct */
 struct ParseDirective {
     ParseTree *parent;
@@ -619,6 +639,11 @@ struct ParseTree {
     mutable string draw_seed_conflict;
     // Draws recorded (root's list) when the assignment being parsed started
     size_t draws_at_assignment = 0;
+    // F-02: .options seed of the root netlist (the last one), applied when parsed
+    bool options_seed_given = false;
+    uint64_t options_seed = 0;
+    // F-02: .step and .mc lines (root tree; a subcircuit body ignores them with a warning)
+    ParsePlan plan;
 
     ParseTree(const string &name = "ROOT")
     : name(name)
@@ -648,6 +673,12 @@ struct ParseTree {
     // F-02: an .options seed of the root netlist, applied when its line is parsed (so that the draws
     // after it use it) unless the seed was given with --seed
     void apply_options_seed(uint64_t seed, const string &where);
+    // F-02: a .step line (values: start stop step, or the list after the keyword "list"); returns
+    // false with a message in error if it is invalid
+    bool add_step(const string &keyword_param, const string &name, const string &keyword_list,
+                  const vector<Variable> &values, const string &where, string &error);
+    // F-02: an .mc line; returns false with a message in error if it is invalid
+    bool set_mc(const Variable &runs, const map<string, Variable> &kwargs, const string &where, string &error);
     // F-02: called after a .param/.assign of `name`: in the root netlist, `name` goes to drawn_params
     // if its value drew and is not overridden (--param, .step)
     void note_assigned_param(const string &name)

@@ -1,0 +1,2 @@
+Error: --format does not apply to the runs of a .step/.mc plan (they write the run table <output>.runs/); use --run K for one run
+

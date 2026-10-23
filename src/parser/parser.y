@@ -14,6 +14,7 @@
     string yyget_filename ( yyscan_t scanner );
     string yyget_current_line ( yyscan_t scanner );
     struct FunctionArgs;
+    struct McLine;
 }
 
 %{
@@ -50,6 +51,22 @@ extern ParseTree *cur_pt;
 */
 int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 
+// F-02: an .mc line being parsed
+struct McLine {
+    Variable runs;
+    map<string, Variable> kwargs;
+    string where;
+};
+
+// yyerror() for an error found when a line is complete: a '\n' read ahead (lookahead, yychar) has
+// already counted the next line
+static int yyerror_line(yyscan_t scanner, ParseTree *pt, const char *err, int lookahead)
+{
+    if (lookahead == '\n')
+        yyset_lineno(yyget_lineno(scanner) - 1, scanner);
+    return yyerror(scanner, pt, err);
+}
+
 // "file:line" of the line being parsed (records of the random draws, F-02); lookahead: the token
 // already read by the parser (yychar), a '\n' read ahead has counted the next line
 static string yy_where(yyscan_t scanner, int lookahead)
@@ -70,6 +87,7 @@ static string yy_where(yyscan_t scanner, int lookahead)
     pair<string, pair<string, Variable>> *netval_assign_ptr;
     pair<pair<string, string>, vector<double>> *cw_sweep_order_ptr;
     FunctionArgs           *funcargs_ptr;
+    McLine                 *mc_line_ptr;
 }
 
 // %define api.value.type {struct YYSTYPE}
@@ -90,6 +108,7 @@ static string yy_where(yyscan_t scanner, int lookahead)
 %token <s_ptr> T_DIRECTIVE_ENDS
 %token <i_val> T_DIRECTIVE_SAVE
 %token <i_val> T_LOCAL_ASSIGNMENT
+%token <i_val> T_DIRECTIVE_STEP T_DIRECTIVE_MC
 %type <c_val> '='
 
 
@@ -123,6 +142,9 @@ static string yy_where(yyscan_t scanner, int lookahead)
 %type <i_val> directive.nodeset
 %type <i_val> directive.save
 %type <elemattr_ptr> save_target
+%type <vec_var_ptr> step_values
+%type <variable_ptr> step_value
+%type <mc_line_ptr> directive.mc
 
 // Rules for circuit nets (value is index in PT elements)
 %type <s_ptr> net_name.base.str
@@ -195,6 +217,15 @@ line: %empty
     | directive { /* cout << "Registered directive [...]" << endl; */ }
     | subcircuit { /* cout << "Parsed subcircuit [...]" << endl; */ }
     | local_assignment { /* cout << "Processed local assignment [...]" << endl; */ }
+    | directive.step
+    | directive.mc
+        {
+            // F-02: the .mc line, once its keywords are read
+            string error;
+            if (!cur_pt->set_mc($1->runs, $1->kwargs, $1->where, error))
+                yyerror_line(scanner, pt, error.c_str(), yychar);
+            delete $1;
+        }
 ;
 
 local_assignment: T_LOCAL_ASSIGNMENT { cur_pt->draw_owner = ".param"; } assignment
@@ -212,6 +243,70 @@ local_assignment: T_LOCAL_ASSIGNMENT { cur_pt->draw_owner = ".param"; } assignme
 ;
 
 /* --------- Directives definitions parsing ----------- */
+
+/* .step param NAME start stop step, .step param NAME list v1 v2 ... (F-02) */
+directive.step: T_DIRECTIVE_STEP T_STR T_STR step_values
+                {
+                    string error;
+                    if (!cur_pt->add_step(*$2, *$3, "", *$4, yy_where(scanner, yychar), error))
+                        yyerror_line(scanner, pt, error.c_str(), yychar);
+                    delete $2;
+                    delete $3;
+                    delete $4;
+                }
+              | T_DIRECTIVE_STEP T_STR T_STR T_STR step_values
+                {
+                    string error;
+                    if (!cur_pt->add_step(*$2, *$3, *$4, *$5, yy_where(scanner, yychar), error))
+                        yyerror_line(scanner, pt, error.c_str(), yychar);
+                    delete $2;
+                    delete $3;
+                    delete $4;
+                    delete $5;
+                }
+;
+step_values: step_value
+                {
+                    $$ = new vector<Variable>(1, *$1);
+                    delete $1;
+                }
+           | step_values step_value
+                {
+                    $$ = $1;
+                    $$->push_back(*$2);
+                    delete $2;
+                }
+;
+/* a number, {expression}, or a signed number (-1, as in SPICE) */
+step_value: variable.delimited_expr
+          | '-' variable_base
+                {
+                    $$ = $2;
+                    if ($$->type == Variable::INTEGER)
+                        $$->inum = -$$->inum;
+                    else
+                        *$$ *= Variable(-1.0);
+                }
+          | '+' variable_base { $$ = $2; }
+;
+
+/* .mc N [seed=S] (F-02) */
+directive.mc: T_DIRECTIVE_MC step_value
+                {
+                    $$ = new McLine();
+                    $$->runs = *$2;
+                    $$->where = yy_where(scanner, yychar);
+                    delete $2;
+                }
+            | directive.mc assignment
+                {
+                    $$ = $1;
+                    if ($$->kwargs.count($2->first))
+                        yyerror_line(scanner, pt, (".mc: keyword " + $2->first + " given twice").c_str(), yychar);
+                    $$->kwargs[$2->first] = $2->second;
+                    delete $2;
+                }
+;
 
 /* .save net QTY(net) ... (F-05): probes on the listed optical nets */
 directive.save: T_DIRECTIVE_SAVE save_target
@@ -949,7 +1044,7 @@ pow:
         string error;
         $$ = new Variable();
         if (!call_function(cur_pt, *$1, *$3, yy_where(scanner, yychar), *$$, error))
-            yyerror(scanner, pt, error.c_str());
+            yyerror_line(scanner, pt, error.c_str(), yychar);
         delete $1;
         delete $3;
     }

@@ -1,0 +1,13 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Run plan: 6 runs, .step param n2 (2 values), .mc 3, seed 7
+Run table: traces/delete_me.runs (6 runs, 0 already done, 6 to run, 2 at a time)
+run 0: ok
+run 1: ok
+run 2: ok
+run 3: ok
+run 4: ok
+run 5: ok
+Runs: 6, 6 ok (0 from before), 0 failed
+

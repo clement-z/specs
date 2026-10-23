@@ -1,0 +1,12 @@
+* F-02: .step param L start stop step (stop included, as .dc: 100, 110, 120 um) of a waveguide in one
+* arm of an unbalanced MZI, no random function: every run uses the master seed 0. Expected: 3 ok runs,
+* the output power of each in the table (power_W.npy, rows 0..2).
+.param L=100e-6
+.step param L 100e-6 120e-6 10e-6
+cwsrc1 in wl=1.55e-6 power=1e-3
+splitter1 in a b
+wg1 a c length={L} neff=2.35 ng=4.2
+wg2 b d length=100e-6 neff=2.35 ng=4.2
+merger1 c d out
+probe1 out
+.tran 1p

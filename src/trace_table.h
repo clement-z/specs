@@ -45,6 +45,16 @@ public:
     const std::vector<std::string> &signal_names() const { return m_signal_names; }
     size_t rows() const { return m_rows; }
 
+    // Keep the columns in memory without a .npz file (call before the first sample): the run of a
+    // .step/.mc plan hands them to the run table (F-02)
+    void keepColumns() { m_keep_columns = true; }
+    const std::vector<double> &time_s() const { return m_time_s; }
+    const std::vector<int32_t> &signal() const { return m_signal; }
+    const std::vector<double> &wavelength_m() const { return m_wavelength_m; }
+    const std::vector<double> &power_W() const { return m_power_W; }
+    const std::vector<double> &field_re() const { return m_field_re; }
+    const std::vector<double> &field_im() const { return m_field_im; }
+
     // Helpers of the .npz writer, public for the unit tests
     // CRC-32 of the zip format (polynomial 0xEDB88320), continued from crc
     static uint32_t crc32(const void *data, size_t size, uint32_t crc = 0);
@@ -58,6 +68,7 @@ private:
     std::ofstream m_csv;
     std::ofstream m_npz;
     bool m_closed = false;
+    bool m_keep_columns = false;
     size_t m_rows = 0;
 
     std::vector<std::string> m_signal_names;

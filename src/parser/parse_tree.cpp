@@ -3,6 +3,7 @@
 #include "parser/parse_element.h"
 #include "parser/parser_state.h"
 #include "specs.h"
+#include "utils/general_utils.h"
 
 #include <sstream>
 #include <iomanip>
@@ -365,6 +366,12 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
         directives.clear();
     }
 
+    if (!plan.empty())
+    {
+        cerr << name << ": found a .step or .mc line in subcircuit, ignoring." << endl;
+        plan = ParsePlan();
+    }
+
     if (analyses.size() > 0)
     {
         cerr << name << ": found an analysis in subcircuit, ignoring." << endl;
@@ -474,6 +481,8 @@ void ParseTree::record_draw(const string &stream, double value, uint64_t seed, c
 void ParseTree::apply_options_seed(uint64_t seed, const string &where)
 {
     // specs --seed takes priority over the netlist (also applied by OPTIONSDirective::create())
+    options_seed_given = true;
+    options_seed = seed;
     if (specsGlobalConfig.seed_explicit)
         return;
     if (has_drawn && seed != drawn_seed && draw_seed_conflict.empty())
@@ -483,6 +492,117 @@ void ParseTree::apply_options_seed(uint64_t seed, const string &where)
                              + " at " + first_draw_where;
     }
     specsGlobalConfig.seed = seed;
+}
+
+bool ParseTree::add_step(const string &keyword_param, const string &name, const string &keyword_list,
+                         const vector<Variable> &values, const string &where, string &error)
+{
+    if (!strutils::iequals(keyword_param, "param"))
+    {
+        error = ".step " + keyword_param + ": expected .step param NAME start stop step, or .step param NAME list v1 v2 ...";
+        return false;
+    }
+    for (const auto &s : plan.steps)
+    {
+        if (s.param == name)
+        {
+            error = ".step param " + name + ": the parameter is already stepped (at " + s.where + ")";
+            return false;
+        }
+    }
+    for (const auto &v : values)
+    {
+        if (v.type != Variable::DOUBLE && v.type != Variable::INTEGER)
+        {
+            error = ".step param " + name + ": the values must be numbers (got " + v.get_str() + ")";
+            return false;
+        }
+        if (!std::isfinite(v.as_double()))
+        {
+            error = ".step param " + name + ": the values must be finite numbers";
+            return false;
+        }
+    }
+    ParseStep step;
+    step.param = name;
+    step.where = where;
+    if (!keyword_list.empty())
+    {
+        if (!strutils::iequals(keyword_list, "list"))
+        {
+            error = ".step param " + name + " " + keyword_list + ": expected start stop step, or list v1 v2 ...";
+            return false;
+        }
+        step.values = values;
+    }
+    else
+    {
+        if (values.size() != 3)
+        {
+            error = ".step param " + name + ": expected 3 values (start stop step), got " + to_string(values.size());
+            return false;
+        }
+        const double start = values[0].as_double(), stop = values[1].as_double(), inc = values[2].as_double();
+        // as .dc (sweep_count()): the stop value is included when (stop - start)/step is an integer
+        if (!(stop > start) || !(inc > 0))
+        {
+            error = ".step param " + name + ": expected start < stop and step > 0";
+            return false;
+        }
+        const double n = floor((stop - start) / inc + 1e-9) + 1;
+        if (!(n <= 1e9))
+        {
+            error = ".step param " + name + ": too many values (" + to_string(n) + ")";
+            return false;
+        }
+        if (values[0].type == Variable::INTEGER && values[1].type == Variable::INTEGER
+            && values[2].type == Variable::INTEGER)
+        {
+            // integers stay integers (e.g. a number of rings)
+            for (int64_t v = values[0].inum; v <= values[1].inum; v += values[2].inum)
+                step.values.emplace_back(v);
+        }
+        else
+        {
+            for (double v : sweep_values(start, stop, inc))
+                step.values.emplace_back(v);
+        }
+    }
+    plan.steps.push_back(step);
+    return true;
+}
+
+bool ParseTree::set_mc(const Variable &runs, const map<string, Variable> &kwargs, const string &where, string &error)
+{
+    if (plan.mc)
+    {
+        error = ".mc: a netlist has one .mc line (the first one is at " + plan.mc_where + ")";
+        return false;
+    }
+    uint64_t n = 0;
+    if (!options_unsigned_integer(runs, n) || n < 1 || n > 1000000000)
+    {
+        error = ".mc: the number of runs must be an integer from 1 to 1000000000 (got " + runs.get_str() + ")";
+        return false;
+    }
+    plan.mc = true;
+    plan.mc_runs = n;
+    plan.mc_where = where;
+    for (const auto &kw : kwargs)
+    {
+        if (!strutils::iequals(kw.first, "seed"))
+        {
+            error = ".mc: unknown keyword " + kw.first + " (expected seed)";
+            return false;
+        }
+        if (!options_unsigned_integer(kw.second, plan.mc_seed))
+        {
+            error = ".mc: seed must be an integer between 0 and 9223372036854775807 (got " + kw.second.get_str() + ")";
+            return false;
+        }
+        plan.mc_seed_given = true;
+    }
+    return true;
 }
 
 const ParseSubcircuit *ParseTree::find_subcircuit(const string &name) const

@@ -1,0 +1,1 @@
+npy: descr=<i4 shape=(0,)

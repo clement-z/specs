@@ -90,6 +90,12 @@
   "err/f01-seed-not-integer",
   "err/f01-seed-overflow",
   "err/f02-options-seed-after-draw",
+  "err/f02-plan-format",
+  "err/f02-run-out-of-range",
+  "err/f02-run-without-plan",
+  "err/f02-step-and-param",
+  "err/f02-step-bad-range",
+  "err/f02-step-unknown-param",
   "err/f02-subckt-default-draw",
   "err/f02-unknown-function",
   "err/f05-format-invalid",
@@ -206,6 +212,11 @@
   "regress/f01-seed-max",
   "regress/f02-functions",
   "regress/f02-functions-seed",
+  "regress/f02-step-failures",
+  "regress/f02-step-linear",
+  "regress/f02-step-mc",
+  "regress/f02-step-mc-dry-run",
+  "regress/f02-step-mc-run",
   "regress/f05-format-csv-npz",
   "regress/f05-format-npz-mlprobe-pdet",
   "regress/f05-format-vcd-csv-dc",
@@ -424,6 +435,18 @@
    "only": "^(regress/f02-functions(-seed)?|err/f02-.*)$",
    "gtest": false,
    "note": "F-02: new cases (functions in expressions: math, gauss/uniform/lognormal/choice, shared=, .options seed after a draw)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T13:45:39Z",
+   "only": "^(cli/help|cli/no-args|err/f15-no-coalescing-removed)$",
+   "gtest": false,
+   "note": "F-02: --help lists the new options --run, -j/--jobs and --overwrite (help text only)"
+  },
+  {
+   "recorded_at_utc": "2026-10-23T13:45:40Z",
+   "only": "^(regress/f02-step-.*|err/f02-step-.*|err/f02-plan-format|err/f02-run-.*)$",
+   "gtest": false,
+   "note": "F-02: new cases (.step, .mc, run table, --run, failures)"
   }
  ]
 }
