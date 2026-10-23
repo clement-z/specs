@@ -56,8 +56,9 @@ is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs
 ### Development environment (pixi, optional)
 
 [pixi](https://pixi.sh) (one command, per-user install) provides the compilers (gcc 15, clang 21), Meson, Ninja,
-CMake, flex and bison from `pixi.lock`, so nothing needs to be installed system-wide. The plain route above is
-unchanged and remains the reference.
+CMake, flex and bison from `pixi.lock` (and numpy and pandas, for the run-table test of `meson test`), so nothing
+needs to be installed system-wide. The plain route above is unchanged and remains the reference; there, `meson test`
+skips the run-table test when numpy or pandas is missing.
 
 ```sh
 pixi run test                      # configure, build and meson test in build-pixi/gcc (gcc 15)

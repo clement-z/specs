@@ -93,6 +93,9 @@
 * `CWSRC`: a negative power is an error when the element is created (`Error (...): power must be >= 0 and finite`,
   exit 1); it aborted in `std::polar` (builds with `_GLIBCXX_ASSERTIONS`, e.g. pixi) or gave a NaN field, and a
   `.step`/`.mc` run was recorded `crashed` instead of `failed` with the message (B-189)
+* The run-table test (`tests/tools/test_run_table.py`, `pyspecs/runtable.py`) was always skipped in the pixi builds
+  and in CI: numpy and pandas are now in pixi's default environment and installed in the CI jobs that run
+  `meson test`; it still skips (exit 77) where they are missing (B-193)
 
 ## [0.3.0] - 2026-10-23
 
