@@ -222,6 +222,9 @@ if get_option('golden')
   subdir('tests/golden')
 endif
 
+# Accuracy suite (oracles) and benchmark ratios (F-06)
+subdir('tests/bench')
+
 # ---- Helper targets -----------------------------------------------------------------------------
 
 doxygen = find_program('doxygen', required: get_option('docs'))
