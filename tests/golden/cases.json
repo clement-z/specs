@@ -4118,7 +4118,7 @@
     "-f",
     "tests/golden/netlists/spar-add-drop-ring.cir"
    ],
-   "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py; the negative through-port group delay near resonance is reported"
+   "note": "F-03: circuits/add_drop.cir with its ring replaced by one 4-port SPAR exported by utils/sparam_export.py (0.05 nm grid since PF03b); .dc, so no delay and no negative-delay warning (the netlist header predates that)"
   },
   {
    "id": "cir/spar-siepic-bdc",
