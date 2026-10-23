@@ -1,0 +1,2 @@
+Error (ROOT/CWSRC1): power must be >= 0 and finite (got -1 W)
+

@@ -90,6 +90,9 @@
   host with googletest installed (e.g. Arch Linux's `gtest`): the environment's pkg-config found the host's
   `gtest.pc`. The pixi builds now use the googletest wrap; remove a `build-pixi/<toolchain>` directory configured
   before this fix
+* `CWSRC`: a negative power is an error when the element is created (`Error (...): power must be >= 0 and finite`,
+  exit 1); it aborted in `std::polar` (builds with `_GLIBCXX_ASSERTIONS`, e.g. pixi) or gave a NaN field, and a
+  `.step`/`.mc` run was recorded `crashed` instead of `failed` with the message (B-189)
 
 ## [0.3.0] - 2026-10-23
 

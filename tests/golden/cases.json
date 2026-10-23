@@ -4632,6 +4632,24 @@
     "tests/golden/netlists/f02-step-reserved-name.cir"
    ],
    "note": "F-02: .step param seed: seed is a column of runs.csv, error naming the .step line, exit 1"
+  },
+  {
+   "id": "err/b189-cwsrc-negative-power",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/b189-cwsrc-negative-power.cir"
+   ],
+   "expect": "fail",
+   "note": "B-189: cwsrc power=-1 is an error at element creation (Error (ROOT/CWSRC1): power must be >= 0 and finite (got -1 W)), exit 1. It reached std::polar(sqrt(-1), ...): SIGABRT with _GLIBCXX_ASSERTIONS (pixi builds), a NaN field otherwise"
   }
  ]
 }

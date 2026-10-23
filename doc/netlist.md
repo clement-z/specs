@@ -477,7 +477,7 @@ Continuous-wave optical source: `CWSRC<name> <out> [wl [power [phi]]] [keyword=v
   more is an error.
 - Keywords (case-insensitive): `WL` (alias `WAVELENGTH`), `POWER`, `PHI`. A keyword overrides the
   positional value; `PHI` is applied after `POWER`.
-- Required: none. `power` defaults to 0 W; always give `wl`.
+- Required: none. `power` defaults to 0 W; always give `wl`. A negative power is an error.
 - Example: `cwsrc1 in 1.55e-6 1e-3 0.5` is `cwsrc1 in wl=1.55e-6 power=1e-3 phi=0.5`.
 
 ## VLSRC

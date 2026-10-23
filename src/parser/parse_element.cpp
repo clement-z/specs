@@ -699,11 +699,23 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
     // Create the object and connect ports to signals
     INSTANTIATE(pt_helper, false);
 
+    // Power in W: negative or not finite is an error, not a NaN field (B-189)
+    auto checked_power = [this](const Variable &v)
+    {
+        const double power = v.as_double();
+        if (!(power >= 0) || !std::isfinite(power))
+        {
+            cerr << "Error (" << name << "): power must be >= 0 and finite (got " << power << " W)" << endl;
+            exit(1);
+        }
+        return power;
+    };
+
     // Parse positional arguments (wl power phi)
     if(args.size() > 0)
         obj->setWavelength(args[0].as_double());
     if(args.size() > 1)
-        obj->setPower(args[1].as_double());
+        obj->setPower(checked_power(args[1]));
     if(args.size() > 2)
         obj->setPhase(args[2].as_double());
 
@@ -715,7 +727,7 @@ sc_module *CWSourceElement::create(ParseTreeCreationHelper &pt_helper) const
         if (kw == "WL" || kw == "WAVELENGTH")
             obj->setWavelength(p.second.as_double());
         else if (kw == "POWER")
-            obj->setPower(p.second.as_double());
+            obj->setPower(checked_power(p.second));
         else if (kw == "PHI")
             continue; // handle it after all power commands are executed
         else {
