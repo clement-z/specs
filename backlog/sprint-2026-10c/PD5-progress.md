@@ -69,3 +69,23 @@ Predicted golden impact of F1 (written before the change):
   (VCD signals, CSV rows, its warning line, its parse-listing line and the element count); and the run
   manifest's netlist hash;
 - every pre-D5 case (the 228 of e5d6c21) and `regress/b184-*`: strictly identical.
+
+## Follow-up 2 (coordinator: `.dc` latch on the swept wavelength, option a)
+
+Heartbeat: `d7cfbcde` (PD5F2-heartbeat). Marker: `PD5-FOLLOWUP2.md`.
+
+| # | Item | Status | Commit | Notes |
+|---|---|---|---|---|
+| G1 | `.dc` WL/F sweep: each plain PROBE latches the swept wavelength when its net carries it at that point (else the smallest); explicit per-point API from the `.dc` runner | todo | | |
+
+Predicted golden impact (written before the change):
+- `regress/probe-latch-dc`: **no change**. At its first point the swept source is at 1541 nm and the fixed one at
+  1550 nm, so the swept wavelength is already the smallest; at the later points only the swept wavelength reaches
+  the net (B-185). Its warning is the same whichever order the two arrive in (1550 nm ignored, 1541 nm traced).
+- No other case has a fixed wavelength next to a swept one: the instrumented base run found no `.dc` point with
+  two wavelengths on a probed net, and `regress/probe-latch-dc` was added later. The other `.dc` cases (WL sweeps
+  `cir/add_drop*`, `opt/*`, `regress/f12-dc-wl-*`, `regress/f05-*-dc`, `regress/f15-stats-dc`,
+  `regress/b004-mode-td-dc`; the power sweep `regress/f12-dc-p-alias`) have one source: strictly identical.
+- New cases: a WL sweep and an F sweep (long form `/src/F`) with a fixed wavelength smaller than the swept range
+  (first point: the swept one), plus a net carrying two fixed wavelengths (smallest rule); gtest list.
+- Everything else strictly identical; counters identical.
