@@ -49,3 +49,23 @@ Prediction:
 3. WL sweeps (`cir/add_drop*` and the other `.dc` cases above): bit-identical.
 4. gtest: the case list (new tests).
 5. Every other case: strictly bit-identical, counters identical.
+
+## Follow-up (coordinator, after the gate)
+
+Heartbeat: `abc26e04` (PD5F-heartbeat). Marker: `PD5-FOLLOWUP.md`.
+
+| # | Item | Status | Commit | Notes |
+|---|---|---|---|---|
+| F1 | remove the PROBE `wl=<wavelength>` selection (maintainer: no selection keyword in v0.3.0); `wl`/`wavelength` back to the e5d6c21 boolean parsing | todo | | |
+| F2 | backlog item for the `.dc` limit (unchanged nets are not rewritten between points) | todo | | |
+
+Predicted golden impact of F1 (written before the change):
+- `err/probe-wl-invalid` removed (netlist, case, baseline directory, manifest case list);
+- gtest list (`Probe.SelectedWavelengthIsTheOnlyOneTraced` removed);
+- **beyond the coordinator's list:** `regress/probe-latch-tran` and `regress/probe-latch-dc`, added in this phase,
+  each have a `probe2 ... wl=<wavelength>` that only exercised the selection. With the old parsing `wl=1.56e-6`
+  means "trace the wavelength" (true), so these cases change whatever is done. I remove `probe2` from both
+  netlists and re-record them. Proof expected: the new outputs equal the old ones minus everything of `PROBE2`
+  (VCD signals, CSV rows, its warning line, its parse-listing line and the element count); and the run
+  manifest's netlist hash;
+- every pre-D5 case (the 228 of e5d6c21) and `regress/b184-*`: strictly identical.
