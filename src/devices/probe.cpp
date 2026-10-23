@@ -94,6 +94,7 @@ void Probe::noteIgnored(double wavelength_m, double traced_m)
     if (isnan(m_ignored_wavelength_m))
     {
         m_ignored_wavelength_m = wavelength_m;
+        m_ignored_time = sc_time_stamp();
         m_traced_when_ignored_m = traced_m;
     }
 }
@@ -158,6 +159,9 @@ bool Probe::accept(const OpticalSignal &s)
         if (m_table)
             m_table->discard(now.to_seconds(), m_table_signal, m_latched_wavelength_id);
         latch(s);
+        // the wavelength ignored in this time step was ignored for this one
+        if (m_ignored_time == now && m_traced_when_ignored_m == previous)
+            m_traced_when_ignored_m = wl;
         noteIgnored(previous, wl);
         return true;
     }

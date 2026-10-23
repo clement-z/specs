@@ -340,11 +340,14 @@ TEST(Probe, LatchOnceKeepsTheSmallestWavelengthOfTheFirstTimeStep)
 
             sc_start(); // initialise the threads
 
-            // First time step that brings a wavelength: 1560 nm, then 1550 nm in the next delta cycle.
-            // The smallest is latched; the 1560 nm sample leaves the table
+            // First time step that brings a wavelength: 1560 nm, 1555 nm, then 1550 nm in later delta
+            // cycles. The smallest is latched; the other samples leave the table
             net.write(sig(2, 0, 1.56e-6));
             settle();
             expectProbeTraces(probe, 4, 0, 1.56e-6);
+            net.write(sig(3, 0, 1.555e-6));
+            settle();
+            expectProbeTraces(probe, 9, 0, 1.555e-6);
             net.write(sig(1, 0, 1.55e-6));
             settle();
             expectProbeTraces(probe, 1, 0, 1.55e-6);
@@ -360,7 +363,7 @@ TEST(Probe, LatchOnceKeepsTheSmallestWavelengthOfTheFirstTimeStep)
             sc_start(1, SC_PS);
             expectProbeTraces(probe, 4, M_PI / 2, 1.55e-6);
 
-            // The warning reports the first wavelength ignored
+            // The warning reports the first wavelength ignored, and the one latched
             EXPECT_EQ(probe.m_ignored_wavelength_m, 1.56e-6);
             EXPECT_EQ(probe.m_traced_when_ignored_m, 1.55e-6);
             EXPECT_TRUE(table.close());

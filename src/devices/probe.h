@@ -66,8 +66,9 @@ public:
     uint32_t m_latched_wavelength_id = 0;
     sc_time m_latch_time;      // time step of the latch
     bool m_latch_final = false; // latched at the enable: no smaller wavelength replaces it
-    // The first wavelength ignored (NaN: none) and the one traced then, for the warning
+    // The first wavelength ignored (NaN: none), when, and the one traced instead, for the warning
     double m_ignored_wavelength_m = std::numeric_limits<double>::quiet_NaN();
+    sc_time m_ignored_time;
     double m_traced_when_ignored_m = std::numeric_limits<double>::quiet_NaN();
 
     // Constructor
