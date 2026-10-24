@@ -155,6 +155,32 @@ devices runs 1e6 iterations in about 0.25 s; a large one is slower per iteration
 If a large circuit stops while the residual keeps decreasing, raise `maxiter`; if the residual stays at the
 size of the signal, the loop does not converge (r = 1 or a gain).
 
+## Order within a time step
+
+An output port emits its pending entries one per delta cycle. Entries with the same time are frequent: in a WDM
+circuit the channels share the delays, so a port holds one entry per channel at each time step, and in `.op`
+and `.dc` everything happens at one time stamp. They are taken **by wavelength, smallest first** (the
+convention of the PROBE latch). Two entries never share a time and a wavelength (a later write of the same
+time and wavelength replaces the pending value), so this order is fully defined by the circuit: it does not
+depend on the magnitudes, on which values were merged, or on the standard library. (Until v0.4.0 the larger
+|E| came first, an order that a merge could change and that depended on the library's heap algorithm.)
+
+What it means for the results:
+
+- A net holds one value. On a net that carries several wavelengths, the value left at the end of a time step
+  is the last one written, usually the largest wavelength now: the `.op` listing and the legacy testbench
+  probes (which trace every wavelength) show that one. Use MLPROBE for per-wavelength values; a PROBE
+  latches the smallest wavelength.
+- Per-wavelength values depend on this order at tolerance level (B-198). A device with two inputs that
+  receive one wavelength in different delta cycles (a coupler in a ring) emits a half-updated value in
+  between; the emission gate compares each value with the last one emitted at its wavelength, including such
+  values, so which value is emitted, and which one stays within tolerance, depends on the order. On a
+  4-channel 3-ring CROW at the default tolerances, going from the |E| order to the wavelength order moved one
+  channel (1551.2 nm) by up to 9e-5 of its peak and left the other three identical
+  (`tests/golden/netlists/pn-wdm-crow-equal-time-order.cir` pins it); with `abstol = reltol = 0` the order
+  makes no difference. Treat per-wavelength differences of about reltol (times the build-up of the circuit,
+  see "Error in circuits with feedback") as noise of the tolerances, not as physics.
+
 ## Zero tolerances
 
 `abstol` and `reltol` may be 0: `.options abstol=0 reltol=0`, `--abstol 0 --reltol 0`. A negative value or NaN

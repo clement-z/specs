@@ -1,0 +1,24 @@
+* Phase N (decision 2026-10-24): pins the equal-time order of the pending entries (time, then the
+* smaller wavelength first). 3-ring CROW, 4 channels on a 100 GHz grid pulsed together
+* (tests/bench/crow_gen.py 3 --nwl 4 --pulses 1 --duration 4e-10 --traceall 0 --probes 0), default
+* tolerances, MLPROBEs on the bus (through), inside ring 2 (r2b_out) and at the drop. The channels share
+* the delays, so each port holds several wavelengths per time step and emits them in successive delta
+* cycles; with zero-delay coupler paths, the per-wavelength values depend on that order at tolerance level
+* (B-198): against the former |E| order, 1551.2 nm moves by up to 9e-5 of its peak, the others are
+* identical. A change of the equal-time order shows here.
+VLSRC1 in values=[[0,0.001,1.55120301459e-06],[0,0.001,1.55040079748e-06],[0,0.001,1.54959940969e-06],[0,0.001,1.54879884993e-06],[1e-09,0,1.55120301459e-06],[1e-09,0,1.55040079748e-06],[1e-09,0,1.54959940969e-06],[1e-09,0,1.54879884993e-06]]
+COUPLER0 in r1b_out through r1a_in kp=0.15
+COUPLER1 r1a_out r2b_out r1b_in r2a_in kp=0.15
+COUPLER2 r2a_out r3b_out r2b_in r3a_in kp=0.15
+COUPLER3 r3a_out add r3b_in drop kp=0.15
+WG1a r1a_in r1a_out L=3.96409238e-05 att=2 neff=2.2 ng=4.3
+WG1b r1b_in r1b_out L=4.0447228e-05 att=2 neff=2.2 ng=4.3
+WG2a r2a_in r2a_out L=3.3531679e-05 att=2 neff=2.2 ng=4.3
+WG2b r2b_in r2b_out L=2.93772817e-05 att=2 neff=2.2 ng=4.3
+WG3a r3a_in r3a_out L=2.77391339e-05 att=2 neff=2.2 ng=4.3
+WG3b r3b_in r3b_out L=3.33566726e-05 att=2 neff=2.2 ng=4.3
+MLPROBE_THROUGH through wl=[1.55120301459e-06, 1.55040079748e-06, 1.54959940969e-06, 1.54879884993e-06]
+MLPROBE_R2B_OUT r2b_out wl=[1.55120301459e-06, 1.55040079748e-06, 1.54959940969e-06, 1.54879884993e-06]
+MLPROBE_DROP drop wl=[1.55120301459e-06, 1.55040079748e-06, 1.54959940969e-06, 1.54879884993e-06]
+.options abstol=1e-08 reltol=0.0001 timescale=-13 traceall=0
+.tran 4e-10

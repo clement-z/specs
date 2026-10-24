@@ -84,9 +84,9 @@ ROOT/CWSRC4 emitted: @ 1560 nm (0.100000 √W, 0.010000 W, 0.0000 rad)
 ║ - ROOT/a2 (OPTICAL) = @ 1560 nm (2.000000 √W, 4.000000 W, 0.0000 rad)
 ║ - ROOT/b1 (OPTICAL) = @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 ║ - ROOT/b2 (OPTICAL) = @ 1560 nm (0.100000 √W, 0.010000 W, 0.0000 rad)
-║ - ROOT/m (OPTICAL) = @ 1550 nm (0.750000 √W, 0.562500 W, 0.0000 rad)
-║ - ROOT/o (OPTICAL) = @ 1550 nm (0.750000 √W, 0.562500 W, 3.0403 rad)
-║ - ROOT/u (OPTICAL) = @ 1550 nm (0.353553 √W, 0.125000 W, 0.0000 rad)
+║ - ROOT/m (OPTICAL) = @ 1560 nm (1.050000 √W, 1.102500 W, 0.0000 rad)
+║ - ROOT/o (OPTICAL) = @ 1560 nm (1.050000 √W, 1.102500 W, 2.9363 rad)
+║ - ROOT/u (OPTICAL) = @ 1560 nm (1.414214 √W, 2.000000 W, 0.0000 rad)
 ║ - ROOT/v (OPTICAL) = @ 1560 nm (0.070711 √W, 0.005000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝

@@ -275,7 +275,8 @@ void OpticalOutputPort::emit_due_entry()
 }
 
 // F-15: an entry pending in delay (sc_event_queue::notify(): the event is notified only when
-// the entry is earlier than all the pending ones). Called before the entry is pushed (B-188)
+// the entry is earlier than all the pending ones). Called before the value is written (B-188):
+// a value earlier than all the pending entries is a new entry, never a merge (phase N)
 void OpticalOutputPort::notify_pending(const sc_time &delay)
 {
     if (m_queue.empty() || sc_time_stamp() + delay < m_queue.top().first)
@@ -330,20 +331,10 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         t = snap_to_next_valid_time(t, resolution_multiplier);
     }
 
-    // find the scheduled signal with this timestamp and this lambda (B-015: no scan for most writes)
-    auto *it = m_queue.find(t, value.m_wavelength_id);
-    const bool coalesced = it != nullptr;
-
-    // check if an event was already scheduled for the same timestamp
-    if (!it) {
-        // if not, just schedule the new event
-        notify_pending(t - sc_time_stamp());
-        m_queue.push(std::make_pair(t, value));
-    }
-    else {
-        // if yes, just replace the old one
-        it->second = value;
-    }
+    // a new entry, or merged into the entry pending at the same time and wavelength (the new value
+    // replaces it). An entry earlier than all the pending ones is new: notified first (phase N)
+    notify_pending(t - sc_time_stamp());
+    const bool coalesced = m_queue.write(t, value);
     if (m_collect_stats)
         count_scheduled(coalesced);
 }
@@ -377,20 +368,10 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
 
     const sc_time &now = sc_time_stamp();
 
-    // find a scheduled signal with this timestamp and this lambda anywhere in
-    // the queue, not only at its top: another wavelength can be on top (B-001)
-    auto *it = m_queue.find(now, value.m_wavelength_id);
-    const bool coalesced = it != nullptr;
-
-    if (!it) {
-        // if not, schedule the signal for the current time
-        notify_pending(SC_ZERO_TIME);
-        m_queue.push(make_pair(now, value));
-    }
-    else {
-        // if yes, just replace the old one
-        it->second = value;
-    }
+    // merged into the entry pending at this time and wavelength anywhere in the queue, not only at
+    // its top: another wavelength can be on top (B-001); else a new entry for the current time
+    notify_pending(SC_ZERO_TIME);
+    const bool coalesced = m_queue.write(now, value);
     if (m_collect_stats)
         count_scheduled(coalesced);
 }
