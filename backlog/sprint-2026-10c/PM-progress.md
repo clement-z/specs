@@ -9,8 +9,8 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 |---|---|---|---|---|
 | 1 | Profile 1/4/16/64 channels | done | (this commit) | findings below |
 | 2a | Pending-queue order without `abs()` | done | c9c6a33 | 4 ch 181 -> 143, 16 ch 324 -> 246, 64 ch 507 -> 391 ns/event (N = 3) |
-| 2b | Pending-entry lookup (B-015) | done | (2b commit) | 16 ch 246 -> 224, 64 ch 389 -> 343 ns/event; 1 ch within noise (+1 %) |
-| 2c | Per-wavelength containers indexed by id | todo | | |
+| 2b | Pending-entry lookup (B-015) | done | 27c9189 | 16 ch 246 -> 224, 64 ch 389 -> 343 ns/event; 1 ch within noise (+1 %) |
+| 2c | Per-wavelength containers indexed by id | done | (2c commit) | 16 ch 225 -> 175, 64 ch 346 -> 223 ns/event; 1 ch unchanged |
 | 3 | Measure after | todo | | |
 | 4 | Docs | todo | | |
 
@@ -125,3 +125,31 @@ Gates: `pixi run test gcc` 17/17; strict golden 278 passed (note: the new gtests
 `perf stat` (N = 30, 1 channel, 3 runs): 2a 7.13 G cycles, 14.51 G instructions; 2b 7.19 G cycles (+0.9 %,
 run-to-run +-1.2 %), 14.78 G instructions (+1.9 %: the per-wavelength bookkeeping, about 20 instructions per
 event; the growth path is out of line).
+
+## Item 2c: per-wavelength containers indexed by the wavelength id
+
+`WavelengthMap<T>` (`src/utils/wavelength_map.h`): one vector of (id, value) indexed by the wavelength id, the
+slot of an absent id marked by an id of `UINT32_MAX`; `operator[]` (adds `T()` also on a read, as the map did),
+`try_emplace()`, `clear()`, `size()`, iteration over the present ids in increasing order (the map's order: the
+sums over wavelengths in the detector, power meter and PCM, and the writes of the phase shifters per
+wavelength, keep their order). It replaces every `std::map<uint32_t, field_type>`: `OpticalOutputPort::
+m_emitted_fields` and the input memories of the couplers (uni, bi), crossings (uni, bi), merger, detector,
+phase shifters (uni, bi), PCM device and power meter. References into it are invalidated when a new id grows
+the vector (a map's were not): checked every use, none is held across an insertion into the same container.
+The probe's `m_listed_by_id` (`std::map<uint32_t, double>`, MLPROBE's cache, a `find` per event) is left as it is
+(not in this benchmark; "Found, not done").
+
+First version, changed before the commit: values and presence flags in two vectors. Same outputs, but +1.6 %
+cycles with 1 channel (N = 30: 7.23 G vs 7.12 G; +10 M L1 misses, two cache lines per access where a one-node
+map touched one). The presence in the id field brought it back to the base (7.05 G cycles, 14.51 G
+instructions; base 7.05 G, 14.53 G).
+
+Test: gtest `WavelengthMap.BehavesAsStdMap` (`src/test/utils/wavelength_map.cpp`: 20000 random writes, reads
+through `operator[]`, `try_emplace()` and `clear()` against `std::map`; same size, contents and iteration order
+after every step). Gates: `pixi run test gcc` 17/17; strict golden 278 passed; `stats-compare` vs base: 277 same.
+
+| ns/event (median of 3; N = 30: of 5) | 1 ch | 4 ch | 16 ch | 64 ch | C-notrace N=30 |
+|---|---|---|---|---|---|
+| base (same session) | | | | | 160.7 |
+| 2b | 135.1 | 141.9 | 225.4 | 346.1 | 160.7 |
+| 2c | 129.5 | 134.3 | 175.1 | 222.9 | 161.1 |

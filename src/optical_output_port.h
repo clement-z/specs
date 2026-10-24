@@ -13,6 +13,7 @@
 #include "optical_net.h"
 #include "optical_pending_queue.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 
 using std::cout;
 using std::endl;
@@ -117,7 +118,7 @@ public:
     sc_event m_pending_event;
     std::priority_queue<sc_time, std::vector<sc_time>, std::greater<sc_time>> m_pending_times;
 
-    std::map<uint32_t,OpticalSignal::field_type> m_emitted_fields;
+    WavelengthMap<OpticalSignal::field_type> m_emitted_fields;
 
     sc_time m_temporal_resolution;
     OpticalOutputPortMode m_mode;

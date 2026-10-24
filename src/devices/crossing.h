@@ -8,6 +8,7 @@
 
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 
 
 /* A waveguide crossing that accounts for */
@@ -83,8 +84,8 @@ public:
     OpticalOutputPort m_out2_writer;
 
     // Memory for multi-wavelength purposes
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in2;
 
     // Processes (methods)
     void on_port_in1_changed();
@@ -142,10 +143,10 @@ public:
     OpticalOutputPort m_p3_out_writer;
 
     // Memory for multi-wavelength purposes
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in0;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in3;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in0;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in2;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in3;
 
     // Processes (methods)
     void on_p0_in_changed();

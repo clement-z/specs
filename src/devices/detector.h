@@ -4,6 +4,7 @@
 
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 #include "specs.h"
 #include "devices/spx_module.h"
 #include "utils/rng.h"
@@ -37,7 +38,7 @@ public:
     double m_cur_readout_no_interf = 0;
 
     // Input memory for multi-wavelength purposes
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in;
 
     // Detector enable signal. Enabled by default (testbenches, C++ users such as OctaneCell); the
     // .op and .dc analyses disable all detectors and .tran enables them after its operating point.

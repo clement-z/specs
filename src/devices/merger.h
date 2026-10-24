@@ -6,6 +6,7 @@
 #include "devices/spx_module.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 
 #include "specs.h"
 
@@ -25,8 +26,8 @@ public:
 
     // Memory for multi-wavelength purposes
     // maybe with vector it has better performance
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in2;
 
     // F-15: field transmission, computed once before the simulation (the device threads
     // computed it when they started)
