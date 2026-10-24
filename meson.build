@@ -1,5 +1,5 @@
 project('specs', 'cpp',
-  version: '0.3.0',
+  version: '0.4.0',
   license: 'LGPL-3.0-or-later',
   meson_version: '>=1.3.0',
   default_options: [

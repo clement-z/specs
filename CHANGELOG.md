@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+## [0.4.0] - 2026-10-24
+
 ### New
 
 * Accuracy suite (`tests/bench/`, F-06): SPECS's `.dc` and `.tran` results against closed forms, as the Meson
