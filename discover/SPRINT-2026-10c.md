@@ -37,7 +37,7 @@ journal publication. Merges into `dev`/`master`, tags and pushes only on an expl
 | K | Fixes before v0.4.0 | B-189, B-193, B-191, B-192, legacy CROW testbench removed | `ws-kfixes` / `ws/kfixes` | Opus 5.5 high | `PK-REPORT.md` | F03d | done, merged (ebd5c6f) |
 | L | B-186: MLPROBE in `.dc` | MLPROBE records each `.dc` point, 0 for absent wavelengths | `ws-mlprobedc` / `ws/mlprobedc` | Opus 5.5 high | `PL-REPORT.md` | — | done, merged |
 | M | B-188: per-event cost vs WDM channels | profile 1/4/16 channels, fix hot spots bit-identically | `ws-wdmcost` / `ws/wdmcost` | Opus 5.5 high | `PM-REPORT.md` | K, L (idle host) | done, merged (3563386) |
-| N | Equal-time order + bucket queue | ties by wavelength (smallest first), re-record + pinning case; per-time-step queue bit-identical to that | `ws-timeorder` / `ws/timeorder` | Opus 5.5 high | `PN-REPORT.md` | M (idle host) | **running** |
+| N | Equal-time order + bucket queue | ties by wavelength (smallest first), re-record + pinning case; per-time-step queue bit-identical to that | `ws-timeorder` / `ws/timeorder` | Opus 5.5 high | `PN-REPORT.md` | M (idle host) | done, merged (19f7ea8) |
 | D4 | F-15 measurement (v0.3.0 candidate) | before/after per-event cost on the CROW benchmark (`discover/scout/bench/`); ratios only (shared host) | coordinator | Opus 5.5 | numbers in the D reports and the board | D1 (before D2), D3 (after) | **done** (2.56× on `C-notrace N=30`) |
 | E | Private validation runs (optional) | instructions kept outside the repository at the maintainer's request | coordinator | Opus 5.5 | outside the repo | A | **running** (on this host first) |
 
@@ -142,6 +142,7 @@ outside the decisions stops the chain and goes to the maintainer. v0.3.0: tag an
 - 2026-10-24 — M (B-188, B-015) merged (3563386): per-event cost at 16 channels 1.26x the 1-channel cost (was 2.46x), 64 channels 1.62x (3.81x), 1 channel -6 %; outputs and counters bit-identical; gtest list re-recorded (da26717).
 - 2026-10-24 — **v0.4.0 released**: release commit 88b7530 (CI run 40051096048 green), annotated tag v0.4.0, dev f62ac34 and master e6aeb87 (--no-ff, trees = v0.4.0), all pushed. No agent or heartbeat running.
 - 2026-10-24 — maintainer: equal-time order by wavelength (option 2) and a bucket queue (phase N, agent 78979756); option 3 (order-independent gate) later, recorded as B-198.
+- 2026-10-24 — N merged (19f7ea8): equal-time entries by wavelength (smallest first; 6 cases re-recorded as predicted, pinning case `regress/pn-wdm-crow-equal-time-order`), then a per-time-step queue (sorted ring buffer), bit-identical to that: ns/event N=3 1 ch 115.6, 64 ch 117.7 (64/1 = 1.02); C-notrace -7 %. Gate: 4 builds 17/17, golden strict 279/279; clang/asan-gcc the same 7; counters: the 3 predicted. Not pushed.
 
 ## Later (on the plan)
 - B-198: order-independent emission gate (option 3): design discussion first; concern: complexity and performance.
