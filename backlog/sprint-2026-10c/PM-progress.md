@@ -10,7 +10,8 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 | 1 | Profile 1/4/16/64 channels | done | (this commit) | findings below |
 | 2a | Pending-queue order without `abs()` | done | c9c6a33 | 4 ch 181 -> 143, 16 ch 324 -> 246, 64 ch 507 -> 391 ns/event (N = 3) |
 | 2b | Pending-entry lookup (B-015) | done | 27c9189 | 16 ch 246 -> 224, 64 ch 389 -> 343 ns/event; 1 ch within noise (+1 %) |
-| 2c | Per-wavelength containers indexed by id | done | (2c commit) | 16 ch 225 -> 175, 64 ch 346 -> 223 ns/event; 1 ch unchanged |
+| 2c | Per-wavelength containers indexed by id | done | 782d85b | 16 ch 225 -> 175, 64 ch 346 -> 223 ns/event; 1 ch unchanged |
+| 2d | Next notification from the queue (no second heap) | done | (2d commit) | all channel counts faster; C-notrace N=30 158 -> 148 ns/event |
 | 3 | Measure after | todo | | |
 | 4 | Docs | todo | | |
 
@@ -153,3 +154,29 @@ after every step). Gates: `pixi run test gcc` 17/17; strict golden 278 passed; `
 | base (same session) | | | | | 160.7 |
 | 2b | 135.1 | 141.9 | 225.4 | 346.1 | 160.7 |
 | 2c | 129.5 | 134.3 | 175.1 | 222.9 | 161.1 |
+
+## Re-profile after 2c, and item 2d
+
+After 2a-2c (N = 3, flat profile, debug-info build): 1 ch: kernel (`sc_event::trigger`, `crunch`, ...) about 45 %,
+`emit_due_entry()` 14.6 %, `delayedWriteEventDriven()` 13.6 %; 64 ch: `emit_due_entry()` 36 %,
+`delayedWriteEventDriven()` 15 %, `fire_pending()` 7.2 %, kernel about 30 %. What grows now is the heap work:
+`pop()`/`push()` of `m_queue` (moves of the 32-byte entries, `PendingEntryLater` on equal times: source lines
+`stl_pair.h`, `stl_heap.h`, `optical_pending_queue.h:23-27`) and the second heap `m_pending_times` in
+`fire_pending()`, both O(log pending) with pending growing linearly with the channels.
+
+Item 2d: `m_pending_times` (F-15, the times not yet fired, replacing `sc_event_queue`) always holds the same
+times as `m_queue`: both get one per new entry (merges add none), lose one per fired entry
+(`emit_due_entry()` pops the queue, `fire_pending()` popped the time) and are cleared together (`drop_queue()`).
+So its top is `m_queue.top().first` (the heap keeps the earliest time on top, also after in-place merges, which
+change only magnitudes). `notify_pending()` now compares with the queue's top before the entry is pushed;
+`fire_pending()` notifies the queue's earliest time. Same notifications, one heap push and pop less per entry.
+Tests: the three error-path tests that called `notify_pending()` without an entry (empty queue, desync) now notify
+`m_pending_event` directly; `KeepsValueQueuedBeforeThreadStart` calls `notify_pending()` before pushing. The
+pending-notification tests (`Pending*`) pass unchanged. Gates: `pixi run test gcc` 17/17; strict golden 278
+passed; `stats-compare` vs base: 277 same.
+
+| ns/event (median of 3; N = 30: of 5) | 1 ch | 4 ch | 16 ch | 64 ch | C-notrace N=30 |
+|---|---|---|---|---|---|
+| base (same session) | | | | | 158.1 |
+| 2c | 128.1 | 132.9 | 175.8 | 223.4 | 160.5 |
+| 2d | 122.6 | 125.1 | 161.7 | 199.8 | 148.1 |

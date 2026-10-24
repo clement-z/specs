@@ -46,7 +46,9 @@ TEST(OpticalOutputPort, EmptyQueueStopsWithoutEmitting)
         OOPHarness h("h");
         sc_start(SC_ZERO_TIME);
 
-        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
+        // a notification without an entry (B-188: notify_pending() notifies for an entry about to
+        // be pushed, so the event is notified directly)
+        h.m_out_writer.m_pending_event.notify(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_EQ(sc_get_status(), SC_STOPPED);
@@ -65,7 +67,7 @@ TEST(OpticalOutputPort, DesyncStopsWithoutEmitting)
         sc_start(SC_ZERO_TIME);
 
         h.enqueue(sc_time(5, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
-        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
+        h.m_out_writer.m_pending_event.notify(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_EQ(sc_get_status(), SC_STOPPED);
@@ -82,8 +84,8 @@ TEST(OpticalOutputPort, KeepsValueQueuedBeforeThreadStart)
     {
         OOPHarness h("h");
 
-        h.enqueue(sc_time(1, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
         h.m_out_writer.notify_pending(sc_time(1, SC_NS));
+        h.enqueue(sc_time(1, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
         sc_start(10, SC_NS);
 
         EXPECT_NE(sc_get_status(), SC_STOPPED);

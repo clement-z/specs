@@ -112,11 +112,12 @@ public:
 
     // F-15: the notifications of the pending entries, as the sc_event_queue used here before
     // made them, without its allocation per notification: m_pending_event fires once per entry,
-    // at its time (equal times in successive delta cycles). m_pending_times holds the times not
-    // yet fired; fire_pending() (called by the method on_data_ready(), at the point where the
-    // kernel ran the method of sc_event_queue) takes the time that fired and notifies the next one
+    // at its time (equal times in successive delta cycles). fire_pending() (called by the method
+    // on_data_ready(), at the point where the kernel ran the method of sc_event_queue) notifies
+    // the next one. B-188: the times not yet fired are those of the entries of m_queue (they
+    // enter and leave together), so the next time is m_queue's earliest; a second heap of times
+    // (m_pending_times) kept them before
     sc_event m_pending_event;
-    std::priority_queue<sc_time, std::vector<sc_time>, std::greater<sc_time>> m_pending_times;
 
     WavelengthMap<OpticalSignal::field_type> m_emitted_fields;
 
@@ -211,7 +212,6 @@ public:
             cerr << "Cannot drop if simulation is running" << endl;
             exit(1);
         }
-        m_pending_times = decltype(m_pending_times)();
         m_pending_event.cancel();
         m_queue.clear();
     }
