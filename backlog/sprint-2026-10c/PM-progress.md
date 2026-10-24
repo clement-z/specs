@@ -8,7 +8,7 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | Profile 1/4/16/64 channels | done | (this commit) | findings below |
-| 2a | Pending-queue order without `abs()` | todo | | |
+| 2a | Pending-queue order without `abs()` | done | (2a commit) | 4 ch 181 -> 143, 16 ch 324 -> 246, 64 ch 507 -> 391 ns/event (N = 3) |
 | 2b | Pending-entry index (B-015) | todo | | |
 | 2c | Per-wavelength containers indexed by id | todo | | |
 | 3 | Measure after | todo | | |
@@ -75,3 +75,21 @@ Plan (each change bit-identical by construction, measured on its own): (2a) comp
 magnitudes without `hypot` where the result is certain (exactly the same comparison results, so the same heap
 and the same emission order); (2b) an index of the pending entries by (time, wavelength id) for the merge
 lookup; (2c) per-wavelength containers indexed by the (dense) wavelength id in the output port and the devices.
+
+## Item 2a: pending-queue order without `abs()`
+
+`PendingEntryLater` (`optical_output_port.h`) replaces `std::greater<pair<sc_time, OpticalSignal>>` as the
+comparator of `m_queue` (`PQueue` takes the comparator as a template parameter now). For equal times it decides
+on the squared norms when `compareSquaredMagnitudes()` is sure and falls back to `modulus()` otherwise: the
+same result as the former comparison for every pair of entries, so the same heap layout and emission order.
+Test: gtest `OpticalOutputPort.PendingEntryOrderMatchesPairComparison` (every pair of a corpus of edge
+magnitudes, about 1.9 M comparisons both ways, equal and different times; then 20000 random pushes, in-place
+replacements and pops on two heaps, one per comparator: same layout after every step). Mutation check: the
+comparator without the `abs()` fallback (norms only) fails it (0 vs 5e-324).
+Gates: `pixi run test gcc` 17/17; strict golden 278 passed (1 note: the new gtest, baseline not re-recorded);
+`stats-compare` vs base: 277 same, 0 differ.
+
+| N = 3, ns/event (median of 3) | 1 ch | 4 ch | 16 ch | 64 ch |
+|---|---|---|---|---|
+| base | 129.5 | 180.6 | 324.0 | 506.8 |
+| 2a | 130.9 | 142.9 | 246.0 | 390.8 |

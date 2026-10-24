@@ -2,6 +2,8 @@
 #include <systemc.h>
 #include <cmath>
 #include <limits>
+#include <queue>
+#include <random>
 #include <set>
 #include <vector>
 
@@ -508,6 +510,96 @@ TEST(OpticalOutputPort, SquaredNormGateMatchesFormerGate)
         EXPECT_TRUE(oop.check_emit_by_abstol(GateField(inf, inf), GateField(inf, 0)));
         EXPECT_FALSE(oop.check_emit_by_reltol(GateField(1, 0), GateField(inf, 0)));
         EXPECT_FALSE(oop.check_snap_to_zero(GateField(inf, 0)));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-188: the order of the pending entries (PendingEntryLater, on squared norms where they decide)
+// is that of std::greater<pair<sc_time, OpticalSignal>>, the comparator of the queue before, for
+// every pair of entries: equal and different times, magnitudes at the edges of
+// compareSquaredMagnitudes() (zero, subnormal, overflow, inf, NaN), equal magnitudes at other
+// phases and magnitudes one ulp apart. Then a heap built and drained with each comparator, with
+// values replaced in place (merges), gives the same entries in the same order
+TEST(OpticalOutputPort, PendingEntryOrderMatchesPairComparison)
+{
+    SPECS_TEST_HEADER()
+    {
+        typedef std::pair<sc_time, OpticalSignal> Entry;
+        std::vector<GateField> fields;
+        for (double m : gateTestMagnitudes())
+        {
+            fields.emplace_back(m, 0);
+            fields.emplace_back(0, m);
+            fields.emplace_back(m * 0.6, m * 0.8);
+            // same magnitude, other phases (std::polar() needs m >= 0)
+            fields.emplace_back(m * std::cos(0.3), m * std::sin(0.3));
+            fields.emplace_back(m * std::cos(2.1), m * std::sin(2.1));
+            fields.emplace_back(std::nextafter(m, 2 * m), 0);
+        }
+        const sc_time t1 = sc_time::from_value(10);
+        const sc_time t2 = sc_time::from_value(11);
+        const PendingEntryLater later;
+        const std::greater<Entry> former;
+        size_t checked = 0;
+        for (const GateField &fa : fields)
+        {
+            for (const GateField &fb : fields)
+            {
+                const Entry a(t1, OpticalSignal(fa, 1u));
+                for (const sc_time &tb : {t1, t2})
+                {
+                    const Entry b(tb, OpticalSignal(fb, 2u));
+                    ASSERT_EQ(later(a, b), former(a, b)) << fa << " at " << a.first << " vs " << fb << " at " << tb;
+                    ASSERT_EQ(later(b, a), former(b, a)) << fb << " at " << tb << " vs " << fa << " at " << a.first;
+                    ++checked;
+                }
+            }
+        }
+        EXPECT_GT(checked, 1000000u);
+
+        // Same heap: random pushes (few distinct times, many equal or near-equal magnitudes),
+        // values replaced in place (a merge does not repair the heap, as in the port) and pops
+        // give the same layout after every step
+        std::mt19937 rng(188);
+        std::uniform_int_distribution<size_t> pick(0, fields.size() - 1);
+        std::uniform_int_distribution<int> time_of(0, 3);
+        std::uniform_int_distribution<int> action(0, 9);
+        PQueue<Entry, std::greater<Entry>> q_former;
+        PQueue<Entry, PendingEntryLater> q_later;
+        auto same = [](const Entry &x, const Entry &y) {
+            const GateField &fx = x.second.m_field;
+            const GateField &fy = y.second.m_field;
+            auto bits = [](double u, double v) { return u == v || (std::isnan(u) && std::isnan(v)); };
+            return x.first == y.first && x.second.m_wavelength_id == y.second.m_wavelength_id
+                && bits(fx.real(), fy.real()) && bits(fx.imag(), fy.imag());
+        };
+        size_t popped = 0;
+        for (int step = 0; step < 20000; ++step)
+        {
+            const int a = action(rng);
+            if (a < 5 || q_later.empty())
+            {
+                const Entry e(sc_time::from_value(100 + time_of(rng)), OpticalSignal(fields[pick(rng)], uint32_t(step % 7)));
+                q_former.push(e);
+                q_later.push(e);
+            }
+            else if (a < 7)
+            {
+                const size_t i = pick(rng) % q_later.size();
+                const OpticalSignal v(fields[pick(rng)], q_later.begin()[i].second.m_wavelength_id);
+                q_former.begin()[i].second = v;
+                q_later.begin()[i].second = v;
+            }
+            else
+            {
+                q_former.pop();
+                q_later.pop();
+                ++popped;
+            }
+            ASSERT_EQ(q_former.size(), q_later.size());
+            ASSERT_TRUE(std::equal(q_former.begin(), q_former.end(), q_later.begin(), same)) << "step " << step;
+        }
+        EXPECT_GT(popped, 2000u);
     }
     SPECS_TEST_FOOTER();
 }

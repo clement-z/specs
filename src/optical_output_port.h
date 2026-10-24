@@ -96,12 +96,51 @@ struct OpticalOutputPortStats {
     std::set<uint32_t> wavelength_ids; // wavelengths of the processed entries
 };
 
+// F-15: compares two squared magnitudes (norms) computed with a few roundings each, when those
+// roundings cannot change the result of comparing the magnitudes themselves (as std::abs()
+// and a division compute them): +1 if x2 > y2, -1 if x2 < y2, 0 if they are within a relative
+// 1e-13 (the roundings are below 1e-14) or either is outside [1e-280, 1e280] (zero, subnormal
+// components, overflow, inf, NaN), where the caller decides on the magnitudes instead
+inline int compareSquaredMagnitudes(double x2, double y2)
+{
+    constexpr double lo = 1e-280;
+    constexpr double hi = 1e280;
+    constexpr double margin = 1e-13;
+    if (!(x2 >= lo && x2 <= hi && y2 >= lo && y2 <= hi))
+        return 0;
+    if (x2 > y2 * (1 + margin))
+        return 1;
+    if (x2 < y2 * (1 - margin))
+        return -1;
+    return 0;
+}
+
+// B-188: the order of the pending entries of an output port, that of std::greater<pair<sc_time,
+// OpticalSignal>> (the comparator of the queue before): earlier time first, and for equal times
+// the larger |E| first (OpticalSignal::operator<, which compares modulus(): std::abs()). Equal
+// times are common with WDM (the channels share the delays), and the pair comparison computed
+// up to four std::abs() there. Decided here on squared norms when compareSquaredMagnitudes() is
+// sure, else on the magnitudes as before: the same result for every pair of entries, so the
+// same heap and the same order of emission, bit for bit
+struct PendingEntryLater {
+    bool operator()(const pair<sc_time, OpticalSignal> &a, const pair<sc_time, OpticalSignal> &b) const
+    {
+        if (a.first != b.first)
+            return a.first > b.first;
+        // a after b when |a| < |b|
+        const int order = compareSquaredMagnitudes(norm(a.second.m_field), norm(b.second.m_field));
+        if (order != 0)
+            return order < 0;
+        return a.second.modulus() < b.second.modulus();
+    }
+};
+
 class OpticalOutputPort : public sc_module {
 public:
     typedef OpticalOutputPort this_type;
 	typedef sc_port<sc_signal_out_if<OpticalSignal>> port_type;
 	typedef pair<sc_time, OpticalSignal> pair_type;
-    typedef PQueue<pair_type> queue_type;
+    typedef PQueue<pair_type, PendingEntryLater> queue_type;
 
 
 // private:
@@ -239,25 +278,6 @@ public:
 
     void delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
 };
-
-// F-15: compares two squared magnitudes (norms) computed with a few roundings each, when those
-// roundings cannot change the result of comparing the magnitudes themselves (as std::abs()
-// and a division compute them): +1 if x2 > y2, -1 if x2 < y2, 0 if they are within a relative
-// 1e-13 (the roundings are below 1e-14) or either is outside [1e-280, 1e280] (zero, subnormal
-// components, overflow, inf, NaN), where the caller decides on the magnitudes instead
-inline int compareSquaredMagnitudes(double x2, double y2)
-{
-    constexpr double lo = 1e-280;
-    constexpr double hi = 1e280;
-    constexpr double margin = 1e-13;
-    if (!(x2 >= lo && x2 <= hi && y2 >= lo && y2 <= hi))
-        return 0;
-    if (x2 > y2 * (1 + margin))
-        return 1;
-    if (x2 < y2 * (1 - margin))
-        return -1;
-    return 0;
-}
 
 // Emission gate (B-021). A new value is emitted only if it differs from the last emitted
 // value (same wavelength) by more than abstol AND by more than reltol relative to it:
