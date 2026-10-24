@@ -12,8 +12,9 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 | 2b | Pending-entry lookup (B-015) | done | 27c9189 | 16 ch 246 -> 224, 64 ch 389 -> 343 ns/event; 1 ch within noise (+1 %) |
 | 2c | Per-wavelength containers indexed by id | done | 782d85b | 16 ch 225 -> 175, 64 ch 346 -> 223 ns/event; 1 ch unchanged |
 | 2d | Next notification from the queue (no second heap) | done | 70db0e1 | all channel counts faster; C-notrace N=30 158 -> 148 ns/event |
-| 3 | Measure after | done | (item 3 commit) | table below |
-| 4 | Docs | todo | | |
+| 3 | Measure after | done | 94b6319 | table below |
+| 4 | Docs | done | (docs commit) | B-188, B-015, `backlog.md` rows, CHANGELOG `[unreleased]` Changed |
+| 5 | Acceptance gates | done | | see below |
 
 ## Item 1: profile (gcc release, no trace)
 
@@ -209,5 +210,16 @@ equal times) and the first touch of the queue (`optical_output_port.cpp:157,167`
 entries of a port grow linearly with the channels (N = 10: mean 2.3 with 1 channel, 7.7 with 4, 30.9 with 16;
 N = 3: 1.3, 3.4, 10.8, 41.6 with 64), so a log W term remains, plus a larger working set. Its layout fixes the
 emission order of equal-time entries (by magnitude, and after in-place merges, by where the merged entry sits),
-so a structure other than this heap (e.g. one bucket per time) would change the delta-cycle order of the
+so a structure other than this heap (e.g. one bucket per time) could change the delta-cycle order of the
 emissions of some cases: an engine-semantics change, not done here (see the report).
+
+## Acceptance gates (tip 70db0e1 code)
+- `pixi run test gcc` 17/17; `pixi run test clang`, `asan-gcc`, `asan-clang` 17/17 each, no
+  AddressSanitizer/LeakSanitizer/UBSan message in their test logs; `lsan.supp` unchanged.
+- `pixi run golden gcc -- --rtol 0 --atol 0 --print-slack 0`: 278 passed (1 with notes: the 3 new gtests are not
+  in the baseline's gtest list; baseline not re-recorded), 0 failed/new/missing.
+- clang and asan-gcc, before (d86b816 in a scratch worktree, `/tmp/PM-wt/base`) vs after, `record` then
+  `compare --rtol 0 --atol 0 --print-slack 0`: 278 passed, 0 failed (notes: the 3 new gtests).
+- `stats-compare` (gcc) base vs after: 277 same, 0 differ.
+- B-015 delay-line check (8 x 10 cm waveguides, 20000 values; about 1230 entries pending per port):
+  0.17 s -> 0.05 s user, VCD identical.
