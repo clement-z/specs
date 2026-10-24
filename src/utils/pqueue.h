@@ -11,7 +11,9 @@ using std::size_t;
 template <class T, class Compare = greater<T>>
 class PQueue: public priority_queue<T, vector<T>, Compare>{
 public:
-    public:
+    // (a stateful comparator: PQueue(compare))
+    using priority_queue<T, vector<T>, Compare>::priority_queue;
+
     typedef typename
         std::priority_queue<T>::container_type::iterator iterator;
     typedef typename

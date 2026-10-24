@@ -2,6 +2,17 @@
 
 ## [unreleased]
 
+### Changed
+
+* Equal-time events (decision 2026-10-24): an output port now takes its pending entries of the same time by
+  wavelength, smallest first, instead of larger |E| first; the order no longer depends on the magnitudes, on
+  merged values or on the standard library's heap algorithm. A net with several wavelengths now ends a time
+  step on another wavelength in the `.op` listing and the legacy testbench probes, and per-wavelength values of
+  WDM circuits with zero-delay paths move at tolerance level (B-198; `doc/numerics.md`, "Order within a time
+  step"). Golden cases re-recorded: `tb/lambda`, `b001-fd-multilambda-stale`, `f15-stats-file-print`,
+  `f15-wdm-crow-mlprobe`, `b184-mlprobe-tran-start-multilambda`, `b062-mlprobe-computed-wavelength`; new
+  pinning case `pn-wdm-crow-equal-time-order`
+
 ## [0.4.0] - 2026-10-24
 
 ### New

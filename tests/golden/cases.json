@@ -3627,7 +3627,24 @@
     "-f",
     "tests/golden/netlists/f15-wdm-crow-mlprobe.cir"
    ],
-   "note": "F-15 (PD3): per-wavelength values (MLPROBE) of a 4-wavelength 3-ring CROW, recorded with the build before the SC_METHOD conversion (39f1bf9); they must not depend on the order of evaluation within a time step (the PD2 time-only queue order changes 1551.2 nm by 4e-5 relative). No plain PROBE (it shows the last write of a time step on a multi-wavelength net)"
+   "note": "F-15 (PD3): per-wavelength values (MLPROBE) of a 4-wavelength 3-ring CROW, recorded with the build before the SC_METHOD conversion (39f1bf9); they must not depend on the order of evaluation within a time step (the PD2 time-only queue order changes 1551.2 nm by 4e-5 relative). No plain PROBE (it shows the last write of a time step on a multi-wavelength net); phase N: the equal-time order by wavelength (decision 2026-10-24) changes 1551.2 nm at tolerance level (re-recorded)"
+  },
+  {
+   "id": "regress/pn-wdm-crow-equal-time-order",
+   "setup": {
+    "copy": [
+     "circuits",
+     "tests/golden/netlists"
+    ],
+    "mkdir": [
+     "traces"
+    ]
+   },
+   "args": [
+    "-f",
+    "tests/golden/netlists/pn-wdm-crow-equal-time-order.cir"
+   ],
+   "note": "Phase N (decision 2026-10-24): pins the equal-time order of the pending entries (time, then the smaller wavelength first) on a 4-channel 3-ring CROW at default tolerances, MLPROBEs on the bus, inside ring 2 and at the drop; per-wavelength values depend on that order at tolerance level (B-198)"
   },
   {
    "id": "regress/f15-maxevents-options-tran",

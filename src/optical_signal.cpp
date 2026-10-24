@@ -104,6 +104,11 @@ double OpticalSignal::getWavelength() const
     return specsGlobalConfig.wavelengths_vector[m_wavelength_id];
 }
 
+uint32_t OpticalSignal::registeredWavelengths()
+{
+    return specsGlobalConfig.wavelengths_vector.size();
+}
+
 double OpticalSignal::getWavelength(const uint32_t &wavelength_id)
 {
     if (wavelength_id >= specsGlobalConfig.wavelengths_vector.size())

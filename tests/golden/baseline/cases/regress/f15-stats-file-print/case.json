@@ -12,9 +12,9 @@
  "exit": 0,
  "files": {
   "traces/custom.stats.json": {
-   "bytes": 1310,
+   "bytes": 1308,
    "kind": "json",
-   "sha256": "d12be9b50b178b3404ffa753f6562ef137680eb49217236f123f270880ad87d0",
+   "sha256": "a7f0f846944c820866a2b70a580822049745a5f982d63530ff2b8276d7748e59",
    "stored": "files/traces/custom.stats.json"
   },
   "traces/x.manifest.json": {
