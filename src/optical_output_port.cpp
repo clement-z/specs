@@ -330,7 +330,7 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         t = snap_to_next_valid_time(t, resolution_multiplier);
     }
 
-    // find the scheduled signal with this timestamp and this lambda (B-015: indexed lookup)
+    // find the scheduled signal with this timestamp and this lambda (B-015: no scan for most writes)
     auto *it = m_queue.find(t, value.m_wavelength_id);
     const bool coalesced = it != nullptr;
 

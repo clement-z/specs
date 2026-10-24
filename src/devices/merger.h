@@ -25,7 +25,6 @@ public:
     double m_attenuation_dB;
 
     // Memory for multi-wavelength purposes
-    // maybe with vector it has better performance
     WavelengthMap<OpticalSignal::field_type> m_memory_in1;
     WavelengthMap<OpticalSignal::field_type> m_memory_in2;
 

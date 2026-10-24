@@ -55,7 +55,6 @@ public:
     OpticalOutputPort m_out2_writer;
 
     // Memory for multi-wavelength purposes
-    // maybe with vector it has better performance
     WavelengthMap<OpticalSignal::field_type> m_memory_in1;
     WavelengthMap<OpticalSignal::field_type> m_memory_in2;
 
@@ -110,7 +109,6 @@ public:
     OpticalOutputPort m_p3_out_writer;
 
     // Memory for multi-wavelength purposes
-    // maybe with vector it has better performance
     WavelengthMap<OpticalSignal::field_type> m_memory_in0;
     WavelengthMap<OpticalSignal::field_type> m_memory_in1;
     WavelengthMap<OpticalSignal::field_type> m_memory_in2;
