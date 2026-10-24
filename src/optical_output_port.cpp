@@ -334,14 +334,12 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         t = snap_to_next_valid_time(t, resolution_multiplier);
     }
 
-    // find first scheduled signal with this timestamp and this lambda
-    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&t](const auto &x) {
-            return t == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
-            });
-    const bool coalesced = it != m_queue.cend();
+    // find the scheduled signal with this timestamp and this lambda (B-015: indexed lookup)
+    auto *it = m_queue.find(t, value.m_wavelength_id);
+    const bool coalesced = it != nullptr;
 
     // check if an event was already scheduled for the same timestamp
-    if (it == m_queue.cend()) {
+    if (!it) {
         // if not, just schedule the new event
         m_queue.push(std::make_pair(t, value));
         notify_pending(t - sc_time_stamp());
@@ -385,12 +383,10 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
 
     // find a scheduled signal with this timestamp and this lambda anywhere in
     // the queue, not only at its top: another wavelength can be on top (B-001)
-    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&now](const auto &x) {
-            return now == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
-            });
-    const bool coalesced = it != m_queue.end();
+    auto *it = m_queue.find(now, value.m_wavelength_id);
+    const bool coalesced = it != nullptr;
 
-    if (it == m_queue.end()) {
+    if (!it) {
         // if not, schedule the signal for the current time
         m_queue.push(make_pair(now, value));
         notify_pending(SC_ZERO_TIME);

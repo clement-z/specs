@@ -8,8 +8,8 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 | # | Item | Status | Commit | Notes |
 |---|---|---|---|---|
 | 1 | Profile 1/4/16/64 channels | done | (this commit) | findings below |
-| 2a | Pending-queue order without `abs()` | done | (2a commit) | 4 ch 181 -> 143, 16 ch 324 -> 246, 64 ch 507 -> 391 ns/event (N = 3) |
-| 2b | Pending-entry index (B-015) | todo | | |
+| 2a | Pending-queue order without `abs()` | done | c9c6a33 | 4 ch 181 -> 143, 16 ch 324 -> 246, 64 ch 507 -> 391 ns/event (N = 3) |
+| 2b | Pending-entry lookup (B-015) | done | (2b commit) | 16 ch 246 -> 224, 64 ch 389 -> 343 ns/event; 1 ch within noise (+1 %) |
 | 2c | Per-wavelength containers indexed by id | todo | | |
 | 3 | Measure after | todo | | |
 | 4 | Docs | todo | | |
@@ -93,3 +93,35 @@ Gates: `pixi run test gcc` 17/17; strict golden 278 passed (1 note: the new gtes
 |---|---|---|---|---|
 | base | 129.5 | 180.6 | 324.0 | 506.8 |
 | 2a | 130.9 | 142.9 | 246.0 | 390.8 |
+
+## Item 2b: pending-entry lookup (B-015)
+
+New `OpticalPendingQueue` (`src/optical_pending_queue.h`, which now also holds `compareSquaredMagnitudes()` and
+`PendingEntryLater`): the same by-value heap (`PQueue<pair, PendingEntryLater>`, so the same layout and order),
+plus per wavelength id the number of pending entries and the latest time among them. `find(t, wl)` answers
+"none" without a scan when t is later than that time (most writes: a device writes at now + its delay), else
+scans the heap from its end (the newest entries; at most one match, so the order does not matter).
+The latest time is exact while entries of that wavelength are pending (entries leave in time order, so the
+one at the latest time leaves last), and only needs to be an upper bound for correctness.
+
+First design, dropped: a heap of slot numbers into stable storage plus a deque of slots per wavelength
+(exact lookup in O(entries of that wavelength)). Same outputs, but slower where pending is small: 1 ch
+131 -> 150, 4 ch 145 -> 161 ns/event (indirection in every heap comparison, deque bookkeeping), no gain at
+16/64 channels beyond the version kept.
+
+Tests: gtest `OpticalOutputPort.PendingQueueMatchesLinearScanQueue` (50000 random writes with merges, at
+times before, at and after the latest pending ones, and pops, against PQueue + the former linear `find_if`:
+same lookups, size and next entry at every step, also across `clear()`); a mutated bound (latest time not
+updated) fails it. `FrequencyDomainWriteMergesBehindQueueTop` adapted to `find()` (the queue is not iterable).
+Gates: `pixi run test gcc` 17/17; strict golden 278 passed (note: the new gtests); `stats-compare` vs base:
+277 same.
+
+| ns/event (median of 3; N = 30: of 5) | 1 ch | 4 ch | 16 ch | 64 ch | C-notrace N=30 |
+|---|---|---|---|---|---|
+| base | | | | | 159.0 |
+| 2a | 130.9 | 147.3 | 245.9 | 389.0 | 161.0 |
+| 2b | 135.1 | 143.2 | 224.4 | 342.8 | 162.5 |
+
+`perf stat` (N = 30, 1 channel, 3 runs): 2a 7.13 G cycles, 14.51 G instructions; 2b 7.19 G cycles (+0.9 %,
+run-to-run +-1.2 %), 14.78 G instructions (+1.9 %: the per-wavelength bookkeeping, about 20 instructions per
+event; the growth path is out of line).

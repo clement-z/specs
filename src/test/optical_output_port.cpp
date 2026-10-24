@@ -9,6 +9,7 @@
 
 #include "optical_output_port.h"
 #include "specs.h"
+#include "utils/pqueue.h"
 
 #include "test/utils.h"
 
@@ -112,15 +113,12 @@ TEST(OpticalOutputPort, FrequencyDomainWriteMergesBehindQueueTop)
         oop.immediateWriteFrequencyDomain(a_new);
 
         ASSERT_EQ(oop.m_queue.size(), 2u);
-        int n_a = 0;
-        for (auto it = oop.m_queue.begin(); it != oop.m_queue.end(); ++it)
-        {
-            if (it->second.m_wavelength_id != a_new.m_wavelength_id)
-                continue;
-            ++n_a;
-            EXPECT_EQ(it->second.m_field, a_new.m_field);
-        }
-        EXPECT_EQ(n_a, 1);
+        const auto *a = oop.m_queue.find(sc_time_stamp(), a_new.m_wavelength_id);
+        ASSERT_NE(a, nullptr);
+        EXPECT_EQ(a->second.m_field, a_new.m_field);
+        oop.m_queue.pop();
+        oop.m_queue.pop();
+        EXPECT_TRUE(oop.m_queue.empty());
     }
     SPECS_TEST_FOOTER();
 }
@@ -600,6 +598,87 @@ TEST(OpticalOutputPort, PendingEntryOrderMatchesPairComparison)
             ASSERT_TRUE(std::equal(q_former.begin(), q_former.end(), q_later.begin(), same)) << "step " << step;
         }
         EXPECT_GT(popped, 2000u);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-015, B-188: OpticalPendingQueue (heap of slots, lookup by wavelength) against the queue of the
+// port before (PQueue with PendingEntryLater, merges found by a linear scan of all entries): random
+// writes (merged into the pending entry of the same time and wavelength, else pushed), at a few
+// times and wavelengths, with equal and near-equal magnitudes, and pops; the same next entry, size
+// and lookups after every step, and across clear()
+TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
+{
+    SPECS_TEST_HEADER()
+    {
+        typedef std::pair<sc_time, OpticalSignal> Entry;
+        std::vector<GateField> fields;
+        for (double m : {0.0, 1e-300, 1e-9, 1e-8, 0.5, 1.0, 2.0})
+        {
+            fields.emplace_back(m, 0);
+            fields.emplace_back(0, m);
+            fields.emplace_back(m * 0.6, m * 0.8);
+            fields.emplace_back(std::nextafter(m, 4.0), 0);
+        }
+        auto same = [](const Entry &x, const Entry &y) {
+            return x.first == y.first && x.second.m_wavelength_id == y.second.m_wavelength_id
+                && x.second.m_field == y.second.m_field;
+        };
+        std::mt19937 rng(15);
+        std::uniform_int_distribution<size_t> pick(0, fields.size() - 1);
+        std::uniform_int_distribution<int> action(0, 9);
+        std::uniform_int_distribution<uint32_t> wavelength(0, 5);
+        PQueue<Entry, PendingEntryLater> former;
+        OpticalPendingQueue queue;
+        sc_time::value_type now = 0;
+        size_t merged = 0;
+        size_t popped = 0;
+        for (int step = 0; step < 50000; ++step)
+        {
+            if (step == 30000)
+            {
+                former = PQueue<Entry, PendingEntryLater>();
+                queue.clear();
+            }
+            const int a = action(rng);
+            if (a < 6 || former.empty())
+            {
+                // times from now to now + 3 (and sometimes the same delay: as a device writes)
+                const sc_time t = sc_time::from_value(now + (a < 3 ? 2 : std::uniform_int_distribution<int>(0, 3)(rng)));
+                const OpticalSignal v(fields[pick(rng)], wavelength(rng));
+                auto it = std::find_if(former.begin(), former.end(), [&](const Entry &x) {
+                    return x.first == t && x.second.m_wavelength_id == v.m_wavelength_id;
+                });
+                Entry *e = queue.find(t, v.m_wavelength_id);
+                ASSERT_EQ(e != nullptr, it != former.end()) << "step " << step;
+                if (e)
+                {
+                    ASSERT_TRUE(same(*e, *it)) << "step " << step;
+                    e->second = v;
+                    it->second = v;
+                    ++merged;
+                }
+                else
+                {
+                    former.push(Entry(t, v));
+                    queue.push(Entry(t, v));
+                }
+            }
+            else
+            {
+                // the port takes entries at their time: time moves to the next one
+                now = former.top().first.value();
+                former.pop();
+                queue.pop();
+                ++popped;
+            }
+            ASSERT_EQ(queue.size(), former.size()) << "step " << step;
+            ASSERT_EQ(queue.empty(), former.empty());
+            if (!former.empty())
+                ASSERT_TRUE(same(queue.top(), former.top())) << "step " << step;
+        }
+        EXPECT_GT(merged, 5000u);
+        EXPECT_GT(popped, 10000u);
     }
     SPECS_TEST_FOOTER();
 }
