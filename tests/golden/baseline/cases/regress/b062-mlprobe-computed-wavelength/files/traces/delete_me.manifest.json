@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "vcd", "--format", "csv", "-f", "tests/golden/netlists/b062-mlprobe-computed-wavelength.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b062-mlprobe-computed-wavelength.cir", "sha256": "52d1c984dacb4e4cc15e2fd66ecc05ad2a8c2651f63014b724089f42d81cc0c1"}
+  ],
+  "data_files": [],
+  "trace_file": "traces/delete_me.vcd"
+}

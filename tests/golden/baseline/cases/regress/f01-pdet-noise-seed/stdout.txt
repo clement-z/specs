@@ -65,11 +65,6 @@ In file: sc_simcontext.cpp
 ╚═══════════════════╝
 ROOT/PDET1 was enabled
 ROOT/PDET2 was enabled
-ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@10 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
-@20 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.022361 √W, 0.000500 W, 0.0000 rad)
-@30 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.038730 √W, 0.001500 W, 0.0000 rad)
 Simulated 50 ps
 ╔═══════════════════╗
 ║        DONE       ║

@@ -1,0 +1,2 @@
+Warning: 1 automatic probe(s) PROBE{<net>} trace one wavelength of their net and ignore the others (e.g. PROBE{ROOT/c:0} traces 1540 nm and ignores 1550 nm): use MLPROBE for per-wavelength values
+

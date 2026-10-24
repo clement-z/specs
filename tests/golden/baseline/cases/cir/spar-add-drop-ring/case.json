@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-add-drop-ring.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 6995,
+   "kind": "text",
+   "sha256": "f2ea73e9247244542c42bdefc05587a8a95f7ded3b678983828115cdf40f6699",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 630,
+   "kind": "json",
+   "sha256": "1e49be570d39a97c7e3979dce0f9e46098f98c885b98dd35b68a6f86774bfe73",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "cir/spar-add-drop-ring"
+}

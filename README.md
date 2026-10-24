@@ -3,8 +3,10 @@
 For the moment, refer to [the online documentation](https://demo.zrounba.fr/specs/doc/index.html
 ) to see how to download and use SPECS, or try it from the browser on our [demonstration website](https://demo.zrounba.fr/specs)
 
-The netlist syntax (numbers and SI suffixes, parameters and `--param`, `.include`, subcircuits, `.op`/`.dc`/`.tran`)
-and the element arguments (e.g. COUPLER `k`/`kp`/`t`) are documented in [`doc/netlist.md`](doc/netlist.md).
+The netlist syntax (numbers and SI suffixes, parameters and `--param`, functions, `.include`, subcircuits,
+`.op`/`.dc`/`.tran`, parameter sweeps and Monte-Carlo runs with `.step`/`.mc` and their run table) and the element
+arguments (e.g. COUPLER `k`/`kp`/`t`) are documented in [`doc/netlist.md`](doc/netlist.md); `pyspecs/runtable.py`
+reads the run table.
 Tolerances and time resolution (`abstol`, `reltol`, `timescale`, ...) and the iteration cap of `.op`/`.dc`
 (`maxiter`) are documented in [`doc/numerics.md`](doc/numerics.md).
 Seeds (`--seed`, `.options seed`), the order of outputs and the run manifest written next to each trace are
@@ -25,7 +27,7 @@ or by hand:
 ```sh
 meson setup build                  # release build by default; downloads SystemC, args and googletest
 meson compile -C build             # builds SystemC 3.0.2 as C++20, then specs
-meson test -C build                # unit tests, testbench smoke tests, golden-output regression
+meson test -C build                # unit tests, testbench smoke tests, golden outputs, analytic oracles
 build/specs -f circuits/add_drop.cir -o traces/out               # needs a traces/ directory
 build/specs -f circuits/add_drop.cir -o traces/out --format csv  # traces/out.csv instead of traces/out.vcd
 ```
@@ -54,8 +56,9 @@ is built with `meson compile -C build spx` (or `-Dspx=true`, which also installs
 ### Development environment (pixi, optional)
 
 [pixi](https://pixi.sh) (one command, per-user install) provides the compilers (gcc 15, clang 21), Meson, Ninja,
-CMake, flex and bison from `pixi.lock`, so nothing needs to be installed system-wide. The plain route above is
-unchanged and remains the reference.
+CMake, flex and bison from `pixi.lock` (and numpy and pandas, for the run-table test of `meson test`), so nothing
+needs to be installed system-wide. The plain route above is unchanged and remains the reference; there, `meson test`
+skips the run-table test when numpy or pandas is missing.
 
 ```sh
 pixi run test                      # configure, build and meson test in build-pixi/gcc (gcc 15)
@@ -70,6 +73,18 @@ pixi run -e docs docs              # Doxygen HTML in build-pixi/doc/html
 The pixi tasks only use `build-pixi/<toolchain>`, never `build/`. Extra Meson options go after `--`
 (`pixi run setup gcc -- -Dspx=true`). Binaries built there link the environment's libstdc++ through an rpath, so
 they run only while `.pixi/` exists; use the plain route for portable binaries. Only Linux is tested.
+The pixi tasks also build googletest from its wrap (`-Dforce_fallback_for=systemc,args,gtest`): the environment's
+pkg-config also reads the host's `/usr/lib/pkgconfig`, and an installed gtest found there does not compile with the
+environment's compilers. Pass the same option to a plain `meson setup` inside `pixi shell`.
+
+### Accuracy suite, benchmark and activity map
+
+`meson test` also runs the accuracy suite of [`tests/bench/`](tests/bench/README.md): SPECS against closed-form
+ring and CROW responses (suite `oracle`), and ratio checks on the paper's CROW benchmark (suite `bench`). The
+CROW generator (`tests/bench/crow_gen.py`) and the benchmark (`tests/bench/bench.py`, absolute times kept in a
+local history file) are there too. [`utils/activity_map.py`](doc/activity_map.md) draws a circuit with each device
+coloured by the events it processed in a run (`specs --json` and `--stats=ports,devices`; rendering with
+`pixi run -e py`).
 
 If you want to contribute with the project, check the `todo.txt` file for some inspiration on points to work on. We are also open for new ideas, so feel free to open an issue and discuss.
 

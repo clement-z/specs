@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--format",
+  "npz",
+  "-f",
+  "tests/golden/netlists/f02-step-linear.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f02-plan-format"
+}

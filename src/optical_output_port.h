@@ -10,8 +10,10 @@
 #include <memory>
 #include <set>
 
+#include "optical_net.h"
+#include "optical_pending_queue.h"
 #include "optical_signal.h"
-#include "utils/pqueue.h"
+#include "utils/wavelength_map.h"
 
 using std::cout;
 using std::endl;
@@ -100,7 +102,7 @@ public:
     typedef OpticalOutputPort this_type;
 	typedef sc_port<sc_signal_out_if<OpticalSignal>> port_type;
 	typedef pair<sc_time, OpticalSignal> pair_type;
-    typedef PQueue<pair_type> queue_type;
+    typedef OpticalPendingQueue queue_type;
 
 
 // private:
@@ -110,13 +112,14 @@ public:
 
     // F-15: the notifications of the pending entries, as the sc_event_queue used here before
     // made them, without its allocation per notification: m_pending_event fires once per entry,
-    // at its time (equal times in successive delta cycles). m_pending_times holds the times not
-    // yet fired; fire_pending() (called by the method on_data_ready(), at the point where the
-    // kernel ran the method of sc_event_queue) takes the time that fired and notifies the next one
+    // at its time (equal times in successive delta cycles). fire_pending() (called by the method
+    // on_data_ready(), at the point where the kernel ran the method of sc_event_queue) notifies
+    // the next one. B-188: the times not yet fired are those of the entries of m_queue (they
+    // enter and leave together), so the next time is m_queue's earliest; a second heap of times
+    // (m_pending_times) kept them before
     sc_event m_pending_event;
-    std::priority_queue<sc_time, std::vector<sc_time>, std::greater<sc_time>> m_pending_times;
 
-    std::map<uint32_t,OpticalSignal::field_type> m_emitted_fields;
+    WavelengthMap<OpticalSignal::field_type> m_emitted_fields;
 
     sc_time m_temporal_resolution;
     OpticalOutputPortMode m_mode;
@@ -124,6 +127,15 @@ public:
     double m_abstol;
     double m_snap_factor;
     bool m_skip_next_convergence_check = false;
+    // .dc (B-003, B-185): each point is a fresh steady state. After a reset(), the first entry of
+    // each wavelength is written whatever the emission gate says (the gate compares it with 0) and
+    // with a value-change event, also when the net already holds that value (OpticalNet), so that
+    // every wavelength of the port reaches the devices and probes downstream at every point. Set by
+    // SPECSConfig::runDCAnalysis() only
+    bool m_emit_each_wavelength = false;
+    // The net written, when it is an OpticalNet (start_of_simulation()); else the forced emissions
+    // above are plain writes
+    OpticalNet *m_net = nullptr;
     bool m_collect_stats = false;
     OpticalOutputPortEventCap *m_event_cap = nullptr; // owned by m_config
 
@@ -200,9 +212,8 @@ public:
             cerr << "Cannot drop if simulation is running" << endl;
             exit(1);
         }
-        m_pending_times = decltype(m_pending_times)();
         m_pending_event.cancel();
-        m_queue = queue_type();
+        m_queue.clear();
     }
 
     void reset()
@@ -229,25 +240,6 @@ public:
 
     void delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
 };
-
-// F-15: compares two squared magnitudes (norms) computed with a few roundings each, when those
-// roundings cannot change the result of comparing the magnitudes themselves (as std::abs()
-// and a division compute them): +1 if x2 > y2, -1 if x2 < y2, 0 if they are within a relative
-// 1e-13 (the roundings are below 1e-14) or either is outside [1e-280, 1e280] (zero, subnormal
-// components, overflow, inf, NaN), where the caller decides on the magnitudes instead
-inline int compareSquaredMagnitudes(double x2, double y2)
-{
-    constexpr double lo = 1e-280;
-    constexpr double hi = 1e280;
-    constexpr double margin = 1e-13;
-    if (!(x2 >= lo && x2 <= hi && y2 >= lo && y2 <= hi))
-        return 0;
-    if (x2 > y2 * (1 + margin))
-        return 1;
-    if (x2 < y2 * (1 - margin))
-        return -1;
-    return 0;
-}
 
 // Emission gate (B-021). A new value is emitted only if it differs from the last emitted
 // value (same wavelength) by more than abstol AND by more than reltol relative to it:

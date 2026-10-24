@@ -6,6 +6,7 @@
 #include "devices/spx_module.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 #include "utils/transmission_cache.h"
 
 /** An electrically-controllable phase shifter. */
@@ -55,7 +56,7 @@ public:
     OpticalOutputPort m_out_writer;
 
     /** Memory of the current input value for all wavelengths. */
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in;
 
     /** F-15: polar() only when the phase changes (on_port_in_changed()) */
     PolarCache m_in_transmission;
@@ -97,8 +98,6 @@ public:
         : PhaseShifterBase(name, attenuation_dB)
         , m_out_writer("out_delayed_writer", p_out)
     {
-        SC_HAS_PROCESS(PhaseShifterUni);
-
         SC_METHOD(on_port_in_changed);
         sensitive << p_in;
         dont_initialize();
@@ -135,8 +134,8 @@ public:
     OpticalOutputPort m_p1_writer;
 
     /** Memory of the current input value for all wavelengths. */
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_p0;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_p1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_p0;
+    WavelengthMap<OpticalSignal::field_type> m_memory_p1;
 
     /** F-15: polar() only when the phase changes (on_p0_in_changed(), on_p1_in_changed()) */
     PolarCache m_p0_transmission;
@@ -181,8 +180,6 @@ public:
         , m_p0_writer("p0_out_delayed_writer", p0_out)
         , m_p1_writer("p1_out_delayed_writer", p1_out)
     {
-        SC_HAS_PROCESS(PhaseShifterBi);
-
         SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
         dont_initialize();

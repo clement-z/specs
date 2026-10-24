@@ -25,7 +25,6 @@ public:
         , m_out_writer("out_writer", p_out)
         , config(make_shared<OpticalOutputPortConfig>())
     {
-        SC_HAS_PROCESS(StatsHarness);
         p_out(out);
         config->m_collect_stats = true;
         m_out_writer.setConfig(config);

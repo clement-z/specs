@@ -1,5 +1,5 @@
 # B-116: Things the Meson port (PLAN.md) must not forget
-severity: low | category: build | effort: M | fix-class: needs-design | verdict: PLAUSIBLE
+severity: low | category: build | effort: M | fix-class: needs-design | verdict: PLAUSIBLE | status: partly: Meson port landed; flex/bison version check (src/parser/meson.build), python3 in CI, clang-format target noted (DECISIONS 28); `-Wfatal-errors` still set (B-115)
 location: discover/meson/PLAN.md, discover/04-build-test-ci.md §9
 ## Problem
 Items that exist in today's build/CI/gitignore, survive the migration, and are absent or underspecified in PLAN.md. Each was checked against the current tree unless stated.

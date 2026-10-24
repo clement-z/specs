@@ -16,6 +16,7 @@ RunManifest::RunManifest(const SPECSConfig &config, const std::string &trace_fil
     , seed(config.seed)
     , command_line(config.command_line)
     , netlist_files(config.netlist_files)
+    , data_files(config.data_files)
     , trace_file(trace_file_name)
 {
 }
@@ -25,7 +26,7 @@ std::string RunManifest::to_json() const
     std::ostringstream ss;
     ss << "{\n";
     ss << "  \"format\": \"specs-run-manifest\",\n";
-    ss << "  \"format_version\": 1,\n";
+    ss << "  \"format_version\": 2,\n";
     ss << "  \"specs_version\": " << json_quote(specs_version) << ",\n";
     ss << "  \"systemc_version\": " << json_quote(systemc_version) << ",\n";
     ss << "  \"seed\": " << seed << ",\n";
@@ -35,21 +36,29 @@ std::string RunManifest::to_json() const
         ss << (i ? ", " : "") << json_quote(command_line[i]);
     ss << "],\n";
 
-    ss << "  \"netlist_files\": [";
-    for (size_t i = 0; i < netlist_files.size(); ++i)
+    ss << "  \"netlist_files\": " << json_file_list(netlist_files) << ",\n";
+    ss << "  \"data_files\": " << json_file_list(data_files) << ",\n";
+
+    ss << "  \"trace_file\": " << (trace_file.empty() ? "null" : json_quote(trace_file)) << "\n";
+    ss << "}\n";
+    return ss.str();
+}
+
+std::string RunManifest::json_file_list(const std::vector<std::string> &paths)
+{
+    std::ostringstream ss;
+    ss << "[";
+    for (size_t i = 0; i < paths.size(); ++i)
     {
         std::string hex;
-        ss << (i ? "," : "") << "\n    {\"path\": " << json_quote(netlist_files[i]) << ", \"sha256\": ";
-        if (spx::sha256_file_hex(netlist_files[i], hex))
+        ss << (i ? "," : "") << "\n    {\"path\": " << json_quote(paths[i]) << ", \"sha256\": ";
+        if (spx::sha256_file_hex(paths[i], hex))
             ss << json_quote(hex);
         else
             ss << "null";
         ss << "}";
     }
-    ss << (netlist_files.empty() ? "" : "\n  ") << "],\n";
-
-    ss << "  \"trace_file\": " << (trace_file.empty() ? "null" : json_quote(trace_file)) << "\n";
-    ss << "}\n";
+    ss << (paths.empty() ? "" : "\n  ") << "]";
     return ss.str();
 }
 

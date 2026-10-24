@@ -1,0 +1,6 @@
+* F-02: a stepped parameter named like a column of runs.csv (seed): error, exit 1
+.param seed=1
+.step param seed list 1 2
+cwsrc1 in wl=1.55e-6 power=1e-3
+probe1 in
+.tran 1p

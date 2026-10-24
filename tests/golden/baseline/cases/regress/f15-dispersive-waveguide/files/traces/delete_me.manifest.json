@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/f15-dispersive-waveguide.cir", "sha256": "60f745dc9140ea7e24b96b96f718cc937c2223e7cfdf751c70cc757327403a78"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

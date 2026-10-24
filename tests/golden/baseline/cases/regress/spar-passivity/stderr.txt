@@ -1,0 +1,3 @@
+Warning (ROOT/SPAR1): the S-parameters of tests/golden/netlists/../../sparam/fixtures/gain.s2p are not passive: for an input on port 'in', the output power is 1.1025 times the input power at 1.53e-06 m
+Warning (ROOT/SPAR2): the S-parameters of tests/golden/netlists/../../sparam/fixtures/gain.s2p are not passive: for an input on port 'in', the output power is 1.1025 times the input power at 1.53e-06 m (passivity=enforce scales S where it exceeds 1)
+

@@ -1,0 +1,4 @@
+* F-03: a wavelength outside the data range of the S-parameters is an error, with the range
+cwsrc1 in wl=1.55e-6 power=1
+spar1 in out file="../../sparam/fixtures/wg.sparam"
+.dc /cwsrc1/WL 1.59e-6 1.61e-6 5e-9

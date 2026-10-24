@@ -1,0 +1,32 @@
+{
+ "args": [
+  "--format",
+  "vcd",
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/b186-mlprobe-dc-wavelength-sweep.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 695,
+   "kind": "text",
+   "sha256": "7be2c7b30f14954b3124715a94c4579fff0b1415797bf549df4056ae0436aa7a",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 519,
+   "kind": "json",
+   "sha256": "08dbaff912105ddafd724ca0608bfbc3ea2d3ded5a95d35a6de2a1466043f0d9",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1910,
+   "kind": "vcd",
+   "sha256": "ed764d89332c449f16b652ed24e3299b4cadff988812959923f22b39a9706e5b",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b186-mlprobe-dc-wavelength-sweep"
+}

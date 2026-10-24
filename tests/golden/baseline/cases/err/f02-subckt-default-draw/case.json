@@ -1,0 +1,9 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f02-subckt-default-draw.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f02-subckt-default-draw"
+}

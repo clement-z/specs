@@ -2,7 +2,8 @@ numpy
 pandas
 matplotlib
 pyDigitalWaveTools>=1.2
-# optional: utils/draw_graph_from_json.py (also needs the Graphviz `dot` binary)
+# optional: utils/draw_graph_from_json.py (also needs the Graphviz `dot` binary;
+# utils/activity_map.py needs only that binary, from the system or pixi's py environment)
 # graphviz
 # optional: utils/analyze_detector_trace.py
 # scipy

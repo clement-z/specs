@@ -88,8 +88,6 @@ public:
         , m_split_ratio(split_ratio)
         , m_attenuation_dB(attenuation_dB)
     {
-        SC_HAS_PROCESS(Splitter);
-
         SC_METHOD(on_port_in_changed);
         sensitive << p_in;
         dont_initialize();

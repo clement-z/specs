@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/b182-subckt-body-syntax-error.cir:9): syntax error
+-- offending token: "\n"
+-- while parsing line: "wg3 m n length="
+

@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/b147-crossing-out-explicit-splitter.cir", "sha256": "5b205170efbd9e345d7788db6e9057c48b60b6ba4fe898293853517b4d470668"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

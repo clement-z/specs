@@ -1,0 +1,2 @@
+Error: .step param W (tests/golden/netlists/f02-step-unknown-param.cir:3): the netlist has no .param W
+

@@ -135,6 +135,18 @@ void TraceTable::append(double time_s, uint32_t signal, const OpticalSignal &s)
         m_pending[it->second] = row; // the last sample of the time step wins
 }
 
+void TraceTable::appendZero(double time_s, uint32_t signal, double wavelength_m)
+{
+    if (m_closed)
+        return;
+    if (time_s != m_pending_time_s)
+    {
+        writePending();
+        m_pending_time_s = time_s;
+    }
+    m_pending.push_back({ time_s, signal, wavelength_m, 0.0, 0.0, 0.0 });
+}
+
 void TraceTable::discard(double time_s, uint32_t signal, uint32_t wavelength_id)
 {
     if (m_closed || time_s != m_pending_time_s)
@@ -168,7 +180,7 @@ void TraceTable::writePending()
             m_line += '\n';
             m_csv.write(m_line.data(), m_line.size());
         }
-        if (m_npz.is_open())
+        if (m_npz.is_open() || m_keep_columns)
         {
             m_time_s.push_back(row.time_s);
             m_signal.push_back(row.signal);

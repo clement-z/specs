@@ -1,0 +1,18 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/b192-value-files/b192-value-files.cir", "-o", "traces/out"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b192-value-files/b192-value-files.cir", "sha256": "fe4e857ee68223f2f7be0ddd45e4465ff0214c361398651da7f4aa62896b7f6f"},
+    {"path": "tests/golden/netlists/b192-value-files/lib/source.cir", "sha256": "724b4665266c0644cbff8eea49ff9dce44d75b19f06a63334d1271cb05e9a864"}
+  ],
+  "data_files": [
+    {"path": "tests/golden/netlists/b192-value-files/vlsrc-values.csv", "sha256": "03c70301334dc7ec226284f606a519d260112189bb30c599bb1fcd842a1c5c4c"},
+    {"path": "tests/golden/netlists/b192-value-files/lib/values.csv", "sha256": "64361e22cf0adc76fa886ba911b7ccbbf93d965d05809dcd2211a098bc0b0297"},
+    {"path": "tests/golden/netlists/b192-value-files/evlsrc-values.csv", "sha256": "1f466c2e88120b6ff5d4576adbcd46cf0a95171e3da3457ab481f17a8620aec5"}
+  ],
+  "trace_file": "traces/out.vcd"
+}

@@ -1,0 +1,14 @@
+* B-192: VLSRC and EVLSRC value files are looked up next to the netlist that names them first, then in
+* the working directory (as .include and SPAR files). The files named here are next to this netlist
+* (vlsrc1, evlsrc1) and next to lib/source.cir, which defines the subcircuit of x1; none is in the working
+* directory, so they failed with "Error: Cannot open the file ..." (exit 1). The run manifest lists them
+* with the path used to open them (tests/golden/netlists/b192-value-files/...).
+.include lib/source.cir
+vlsrc1 a "vlsrc-values.csv"
+evlsrc1 e values="evlsrc-values.csv"
+x1 b SOURCE
+wg1 a c length=1e-4
+wg2 b d length=1e-4
+probe1 c
+probe2 d
+.tran 1e-9

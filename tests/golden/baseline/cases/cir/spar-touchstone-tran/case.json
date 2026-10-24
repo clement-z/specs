@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-touchstone-tran.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 722,
+   "kind": "text",
+   "sha256": "bfd2c1181c939096506a5f85b5fe311f6eb18c6732de12c8f85363b82419fcf5",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 626,
+   "kind": "json",
+   "sha256": "fd6e28b49a105de2534a2e507e6d95d6cda019e81c5e45845d486eeab9314cf2",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "cir/spar-touchstone-tran"
+}

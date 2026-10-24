@@ -50,6 +50,12 @@ SPECSConfig::SPECSConfig(sc_module_name name)
 
 SPECSConfig::~SPECSConfig() {}
 
+void SPECSConfig::record_data_file(const string &path)
+{
+    if (std::find(data_files.begin(), data_files.end(), path) == data_files.end())
+        data_files.push_back(path);
+}
+
 void SPECSConfig::runAnalysis()
 {
     run_start = std::chrono::steady_clock::now();
@@ -83,6 +89,10 @@ void SPECSConfig::runAnalysis()
     }
     if (progress)
         progress->stop();
+
+    // B-062: the wavelengths each MLPROBE ignored, one warning per probe, in name order
+    for (auto mlprobe : sc_get_all_module_by_type<MLambdaProbe>())
+        mlprobe->reportIgnoredWavelengths();
 
     // F-05: write the .npz table, close the CSV
     if (default_trace_table && !default_trace_table->close())
@@ -288,14 +298,18 @@ void SPECSConfig::runDCAnalysis()
         probe->enable = sc_logic(1);
     }
 
-    // Disable ML probes
+    // Enable ML probes: each one traces every listed wavelength at each point (B-186)
     for (auto mlprobe: all_mlprobes) {
-        mlprobe->enable = sc_logic(0);
+        mlprobe->enable = sc_logic(1);
+        mlprobe->m_per_point = true;
     }
 
-    // Set all ports mode to NO_DELAY
+    // Set all ports mode to NO_DELAY. Each sweep point is a fresh steady state (B-003, B-185): after
+    // the reset of the ports at each point, each port writes the first value of each of its
+    // wavelengths, with an event, also below abstol or unchanged since the previous point
     for (auto oop: all_oop) {
         oop->m_mode = OpticalOutputPortMode::NO_DELAY;
+        oop->m_emit_each_wavelength = true;
     }
 
     // Activate CW sources
@@ -343,6 +357,10 @@ void SPECSConfig::runDCAnalysis()
         if (!runFixedPoint())
             reportNonConvergence(what.str(), start_delta);
         checkEventCap(what.str());
+        // The converged value of each listed wavelength, 0 for one not carried at this point (B-186),
+        // traced in this time step: the next sc_start() updates the trace signals before advancing
+        for (auto mlprobe: all_mlprobes)
+            mlprobe->tracePoint();
         sc_start(sc_time::from_value(1));
         checkEventCap(what.str());
 
@@ -583,7 +601,7 @@ void SPECSConfig::applyDefaultTraceFileToAllSignals() {
     if (!default_trace_file)
     {
         // the tables only hold the probes (F-05)
-        if (!all_pdets.empty() || !all_pwr_meters.empty())
+        if ((!all_pdets.empty() || !all_pwr_meters.empty()) && !plan_run)
             cerr << "Warning: photodetector and power meter readouts are only traced in the VCD "
                  << "(add --format vcd)" << endl;
         return;

@@ -45,8 +45,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install meson
-        run: python -m pip install "meson==${MESON_VERSION}"
+      # numpy and pandas: tests/tools/test_run_table.py (skipped without them, B-193)
+      - name: Install meson, numpy, pandas
+        run: python -m pip install "meson==${MESON_VERSION}" numpy pandas
 
       # Wrap downloads (SystemC, args, gtest), and the compiler cache (SystemC is built every run)
       - name: Cache wrap downloads
@@ -100,8 +101,6 @@ jobs:
           name: meson-logs-${{ matrix.compiler }}
           path: build/meson-logs
 
-  # Not gating yet: known memory bugs (backlog, e.g. `specs -t mesh` use-after-free), and the
-  # sanitizer reports change the stderr the golden test compares.
   sanitizers:
     name: asan + ubsan (debug, gcc)
     runs-on: ubuntu-24.04
@@ -123,8 +122,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install meson
-        run: python -m pip install "meson==${MESON_VERSION}"
+      # numpy and pandas: tests/tools/test_run_table.py (skipped without them, B-193)
+      - name: Install meson, numpy, pandas
+        run: python -m pip install "meson==${MESON_VERSION}" numpy pandas
 
       - name: Cache wrap downloads
         uses: actions/cache@v4

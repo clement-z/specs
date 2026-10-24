@@ -1,0 +1,11 @@
+{
+ "args": [
+  "--run",
+  "0",
+  "-f",
+  "tests/golden/netlists/f02-functions.cir"
+ ],
+ "exit": 1,
+ "files": {},
+ "id": "err/f02-run-without-plan"
+}

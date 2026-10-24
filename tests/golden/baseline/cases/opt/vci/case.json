@@ -7,9 +7,9 @@
  "exit": 0,
  "files": {
   "traces/delete_me.manifest.json": {
-   "bytes": 525,
+   "bytes": 545,
    "kind": "json",
-   "sha256": "4108990ad91b89514f5070ea06d042898cdaaa30677ff946d3f40048c24e8a20",
+   "sha256": "0a09b5f6679a6d6c052f555185942cc8d4599a50d66d01f70c2d51690e0469fd",
    "stored": "files/traces/delete_me.manifest.json"
   },
   "traces/delete_me.vcd": {

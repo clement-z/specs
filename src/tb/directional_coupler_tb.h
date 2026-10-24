@@ -18,8 +18,6 @@ public:
     void monitor();
     SC_CTOR(DirectionalCoupler_tb)
     {
-        SC_HAS_PROCESS(DirectionalCoupler_tb);
-
         SC_THREAD(run_1);
 
         SC_THREAD(monitor);

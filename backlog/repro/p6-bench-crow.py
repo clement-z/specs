@@ -35,7 +35,7 @@ def probe_waveforms(path):
                     out.setdefault(codes[code], []).append((t, val))
     return out
 
-gen = subprocess.run([sys.executable, "-I", repo + "/discover/scout/bench/crow_gen.py", n, "--seed", "1"],
+gen = subprocess.run([sys.executable, "-I", repo + "/tests/bench/crow_gen.py", n, "--seed", "1"],
                      capture_output=True, text=True, check=True).stdout
 net_default = re.sub(r" traceall=\d+", "", gen)                  # no .options traceall: the F-05 rule decides
 net_traceall = re.sub(r" traceall=\d+", " traceall=1", gen)      # explicit full tracing

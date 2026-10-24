@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/b182-nested-subckt-ends-mismatch.cir:9): .ends WRONG does not match the name of the subcircuit (.subckt INNER)
+-- offending token: "WRONG"
+-- while parsing line: ".ends WRONG"
+

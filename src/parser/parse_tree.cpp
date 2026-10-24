@@ -3,6 +3,7 @@
 #include "parser/parse_element.h"
 #include "parser/parser_state.h"
 #include "specs.h"
+#include "utils/general_utils.h"
 
 #include <sstream>
 #include <iomanip>
@@ -314,6 +315,7 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
 {
     parent = subcircuit.parent;
     is_subcircuit = true;
+    subckt_name = subcircuit.name;
 
     // take kwargs as local assignments
     local_assignments = subcircuit.kwargs;
@@ -339,6 +341,10 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
     yylex_init_extra(parser_state, &scanner);
     buf = yy_scan_string(subcircuit.netlist.c_str(), scanner);
     yy_switch_to_buffer(buf, scanner);
+    // Parse errors in the body: the file that defines the subcircuit and the line in it (B-182;
+    // a string buffer has no line number of its own)
+    parser_state->current_filename = subcircuit.filename;
+    yyset_lineno(subcircuit.body_line, scanner);
 
     int parsing_result = yyparse(scanner, this);
 
@@ -360,6 +366,12 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
         directives.clear();
     }
 
+    if (!plan.empty())
+    {
+        cerr << name << ": found a .step or .mc line in subcircuit, ignoring." << endl;
+        plan = ParsePlan();
+    }
+
     if (analyses.size() > 0)
     {
         cerr << name << ": found an analysis in subcircuit, ignoring." << endl;
@@ -372,6 +384,7 @@ ParseTree::ParseTree(const string &name, const ParseSubcircuit &subcircuit, cons
 
 int ParseTree::register_directive(ParseDirective *directive)
 {
+    draw_owner = "." + directive->kind();
     directive->parent = this;
     directives.push_back(directive);
     // cout << "Created directive " << directive->kind() << endl;
@@ -382,6 +395,8 @@ int ParseTree::register_directive(ParseDirective *directive)
 
 int ParseTree::register_element(ParseElement *element)
 {
+    draw_owner = element->name;
+    strutils::toupper(draw_owner);
     element->name = name_prefix() + element->name;
     strutils::toupper(element->name);
     element->parent = this;
@@ -399,6 +414,7 @@ int ParseTree::register_analysis(ParseAnalysis *analysis)
         cerr << "But another one was already specified (" << analyses[0]->kind() << ")" << endl;
         exit(1);
     }
+    draw_owner = "." + analysis->kind();
     analysis->parent = this;
     analyses.push_back(analysis);
     // cout << "Created analysis " << analysis->kind() << endl;
@@ -409,6 +425,9 @@ int ParseTree::register_analysis(ParseAnalysis *analysis)
 int ParseTree::register_subcircuit(string name)
 {
     strutils::toupper(name);
+    // F-02: the parameter defaults of the .subckt line are evaluated once for every instance
+    draw_owner = ".SUBCKT " + name;
+    draws_forbidden = true;
     //name = name_prefix() + name;
 
     auto it = find_if(subcircuits.cbegin(), subcircuits.cend(),
@@ -429,6 +448,167 @@ int ParseTree::register_subcircuit(string name)
     // cout << "(current number of subcircuits: " << subcircuits.size() << ")" << endl;
 
     return i;
+}
+
+string ParseTree::next_draw_stream(int shared, const string &shared_name)
+{
+    if (shared == 2)
+        return "SHARED/" + shared_name;
+    // shared=1: the same streams in every instance of the subcircuit (no instance path)
+    const string scope = shared == 1 && is_subcircuit ? "SUBCKT:" + subckt_name + "/" : name_prefix();
+    const string base = scope + draw_owner + "/" + draw_key;
+    return base + "#" + to_string(draw_counts[base]++);
+}
+
+void ParseTree::record_draw(const string &stream, double value, uint64_t seed, const string &where) const
+{
+    const ParseTree *root = root_tree();
+    if (!root->has_drawn)
+    {
+        root->has_drawn = true;
+        root->drawn_seed = seed;
+        root->first_draw_where = where;
+    }
+    else if (seed != root->drawn_seed && root->draw_seed_conflict.empty())
+    {
+        root->draw_seed_conflict = "a random function at " + where + " draws with seed " + to_string(seed)
+                                   + ", one at " + root->first_draw_where + " drew with seed "
+                                   + to_string(root->drawn_seed);
+    }
+    root->draws.emplace_back(stream, value);
+}
+
+void ParseTree::apply_options_seed(uint64_t seed, const string &where)
+{
+    // specs --seed takes priority over the netlist (also applied by OPTIONSDirective::create())
+    options_seed_given = true;
+    options_seed = seed;
+    if (specsGlobalConfig.seed_explicit)
+        return;
+    if (has_drawn && seed != drawn_seed && draw_seed_conflict.empty())
+    {
+        draw_seed_conflict = ".options seed=" + to_string(seed) + " at " + where
+                             + " comes after a random function that drew with seed " + to_string(drawn_seed)
+                             + " at " + first_draw_where;
+    }
+    specsGlobalConfig.seed = seed;
+}
+
+bool ParseTree::add_step(const string &keyword_param, const string &name, const string &keyword_list,
+                         const vector<Variable> &values, const string &where, string &error)
+{
+    if (!strutils::iequals(keyword_param, "param"))
+    {
+        error = ".step " + keyword_param + ": expected .step param NAME start stop step, or .step param NAME list v1 v2 ...";
+        return false;
+    }
+    for (const auto &s : plan.steps)
+    {
+        if (s.param == name)
+        {
+            error = ".step param " + name + ": the parameter is already stepped (at " + s.where + ")";
+            return false;
+        }
+    }
+    for (const auto &v : values)
+    {
+        if (v.type != Variable::DOUBLE && v.type != Variable::INTEGER)
+        {
+            error = ".step param " + name + ": the values must be numbers (got " + v.get_str() + ")";
+            return false;
+        }
+        if (!std::isfinite(v.as_double()))
+        {
+            error = ".step param " + name + ": the values must be finite numbers";
+            return false;
+        }
+    }
+    ParseStep step;
+    step.param = name;
+    step.where = where;
+    if (!keyword_list.empty())
+    {
+        if (!strutils::iequals(keyword_list, "list"))
+        {
+            error = ".step param " + name + " " + keyword_list + ": expected start stop step, or list v1 v2 ...";
+            return false;
+        }
+        step.values = values;
+    }
+    else
+    {
+        if (values.size() != 3)
+        {
+            error = ".step param " + name + ": expected 3 values (start stop step), got " + to_string(values.size());
+            return false;
+        }
+        const double start = values[0].as_double(), stop = values[1].as_double(), inc = values[2].as_double();
+        // as .dc (sweep_count()): the stop value is included when (stop - start)/step is an integer
+        if (!(stop > start) || !(inc > 0))
+        {
+            error = ".step param " + name + ": expected start < stop and step > 0";
+            return false;
+        }
+        const double n = floor((stop - start) / inc + 1e-9) + 1;
+        if (!(n <= 1e9))
+        {
+            error = ".step param " + name + ": too many values (" + to_string(n) + ")";
+            return false;
+        }
+        if (values[0].type == Variable::INTEGER && values[1].type == Variable::INTEGER
+            && values[2].type == Variable::INTEGER)
+        {
+            // integers stay integers (e.g. a number of rings); the differences in unsigned arithmetic,
+            // where they cannot overflow (v <= stop)
+            const int64_t stop_i = values[1].inum, inc_i = values[2].inum;
+            for (int64_t v = values[0].inum;; v += inc_i)
+            {
+                step.values.emplace_back(v);
+                if (static_cast<uint64_t>(stop_i) - static_cast<uint64_t>(v) < static_cast<uint64_t>(inc_i))
+                    break;
+            }
+        }
+        else
+        {
+            for (double v : sweep_values(start, stop, inc))
+                step.values.emplace_back(v);
+        }
+    }
+    plan.steps.push_back(step);
+    return true;
+}
+
+bool ParseTree::set_mc(const Variable &runs, const map<string, Variable> &kwargs, const string &where, string &error)
+{
+    if (plan.mc)
+    {
+        error = ".mc: a netlist has one .mc line (the first one is at " + plan.mc_where + ")";
+        return false;
+    }
+    uint64_t n = 0;
+    if (!options_unsigned_integer(runs, n) || n < 1 || n > 1000000000)
+    {
+        error = ".mc: the number of runs must be an integer from 1 to 1000000000 (got " + runs.get_str() + ")";
+        return false;
+    }
+    plan.mc = true;
+    plan.mc_runs = n;
+    plan.mc_where = where;
+    for (const auto &kw : kwargs)
+    {
+        if (!strutils::iequals(kw.first, "seed"))
+        {
+            error = ".mc: unknown keyword " + kw.first + " (expected seed)";
+            return false;
+        }
+        if (!options_unsigned_integer(kw.second, plan.mc_seed))
+        {
+            error = ".mc: seed must be an integer between 0 and 9223372036854775807 (got " + kw.second.get_str() + ")";
+            return false;
+        }
+        plan.mc_seed_given = true;
+    }
+    return true;
 }
 
 const ParseSubcircuit *ParseTree::find_subcircuit(const string &name) const
@@ -901,6 +1081,20 @@ void ParseTree::build_circuit()
     for (const auto &x: circuit_signals)
         for (const auto &sig: x.second)
             specsGlobalConfig.register_object(sig);
+}
+
+vector<string> ParseTree::data_files() const
+{
+    vector<string> files;
+    for (const auto *e : elements)
+    {
+        for (const auto &f : e->data_files())
+        {
+            if (std::find(files.begin(), files.end(), f) == files.end())
+                files.push_back(f);
+        }
+    }
+    return files;
 }
 
 void ParseTree::flatten()

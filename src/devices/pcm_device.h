@@ -7,6 +7,7 @@
 #include "devices/spx_module.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 
 #include "specs.h"
 
@@ -36,7 +37,7 @@ public:
 
     /** Current information about the optical input, before any attenuation and phase shift. */
     double m_last_pulse_power = 0;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in;
 
     // Processes
     void on_input_changed();
@@ -69,8 +70,6 @@ public:
         , m_speed(speed)
         , m_stateCurrent(state)
     {
-        SC_HAS_PROCESS(PCMElement);
-
         SC_THREAD(on_input_changed);
         sensitive << p_in;
     }

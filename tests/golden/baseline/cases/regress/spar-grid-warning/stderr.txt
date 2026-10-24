@@ -1,0 +1,3 @@
+Warning (ROOT/SPAR1): the frequency grid of tests/golden/netlists/spar-ring-1nm.sparam may be too coarse: at 1.554e-06 m, S from port 'in' to port 'out' interpolated from the neighbouring grid points differs from the file by 0.704106 (field; more than 0.02): features narrower than the grid spacing are not resolved, and the interpolated values and group delays near there are unreliable
+Warning (ROOT/SPAR1): negative group delay -6.775e-13 s from port 'in' to port 'out' at 1.55e-06 m in the S-parameters, 0 used (reported once per path); it comes from grid points where the grid is too coarse (see the grid warning): probably an artefact of the grid. The path acts as a connection without delay, also inside a feedback loop (nothing else reports a loop without delay)
+

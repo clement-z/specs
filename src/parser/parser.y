@@ -13,6 +13,8 @@
 
     string yyget_filename ( yyscan_t scanner );
     string yyget_current_line ( yyscan_t scanner );
+    struct FunctionArgs;
+    struct McLine;
 }
 
 %{
@@ -26,6 +28,7 @@
 #include "parser/parse_element.h"
 #include "parser/parse_analysis.h"
 #include "parser/parse_directive.h"
+#include "parser/parse_functions.h"
 #include "parser/parser_state.h"
 
 #include "parser.h"
@@ -47,6 +50,29 @@ extern ParseTree *cur_pt;
 }
 */
 int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
+
+// F-02: an .mc line being parsed
+struct McLine {
+    Variable runs;
+    map<string, Variable> kwargs;
+    string where;
+};
+
+// yyerror() for an error found when a line is complete: a '\n' read ahead (lookahead, yychar) has
+// already counted the next line
+static int yyerror_line(yyscan_t scanner, ParseTree *pt, const char *err, int lookahead)
+{
+    if (lookahead == '\n')
+        yyset_lineno(yyget_lineno(scanner) - 1, scanner);
+    return yyerror(scanner, pt, err);
+}
+
+// "file:line" of the line being parsed (records of the random draws, F-02); lookahead: the token
+// already read by the parser (yychar), a '\n' read ahead has counted the next line
+static string yy_where(yyscan_t scanner, int lookahead)
+{
+    return yyget_filename(scanner) + ":" + std::to_string(yyget_lineno(scanner) - (lookahead == '\n' ? 1 : 0));
+}
 %}
 
 %union {
@@ -60,6 +86,8 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
     pair<string, string>   *elemattr_ptr;
     pair<string, pair<string, Variable>> *netval_assign_ptr;
     pair<pair<string, string>, vector<double>> *cw_sweep_order_ptr;
+    FunctionArgs           *funcargs_ptr;
+    McLine                 *mc_line_ptr;
 }
 
 // %define api.value.type {struct YYSTYPE}
@@ -73,12 +101,14 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %token <s_ptr> T_ELEM_PSHIFT T_ELEM_MZI T_ELEM_CROSSING T_ELEM_PCMCELL
 %token <s_ptr> T_ELEM_PROBE T_ELEM_MLPROBE T_ELEM_PDET T_ELEM_PWR_METER
 %token <s_ptr> T_ELEM_X
+%token <s_ptr> T_ELEM_SPAR
 %token <i_val> T_ANALYSIS_OP T_ANALYSIS_DC T_ANALYSIS_TRAN
 %token <i_val> T_DIRECTIVE_OPTIONS T_DIRECTIVE_NODESET
 %token <i_val> T_DIRECTIVE_SUBCKT
 %token <s_ptr> T_DIRECTIVE_ENDS
 %token <i_val> T_DIRECTIVE_SAVE
 %token <i_val> T_LOCAL_ASSIGNMENT
+%token <i_val> T_DIRECTIVE_STEP T_DIRECTIVE_MC
 %type <c_val> '='
 
 
@@ -99,6 +129,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <i_val> element.power_meter
 %type <i_val> element.pdet
 %type <i_val> element.x
+%type <i_val> element.spar element.spar.with_nets element.spar.with_kwargs
 
 // Available analysis
 %type <i_val> analysis.op
@@ -111,6 +142,9 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 %type <i_val> directive.nodeset
 %type <i_val> directive.save
 %type <elemattr_ptr> save_target
+%type <vec_var_ptr> step_values
+%type <variable_ptr> step_value
+%type <mc_line_ptr> directive.mc
 
 // Rules for circuit nets (value is index in PT elements)
 %type <s_ptr> net_name.base.str
@@ -150,6 +184,7 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 // For expression parsing
 %type <variable_ptr> expr term fact pow constant
 %type <variable_ptr> listvar.tail listvar.unbound listvar.bound //TODO: check
+%type <funcargs_ptr> funcargs
 
 // Add parse tree parameter to yyparse signature
 %parse-param {ParseTree *pt}
@@ -169,6 +204,11 @@ int yyerror(yyscan_t scanner, ParseTree *pt, const char *err);
 
 input: %empty
      | input line '\n'
+        {
+            // F-02: the owner of the draws of a line (ParseTree::draw_owner) is set by the line
+            cur_pt->draw_owner.clear();
+            cur_pt->draws_forbidden = false;
+        }
 ;
 
 line: %empty
@@ -177,21 +217,96 @@ line: %empty
     | directive { /* cout << "Registered directive [...]" << endl; */ }
     | subcircuit { /* cout << "Parsed subcircuit [...]" << endl; */ }
     | local_assignment { /* cout << "Processed local assignment [...]" << endl; */ }
+    | directive.step
+    | directive.mc
+        {
+            // F-02: the .mc line, once its keywords are read
+            string error;
+            if (!cur_pt->set_mc($1->runs, $1->kwargs, $1->where, error))
+                yyerror_line(scanner, pt, error.c_str(), yychar);
+            delete $1;
+        }
 ;
 
-local_assignment: T_LOCAL_ASSIGNMENT assignment
+local_assignment: T_LOCAL_ASSIGNMENT { cur_pt->draw_owner = ".param"; } assignment
                     {
-                        cur_pt->set_local_variable($2->first, $2->second);
-                        delete $2;
+                        cur_pt->set_local_variable($3->first, $3->second);
+                        cur_pt->note_assigned_param($3->first);
+                        delete $3;
                     }
                 | local_assignment assignment
                     {
                         cur_pt->set_local_variable($2->first, $2->second);
+                        cur_pt->note_assigned_param($2->first);
                         delete $2;
                     }
 ;
 
 /* --------- Directives definitions parsing ----------- */
+
+/* .step param NAME start stop step, .step param NAME list v1 v2 ... (F-02) */
+directive.step: T_DIRECTIVE_STEP T_STR T_STR step_values
+                {
+                    string error;
+                    if (!cur_pt->add_step(*$2, *$3, "", *$4, yy_where(scanner, yychar), error))
+                        yyerror_line(scanner, pt, error.c_str(), yychar);
+                    delete $2;
+                    delete $3;
+                    delete $4;
+                }
+              | T_DIRECTIVE_STEP T_STR T_STR T_STR step_values
+                {
+                    string error;
+                    if (!cur_pt->add_step(*$2, *$3, *$4, *$5, yy_where(scanner, yychar), error))
+                        yyerror_line(scanner, pt, error.c_str(), yychar);
+                    delete $2;
+                    delete $3;
+                    delete $4;
+                    delete $5;
+                }
+;
+step_values: step_value
+                {
+                    $$ = new vector<Variable>(1, *$1);
+                    delete $1;
+                }
+           | step_values step_value
+                {
+                    $$ = $1;
+                    $$->push_back(*$2);
+                    delete $2;
+                }
+;
+/* a number, {expression}, or a signed number (-1, as in SPICE) */
+step_value: variable.delimited_expr
+          | '-' variable_base
+                {
+                    $$ = $2;
+                    if ($$->type == Variable::INTEGER)
+                        $$->inum = -$$->inum;
+                    else
+                        *$$ *= Variable(-1.0);
+                }
+          | '+' variable_base { $$ = $2; }
+;
+
+/* .mc N [seed=S] (F-02) */
+directive.mc: T_DIRECTIVE_MC step_value
+                {
+                    $$ = new McLine();
+                    $$->runs = *$2;
+                    $$->where = yy_where(scanner, yychar);
+                    delete $2;
+                }
+            | directive.mc assignment
+                {
+                    $$ = $1;
+                    if ($$->kwargs.count($2->first))
+                        yyerror_line(scanner, pt, (".mc: keyword " + $2->first + " given twice").c_str(), yychar);
+                    $$->kwargs[$2->first] = $2->second;
+                    delete $2;
+                }
+;
 
 /* .save net QTY(net) ... (F-05): probes on the listed optical nets */
 directive.save: T_DIRECTIVE_SAVE save_target
@@ -245,6 +360,8 @@ subcircuit.with_ports: T_DIRECTIVE_SUBCKT T_STR
                         $$ = cur_pt->register_subcircuit(*$2);
                         // directory of the file being scanned, for .include in the body (B-143)
                         cur_pt->subcircuits[$$]->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
+                        // and its name, for the parse errors in the body (B-182)
+                        cur_pt->subcircuits[$$]->filename = yyget_filename(scanner);
                         delete $2;
                     }
                 | subcircuit.with_ports port_name
@@ -270,6 +387,7 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
             {
                 // cout << "Parsed subcircuit " << cur_pt->subcircuits[$1]->name << endl;
                 cur_pt->subcircuits[$1]->netlist = *$2;
+                cur_pt->subcircuits[$1]->body_line = static_cast<ParserState *>(yyget_extra(scanner))->subckt_body_line;
                 delete $2;
             }
           | subcircuit.with_assignments T_DIRECTIVE_ENDS T_STR
@@ -283,6 +401,7 @@ subcircuit: subcircuit.with_assignments T_DIRECTIVE_ENDS
                     yyerror(scanner, pt, ss.str().c_str());
                 }
                 cur_pt->subcircuits[$1]->netlist = *$2;
+                cur_pt->subcircuits[$1]->body_line = static_cast<ParserState *>(yyget_extra(scanner))->subckt_body_line;
                 delete $2;
                 delete $3;
             }
@@ -383,6 +502,8 @@ element.cwsrc: T_ELEM_CWSRC net.oa.out
 element.vlsrc: T_ELEM_VLSRC net.oa.out
             {
                 $$ = cur_pt->register_element(new VLSourceElement(*$1, {*$2}));
+                // directory of the file being read, for a relative value file (as .include and SPAR, B-192)
+                static_cast<VLSourceElement *>(cur_pt->elements[$$])->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                 delete $1;
                 delete $2;
             }
@@ -391,6 +512,8 @@ element.vlsrc: T_ELEM_VLSRC net.oa.out
 element.evlsrc: T_ELEM_EVLSRC net.eanalog
             {
                 $$ = cur_pt->register_element(new EVLSourceElement(*$1, {*$2}));
+                // directory of the file being read, for a relative value file (as .include and SPAR, B-192)
+                static_cast<EVLSourceElement *>(cur_pt->elements[$$])->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
                 delete $1;
                 delete $2;
             }
@@ -484,6 +607,12 @@ directive.with_kwargs:
             {
                 // cout << "found keyword arg: " << $2->second.get_str() << endl;
                 cur_pt->directives[$1]->kwargs[$2->first] = $2->second;
+                // F-02: the seed of the root netlist applies to the draws parsed after it (a value that
+                // is not a valid seed is reported by OPTIONSDirective::create(), as before)
+                uint64_t seed = 0;
+                if (!cur_pt->parent && dynamic_cast<OPTIONSDirective *>(cur_pt->directives[$1])
+                    && strutils::iequals($2->first, "seed") && options_unsigned_integer($2->second, seed))
+                    cur_pt->apply_options_seed(seed, yy_where(scanner, yychar));
                 $$ = $1;
                 delete $2;
             }
@@ -577,9 +706,53 @@ element.x.with_kwargs:
 | element.x.with_args
 ;
 
+/* SPARname n1 n2 ... nN [keyword=value ...] (F-03): the number of nets is free, so their roles are
+   set once the line is read (SPARElement::set_net_roles()) */
+element.spar: T_ELEM_SPAR
+            {
+                $$ = cur_pt->register_element(new SPARElement(*$1));
+                // directory of the file being read, for a relative file= (as .include, B-143)
+                static_cast<SPARElement *>(cur_pt->elements[$$])->include_dir = static_cast<ParserState *>(yyget_extra(scanner))->current_include_dir();
+                delete $1;
+            }
+;
+
+element.spar.with_nets:
+  element.spar.with_nets net.oanalog
+            {
+                cur_pt->elements[$1]->nets.push_back(*$2);
+                $$ = $1;
+                delete $2;
+            }
+| element.spar.with_nets net.oanalog '&'
+            {
+                // explicitly bidirectional net (as net.oa.explicit_bidir; its role is counted later)
+                cur_pt->nets[*$2].m_bidirectional = true;
+                cur_pt->elements[$1]->nets.push_back(*$2);
+                $$ = $1;
+                delete $2;
+            }
+| element.spar { $$ = $1; }
+;
+
+element.spar.with_kwargs:
+  element.spar.with_kwargs assignment
+            {
+                cur_pt->elements[$1]->kwargs[$2->first] = $2->second;
+                $$ = $1;
+                delete $2;
+            }
+| element.spar.with_nets { $$ = $1; }
+;
+
 element:
   element.with_kwargs
 | element.x.with_kwargs
+| element.spar.with_kwargs
+            {
+                static_cast<SPARElement *>(cur_pt->elements[$1])->set_net_roles(*cur_pt);
+                $$ = $1;
+            }
 ;
 
 /* ---------- Analysis arguments parsing ----------- */
@@ -775,11 +948,18 @@ element_attribute: '/' T_STR '/' T_STR
                 }
 ;
 
-assignment: T_ASSIGN_ID '=' variable
+assignment: T_ASSIGN_ID '='
             {
-                $$ = new pair<string, Variable>(*$1, *$3);
+                // F-02: name of the streams of the draws in this value
+                cur_pt->draw_key = *$1;
+                cur_pt->draws_at_assignment = cur_pt->root_tree()->draws.size();
+            }
+            variable
+            {
+                $$ = new pair<string, Variable>(*$1, *$4);
+                cur_pt->draw_key.clear();
                 delete $1;
-                delete $3;
+                delete $4;
             }
 ;
 
@@ -862,6 +1042,47 @@ fact:
 pow:
   constant
 | '(' expr ')' { $$ = $2; }
+| T_STR '(' funcargs ')'
+    {
+        // F-02: function call (parser/parse_functions.h)
+        string error;
+        $$ = new Variable();
+        if (!call_function(cur_pt, *$1, *$3, yy_where(scanner, yychar), *$$, error))
+            yyerror_line(scanner, pt, error.c_str(), yychar);
+        delete $1;
+        delete $3;
+    }
+;
+
+funcargs:
+  expr
+    {
+        $$ = new FunctionArgs();
+        $$->args.push_back(*$1);
+        delete $1;
+    }
+| T_ASSIGN_ID '=' expr
+    {
+        $$ = new FunctionArgs();
+        $$->kwargs[*$1] = *$3;
+        delete $1;
+        delete $3;
+    }
+| funcargs ',' expr
+    {
+        $$ = $1;
+        $$->args.push_back(*$3);
+        delete $3;
+    }
+| funcargs ',' T_ASSIGN_ID '=' expr
+    {
+        $$ = $1;
+        if ($$->kwargs.count(*$3))
+            yyerror(scanner, pt, ("keyword " + *$3 + " given twice in a function call").c_str());
+        $$->kwargs[*$3] = *$5;
+        delete $3;
+        delete $5;
+    }
 ;
 
 // --------------- variables list (elements can have different types)

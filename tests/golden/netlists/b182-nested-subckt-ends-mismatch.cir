@@ -1,0 +1,11 @@
+* B-182 regression: a nested subcircuit whose .ends name does not match its .subckt is found when the outer
+* body is parsed (per instance): the error points at line 9 of this file.
+cwsrc1 in wl=1.55e-6 power=1
+x1 in out OUTER
+.subckt OUTER a b
+x2 a b INNER
+.subckt INNER c d
+wg1 c d length=10e-6
+.ends WRONG
+.ends OUTER
+.op

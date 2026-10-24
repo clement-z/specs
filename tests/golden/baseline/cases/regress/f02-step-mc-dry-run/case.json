@@ -1,0 +1,10 @@
+{
+ "args": [
+  "-n",
+  "-f",
+  "tests/golden/netlists/f02-step-mc.cir"
+ ],
+ "exit": 0,
+ "files": {},
+ "id": "regress/f02-step-mc-dry-run"
+}

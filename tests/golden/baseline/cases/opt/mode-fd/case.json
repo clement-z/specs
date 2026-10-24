@@ -8,15 +8,15 @@
  "exit": 0,
  "files": {
   "traces/delete_me.manifest.json": {
-   "bytes": 399,
+   "bytes": 419,
    "kind": "json",
-   "sha256": "90130adb36e6243d4e6b7fe0a0747f159136e8d674f64fa03aac7e683aedaa8a",
+   "sha256": "56af70b09b986803a71a672b72a09e06dd636876ea4531339dcb4a7b6a97572e",
    "stored": "files/traces/delete_me.manifest.json"
   },
   "traces/delete_me.vcd": {
-   "bytes": 27050,
+   "bytes": 26932,
    "kind": "vcd",
-   "sha256": "0ea8886ba1cc537b9a04ecd4bf46a35c6983b1985447a5e4c2de0f8f830a905d",
+   "sha256": "d133ebefb1f63e433b06d97f6d00e065165bf6418390782417c5ed9cbd1e0a0a",
    "stored": "files/traces/delete_me.vcd"
   }
  },

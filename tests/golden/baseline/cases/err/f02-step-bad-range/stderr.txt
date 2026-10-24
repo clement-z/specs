@@ -1,0 +1,4 @@
+Parsing error (tests/golden/netlists/f02-step-bad-range.cir:3): .step param L: expected start < stop and step > 0
+-- offending token: "\n"
+-- while parsing line: ".step param L 200e-6 100e-6 10e-6"
+

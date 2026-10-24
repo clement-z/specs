@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/b021-snapfactor.cir", "sha256": "277c30d1a843b427ee49688d9329b1dcd4f2921a20329ee064d66a4ac9900cd9"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

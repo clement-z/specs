@@ -2,11 +2,14 @@
 #include <systemc.h>
 #include <cmath>
 #include <limits>
+#include <queue>
+#include <random>
 #include <set>
 #include <vector>
 
 #include "optical_output_port.h"
 #include "specs.h"
+#include "utils/pqueue.h"
 
 #include "test/utils.h"
 
@@ -43,7 +46,9 @@ TEST(OpticalOutputPort, EmptyQueueStopsWithoutEmitting)
         OOPHarness h("h");
         sc_start(SC_ZERO_TIME);
 
-        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
+        // a notification without an entry (B-188: notify_pending() notifies for an entry about to
+        // be pushed, so the event is notified directly)
+        h.m_out_writer.m_pending_event.notify(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_EQ(sc_get_status(), SC_STOPPED);
@@ -62,7 +67,7 @@ TEST(OpticalOutputPort, DesyncStopsWithoutEmitting)
         sc_start(SC_ZERO_TIME);
 
         h.enqueue(sc_time(5, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
-        h.m_out_writer.notify_pending(sc_time(1, SC_NS));
+        h.m_out_writer.m_pending_event.notify(sc_time(1, SC_NS));
         sc_start(10, SC_NS);
 
         EXPECT_EQ(sc_get_status(), SC_STOPPED);
@@ -79,8 +84,8 @@ TEST(OpticalOutputPort, KeepsValueQueuedBeforeThreadStart)
     {
         OOPHarness h("h");
 
-        h.enqueue(sc_time(1, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
         h.m_out_writer.notify_pending(sc_time(1, SC_NS));
+        h.enqueue(sc_time(1, SC_NS), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
         sc_start(10, SC_NS);
 
         EXPECT_NE(sc_get_status(), SC_STOPPED);
@@ -110,15 +115,12 @@ TEST(OpticalOutputPort, FrequencyDomainWriteMergesBehindQueueTop)
         oop.immediateWriteFrequencyDomain(a_new);
 
         ASSERT_EQ(oop.m_queue.size(), 2u);
-        int n_a = 0;
-        for (auto it = oop.m_queue.begin(); it != oop.m_queue.end(); ++it)
-        {
-            if (it->second.m_wavelength_id != a_new.m_wavelength_id)
-                continue;
-            ++n_a;
-            EXPECT_EQ(it->second.m_field, a_new.m_field);
-        }
-        EXPECT_EQ(n_a, 1);
+        const auto *a = oop.m_queue.find(sc_time_stamp(), a_new.m_wavelength_id);
+        ASSERT_NE(a, nullptr);
+        EXPECT_EQ(a->second.m_field, a_new.m_field);
+        oop.m_queue.pop();
+        oop.m_queue.pop();
+        EXPECT_TRUE(oop.m_queue.empty());
     }
     SPECS_TEST_FOOTER();
 }
@@ -512,6 +514,177 @@ TEST(OpticalOutputPort, SquaredNormGateMatchesFormerGate)
     SPECS_TEST_FOOTER();
 }
 
+// B-188: the order of the pending entries (PendingEntryLater, on squared norms where they decide)
+// is that of std::greater<pair<sc_time, OpticalSignal>>, the comparator of the queue before, for
+// every pair of entries: equal and different times, magnitudes at the edges of
+// compareSquaredMagnitudes() (zero, subnormal, overflow, inf, NaN), equal magnitudes at other
+// phases and magnitudes one ulp apart. Then a heap built and drained with each comparator, with
+// values replaced in place (merges), gives the same entries in the same order
+TEST(OpticalOutputPort, PendingEntryOrderMatchesPairComparison)
+{
+    SPECS_TEST_HEADER()
+    {
+        typedef std::pair<sc_time, OpticalSignal> Entry;
+        std::vector<GateField> fields;
+        for (double m : gateTestMagnitudes())
+        {
+            fields.emplace_back(m, 0);
+            fields.emplace_back(0, m);
+            fields.emplace_back(m * 0.6, m * 0.8);
+            // same magnitude, other phases (std::polar() needs m >= 0)
+            fields.emplace_back(m * std::cos(0.3), m * std::sin(0.3));
+            fields.emplace_back(m * std::cos(2.1), m * std::sin(2.1));
+            fields.emplace_back(std::nextafter(m, 2 * m), 0);
+        }
+        const sc_time t1 = sc_time::from_value(10);
+        const sc_time t2 = sc_time::from_value(11);
+        const PendingEntryLater later;
+        const std::greater<Entry> former;
+        size_t checked = 0;
+        for (const GateField &fa : fields)
+        {
+            for (const GateField &fb : fields)
+            {
+                const Entry a(t1, OpticalSignal(fa, 1u));
+                for (const sc_time &tb : {t1, t2})
+                {
+                    const Entry b(tb, OpticalSignal(fb, 2u));
+                    ASSERT_EQ(later(a, b), former(a, b)) << fa << " at " << a.first << " vs " << fb << " at " << tb;
+                    ASSERT_EQ(later(b, a), former(b, a)) << fb << " at " << tb << " vs " << fa << " at " << a.first;
+                    ++checked;
+                }
+            }
+        }
+        EXPECT_GT(checked, 1000000u);
+
+        // Same heap: random pushes (few distinct times, many equal or near-equal magnitudes),
+        // values replaced in place (a merge does not repair the heap, as in the port) and pops
+        // give the same layout after every step
+        std::mt19937 rng(188);
+        std::uniform_int_distribution<size_t> pick(0, fields.size() - 1);
+        std::uniform_int_distribution<int> time_of(0, 3);
+        std::uniform_int_distribution<int> action(0, 9);
+        PQueue<Entry, std::greater<Entry>> q_former;
+        PQueue<Entry, PendingEntryLater> q_later;
+        auto same = [](const Entry &x, const Entry &y) {
+            const GateField &fx = x.second.m_field;
+            const GateField &fy = y.second.m_field;
+            auto bits = [](double u, double v) { return u == v || (std::isnan(u) && std::isnan(v)); };
+            return x.first == y.first && x.second.m_wavelength_id == y.second.m_wavelength_id
+                && bits(fx.real(), fy.real()) && bits(fx.imag(), fy.imag());
+        };
+        size_t popped = 0;
+        for (int step = 0; step < 20000; ++step)
+        {
+            const int a = action(rng);
+            if (a < 5 || q_later.empty())
+            {
+                const Entry e(sc_time::from_value(100 + time_of(rng)), OpticalSignal(fields[pick(rng)], uint32_t(step % 7)));
+                q_former.push(e);
+                q_later.push(e);
+            }
+            else if (a < 7)
+            {
+                const size_t i = pick(rng) % q_later.size();
+                const OpticalSignal v(fields[pick(rng)], q_later.begin()[i].second.m_wavelength_id);
+                q_former.begin()[i].second = v;
+                q_later.begin()[i].second = v;
+            }
+            else
+            {
+                q_former.pop();
+                q_later.pop();
+                ++popped;
+            }
+            ASSERT_EQ(q_former.size(), q_later.size());
+            ASSERT_TRUE(std::equal(q_former.begin(), q_former.end(), q_later.begin(), same)) << "step " << step;
+        }
+        EXPECT_GT(popped, 2000u);
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// B-015, B-188: OpticalPendingQueue (heap of slots, lookup by wavelength) against the queue of the
+// port before (PQueue with PendingEntryLater, merges found by a linear scan of all entries): random
+// writes (merged into the pending entry of the same time and wavelength, else pushed), at a few
+// times and wavelengths, with equal and near-equal magnitudes, and pops; the same next entry, size
+// and lookups after every step, and across clear()
+TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
+{
+    SPECS_TEST_HEADER()
+    {
+        typedef std::pair<sc_time, OpticalSignal> Entry;
+        std::vector<GateField> fields;
+        for (double m : {0.0, 1e-300, 1e-9, 1e-8, 0.5, 1.0, 2.0})
+        {
+            fields.emplace_back(m, 0);
+            fields.emplace_back(0, m);
+            fields.emplace_back(m * 0.6, m * 0.8);
+            fields.emplace_back(std::nextafter(m, 4.0), 0);
+        }
+        auto same = [](const Entry &x, const Entry &y) {
+            return x.first == y.first && x.second.m_wavelength_id == y.second.m_wavelength_id
+                && x.second.m_field == y.second.m_field;
+        };
+        std::mt19937 rng(15);
+        std::uniform_int_distribution<size_t> pick(0, fields.size() - 1);
+        std::uniform_int_distribution<int> action(0, 9);
+        std::uniform_int_distribution<uint32_t> wavelength(0, 5);
+        PQueue<Entry, PendingEntryLater> former;
+        OpticalPendingQueue queue;
+        sc_time::value_type now = 0;
+        size_t merged = 0;
+        size_t popped = 0;
+        for (int step = 0; step < 50000; ++step)
+        {
+            if (step == 30000)
+            {
+                former = PQueue<Entry, PendingEntryLater>();
+                queue.clear();
+            }
+            const int a = action(rng);
+            if (a < 6 || former.empty())
+            {
+                // times from now to now + 3 (and sometimes the same delay: as a device writes)
+                const sc_time t = sc_time::from_value(now + (a < 3 ? 2 : std::uniform_int_distribution<int>(0, 3)(rng)));
+                const OpticalSignal v(fields[pick(rng)], wavelength(rng));
+                auto it = std::find_if(former.begin(), former.end(), [&](const Entry &x) {
+                    return x.first == t && x.second.m_wavelength_id == v.m_wavelength_id;
+                });
+                Entry *e = queue.find(t, v.m_wavelength_id);
+                ASSERT_EQ(e != nullptr, it != former.end()) << "step " << step;
+                if (e)
+                {
+                    ASSERT_TRUE(same(*e, *it)) << "step " << step;
+                    e->second = v;
+                    it->second = v;
+                    ++merged;
+                }
+                else
+                {
+                    former.push(Entry(t, v));
+                    queue.push(Entry(t, v));
+                }
+            }
+            else
+            {
+                // the port takes entries at their time: time moves to the next one
+                now = former.top().first.value();
+                former.pop();
+                queue.pop();
+                ++popped;
+            }
+            ASSERT_EQ(queue.size(), former.size()) << "step " << step;
+            ASSERT_EQ(queue.empty(), former.empty());
+            if (!former.empty())
+                ASSERT_TRUE(same(queue.top(), former.top())) << "step " << step;
+        }
+        EXPECT_GT(merged, 5000u);
+        EXPECT_GT(popped, 10000u);
+    }
+    SPECS_TEST_FOOTER();
+}
+
 // F-15: the notifications of the pending entries (were made by an sc_event_queue). Records every
 // value the port writes, with time and delta cycle
 class PendingHarness : public sc_module {
@@ -532,7 +705,6 @@ public:
         : sc_module(name)
         , m_out_writer("out_writer", p_out)
     {
-        SC_HAS_PROCESS(PendingHarness);
         p_out(out);
         auto config = make_shared<OpticalOutputPortConfig>();
         m_out_writer.setConfig(config);
@@ -574,7 +746,9 @@ TEST(OpticalOutputPort, PendingEqualTimesOnePerDeltaCycle)
             EXPECT_EQ(h.seen[i].t, sc_time(1, SC_NS));
             EXPECT_EQ(OpticalSignal::getWavelength(h.seen[i].wavelength_id), wl[i]);
             if (i > 0)
+            {
                 EXPECT_EQ(h.seen[i].delta, h.seen[i - 1].delta + 1);
+            }
         }
         EXPECT_EQ(h.out.read().m_field, OpticalSignal::field_type(1, 0));
         EXPECT_TRUE(h.m_out_writer.isempty());
@@ -660,6 +834,113 @@ TEST(OpticalOutputPort, PendingResetCancelsNotification)
         ASSERT_EQ(h.seen.size(), 1u);
         EXPECT_EQ(h.seen[0].t, sc_time(7, SC_NS));
         EXPECT_EQ(h.seen[0].field, OpticalSignal::field_type(3, 0));
+    }
+    SPECS_TEST_FOOTER();
+}
+
+// A .dc point (B-003, B-185): after reset(), a port with m_emit_each_wavelength writes the first
+// value of each wavelength with an event, also when it is below abstol (written as 0, snapped) or
+// equal to the value its net holds; the later values of the point go through the gate. Without the
+// flag (.op, .tran), the gate compares the first value with 0 and an unchanged value wakes nothing
+TEST(OpticalOutputPort, DcPointWritesFirstValueOfEachWavelengthWithAnEvent)
+{
+    for (const bool each_wavelength : {false, true})
+    {
+        SCOPED_TRACE(each_wavelength ? "m_emit_each_wavelength" : "default");
+        SPECS_TEST_HEADER()
+        {
+            PendingHarness h("h");
+            auto &oop = h.m_out_writer;
+            sc_start(SC_ZERO_TIME);
+            oop.m_mode = OpticalOutputPortMode::NO_DELAY;
+            oop.m_emit_each_wavelength = each_wavelength;
+            auto write = [&oop](double field, double wavelength)
+            {
+                oop.delayedWrite(OpticalSignal(OpticalSignal::field_type(field, 0), wavelength), SC_ZERO_TIME);
+            };
+
+            // first point: two wavelengths (1.56 um, the larger |E|, is taken first)
+            oop.reset();
+            write(1, 1.55e-6);
+            write(2, 1.56e-6);
+            sc_start(1, SC_NS);
+            ASSERT_EQ(h.seen.size(), 2u);
+            EXPECT_EQ(h.out.read(), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
+
+            // next point: the same values (the net holds the first one), and one below abstol (1e-8)
+            h.seen.clear();
+            oop.reset();
+            write(1, 1.55e-6);
+            write(2, 1.56e-6);
+            write(1e-9, 1.57e-6);
+            sc_start(1, SC_NS);
+            std::set<std::pair<double, double>> seen; // (field, wavelength)
+            for (const auto &w : h.seen)
+                seen.insert({w.field.real(), OpticalSignal::getWavelength(w.wavelength_id)});
+            if (each_wavelength)
+            {
+                EXPECT_EQ(h.seen.size(), 3u);
+                EXPECT_EQ(seen, (std::set<std::pair<double, double>>{{1, 1.55e-6}, {2, 1.56e-6}, {0, 1.57e-6}}));
+            }
+            else
+            {
+                // 1.56 um changes the net, then 1.55 um changes it back; 1.57 um is gated
+                EXPECT_EQ(h.seen.size(), 2u);
+                EXPECT_EQ(seen, (std::set<std::pair<double, double>>{{1, 1.55e-6}, {2, 1.56e-6}}));
+            }
+
+            // in the same point, an unchanged value of a wavelength already written is gated
+            h.seen.clear();
+            write(2, 1.56e-6);
+            sc_start(1, SC_NS);
+            EXPECT_TRUE(h.seen.empty());
+        }
+        SPECS_TEST_FOOTER();
+    }
+}
+
+// OpticalNet::writeWithEvent(): a value-change event also when the value does not change; a
+// plain write of the current value notifies nothing (sc_signal)
+class NetEventHarness : public sc_module {
+public:
+    spx::oa_signal_type net{"net"};
+    int events = 0;
+
+    NetEventHarness(sc_module_name name)
+        : sc_module(name)
+    {
+        SC_METHOD(on_net_changed);
+        sensitive << net;
+        dont_initialize();
+    }
+
+    void on_net_changed()
+    {
+        ++events;
+    }
+};
+
+TEST(OpticalNet, WriteWithEventNotifiesAnUnchangedValue)
+{
+    SPECS_TEST_HEADER()
+    {
+        NetEventHarness h("h");
+        const OpticalSignal s(OpticalSignal::field_type(1, 0), 1.55e-6);
+        sc_start(SC_ZERO_TIME);
+        h.net.write(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 1);
+        h.net.write(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 1);
+        h.net.writeWithEvent(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 2);
+        EXPECT_TRUE(h.net.read() == s);
+        // the next plain write of the same value notifies nothing again
+        h.net.write(s);
+        sc_start(1, SC_NS);
+        EXPECT_EQ(h.events, 2);
     }
     SPECS_TEST_FOOTER();
 }

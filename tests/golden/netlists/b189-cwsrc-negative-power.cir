@@ -1,0 +1,6 @@
+* B-189: a CW source with a negative power is an error at element creation
+* (Error (ROOT/CWSRC1): power must be >= 0 and finite (got -1 W), exit 1); it aborted in std::polar
+cwsrc1 a wl=1.55u power=-1
+wg1 a b length=1e-4
+probe1 b
+.tran 1e-11

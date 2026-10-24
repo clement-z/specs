@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-siepic-bdc.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 11078,
+   "kind": "text",
+   "sha256": "f3f46f5473ea4db848a25ce927ad0dfc142125e16f9fededd408d568931cf5bf",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 635,
+   "kind": "json",
+   "sha256": "5d7dc6a718cfb4d8ea77d37b3eea070c96546277a9a2501704d2cfe430517017",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "cir/spar-siepic-bdc"
+}

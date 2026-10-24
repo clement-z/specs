@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-3port-taylor.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 1619,
+   "kind": "text",
+   "sha256": "01ecf6589444197513e2de43be939cc14f4747d9652b9133b4d325e9ddfe0149",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 607,
+   "kind": "json",
+   "sha256": "bcb768422e8057bc1222d621b870e94d40d78fa0e6e69d278c2d1c9886a003c7",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/spar-3port-taylor"
+}

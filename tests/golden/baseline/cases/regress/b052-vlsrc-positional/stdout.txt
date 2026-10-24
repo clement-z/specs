@@ -30,9 +30,6 @@ Done (flattening)
 Done with bidirectional nets
 Elaborating network of ROOT/a...
 Creating ROOT/VLSRC1 (reason: connection to unidir net)
-1e-10: 0.001W @1550nm
-2e-10: 0.002W @1550nm
-3e-10: 0W @1550nm
 Done creating ROOT/VLSRC1
 Creating ROOT/PROBE1 (reason: unidir backlog)
 Done creating ROOT/PROBE1
@@ -57,11 +54,6 @@ Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
 ║ - ROOT/a (OPTICAL) = @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
-ROOT/VLSRC1 was enabled
-@0 s, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
-@100 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
-@200 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
-@300 ps, ROOT/VLSRC1 emitted: @ 1550 nm (0.000000 √W, 0.000000 W, 0.0000 rad)
 Simulated 1 ns
 ╔═══════════════════╗
 ║        DONE       ║

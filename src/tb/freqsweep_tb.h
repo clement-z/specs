@@ -18,8 +18,6 @@ public:
     void monitor();
     SC_CTOR(freqsweep_tb)
     {
-        SC_HAS_PROCESS(freqsweep_tb);
-
         SC_THREAD(run_1);
 
         SC_THREAD(monitor);

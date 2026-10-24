@@ -4,6 +4,7 @@
 #include <map>
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 #include "devices/spx_module.h"
 #include "specs.h"
 
@@ -54,9 +55,8 @@ public:
     OpticalOutputPort m_out2_writer;
 
     // Memory for multi-wavelength purposes
-    // maybe with vector it has better performance
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in2;
 
     // Processes (methods)
     void on_port_in1_changed();
@@ -73,8 +73,6 @@ public:
         , m_out1_writer("out1_delayed_writer", p_out1)
         , m_out2_writer("out2_delayed_writer", p_out2)
     {
-        SC_HAS_PROCESS(DirectionalCouplerUni);
-
         SC_METHOD(on_port_in1_changed);
         sensitive << p_in1;
         dont_initialize();
@@ -111,11 +109,10 @@ public:
     OpticalOutputPort m_p3_out_writer;
 
     // Memory for multi-wavelength purposes
-    // maybe with vector it has better performance
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in0;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in3;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in0;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in2;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in3;
 
     // Processes (methods)
     void on_p0_in_changed();
@@ -136,8 +133,6 @@ public:
         , m_p2_out_writer("p2_out_delayed_writer", p2_out)
         , m_p3_out_writer("p3_out_delayed_writer", p3_out)
     {
-        SC_HAS_PROCESS(DirectionalCouplerBi);
-
         SC_METHOD(on_p0_in_changed);
         sensitive << p0_in;
         dont_initialize();

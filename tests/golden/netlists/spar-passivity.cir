@@ -1,0 +1,7 @@
+* F-03: a Touchstone file with |S21| = 1.05 (power 1.1025): passivity=check (default) warns, enforce scales S
+cwsrc1 in wl=1.55e-6 power=1
+splitter1 in a b
+spar1 a out_check file="../../sparam/fixtures/gain.s2p"
+spar2 b out_enforce file="../../sparam/fixtures/gain.s2p" passivity="enforce"
+.save out_check out_enforce
+.dc /cwsrc1/WL 1.55e-6 1.551e-6 1e-9

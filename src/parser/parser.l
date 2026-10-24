@@ -112,6 +112,8 @@ int yy_load_next_buf(yyscan_t scanner)
     if ( last_file )
     {
         fclose(last_file);
+        // a later parse in the same process (F-02 --run) must not close it again
+        last_file = nullptr;
     }
 
     if (netlist_content_fifo.empty())
@@ -248,6 +250,20 @@ static double from_si_suffixed_string(string str)
     return from_string<double>(str + "e" + std::to_string(exp));
 }
 
+// B-191: the first match after the line rule leaves its state (the rules of the line state are those of
+// the state, so the match is the one that rejecting the line rule gave), before the action of the rule runs
+#define YY_USER_ACTION leave_line_state(yyg);
+#define leave_line_state(yyg) \
+    switch (YY_START) \
+    { \
+        case INITIAL_L: BEGIN(INITIAL); break; \
+        case INCLUDE_L: BEGIN(INCLUDE); break; \
+        case SUBCKT_DECLARATION_L: BEGIN(SUBCKT_DECLARATION); break; \
+        case SUBCKT_DEFINITION_L: BEGIN(SUBCKT_DEFINITION); break; \
+        case IN_DQUOTES_L: BEGIN(IN_DQUOTES); break; \
+        default: break; \
+    }
+
 string convert_special_char(char c)
 {
     stringstream ss;
@@ -281,6 +297,14 @@ string convert_special_char(char c)
 %x SUBCKT_DEFINITION
 /*Quoted string (returns char[]) (capture until next '"' and throw error on newline)*/
 %x IN_DQUOTES
+/* B-191: the same states once the line rule (below) has recorded the line: every rule of the state but
+   that one. Scanning the line again there replaces flex's reject action, whose use stops flex from
+   growing its buffer for a line longer than YY_BUF_SIZE. Inclusive or exclusive as the state they copy. */
+%s INITIAL_L
+%x INCLUDE_L
+%s SUBCKT_DECLARATION_L
+%x SUBCKT_DEFINITION_L
+%x IN_DQUOTES_L
 
 
 
@@ -288,11 +312,11 @@ string convert_special_char(char c)
 
 %%  /*** Rules section ***/
 
-<INITIAL>^\.include  {
+<INITIAL,INITIAL_L>^\.include  {
     yy_push_state(INCLUDE, yyscanner);
 }
-<INCLUDE>{WS}*      /* eat the whitespace */
-<INCLUDE>[^ ;\t\n\r]+   { /* got the include file name */
+<INCLUDE,INCLUDE_L>{WS}*      /* eat the whitespace */
+<INCLUDE,INCLUDE_L>[^ ;\t\n\r]+   { /* got the include file name */
         ParserState *state = (ParserState *)yyextra;
         // relative to the including file, then to the working directory (B-143)
         const string path = state->resolve_include(yytext);
@@ -313,46 +337,45 @@ string convert_special_char(char c)
         BEGIN(INITIAL);
         }
 
-<IN_DQUOTES>\" {
+<IN_DQUOTES,IN_DQUOTES_L>\" {
     yy_pop_state(yyscanner);
     // cout << "leaving dquotes mode" << endl;
     return '"';
     }
-<IN_DQUOTES>{EOL} { exit(yylerror(yyscanner, "Unmatched double quote")); }
-<IN_DQUOTES>[^\"\r\n]* {
+<IN_DQUOTES,IN_DQUOTES_L>{EOL} { exit(yylerror(yyscanner, "Unmatched double quote")); }
+<IN_DQUOTES,IN_DQUOTES_L>[^\"\r\n]* {
     // cout << "found quoted string: " << yytext << endl;
     yylval_param->s_ptr = new string(yytext);
     return T_STR;
     }
 
-<SUBCKT_DECLARATION>{EOL} {
+<SUBCKT_DECLARATION,SUBCKT_DECLARATION_L>{EOL} {
     // end of subcircuit declaration line (.subckt name node1 node2...)
     // go into subckt_definition state, which copies all text to a string
     // until the corresponding .ends is reached
     yylval_param->s_ptr = new string;
     internal_subckt_count = 0;
+    // the body starts on the next line (yylineno already counts this EOL), B-182
+    ((ParserState *)yyextra)->subckt_body_line = yylineno;
     // cout << endl << "going to subckt definition mode" << endl;
     BEGIN(SUBCKT_DEFINITION); //needs BEGIN and not yy_push_state
 }
 
-<SUBCKT_DEFINITION>^\.SUBCKT {
-    // cout << "hello2" << endl;
+<SUBCKT_DEFINITION,SUBCKT_DEFINITION_L>^\.SUBCKT {
     // increase internal count for keeping track of included subcircuits
     internal_subckt_count++;
-    // but reject the rule and go to the next matching pattern
-    // (i.e. save the line to the string)
-    REJECT;
+    // and save the text to the string, as the rule below does (B-191, instead of rejecting the rule)
+    *yylval_param->s_ptr += yytext;
 }
 
-<SUBCKT_DEFINITION>^\.ENDS {
+<SUBCKT_DEFINITION,SUBCKT_DEFINITION_L>^\.ENDS {
     if (internal_subckt_count)
     {
         // found .ends of included subcircuit
         // decrease internal count
         --internal_subckt_count;
-        // but reject the rule and go to the next matching pattern
-        // (i.e. save the line to the string)
-        REJECT;
+        // and save the text to the string, as the rule below does (B-191, instead of rejecting the rule)
+        *yylval_param->s_ptr += yytext;
     }
     else
     {
@@ -365,17 +388,17 @@ string convert_special_char(char c)
     }
 }
 
-<SUBCKT_DEFINITION>. {
+<SUBCKT_DEFINITION,SUBCKT_DEFINITION_L>. {
     /* save characters to buffer as-is */
     *yylval_param->s_ptr += yytext;
 }
 
-<SUBCKT_DEFINITION>{EOL} {
+<SUBCKT_DEFINITION,SUBCKT_DEFINITION_L>{EOL} {
     /* save characters to buffer */
     *yylval_param->s_ptr += yytext;
 }
 
-<SUBCKT_DEFINITION><<EOF>> {
+<SUBCKT_DEFINITION,SUBCKT_DEFINITION_L><<EOF>> {
     cerr << "Reached end of file before end of subcircuit definition" << endl;
     exit(1);
 }
@@ -448,6 +471,12 @@ string convert_special_char(char c)
     /* merger instance name */
     yylval_param->s_ptr = new string(yytext);
     return T_ELEM_SPLITTER;
+}
+
+^SPAR({ALPHA_PLUS_NUM})+ {
+    /* S-parameter device instance name (F-03) */
+    yylval_param->s_ptr = new string(yytext);
+    return T_ELEM_SPAR;
 }
 
 ^COUPLER({ALPHA_PLUS_NUM})+ {
@@ -531,6 +560,8 @@ string convert_special_char(char c)
 ^\.TRAN { return T_ANALYSIS_TRAN; }
 
 ^\.OPTIONS { return T_DIRECTIVE_OPTIONS; }
+^\.STEP { return T_DIRECTIVE_STEP; }
+^\.MC { return T_DIRECTIVE_MC; }
 ^\.NODESET { return T_DIRECTIVE_NODESET; }
 ^\.IC { yylerror(yyscanner, "the .ic directive is not supported"); exit(1); }
 ^\.SUBCKT {
@@ -541,12 +572,16 @@ string convert_special_char(char c)
     return T_DIRECTIVE_SUBCKT;
 }
 
-<INITIAL>^\.ENDS {
+<INITIAL,INITIAL_L>^\.ENDS {
     cerr << "unexpected '.ENDS' directive" << endl;
     exit(1);
 }
 
-{ALPHA_PLUS}{ALPHA_PLUS_NUM}*/{WS}*= {
+{ALPHA_PLUS}{ALPHA_PLUS_NUM}*{WS}*= {
+    // the name, followed by "=": {WS}*= goes back to the input (as with the trailing context /{WS}*=,
+    // which flex scans with its reject machinery, B-191). The bytes of {WS}: space, tab and those of
+    // U+00A0 in UTF-8; none can be in the name
+    yyless(strcspn(yytext, " \t=\xC2\xA0"));
     yylval_param->s_ptr = new string(yytext);
 
     return T_ASSIGN_ID;
@@ -565,16 +600,30 @@ string convert_special_char(char c)
 
 {WS} ;
 
-<*>^.*/{EOL} {
+<INITIAL,INCLUDE,SUBCKT_DECLARATION,SUBCKT_DEFINITION,IN_DQUOTES>^.*/\n {
+    // line rule: the line (without its \n; a \r before it is kept) for the error messages; then the line
+    // goes back to the input and is scanned in the line state (above), where this rule is not (B-191)
     yyset_current_line(yytext, yyscanner);
-    REJECT;
+    yyless(0);
+    yy_set_bol(1);
+    switch (YY_START)
+    {
+        case INITIAL: BEGIN(INITIAL_L); break;
+        case INCLUDE: BEGIN(INCLUDE_L); break;
+        case SUBCKT_DECLARATION: BEGIN(SUBCKT_DECLARATION_L); break;
+        case SUBCKT_DEFINITION: BEGIN(SUBCKT_DEFINITION_L); break;
+        case IN_DQUOTES: BEGIN(IN_DQUOTES_L); break;
+    }
 }
 
 (?# the following lines are for compatibility with KiCad generated netlists)
 (?# they were added fast with relatively no checking for potential problems if)
 (?# the keywords are found in subcircuit files or included files)
-^\.TITLE({WS}.*)?/{EOL} {
+(?# B-191: two rules with a fixed trailing context instead of /{EOL}, variable, which flex scans with its reject machinery)
+^\.TITLE({WS}.*)?/\n {
     // cout << "Found '.title' directive, ignoring." << endl;
+}
+^\.TITLE/\r\n {
 }
 ^\.END {
     // cout << "Found '.end' directive, ignoring." << endl;
@@ -586,7 +635,7 @@ string convert_special_char(char c)
 {EOL} { return '\n'; }
 
 
-<INITIAL><<EOF>> {
+<INITIAL,INITIAL_L><<EOF>> {
     FILE *popped_file = YY_CURRENT_BUFFER ? YY_CURRENT_BUFFER->yy_input_file : nullptr;
     yypop_buffer_state(yyscanner);
     // a buffer below the popped one means it was pushed by .include: close its file
@@ -607,7 +656,7 @@ string convert_special_char(char c)
     return '\n';
 }
 
-<SUBCKT_DECLARATION,IN_DQUOTES,INCLUDE><<EOF>> {
+<SUBCKT_DECLARATION,IN_DQUOTES,INCLUDE,SUBCKT_DECLARATION_L,IN_DQUOTES_L,INCLUDE_L><<EOF>> {
     exit(yylerror(yyscanner, "unexpected end of file."));
 }
 

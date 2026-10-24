@@ -2,6 +2,14 @@
 
 value 5 | effort M | risk low-med | prerequisites: F-01 (seeds), F-05 (table outputs) | horizon 2
 
+> **Status 2026-10-23: implemented (sprint 2026-10c, phase PF02, branch `ws/sweeps`, report
+> `backlog/sprint-2026-10c/PF02-REPORT.md`).** Functions in expressions (math, `gauss`/`uniform`/`lognormal`/
+> `choice`, per-instance draws, `shared=`), `.step param` (linear with the stop included, `list`, nested),
+> `.mc N [seed=]`, one process per run (`-j N`), one run table `<output>.runs/` (appendable `.npy` columns +
+> `runs.csv`, failures recorded, resume), `--run K`, `pyspecs/runtable.py`. Decisions 2026-10-23 (third round)
+> answered the open questions: SPICE syntax with `param`, stop included, independent draws per instance with
+> `shared=`, one table. Not done: `pyspecs.sweep()`/`mc()` runners (F-07), in-process `reconfigure()`.
+
 ## Problem / user story
 *As a PUF researcher I simulate 20 device instances x 200 challenges; as an OCTANE researcher I run 1e5 random
 matrix multiplications per tile size; as a filter designer I sweep a coupling ratio.* Today:

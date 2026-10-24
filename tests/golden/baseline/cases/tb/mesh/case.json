@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/mesh_tb.manifest.json": {
-   "bytes": 249,
+   "bytes": 269,
    "kind": "json",
-   "sha256": "2dc19e261a6f23d0db45d4e576ff92f034ab0d66607d365bacdc9b08b4f8d6df",
+   "sha256": "ab5c6d8ebdf6f46336898b811ad722ef10a9f1d87949e11d4ed05aef5923305f",
    "stored": "files/traces/mesh_tb.manifest.json"
   },
   "traces/mesh_tb.vcd": {

@@ -4,7 +4,6 @@ tb_sources = files('alltestbenches.cpp')
 tb_args = []
 if get_option('old_tb')
   tb_sources += files(
-    'crow_tb.cpp',
     'detector_tb.cpp',
     'directional_coupler_tb.cpp',
     'freqsweep_tb.cpp',

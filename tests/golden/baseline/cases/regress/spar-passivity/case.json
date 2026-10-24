@@ -1,0 +1,24 @@
+{
+ "args": [
+  "--format",
+  "csv",
+  "-f",
+  "tests/golden/netlists/spar-passivity.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.csv": {
+   "bytes": 405,
+   "kind": "text",
+   "sha256": "e0c87755c2b63be4089a89ef7a0da8bb86fd8128121db8b511fd1f2c3912bf1e",
+   "stored": "files/traces/delete_me.csv"
+  },
+  "traces/delete_me.manifest.json": {
+   "bytes": 614,
+   "kind": "json",
+   "sha256": "89eb0689e6ed797d29ba89169e8af8503f0fdbde9988f6d2cd5a73198985a132",
+   "stored": "files/traces/delete_me.manifest.json"
+  }
+ },
+ "id": "regress/spar-passivity"
+}

@@ -57,6 +57,10 @@ inline void toupper(std::string &s)
 {
     std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 }
+inline void lowercase(std::string &s)
+{
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+}
 
 inline bool strcontains(const std::string &s, const std::string &sub)
 {

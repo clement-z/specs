@@ -1,0 +1,8 @@
+* B-010: wavelengths equal within a relative 1e-12 are one wavelength. Two in-phase 1 W sources at "the same"
+* wavelength written two ways (1550*1e-9 is not the double 1.55e-6) into a MERGER now add coherently.
+* Expected: ROOT/m = @ 1550 nm (1.414214, 2.000000 W). Before: two wavelength ids, both printed "@ 1550 nm",
+* added as separate wavelengths (0.5 W shown). From backlog/repro/a1-near-duplicate-lambda.cir.
+cwsrc1 a wl=1.55e-6 power=1
+cwsrc2 b wl=1550*1e-9 power=1
+merger1 a b m
+.op

@@ -103,8 +103,6 @@ OpticalOutputPort::OpticalOutputPort(sc_module_name name, port_type &p)
     , m_port(p)
     , m_config(nullptr)
 {
-    SC_HAS_PROCESS(OpticalOutputPort);
-
     // F-15: a method, not a thread (no context switch per entry). It runs only when an entry
     // is due (the thread it replaces ran at initialization only to wait). It also does the work
     // of the method of the former sc_event_queue member (fire_pending())
@@ -140,6 +138,7 @@ void OpticalOutputPort::applyConfig() {
 
 void OpticalOutputPort::start_of_simulation() {
     applyConfig();
+    m_net = dynamic_cast<OpticalNet *>(m_port.get_interface());
 }
 
 // F-15: m_pending_event fired: emit the entry that is due, then notify the next one. The kernel
@@ -190,7 +189,12 @@ void OpticalOutputPort::emit_due_entry()
 
     uint32_t wlid = s.m_wavelength_id;
 
-    auto &emitted = m_emitted_fields[wlid];
+    // (a new wavelength starts at 0)
+    const auto emitted_it = m_emitted_fields.try_emplace(wlid);
+    auto &emitted = emitted_it.first->second;
+
+    // .dc: the first entry of each wavelength after a reset() is written (m_emit_each_wavelength)
+    const bool force = m_skip_next_convergence_check || (m_emit_each_wavelength && emitted_it.second);
 
     // Store the desired output value which we know is valid
     desired = s.m_field;
@@ -203,9 +207,10 @@ void OpticalOutputPort::emit_due_entry()
     emit_signal = pass_abstol && pass_reltol;
 
     // Emit zeros instead of values smaller than snap_factor * abstol (default 10, as in
-    // the paper benchmarks; .options snapfactor, 0 disables it, B-021)
+    // the paper benchmarks; .options snapfactor, 0 disables it, B-021). Also for a forced
+    // emission (the null of a .dc point is written as 0)
     bool snapped = false;
-    if (emit_signal && check_snap_to_zero(desired))
+    if ((emit_signal || force) && check_snap_to_zero(desired))
     {
         desired = complex<double>(0,0);
         snapped = true;
@@ -216,14 +221,14 @@ void OpticalOutputPort::emit_due_entry()
     {
         ++m_stats.processed;
         m_stats.wavelength_ids.insert(wlid);
-        if (!emit_signal && !m_skip_next_convergence_check)
+        if (!emit_signal && !force)
         {
             if (!pass_abstol)
                 ++m_stats.suppressed_abstol;
             else
                 ++m_stats.suppressed_reltol;
         }
-        else if (snapped && desired == emitted)
+        else if (snapped && !force && desired == emitted)
             ++m_stats.suppressed_snap;
         else
         {
@@ -244,7 +249,7 @@ void OpticalOutputPort::emit_due_entry()
 
     // cout << "emit: " << emit_signal << endl;
     // Emit the desired output value if its stars are aligned
-    if (emit_signal || m_skip_next_convergence_check)
+    if (emit_signal || force)
     {
         // cout << dynamic_cast<spx::oa_signal_type *>(m_port.get_interface())->name();
         // cout << " emitting " << desired << endl;
@@ -261,31 +266,30 @@ void OpticalOutputPort::emit_due_entry()
         // Replace the stored emitted output value at that wavelength
         emitted = desired;
 
-        // Write the value to the port
-        m_port->write(spx::oa_value_type(desired, wlid));
+        // Write the value to the port (forced: with an event, also if the net holds that value)
+        if (force && m_net)
+            m_net->writeWithEvent(spx::oa_value_type(desired, wlid));
+        else
+            m_port->write(spx::oa_value_type(desired, wlid));
     }
 }
 
 // F-15: an entry pending in delay (sc_event_queue::notify(): the event is notified only when
-// the entry is earlier than all the pending ones)
+// the entry is earlier than all the pending ones). Called before the entry is pushed (B-188)
 void OpticalOutputPort::notify_pending(const sc_time &delay)
 {
-    const sc_time t = sc_time_stamp() + delay;
-    if (m_pending_times.empty() || t < m_pending_times.top())
+    if (m_queue.empty() || sc_time_stamp() + delay < m_queue.top().first)
         m_pending_event.notify(delay);
-    m_pending_times.push(t);
 }
 
-// F-15: m_pending_event fired (sc_event_queue::fire_event()): one entry is due now, notify the
-// next one
+// F-15: m_pending_event fired (sc_event_queue::fire_event()): one entry was due now (taken by
+// emit_due_entry()), notify the next one
 void OpticalOutputPort::fire_pending()
 {
-    // cancelled (drop_queue())
-    if (m_pending_times.empty())
+    // none left, or cancelled (drop_queue())
+    if (m_queue.empty())
         return;
-    m_pending_times.pop();
-    if (!m_pending_times.empty())
-        m_pending_event.notify(m_pending_times.top() - sc_time_stamp());
+    m_pending_event.notify(m_queue.top().first - sc_time_stamp());
 }
 
 sc_time OpticalOutputPort::snap_to_next_valid_time(const sc_time &t, const unsigned int resolution_multiplier)
@@ -326,17 +330,15 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         t = snap_to_next_valid_time(t, resolution_multiplier);
     }
 
-    // find first scheduled signal with this timestamp and this lambda
-    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&t](const auto &x) {
-            return t == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
-            });
-    const bool coalesced = it != m_queue.cend();
+    // find the scheduled signal with this timestamp and this lambda (B-015: no scan for most writes)
+    auto *it = m_queue.find(t, value.m_wavelength_id);
+    const bool coalesced = it != nullptr;
 
     // check if an event was already scheduled for the same timestamp
-    if (it == m_queue.cend()) {
+    if (!it) {
         // if not, just schedule the new event
-        m_queue.push(std::make_pair(t, value));
         notify_pending(t - sc_time_stamp());
+        m_queue.push(std::make_pair(t, value));
     }
     else {
         // if yes, just replace the old one
@@ -377,15 +379,13 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
 
     // find a scheduled signal with this timestamp and this lambda anywhere in
     // the queue, not only at its top: another wavelength can be on top (B-001)
-    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&now](const auto &x) {
-            return now == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
-            });
-    const bool coalesced = it != m_queue.end();
+    auto *it = m_queue.find(now, value.m_wavelength_id);
+    const bool coalesced = it != nullptr;
 
-    if (it == m_queue.end()) {
+    if (!it) {
         // if not, schedule the signal for the current time
-        m_queue.push(make_pair(now, value));
         notify_pending(SC_ZERO_TIME);
+        m_queue.push(make_pair(now, value));
     }
     else {
         // if yes, just replace the old one

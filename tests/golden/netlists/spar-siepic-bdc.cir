@@ -1,0 +1,7 @@
+* PF03b (F-03 brief): the SiEPIC EBeam PDK 50/50 broadband directional coupler (third-party Lumerical .sparam,
+* tests/sparam/data/siepic, MIT, see its NOTICE) as a 4-port SPAR: ports 1, 2 inputs, 3, 4 outputs. .dc sweep of
+* the split ratio over the file's range (1.5 to 1.6 um): about 0.5 on each output near 1.55 um (0.502 and 0.490 at 1.55 um)
+cwsrc1 in wl=1.55e-6 power=1
+spar1 in in2 out1 out2 file="../../sparam/data/siepic/EBeam_1550_TE_BDC.sparam"
+.save out1 out2
+.dc /cwsrc1/WL 1.5e-6 1.6e-6 2e-9

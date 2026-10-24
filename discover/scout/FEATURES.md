@@ -79,6 +79,8 @@ sign-off (`needs-human` per CLAUDE.md), golden-output churn and architectural un
 | F-28 | **Frequency-domain convergence diagnostics**: iteration cap, residual report, non-convergence error (issue #12) | 3 | S | med (numerics) | none | Lossless loops hang the `.op` fixed point today with no message. |
 | F-29 | **Multi-threaded SystemC kernel** | 2 | XL | very high | — | Not recommended: research kernels gain on loosely-timed TLM, not on fine-grained delta networks; process-level parallelism (F-02) gives N x on N cores for free. |
 | F-30 | **Lasers and amplifiers**: rate-equation DML, SOA (Agrawal-Olsson), EDFA | 2 | L | high | F-08 | Sampled-island physics; valuable for the spiking-laser roadmap but after the enablers. |
+| F-31 | **Activity map**: event activity from `--stats` drawn on the circuit graph (devices coloured by processed events, nets labelled with emitted/suppressed counts), time-resolved later, KiCad back-annotation after F-13 ([brief](F-31-activity-map.md)) | 3-4 | S / M / L | low | F-15 (done), `--json` | Explains a run's cost at a glance; a figure for the paper's activity discussion. Added 2026-10-23 at the maintainer's request. |
+| F-32 | **Schematic from a netlist**: KiCad schematic inferred from the netlist with placement rules and an LLM in the loop (about 27B class, through an API key, model-family agnostic); gives F-31 a real schematic to colour ([brief](F-32-schematic-from-netlist.md)) | 4 | L | med | F-13, F-31 | Maintainer idea (2026-10-23), not scoped yet. |
 
 ## 2. Recommended roadmap
 

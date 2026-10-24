@@ -1,0 +1,2 @@
+Error (ROOT/SPAR1): wavelength 1.6049999999999999e-06 m is outside the range [1.5e-06, 1.5999999999999999e-06] m of the S-parameters of tests/golden/netlists/../../sparam/fixtures/wg.sparam
+

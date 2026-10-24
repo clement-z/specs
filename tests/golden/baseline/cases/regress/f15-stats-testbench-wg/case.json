@@ -1,0 +1,23 @@
+{
+ "args": [
+  "-t",
+  "wg",
+  "--stats=ports"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/waveguide_tb.manifest.json": {
+   "bytes": 289,
+   "kind": "json",
+   "sha256": "f69e240f7fed55c7774c121c36eba5c416247f8e2fcaf331e453e3cf41a93611",
+   "stored": "files/traces/waveguide_tb.manifest.json"
+  },
+  "traces/waveguide_tb.stats.json": {
+   "bytes": 534,
+   "kind": "json",
+   "sha256": "61c5d31699e2ef43bf139d9627f2fc0f3122a6b2f78790999d93c72231f62282",
+   "stored": "files/traces/waveguide_tb.stats.json"
+  }
+ },
+ "id": "regress/f15-stats-testbench-wg"
+}

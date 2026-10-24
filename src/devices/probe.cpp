@@ -1,5 +1,8 @@
+#include <cstdlib>
+#include <iomanip>
 #include <ios>
 #include <iterator>
+#include <sstream>
 #include "devices/probe.h"
 #include "trace_table.h"
 
@@ -11,6 +14,21 @@ namespace {
 inline bool isDefaultSignal(const OpticalSignal &s)
 {
     return s.m_field == OpticalSignal::field_type(0.0) && s.m_wavelength_id == 0;
+}
+
+// Shortest decimal form that reads back as the same double: a wavelength that misses a listed one by
+// its last bits does not print like it (B-062)
+std::string exactString(double x)
+{
+    std::ostringstream ss;
+    for (int precision = 6; precision <= 17; ++precision)
+    {
+        ss.str("");
+        ss << std::setprecision(precision) << x;
+        if (std::strtod(ss.str().c_str(), nullptr) == x)
+            break;
+    }
+    return ss.str();
 }
 
 }
@@ -233,8 +251,23 @@ void MLambdaProbe::on_port_in_changed()
         // wavelength without tracing it (B-184). Unlisted wavelengths are ignored silently
         if (!enable.read().to_bool())
         {
-            if (p_in->event() && !isDefaultSignal(s) && m_lambdas.count(s.getWavelength()))
-                m_disabled_samples[s.getWavelength()] = s;
+            if (p_in->event() && !isDefaultSignal(s) && !isnan(listedWavelength(s)))
+                m_disabled_samples[listedWavelength(s)] = s;
+            continue;
+        }
+
+        // .dc point (B-186): keep the last value of each listed wavelength, traced by tracePoint().
+        // Only the events of this point: every wavelength of the net is written again at each point (B-185)
+        if (m_per_point)
+        {
+            if (p_in->event() && !isDefaultSignal(s))
+            {
+                const double listed_m = listedWavelength(s);
+                if (!isnan(listed_m))
+                    m_point_samples[listed_m] = s;
+                else
+                    m_ignored_wavelengths_m.insert(s.getWavelength());
+            }
             continue;
         }
 
@@ -247,13 +280,13 @@ void MLambdaProbe::on_port_in_changed()
         // last one of its wavelength
         if (enable.posedge())
         {
-            if (sampled && m_lambdas.count(s.getWavelength()))
-                m_disabled_samples[s.getWavelength()] = s;
+            if (sampled && !isnan(listedWavelength(s)))
+                m_disabled_samples[listedWavelength(s)] = s;
             for (const auto &p : m_disabled_samples)
-                traceSample(p.second);
+                traceSample(p.second, p.first);
             m_disabled_samples.clear();
-            if (sampled && !m_lambdas.count(s.getWavelength()))
-                cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;
+            if (sampled && isnan(listedWavelength(s)))
+                m_ignored_wavelengths_m.insert(s.getWavelength());
             continue;
         }
 
@@ -262,20 +295,41 @@ void MLambdaProbe::on_port_in_changed()
 
         // A listed wavelength (the VCD signals only exist with a trace file: without one, e.g. with
         // --no-trace or --format csv, a listed wavelength is not "unsupported", F-05)
-        if (m_lambdas.count(s.getWavelength()))
+        const double listed_m = listedWavelength(s);
+        if (!isnan(listed_m))
         {
             //cout << name() << " received supported signal (lambda = " << s.getWavelength() << "m)" << endl;
-            traceSample(s);
+            traceSample(s, listed_m);
         }
-        else {
-            cout << name() << " received unsupported signal (lambda = " << s.getWavelength() << "m)" << endl;
-        }
+        else
+            m_ignored_wavelengths_m.insert(s.getWavelength());
     }
 }
 
-void MLambdaProbe::traceSample(const OpticalSignal &s)
+// The listed wavelength that the wavelength of s matches (OpticalSignal::sameWavelength(), B-062), NaN
+// if none; the smallest one if several do. Computed once per wavelength id
+double MLambdaProbe::listedWavelength(const OpticalSignal &s)
 {
-    auto search = m_lambda_signals.find(s.getWavelength());
+    const auto cached = m_listed_by_id.find(s.m_wavelength_id);
+    if (cached != m_listed_by_id.end())
+        return cached->second;
+    const double wl = s.getWavelength();
+    double listed_m = std::numeric_limits<double>::quiet_NaN();
+    for (const double l : m_lambdas)
+    {
+        if (OpticalSignal::sameWavelength(l, wl))
+        {
+            listed_m = l;
+            break;
+        }
+    }
+    m_listed_by_id.emplace(s.m_wavelength_id, listed_m);
+    return listed_m;
+}
+
+void MLambdaProbe::traceSample(const OpticalSignal &s, double listed_m)
+{
+    auto search = m_lambda_signals.find(listed_m);
     if (search != m_lambda_signals.end())
     {
         search->second[0]->write(s.power());
@@ -284,4 +338,42 @@ void MLambdaProbe::traceSample(const OpticalSignal &s)
     }
     if (m_table)
         m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
+}
+
+void MLambdaProbe::tracePoint()
+{
+    for (const double listed_m : m_lambdas)
+    {
+        const auto sample = m_point_samples.find(listed_m);
+        if (sample != m_point_samples.end())
+        {
+            traceSample(sample->second, listed_m);
+            continue;
+        }
+        // Not carried at this point: 0, at the listed wavelength (which need not be registered)
+        auto search = m_lambda_signals.find(listed_m);
+        if (search != m_lambda_signals.end())
+        {
+            for (auto &signal : search->second)
+                signal->write(0.0);
+        }
+        if (m_table)
+            m_table->appendZero(sc_time_stamp().to_seconds(), m_table_signal, listed_m);
+    }
+    m_point_samples.clear();
+}
+
+void MLambdaProbe::reportIgnoredWavelengths()
+{
+    if (m_ignored_wavelengths_m.empty())
+        return;
+    cerr << "Warning: " << name() << " ignored the wavelengths of its net " << port_channel_name(p_in)
+         << " that it does not list (";
+    for (auto it = m_ignored_wavelengths_m.begin(); it != m_ignored_wavelengths_m.end(); ++it)
+        cerr << (it == m_ignored_wavelengths_m.begin() ? "" : ", ") << exactString(*it) << " m";
+    cerr << "; listed: ";
+    for (auto it = m_lambdas.begin(); it != m_lambdas.end(); ++it)
+        cerr << (it == m_lambdas.begin() ? "" : ", ") << exactString(*it) << " m";
+    cerr << ")" << endl;
+    m_ignored_wavelengths_m.clear();
 }

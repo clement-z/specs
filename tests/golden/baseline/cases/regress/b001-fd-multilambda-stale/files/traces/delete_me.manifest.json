@@ -1,6 +1,6 @@
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -8,5 +8,6 @@
   "netlist_files": [
     {"path": "tests/golden/netlists/b001-fd-multilambda-stale.cir", "sha256": "eeb344271e12ca8229198edb2b4d02e69a1f7a69a8152290d1b08e42cc45a4b5"}
   ],
+  "data_files": [],
   "trace_file": "traces/delete_me.vcd"
 }

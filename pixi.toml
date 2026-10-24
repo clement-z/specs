@@ -30,6 +30,9 @@ flex = "*"
 bison = ">=3"
 python = "3.12.*"
 ccache = "*"
+# For meson test: tests/tools/test_run_table.py (pyspecs/runtable.py) needs them; skipped without (B-193)
+numpy = "*"
+pandas = "*"
 
 [target.linux.dependencies]
 gcc = "15.*"
@@ -103,6 +106,7 @@ numpy = "*"
 pandas = "*"
 matplotlib-base = "*"     # matplotlib without the Qt backend (Tk and Jupyter backends work)
 jupyterlab = "*"
+graphviz = "*"           # dot, for utils/activity_map.py (layout of the circuit graph)
 
 [feature.py.pypi-dependencies]
 pyDigitalWaveTools = ">=1.2"

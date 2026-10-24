@@ -1,0 +1,10 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Run plan: 3 runs, .step param M (3 values), seed 0
+Run table: traces/delete_me.runs (3 runs, 0 already done, 3 to run, 1 at a time)
+run 0: ok
+run 1: failed (exit 1): Error: .op: the operating point did not converge within 100 iterations (delta cycles, .options maxiter)
+run 2: ok
+Runs: 3, 2 ok (0 from before), 1 failed
+

@@ -1,0 +1,2 @@
+Error: .step param seed (tests/golden/netlists/f02-step-reserved-name.cir:3): seed is a column of the run table, rename the parameter
+

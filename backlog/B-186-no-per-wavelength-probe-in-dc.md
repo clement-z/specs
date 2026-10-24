@@ -1,5 +1,5 @@
 # B-186: No per-wavelength probe in a `.dc` sweep (MLPROBE traces nothing there)
-severity: med | category: feature | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: open (look at later, maintainer 2026-10-23)
+severity: med | category: feature | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 314727a (sprint 2026-10c PL)
 location: src/devices/probe.cpp (`MLambdaProbe`), the `.dc` runner in src/specs.cpp
 
 ## Problem
@@ -30,3 +30,22 @@ in a wavelength sweep) and MLPROBE in `.dc` and frequency/transmission sweeps.
 
 ## Related
 B-184 (MLPROBE at `.tran` start), B-185 (`.dc` and unchanged nets), PD5 report (PROBE latch).
+
+## Update (sprint 2026-10c PH)
+B-185 is fixed (b6488a3): every wavelength of a net is written again at every `.dc` point, so the interaction
+mentioned above is gone; an MLPROBE enabled in `.dc` would see each of its wavelengths at every point. MLPROBE
+stays disabled in `.dc` (separate decision); the repro's evidence is unchanged.
+
+## Fix (sprint 2026-10c PL, maintainer's decision 2026-10-24)
+`runDCAnalysis()` enables the MLPROBEs (`m_per_point`). During a point, an MLPROBE keeps the last value of each
+listed wavelength received at that point (events only: every wavelength of a net is written again at each
+point, B-185); once the point converged, `runDCAnalysis()` calls `MLambdaProbe::tracePoint()`, which traces
+every listed wavelength in wavelength order, the received value or 0 for a wavelength the net did not carry at
+that point (fresh steady state), in the VCD signals and in the table (`TraceTable::appendZero()`: a zero row
+at the listed wavelength, which need not be registered). The trace signals are written before the
+`sc_start()` that ends the point, so the VCD records them at the point's time step. PROBE is unchanged
+(it follows the swept wavelength, PD5). `.op` is not changed: there, PROBEs and MLPROBEs are both disabled by
+`runOPAnalysis()` (the operating point of a `.tran` too), a separate question (PL report).
+Tests: gtest `MLambdaProbe.DcPointTracesEveryListedWavelengthOrZero`; golden cases
+`regress/b186-mlprobe-dc-wavelength-sweep` (this repro) and `regress/b186-mlprobe-dc-power-sweep-wdm`
+(a power sweep of a two-channel add-drop ring). No existing golden case changed (none has an MLPROBE in a `.dc`).

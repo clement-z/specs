@@ -1,0 +1,19 @@
+* Replaces the legacy testbench `specs -t ac_crow` (src/tb/crow_tb.cpp, removed in v0.4.0): its circuit with 3
+* rings, written by `python3 -I tests/bench/crow_gen.py 3 --preset crow_tb`. The preset gave the testbench's
+* event times and powers within 7e-13 W for 3 and 2 rings (PF06). Do not edit by hand: regenerate.
+* CROW with 3 rings, preset crow_tb; seed=1 nwl=1 source=pulses analysis=tran
+VLSRC1 in values=[[0,1,1.553e-06],[1e-09,0,1.553e-06],[2e-09,1,1.553e-06],[3e-09,0,1.553e-06],[4e-09,1,1.553e-06],[5e-09,0,1.553e-06],[6e-09,1,1.553e-06],[7e-09,0,1.553e-06]]
+COUPLER0 in r1b_out through r1a_in kp=0.2
+COUPLER1 r1a_out r2b_out r1b_in r2a_in kp=0.2
+COUPLER2 r2a_out r3b_out r2b_in r3a_in kp=0.2
+COUPLER3 r3a_out add r3b_in drop kp=0.2
+WG1a r1a_in r1a_out L=0.0003878875 att=2 neff=1 ng=2
+WG1b r1b_in r1b_out L=0.0003878875 att=2 neff=1 ng=2
+WG2a r2a_in r2a_out L=0.0003878875 att=2 neff=1 ng=2
+WG2b r2b_in r2b_out L=0.0003878875 att=2 neff=1 ng=2
+WG3a r3a_in r3a_out L=0.0003878875 att=2 neff=1 ng=2
+WG3b r3b_in r3b_out L=0.0003878875 att=2 neff=1 ng=2
+PROBE1 through
+PROBE2 drop
+.options abstol=1e-08 reltol=0.0001 timescale=-13 traceall=0
+.tran 5e-08

@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b062-mlprobe-unlisted-wavelength.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 481,
+   "kind": "json",
+   "sha256": "9a3efc1cbc1c0c5a1ba94da6a9f10f42d685aaed85a6102faf40d3aa6e209ccb",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1775,
+   "kind": "vcd",
+   "sha256": "b9586ecda4cbd78cea1c6768fd5f800850cb09714611b575aa926cd54c1f9419",
+   "stored": "files/traces/delete_me.vcd"
+  }
+ },
+ "id": "regress/b062-mlprobe-unlisted-wavelength"
+}

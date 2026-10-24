@@ -4,6 +4,7 @@
 
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 #include "specs.h"
 #include "devices/spx_module.h"
 
@@ -15,7 +16,7 @@ public:
     double m_cur_power = 0;
 
     // Input memory for multi-wavelength purposes
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in;
 
     // Processes
     void on_port_in_changed();
@@ -26,8 +27,6 @@ public:
     PowerMeter(sc_module_name name)
         : spx_module(name)
     {
-        SC_HAS_PROCESS(PowerMeter);
-
         SC_THREAD(on_port_in_changed);
         sensitive << p_in;
     }

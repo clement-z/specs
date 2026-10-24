@@ -1,0 +1,126 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/f02-step-failures.cir"
+ ],
+ "exit": 1,
+ "files": {
+  "traces/delete_me.runs/.lock": {
+   "bytes": 0,
+   "kind": "text",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stored": "files/traces/delete_me.runs/.lock"
+  },
+  "traces/delete_me.runs/draw_name.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "040ce28f7590a34af85fbdb8115c90c9a0529a73b047533889c859c2f2c6e627",
+   "sha256": "3256b779cb2a36317fb96a766fbc46b98c3b3dc301c4737cfe2e76bfdc54a519",
+   "stored": "files/traces/delete_me.runs/draw_name.npy.txt"
+  },
+  "traces/delete_me.runs/draw_names.txt": {
+   "bytes": 0,
+   "kind": "text",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "stored": "files/traces/delete_me.runs/draw_names.txt"
+  },
+  "traces/delete_me.runs/draw_run.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "040ce28f7590a34af85fbdb8115c90c9a0529a73b047533889c859c2f2c6e627",
+   "sha256": "3256b779cb2a36317fb96a766fbc46b98c3b3dc301c4737cfe2e76bfdc54a519",
+   "stored": "files/traces/delete_me.runs/draw_run.npy.txt"
+  },
+  "traces/delete_me.runs/draw_value.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/delete_me.runs/draw_value.npy.txt"
+  },
+  "traces/delete_me.runs/field_im.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/delete_me.runs/field_im.npy.txt"
+  },
+  "traces/delete_me.runs/field_re.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/delete_me.runs/field_re.npy.txt"
+  },
+  "traces/delete_me.runs/logs/run1.log": {
+   "bytes": 756,
+   "kind": "text",
+   "sha256": "e079d0085f4d91fb1164e32d5995f08d6a529652092cf00203d210df44251141",
+   "stored": "files/traces/delete_me.runs/logs/run1.log"
+  },
+  "traces/delete_me.runs/power_W.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/delete_me.runs/power_W.npy.txt"
+  },
+  "traces/delete_me.runs/run.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "040ce28f7590a34af85fbdb8115c90c9a0529a73b047533889c859c2f2c6e627",
+   "sha256": "3256b779cb2a36317fb96a766fbc46b98c3b3dc301c4737cfe2e76bfdc54a519",
+   "stored": "files/traces/delete_me.runs/run.npy.txt"
+  },
+  "traces/delete_me.runs/runs.csv": {
+   "bytes": 265,
+   "kind": "text",
+   "sha256": "a28818703007862825a35c6efce17d8e52fb13e20c6e6ca02bf4e884c04f9c62",
+   "stored": "files/traces/delete_me.runs/runs.csv"
+  },
+  "traces/delete_me.runs/signal.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "040ce28f7590a34af85fbdb8115c90c9a0529a73b047533889c859c2f2c6e627",
+   "sha256": "3256b779cb2a36317fb96a766fbc46b98c3b3dc301c4737cfe2e76bfdc54a519",
+   "stored": "files/traces/delete_me.runs/signal.npy.txt"
+  },
+  "traces/delete_me.runs/signal_names.txt": {
+   "bytes": 12,
+   "kind": "text",
+   "sha256": "5b18e84cd6bf9a38758c020d11ffaf88d38329f1f27df23d1d41242ca870c6af",
+   "stored": "files/traces/delete_me.runs/signal_names.txt"
+  },
+  "traces/delete_me.runs/table.manifest.json": {
+   "bytes": 532,
+   "kind": "json",
+   "sha256": "f318b9a9cbfa2cf0e3aa7d449d35e0d72c355fdab1f84cbcfbaaef8cda3feb25",
+   "stored": "files/traces/delete_me.runs/table.manifest.json"
+  },
+  "traces/delete_me.runs/time_s.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/delete_me.runs/time_s.npy.txt"
+  },
+  "traces/delete_me.runs/wavelength_m.npy": {
+   "bytes": 26,
+   "kind": "npy",
+   "raw_bytes": 128,
+   "raw_sha256": "fdee2f2368bf2af9c942f32cce9d982e48dfc46889bf923e99bc9ac834a4ba46",
+   "sha256": "9ce4277ed90db2231eaf130d8cca5a15642477aa5f70e62f2587940d6a6ca096",
+   "stored": "files/traces/delete_me.runs/wavelength_m.npy.txt"
+  }
+ },
+ "id": "regress/f02-step-failures"
+}

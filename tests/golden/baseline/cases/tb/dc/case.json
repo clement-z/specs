@@ -6,9 +6,9 @@
  "exit": 0,
  "files": {
   "traces/directional_coupler_tb.manifest.json": {
-   "bytes": 262,
+   "bytes": 282,
    "kind": "json",
-   "sha256": "886c24e0a2f91bc63fe76c6e43e6cebcf8d78b7c0a310e4504b4ec21a7fc28e5",
+   "sha256": "5f51e6674792d719eed6bcba29178baad64ee7aec8a756e3c2f5f2dadafd8a24",
    "stored": "files/traces/directional_coupler_tb.manifest.json"
   },
   "traces/directional_coupler_tb.vcd": {

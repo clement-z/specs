@@ -6,6 +6,7 @@
 #include "devices/spx_module.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 
 #include "specs.h"
 
@@ -24,9 +25,8 @@ public:
     double m_attenuation_dB;
 
     // Memory for multi-wavelength purposes
-    // maybe with vector it has better performance
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in1;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in2;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in2;
 
     // F-15: field transmission, computed once before the simulation (the device threads
     // computed it when they started)
@@ -48,8 +48,6 @@ public:
         , m_out_writer("out_delayed_writer", p_out)
         , m_attenuation_dB(attenuation_dB)
     {
-        SC_HAS_PROCESS(Merger);
-
         SC_METHOD(on_port_in1_changed);
         sensitive << p_in1;
         dont_initialize();

@@ -174,9 +174,10 @@ Artifacts: `specs` 1.6 MB and `libspx.so` 0.9 MB (Release, no `-g`). The build-t
 * `alltestbenches.cpp` maps names to functions in `std::map tb_map` (guarded by `#if BUILD_TB == 1`).
 * `main.cpp do_test()` looks the name up in `tb_map` and runs it, then prints `Total runtime: X ms`.
 * It **always returns 0**: self-check failures (`Failure!`, `Success rate: n/m`) are only printed.
-* The 19 names (13 functions):
+* The 18 names (12 functions; `ac_crow` was removed in v0.4.0: `tests/bench/crow_gen.py --preset crow_tb`
+  writes its circuit as a netlist):
   * `wg`/`waveguide`, `merg`/`merger`, `dc`/`directional_coupler`, `spli`/`splitter`, `det`/`detector`
-  * `pcm`, `mzi`, `ring`, `ac_add_drop` (freqsweep), `ac_crow`, `lambda`, `phaseshifter`/`ps`, `mesh`
+  * `pcm`, `mzi`, `ring`, `ac_add_drop` (freqsweep), `lambda`, `phaseshifter`/`ps`, `mesh`
 * Results today:
   * 12 run fine (each in under 0.1 s), writing `traces/<name>.vcd`. `traces/` must exist in the cwd;
     otherwise SystemC raises `E701` and exits 1.

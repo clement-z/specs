@@ -31,6 +31,9 @@ public:
     // Processes
     void runner();
 
+    // A value whose time is before `now` is skipped (B-066: counted in one warning at enable)
+    static bool isPast(double t_s, const sc_time &now) { return t_s < now.to_seconds(); }
+
     EVLSource(sc_module_name name, const vector<time_value_pair_type> &values = {})
     : spx_module(name)
     , m_values_queue(values)
@@ -38,7 +41,6 @@ public:
         sortValues();
         enable = sc_logic(0);
 
-        SC_HAS_PROCESS(EVLSource);
         SC_THREAD(runner);
     }
 
@@ -56,6 +58,7 @@ public:
             cerr << "Error: Cannot open the file \"" << filename << "\"." << endl;
             exit(1);
         }
+        specsGlobalConfig.record_data_file(filename); // run manifest (F-01)
 
         string line;
 
@@ -72,13 +75,15 @@ public:
             // Skip if line is empty or starts with ;
             if (line.empty())
             {
-                cout << "Skipping empty line." << endl;
+                if (specsGlobalConfig.verbose_component_initialization)
+                    cout << "Skipping empty line." << endl;
                 continue;
             }
             // Skip if line starts with ;
             if (line[0] == ';')
             {
-                cout << "Skipping commented line: " << line << endl;
+                if (specsGlobalConfig.verbose_component_initialization)
+                    cout << "Skipping commented line: " << line << endl;
                 continue;
             }
 
@@ -89,7 +94,8 @@ public:
             // Skip header line if it exists
             if(lineNumber == 1 && field == "time")
             {
-                cout << "Skipping header line: " << line << endl;
+                if (specsGlobalConfig.verbose_component_initialization)
+                    cout << "Skipping header line: " << line << endl;
                 continue;
             }
 
@@ -109,7 +115,8 @@ public:
                 exit(1);
             }
 
-            cout << t << ": " << V << "V" << endl;
+            if (specsGlobalConfig.verbose_component_initialization)
+                cout << t << ": " << V << "V" << endl;
             m_values_queue.emplace_back(t, V);
         }
 

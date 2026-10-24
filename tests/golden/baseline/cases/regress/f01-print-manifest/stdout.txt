@@ -49,7 +49,7 @@ Done creating ROOT/PROBE1
 Done (elaborating network of ROOT/in)
 {
   "format": "specs-run-manifest",
-  "format_version": 1,
+  "format_version": 2,
   "specs_version": "<VERSION>",
   "systemc_version": "3.0.2-Accellera",
   "seed": 0,
@@ -59,6 +59,7 @@ Done (elaborating network of ROOT/in)
     {"path": "tests/golden/netlists/f01-manifest-sub.cir", "sha256": "4ff4ac4d7351edd5cb44e5b7ca78ba64f46dbde7128b80a19cf563bc92a861fc"},
     {"path": "tests/golden/netlists/f01-manifest-leaf.cir", "sha256": "230123448010cf7d663dac808d49c27a08ebc207c7dda6ffd8db3af87f52de26"}
   ],
+  "data_files": [],
   "trace_file": null
 }
 ╔══════════════════════╗

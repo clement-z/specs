@@ -2,6 +2,7 @@
 
 #include "utils/sysc_utils.h"
 #include "optical_signal.h"
+#include "optical_net.h"
 #include "optical_output_port.h"
 
 #include <systemc.h>
@@ -39,7 +40,7 @@ namespace spx {
     typedef sc_logic ed_value_type;
 
     // Signal types
-    typedef sc_signal<oa_value_type, SC_MANY_WRITERS> oa_signal_type;
+    typedef OpticalNet oa_signal_type; // sc_signal<oa_value_type, SC_MANY_WRITERS> (optical_net.h)
     typedef sc_signal<ea_value_type, SC_MANY_WRITERS> ea_signal_type;
     typedef sc_signal<ed_value_type, SC_MANY_WRITERS> ed_signal_type;
     typedef sc_signal<sc_lv_base, SC_MANY_WRITERS> ed_bus_type;
@@ -165,10 +166,16 @@ public:
     bool trace_csv = false;
     bool trace_npz = false;
     std::unique_ptr<TraceTable> default_trace_table;
+    // F-02: this process simulates one run of a .step/.mc plan for its run table (the parent warned
+    // once that the table holds no photodetector or power meter readout)
+    bool plan_run = false;
 
     // Run manifest (F-01, src/run_manifest.h), written next to the default trace file
     vector<string> command_line; // argv as received by sc_main
     vector<string> netlist_files; // files opened by the parser (-f, .include), in first-open order
+    // data files read by the devices (SPAR S-parameter files, VLSRC/EVLSRC value files), as the paths
+    // used to open them, in first-open order (record_data_file())
+    vector<string> data_files;
     bool print_run_manifest = false; // also print the run manifest to stdout, once (--print-manifest)
 
     // Run statistics (F-15, src/run_stats.h): RunStats::Section flags, 0: off (specs --stats).
@@ -190,6 +197,9 @@ public:
     SPECSConfig(sc_module_name name);
 
     ~SPECSConfig();
+
+    // Record a data file (run manifest, F-01): path as used to open it, unless already recorded
+    void record_data_file(const string &path);
 
     void runAnalysis();
     void runOPAnalysis();

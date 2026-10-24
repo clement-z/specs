@@ -87,8 +87,6 @@ public:
         , m_trace_phase(trace_phase)
         , m_trace_wavelength(trace_wavelength)
     {
-        SC_HAS_PROCESS(Probe);
-
         SC_THREAD(on_port_in_changed);
         // Also woken when the probe is enabled, to sample the current value of its net (B-048)
         sensitive << p_in << enable.posedge_event();
@@ -147,13 +145,35 @@ public:
     std::set<double> m_lambdas;
     std::map< double, std::vector< unique_ptr<sc_signal<double> > > > m_lambda_signals;
     // While disabled (the OP of a .tran), the last value of each listed wavelength, traced when the
-    // probe is enabled: the net only holds the last value written to it, of any wavelength (B-184)
+    // probe is enabled: the net only holds the last value written to it, of any wavelength (B-184).
+    // Keyed by the listed wavelength
     std::map<double, OpticalSignal> m_disabled_samples;
+    // The wavelengths of the events received while enabled that the probe does not list (B-062):
+    // reported once, at the end of the run, instead of a line per event
+    std::set<double> m_ignored_wavelengths_m;
+    // Wavelength id -> the listed wavelength it matches within OpticalSignal::WAVELENGTH_MATCH_RTOL (NaN:
+    // none), filled at the first event of each wavelength (listedWavelength(), B-062)
+    std::map<uint32_t, double> m_listed_by_id;
+    // .dc (B-186): the probe traces each sweep point as a whole, in tracePoint(), called by
+    // SPECSConfig::runDCAnalysis() once the point converged. Meanwhile, the last value of each listed
+    // wavelength received at this point. Keyed by the listed wavelength
+    bool m_per_point = false;
+    std::map<double, OpticalSignal> m_point_samples;
 
     void setTraceFile(sc_trace_file *Tf);
     void setTraceTable(TraceTable *table);
-    // Traces s, of a listed wavelength
-    void traceSample(const OpticalSignal &s);
+    // The listed wavelength that the wavelength of s matches, NaN if none
+    double listedWavelength(const OpticalSignal &s);
+    // Traces s, of the listed wavelength listed_m
+    void traceSample(const OpticalSignal &s, double listed_m);
+    // .dc point (m_per_point): traces every listed wavelength, in wavelength order, with the last value its
+    // net received at this point, or 0 if the net did not carry it at this point (each point is a fresh
+    // steady state, B-185, B-186)
+    void tracePoint();
+    // One warning on stderr if the probe ignored wavelengths, then forgets them. Called for every
+    // MLPROBE in name order at the end of a netlist run (SPECSConfig::runAnalysis()), and by the
+    // destructor for the probes of testbenches and C++ users
+    void reportIgnoredWavelengths();
 
     // Constructor
     MLambdaProbe(sc_module_name name, set<double> lambdas = {})
@@ -162,12 +182,12 @@ public:
         , m_Tf(nullptr)
         , m_lambdas(lambdas)
     {
-        SC_HAS_PROCESS(MLambdaProbe);
-
         SC_THREAD(on_port_in_changed);
         // Also woken when the probe is enabled, to sample the current value of its net (B-048)
         sensitive << p_in << enable.posedge_event();
     }
+
+    ~MLambdaProbe() { reportIgnoredWavelengths(); }
 
     // TODO: overload the constructor for the case of not informing lambdas, need to check all components
 };

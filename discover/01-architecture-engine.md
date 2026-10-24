@@ -50,7 +50,7 @@ I read the code and checked the SystemC 3.0.1 kernel sources in `thirdparty/syst
 
 0. **Static init.** `SPECSConfig specsGlobalConfig{"SPX"}` is constructed before `main` (specs.cpp:19-39). This is an `sc_module` built during static initialization. Defaults: timescale `HUNDRED_FS` (the in-class initializer at specs.h:96 says `ONE_FS` but the constructor overwrites it), mode `EVENT_DRIVEN`, analysis `TIME_DOMAIN`, trace file `"traces/delete_me"` (resolved relative to the working directory).
 1. SystemC's `main` calls `sc_elab_and_sim` (thirdparty .../kernel/sc_main_main.cpp:66), which calls `sc_main` (main.cpp:191).
-2. **CLI parsing** (main.cpp:194-285). Flags: `-f` (repeatable), `-R`, `-m`, `-T`, `-o`, `--json`, `-n`, `--reltol`, `--abstol`, `--nrings_crow`, `--vci`, `-p`, `--mon`, `-t`, `-h`.
+2. **CLI parsing** (main.cpp:194-285). Flags: `-f` (repeatable), `-R`, `-m`, `-T`, `-o`, `--json`, `-n`, `--reltol`, `--abstol`, `--nrings_crow` (removed in v0.4.0 with `-t ac_crow`), `--vci`, `-p`, `--mon`, `-t`, `-h`.
 3. **Overrides.**
    - `-m` writes `specsGlobalConfig.simulation_mode` directly (290-312).
    - `--reltol`, `--abstol` and `-R` are validated, then serialized into a footer `.options k=v` that is parsed after the netlists (314-356, 383-388).
