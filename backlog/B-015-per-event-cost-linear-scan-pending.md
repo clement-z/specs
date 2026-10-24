@@ -1,5 +1,5 @@
 # B-015: Per-event cost: linear scan of the pending queue, plus a heap allocation per notify
-severity: med | category: perf | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: partly addressed in 67d1702 (sprint 2026-10c D2): no heap allocation per notify (sc_event_queue replaced); the linear find_if over pending entries stays open
+severity: med | category: perf | effort: M | fix-class: needs-design | verdict: CONFIRMED | status: fixed in 27c9189 (phase PM, B-188), after 67d1702 (sprint 2026-10c D2: no heap allocation per notify, sc_event_queue replaced); 70db0e1 also drops the second heap of pending times
 location: src/optical_output_port.cpp:341-343,348-349
 ## Problem
 Every event-driven write does a `find_if` over all pending entries of the port. That is O(n) per write and O(n²)
@@ -26,3 +26,15 @@ B-001 (its fix adds the same scan to the FD path).
 - Review ids: F-A1-15.
 ## Verification
 Profiled with perf. Read the kernel source.
+
+## Fix (phase PM, 2026-10-24)
+27c9189: `OpticalPendingQueue` (`src/optical_pending_queue.h`) keeps, per wavelength id, the number of pending
+entries and the latest time among them. A value written later than that time cannot merge, so there is no scan
+(the case of delay lines: a device writes at now + its delay); otherwise (a merge, or a write before the latest
+entry, e.g. paths of different delays into one port) the heap is scanned from its end, where the newest entries
+are; at most one entry matches. Worst case still linear in the pending entries, for writes that are not later
+than the latest of their wavelength. 70db0e1: the second heap (`m_pending_times`, the times not yet fired) is
+gone; the next notification is the queue's earliest entry. Same heap, same order, same notifications: outputs
+and counters identical.
+Measured: a chain of 8 waveguides of 10 cm fed by 20000 values 1 ps apart (1230 entries in flight per port on
+average, 1435 at most; ad hoc netlist, not committed): 0.17 s -> 0.05 s user, same VCD.

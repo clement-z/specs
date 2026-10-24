@@ -36,6 +36,7 @@ if gtest_dep.found()
       'tran_start.cpp',
       'utils/sha256.cpp',
       'utils/transmission_cache.cpp',
+      'utils/wavelength_map.cpp',
     ),
     cpp_args: ['-pedantic'],
     # parser_dep: the netlist lexer and parser (integer_literals.cpp)

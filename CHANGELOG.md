@@ -84,6 +84,14 @@
   that is not swept reaches the nets and probes after it at every point (before, at the first point only); a
   PROBE on such a net now has a sample at every point. More events per point in such circuits (`--stats`);
   `.op` and `.tran` are unchanged (B-185)
+* Performance: the cost per event depends much less on the number of WDM channels (B-188, B-015). On the CROW
+  benchmark (`tests/bench/crow_gen.py`, 3 rings, no trace, gcc release), 4 channels 180 -> 125 ns per event,
+  16 channels 325 -> 157 ns, 64 channels 504 -> 200 ns; one channel 132 -> 124 ns (30 rings: 160 -> 150 ns).
+  The output port orders the pending entries of equal time without computing their magnitudes where their
+  squared norms decide, skips the search for a pending entry to merge into when the new value is later than
+  all of its wavelength, takes the next notification from its queue instead of a second heap, and the
+  per-wavelength memories of the ports and devices are vectors indexed by the wavelength id instead of maps.
+  Outputs and `--stats` counters are bit-identical
 
 ### Removed
 

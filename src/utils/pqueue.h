@@ -8,8 +8,8 @@ using std::vector;
 using std::greater;
 using std::size_t;
 
-template <class T>
-class PQueue: public priority_queue<T, vector<T>, greater<T>>{
+template <class T, class Compare = greater<T>>
+class PQueue: public priority_queue<T, vector<T>, Compare>{
 public:
     public:
     typedef typename
