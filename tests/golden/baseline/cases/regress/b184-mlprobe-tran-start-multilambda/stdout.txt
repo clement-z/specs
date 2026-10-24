@@ -64,7 +64,7 @@ ROOT/CWSRC2 emitted: @ 1560 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 ║                   ╨───┄┄
 ║ - ROOT/a (OPTICAL) = @ 1550 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
 ║ - ROOT/b (OPTICAL) = @ 1560 nm (1.000000 √W, 1.000000 W, 0.0000 rad)
-║ - ROOT/m (OPTICAL) = @ 1550 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
+║ - ROOT/m (OPTICAL) = @ 1560 nm (0.707107 √W, 0.500000 W, 0.0000 rad)
 ║                   ╥───┄┄
 ╚═══════════════════╝
 Simulated 1 ns

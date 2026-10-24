@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "-f", "tests/golden/netlists/pn-wdm-crow-equal-time-order.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/pn-wdm-crow-equal-time-order.cir", "sha256": "f25900ea3875845b2410308679661df314626a7be2cf99c95c6a2141e0af3a18"}
+  ],
+  "data_files": [],
+  "trace_file": "traces/delete_me.vcd"
+}

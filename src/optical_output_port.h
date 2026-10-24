@@ -241,6 +241,25 @@ public:
     void delayedWrite(const OpticalSignal &value, const sc_time &delay, const unsigned int resolution_multiplier=1);
 };
 
+// F-15: compares two squared magnitudes (norms) computed with a few roundings each, when those
+// roundings cannot change the result of comparing the magnitudes themselves (as std::abs()
+// and a division compute them): +1 if x2 > y2, -1 if x2 < y2, 0 if they are within a relative
+// 1e-13 (the roundings are below 1e-14) or either is outside [1e-280, 1e280] (zero, subnormal
+// components, overflow, inf, NaN), where the caller decides on the magnitudes instead
+inline int compareSquaredMagnitudes(double x2, double y2)
+{
+    constexpr double lo = 1e-280;
+    constexpr double hi = 1e280;
+    constexpr double margin = 1e-13;
+    if (!(x2 >= lo && x2 <= hi && y2 >= lo && y2 <= hi))
+        return 0;
+    if (x2 > y2 * (1 + margin))
+        return 1;
+    if (x2 < y2 * (1 - margin))
+        return -1;
+    return 0;
+}
+
 // Emission gate (B-021). A new value is emitted only if it differs from the last emitted
 // value (same wavelength) by more than abstol AND by more than reltol relative to it:
 //   |desired - last| > max(abstol, reltol * |last|)

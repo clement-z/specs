@@ -253,6 +253,7 @@
   "regress/f15-wdm-crow-mlprobe",
   "regress/f28-maxiter-cli-priority",
   "regress/f28-maxiter-zero",
+  "regress/pn-wdm-crow-equal-time-order",
   "regress/probe-latch-dc",
   "regress/probe-latch-dc-swept-f",
   "regress/probe-latch-dc-swept-wl",
@@ -585,6 +586,12 @@
    "only": "^gtest/",
    "gtest": true,
    "note": "gtest list after phase M (B-188/B-015): 3 new unit tests (PendingEntryOrderMatchesPairComparison, PendingQueueMatchesLinearScanQueue, WavelengthMap.BehavesAsStdMap); no other change"
+  },
+  {
+   "recorded_at_utc": "2026-10-24T10:40:58Z",
+   "only": "^(tb/lambda|regress/b001-fd-multilambda-stale|regress/f15-stats-file-print|regress/f15-wdm-crow-mlprobe|regress/b184-mlprobe-tran-start-multilambda|regress/b062-mlprobe-computed-wavelength|regress/pn-wdm-crow-equal-time-order|gtest/unit_tests)$",
+   "gtest": true,
+   "note": "equal-time order by wavelength, decision 2026-10-24 (phase N): listings of multi-wavelength nets show another last write; per-wavelength values of the WDM CROW at tolerance level; pending_mean; new pinning case; gtest list"
   }
  ]
 }

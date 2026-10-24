@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <systemc.h>
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <queue>
@@ -9,7 +10,6 @@
 
 #include "optical_output_port.h"
 #include "specs.h"
-#include "utils/pqueue.h"
 
 #include "test/utils.h"
 
@@ -104,13 +104,13 @@ TEST(OpticalOutputPort, FrequencyDomainWriteMergesBehindQueueTop)
         OOPHarness h("h");
         auto &oop = h.m_out_writer;
 
-        const OpticalSignal a_old(OpticalSignal::field_type(0.1, 0), 1.55e-6);
-        const OpticalSignal b(OpticalSignal::field_type(2, 0), 1.56e-6);
-        const OpticalSignal a_new(OpticalSignal::field_type(0.5, 0), 1.55e-6);
+        const OpticalSignal a_old(OpticalSignal::field_type(0.1, 0), 1.56e-6);
+        const OpticalSignal b(OpticalSignal::field_type(2, 0), 1.55e-6);
+        const OpticalSignal a_new(OpticalSignal::field_type(0.5, 0), 1.56e-6);
 
         oop.immediateWriteFrequencyDomain(a_old);
         oop.immediateWriteFrequencyDomain(b);
-        // equal-time entries pop larger |E| first: b is now on top
+        // equal-time entries pop the smaller wavelength first: b is now on top
         ASSERT_EQ(oop.m_queue.top().second.m_wavelength_id, b.m_wavelength_id);
         oop.immediateWriteFrequencyDomain(a_new);
 
@@ -514,101 +514,60 @@ TEST(OpticalOutputPort, SquaredNormGateMatchesFormerGate)
     SPECS_TEST_FOOTER();
 }
 
-// B-188: the order of the pending entries (PendingEntryLater, on squared norms where they decide)
-// is that of std::greater<pair<sc_time, OpticalSignal>>, the comparator of the queue before, for
-// every pair of entries: equal and different times, magnitudes at the edges of
-// compareSquaredMagnitudes() (zero, subnormal, overflow, inf, NaN), equal magnitudes at other
-// phases and magnitudes one ulp apart. Then a heap built and drained with each comparator, with
-// values replaced in place (merges), gives the same entries in the same order
-TEST(OpticalOutputPort, PendingEntryOrderMatchesPairComparison)
+// Phase N: equal-time pending entries are taken by wavelength, smallest first, whatever their
+// magnitudes, the order of the writes or of the wavelength ids, also after a merge that changes
+// the magnitude of an entry (it keeps its key)
+TEST(OpticalOutputPort, PendingEqualTimesBySmallestWavelength)
 {
     SPECS_TEST_HEADER()
     {
         typedef std::pair<sc_time, OpticalSignal> Entry;
-        std::vector<GateField> fields;
-        for (double m : gateTestMagnitudes())
-        {
-            fields.emplace_back(m, 0);
-            fields.emplace_back(0, m);
-            fields.emplace_back(m * 0.6, m * 0.8);
-            // same magnitude, other phases (std::polar() needs m >= 0)
-            fields.emplace_back(m * std::cos(0.3), m * std::sin(0.3));
-            fields.emplace_back(m * std::cos(2.1), m * std::sin(2.1));
-            fields.emplace_back(std::nextafter(m, 2 * m), 0);
-        }
+        // ids registered in another order than the wavelengths
+        const double wl[] = {1.553e-6, 1.551e-6, 1.554e-6, 1.550e-6, 1.552e-6};
+        std::vector<uint32_t> id;
+        for (double w : wl)
+            id.push_back(OpticalSignal(0, w).m_wavelength_id);
         const sc_time t1 = sc_time::from_value(10);
         const sc_time t2 = sc_time::from_value(11);
-        const PendingEntryLater later;
-        const std::greater<Entry> former;
-        size_t checked = 0;
-        for (const GateField &fa : fields)
-        {
-            for (const GateField &fb : fields)
-            {
-                const Entry a(t1, OpticalSignal(fa, 1u));
-                for (const sc_time &tb : {t1, t2})
-                {
-                    const Entry b(tb, OpticalSignal(fb, 2u));
-                    ASSERT_EQ(later(a, b), former(a, b)) << fa << " at " << a.first << " vs " << fb << " at " << tb;
-                    ASSERT_EQ(later(b, a), former(b, a)) << fb << " at " << tb << " vs " << fa << " at " << a.first;
-                    ++checked;
-                }
-            }
-        }
-        EXPECT_GT(checked, 1000000u);
 
-        // Same heap: random pushes (few distinct times, many equal or near-equal magnitudes),
-        // values replaced in place (a merge does not repair the heap, as in the port) and pops
-        // give the same layout after every step
-        std::mt19937 rng(188);
-        std::uniform_int_distribution<size_t> pick(0, fields.size() - 1);
-        std::uniform_int_distribution<int> time_of(0, 3);
-        std::uniform_int_distribution<int> action(0, 9);
-        PQueue<Entry, std::greater<Entry>> q_former;
-        PQueue<Entry, PendingEntryLater> q_later;
-        auto same = [](const Entry &x, const Entry &y) {
-            const GateField &fx = x.second.m_field;
-            const GateField &fy = y.second.m_field;
-            auto bits = [](double u, double v) { return u == v || (std::isnan(u) && std::isnan(v)); };
-            return x.first == y.first && x.second.m_wavelength_id == y.second.m_wavelength_id
-                && bits(fx.real(), fy.real()) && bits(fx.imag(), fy.imag());
-        };
-        size_t popped = 0;
-        for (int step = 0; step < 20000; ++step)
+        OpticalPendingQueue queue;
+        // magnitudes increasing and decreasing with the wavelength, zero, NaN
+        const GateField fields[] = {GateField(2, 0), GateField(0, 0), GateField(0.5, 0.5),
+                                    GateField(std::numeric_limits<double>::quiet_NaN(), 0), GateField(1e-300, 0)};
+        for (size_t i = 0; i < 5; ++i)
         {
-            const int a = action(rng);
-            if (a < 5 || q_later.empty())
-            {
-                const Entry e(sc_time::from_value(100 + time_of(rng)), OpticalSignal(fields[pick(rng)], uint32_t(step % 7)));
-                q_former.push(e);
-                q_later.push(e);
-            }
-            else if (a < 7)
-            {
-                const size_t i = pick(rng) % q_later.size();
-                const OpticalSignal v(fields[pick(rng)], q_later.begin()[i].second.m_wavelength_id);
-                q_former.begin()[i].second = v;
-                q_later.begin()[i].second = v;
-            }
-            else
-            {
-                q_former.pop();
-                q_later.pop();
-                ++popped;
-            }
-            ASSERT_EQ(q_former.size(), q_later.size());
-            ASSERT_TRUE(std::equal(q_former.begin(), q_former.end(), q_later.begin(), same)) << "step " << step;
+            queue.push(Entry(t2, OpticalSignal(fields[4 - i], id[i])));
+            queue.push(Entry(t1, OpticalSignal(fields[i], id[i])));
         }
-        EXPECT_GT(popped, 2000u);
+        // a merge: the entry of 1.551 um at t1 becomes the largest one
+        Entry *merged = queue.find(t1, id[1]);
+        ASSERT_NE(merged, nullptr);
+        merged->second = OpticalSignal(GateField(10, 0), id[1]);
+
+        const double expected_m[] = {1.550e-6, 1.551e-6, 1.552e-6, 1.553e-6, 1.554e-6};
+        for (const sc_time &t : {t1, t2})
+        {
+            for (double m : expected_m)
+            {
+                ASSERT_FALSE(queue.empty());
+                EXPECT_EQ(queue.top().first, t);
+                EXPECT_EQ(OpticalSignal::getWavelength(queue.top().second.m_wavelength_id), m);
+                queue.pop();
+            }
+        }
+        EXPECT_TRUE(queue.empty());
     }
     SPECS_TEST_FOOTER();
 }
 
-// B-015, B-188: OpticalPendingQueue (heap of slots, lookup by wavelength) against the queue of the
-// port before (PQueue with PendingEntryLater, merges found by a linear scan of all entries): random
-// writes (merged into the pending entry of the same time and wavelength, else pushed), at a few
-// times and wavelengths, with equal and near-equal magnitudes, and pops; the same next entry, size
-// and lookups after every step, and across clear()
+// B-015, B-188, phase N: OpticalPendingQueue (entries in order in a ring buffer) against a reference
+// (a vector of the entries, merges found by a linear scan of all entries, the next entry the minimum
+// of (time, wavelength) over all of them): random writes (merged into the pending entry of the same
+// time and wavelength, else new), through write() or through find() and push(), at a few times and
+// wavelengths (ids registered in another order than the wavelengths, so insertions in the middle on
+// both sides, wrap-around and growth of the ring), with equal and near-equal magnitudes, and pops;
+// the same next entry, size and lookups after every step, every entry found regularly, and across
+// clear()
 TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
 {
     SPECS_TEST_HEADER()
@@ -626,20 +585,44 @@ TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
             return x.first == y.first && x.second.m_wavelength_id == y.second.m_wavelength_id
                 && x.second.m_field == y.second.m_field;
         };
+        std::vector<uint32_t> ids;
+        for (double w : {1.553e-6, 1.551e-6, 1.556e-6, 1.550e-6, 1.552e-6, 1.555e-6})
+            ids.push_back(OpticalSignal(0, w).m_wavelength_id);
+        // the reference: entries in no particular order
+        struct Reference {
+            std::vector<Entry> entries;
+            bool empty() const { return entries.empty(); }
+            size_t size() const { return entries.size(); }
+            std::vector<Entry>::iterator begin() { return entries.begin(); }
+            std::vector<Entry>::iterator end() { return entries.end(); }
+            void push(const Entry &e) { entries.push_back(e); }
+            std::vector<Entry>::iterator next()
+            {
+                return std::min_element(entries.begin(), entries.end(), [](const Entry &x, const Entry &y) {
+                    if (x.first != y.first)
+                        return x.first < y.first;
+                    return OpticalSignal::getWavelength(x.second.m_wavelength_id)
+                        < OpticalSignal::getWavelength(y.second.m_wavelength_id);
+                });
+            }
+            const Entry &top() { return *next(); }
+            void pop() { entries.erase(next()); }
+        };
         std::mt19937 rng(15);
         std::uniform_int_distribution<size_t> pick(0, fields.size() - 1);
         std::uniform_int_distribution<int> action(0, 9);
-        std::uniform_int_distribution<uint32_t> wavelength(0, 5);
-        PQueue<Entry, PendingEntryLater> former;
+        std::uniform_int_distribution<size_t> wavelength(0, ids.size() - 1);
+        Reference former;
         OpticalPendingQueue queue;
         sc_time::value_type now = 0;
         size_t merged = 0;
         size_t popped = 0;
+        size_t max_size = 0;
         for (int step = 0; step < 50000; ++step)
         {
             if (step == 30000)
             {
-                former = PQueue<Entry, PendingEntryLater>();
+                former = Reference();
                 queue.clear();
             }
             const int a = action(rng);
@@ -647,23 +630,38 @@ TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
             {
                 // times from now to now + 3 (and sometimes the same delay: as a device writes)
                 const sc_time t = sc_time::from_value(now + (a < 3 ? 2 : std::uniform_int_distribution<int>(0, 3)(rng)));
-                const OpticalSignal v(fields[pick(rng)], wavelength(rng));
+                const OpticalSignal v(fields[pick(rng)], ids[wavelength(rng)]);
                 auto it = std::find_if(former.begin(), former.end(), [&](const Entry &x) {
                     return x.first == t && x.second.m_wavelength_id == v.m_wavelength_id;
                 });
-                Entry *e = queue.find(t, v.m_wavelength_id);
-                ASSERT_EQ(e != nullptr, it != former.end()) << "step " << step;
-                if (e)
+                if (step % 2 == 0)
                 {
-                    ASSERT_TRUE(same(*e, *it)) << "step " << step;
-                    e->second = v;
-                    it->second = v;
-                    ++merged;
+                    // as the port writes
+                    ASSERT_EQ(queue.write(t, v), it != former.end()) << "step " << step;
+                    if (it != former.end())
+                    {
+                        it->second = v;
+                        ++merged;
+                    }
+                    else
+                        former.push(Entry(t, v));
                 }
                 else
                 {
-                    former.push(Entry(t, v));
-                    queue.push(Entry(t, v));
+                    Entry *e = queue.find(t, v.m_wavelength_id);
+                    ASSERT_EQ(e != nullptr, it != former.end()) << "step " << step;
+                    if (e)
+                    {
+                        ASSERT_TRUE(same(*e, *it)) << "step " << step;
+                        e->second = v;
+                        it->second = v;
+                        ++merged;
+                    }
+                    else
+                    {
+                        former.push(Entry(t, v));
+                        queue.push(Entry(t, v));
+                    }
                 }
             }
             else
@@ -677,8 +675,21 @@ TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
             ASSERT_EQ(queue.size(), former.size()) << "step " << step;
             ASSERT_EQ(queue.empty(), former.empty());
             if (!former.empty())
+            {
                 ASSERT_TRUE(same(queue.top(), former.top())) << "step " << step;
+            }
+            if (step % 97 == 0)
+            {
+                for (const Entry &x : former.entries)
+                {
+                    const Entry *e = queue.find(x.first, x.second.m_wavelength_id);
+                    ASSERT_NE(e, nullptr) << "step " << step;
+                    ASSERT_TRUE(same(*e, x)) << "step " << step;
+                }
+            }
+            max_size = std::max(max_size, queue.size());
         }
+        EXPECT_GT(max_size, 16u);
         EXPECT_GT(merged, 5000u);
         EXPECT_GT(popped, 10000u);
     }
@@ -725,8 +736,8 @@ public:
     }
 };
 
-// Equal times: one entry per delta cycle, larger |E| first (the order of the coalescing
-// queue); the last one taken is the value left on the net
+// Equal times: one entry per delta cycle, smallest wavelength first (phase N; was: larger |E|
+// first); the last one taken is the value left on the net
 TEST(OpticalOutputPort, PendingEqualTimesOnePerDeltaCycle)
 {
     SPECS_TEST_HEADER()
@@ -740,7 +751,7 @@ TEST(OpticalOutputPort, PendingEqualTimesOnePerDeltaCycle)
         sc_start(2, SC_NS);
 
         ASSERT_EQ(h.seen.size(), 3u);
-        const double wl[] = {1.56e-6, 1.57e-6, 1.55e-6};
+        const double wl[] = {1.55e-6, 1.56e-6, 1.57e-6};
         for (size_t i = 0; i < 3; ++i)
         {
             EXPECT_EQ(h.seen[i].t, sc_time(1, SC_NS));
@@ -750,7 +761,7 @@ TEST(OpticalOutputPort, PendingEqualTimesOnePerDeltaCycle)
                 EXPECT_EQ(h.seen[i].delta, h.seen[i - 1].delta + 1);
             }
         }
-        EXPECT_EQ(h.out.read().m_field, OpticalSignal::field_type(1, 0));
+        EXPECT_EQ(h.out.read().m_field, OpticalSignal::field_type(2, 0));
         EXPECT_TRUE(h.m_out_writer.isempty());
     }
     SPECS_TEST_FOOTER();
@@ -800,16 +811,17 @@ TEST(OpticalOutputPort, PendingSameTimeAndWavelengthMerges)
         EXPECT_EQ(oop.pending(), 4u);
         sc_start(10, SC_NS);
 
-        // (the order of equal times is not tested: a merged entry keeps its place in the heap)
+        // equal times by wavelength, smallest first, also for a merged entry
         ASSERT_EQ(h.seen.size(), 4u);
-        std::set<std::pair<double, double>> at3, at5; // (field, wavelength)
-        for (const auto &w : h.seen)
+        const double t_ns[] = {3, 3, 5, 5};
+        const double field[] = {4, 3, 2, 5};
+        const double wl[] = {1.55e-6, 1.56e-6, 1.55e-6, 1.56e-6};
+        for (size_t i = 0; i < 4; ++i)
         {
-            ASSERT_TRUE(w.t == sc_time(3, SC_NS) || w.t == sc_time(5, SC_NS));
-            (w.t == sc_time(3, SC_NS) ? at3 : at5).insert({w.field.real(), OpticalSignal::getWavelength(w.wavelength_id)});
+            EXPECT_EQ(h.seen[i].t, sc_time(t_ns[i], SC_NS));
+            EXPECT_EQ(h.seen[i].field, OpticalSignal::field_type(field[i], 0));
+            EXPECT_EQ(OpticalSignal::getWavelength(h.seen[i].wavelength_id), wl[i]);
         }
-        EXPECT_EQ(at3, (std::set<std::pair<double, double>>{{4, 1.55e-6}, {3, 1.56e-6}}));
-        EXPECT_EQ(at5, (std::set<std::pair<double, double>>{{2, 1.55e-6}, {5, 1.56e-6}}));
     }
     SPECS_TEST_FOOTER();
 }
@@ -859,15 +871,15 @@ TEST(OpticalOutputPort, DcPointWritesFirstValueOfEachWavelengthWithAnEvent)
                 oop.delayedWrite(OpticalSignal(OpticalSignal::field_type(field, 0), wavelength), SC_ZERO_TIME);
             };
 
-            // first point: two wavelengths (1.56 um, the larger |E|, is taken first)
+            // first point: two wavelengths (1.55 um, the smaller one, is taken first)
             oop.reset();
             write(1, 1.55e-6);
             write(2, 1.56e-6);
             sc_start(1, SC_NS);
             ASSERT_EQ(h.seen.size(), 2u);
-            EXPECT_EQ(h.out.read(), OpticalSignal(OpticalSignal::field_type(1, 0), 1.55e-6));
+            EXPECT_EQ(h.out.read(), OpticalSignal(OpticalSignal::field_type(2, 0), 1.56e-6));
 
-            // next point: the same values (the net holds the first one), and one below abstol (1e-8)
+            // next point: the same values (the net holds the last one), and one below abstol (1e-8)
             h.seen.clear();
             oop.reset();
             write(1, 1.55e-6);
@@ -884,7 +896,7 @@ TEST(OpticalOutputPort, DcPointWritesFirstValueOfEachWavelengthWithAnEvent)
             }
             else
             {
-                // 1.56 um changes the net, then 1.55 um changes it back; 1.57 um is gated
+                // 1.55 um changes the net, then 1.56 um changes it back; 1.57 um is gated
                 EXPECT_EQ(h.seen.size(), 2u);
                 EXPECT_EQ(seen, (std::set<std::pair<double, double>>{{1, 1.55e-6}, {2, 1.56e-6}}));
             }

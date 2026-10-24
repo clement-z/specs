@@ -86,6 +86,9 @@ public:
 
     static double getWavelength(const uint32_t &wavelength_id);
 
+    // The number of registered wavelengths (ids 0 to n - 1)
+    static uint32_t registeredWavelengths();
+
     // Wavelength matching (B-010, B-062): two wavelengths equal within this relative tolerance,
     // |a - b| <= WAVELENGTH_MATCH_RTOL * max(|a|, |b|), are one wavelength, so that values written
     // differently (1550*1e-9 and 1.55e-6), computed (c/f, {expression}) or accumulated by a .dc sweep

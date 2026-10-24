@@ -1,0 +1,22 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/pn-wdm-crow-equal-time-order.cir"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/delete_me.manifest.json": {
+   "bytes": 473,
+   "kind": "json",
+   "sha256": "f93fded81b35839e3372e35e6e8a48c14f48bfecde15e2d8e8b799ec94620fea",
+   "stored": "files/traces/delete_me.manifest.json"
+  },
+  "traces/delete_me.vcd": {
+   "bytes": 1267844,
+   "kind": "vcd",
+   "sha256": "ca66e6f8fb1ae4e025b84347868deea3e6e7c0c527dfe95f2a0513e386221b0d",
+   "stored": "files/traces/delete_me.vcd.gz"
+  }
+ },
+ "id": "regress/pn-wdm-crow-equal-time-order"
+}

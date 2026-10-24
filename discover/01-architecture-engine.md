@@ -119,7 +119,7 @@ I read the code and checked the SystemC 3.0.1 kernel sources in `thirdparty/syst
 - **Arithmetic** (optical_signal.cpp:8-64): `+=`/`-=` add fields when λ matches. If λ differs:
   - in TIME_DOMAIN: print to `cerr` and keep lhs (rhs power is dropped);
   - in FREQUENCY_DOMAIN (read from the **global** mode): keep whichever signal has the longer λ.
-- **Equality and ordering.** `operator==` compares field and λ-id exactly; `sc_signal` uses it for change detection. `operator<` is **inverted** (`a<b` ⇔ |a|>|b|). Through `pair<sc_time,OpticalSignal>` in `PQueue` with `greater<>`, this makes equal-time entries pop in **decreasing |E|** order, not FIFO.
+- **Equality and ordering.** `operator==` compares field and λ-id exactly; `sc_signal` uses it for change detection. `operator<` is **inverted** (`a<b` ⇔ |a|>|b|). Through `pair<sc_time,OpticalSignal>` in `PQueue` with `greater<>`, this made equal-time entries pop in **decreasing |E|** order, not FIFO; since phase N (2026-10-24) the pending entries no longer use it: equal-time entries pop by wavelength, smallest first (`src/optical_pending_queue.h`, `doc/numerics.md`).
 - **Time and units.**
   - Kernel resolution is `10^ts` s, with `ts∈[-15,0]` (default -13 = 100 fs).
   - OOP timestep = `m_timestep_value` ticks (default 1).

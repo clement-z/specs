@@ -65,7 +65,7 @@
   "OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop": "PASS",
   "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
   "OpticalOutputPort.PendingEarlierWriteIsTakenFirst": "PASS",
-  "OpticalOutputPort.PendingEntryOrderMatchesPairComparison": "PASS",
+  "OpticalOutputPort.PendingEqualTimesBySmallestWavelength": "PASS",
   "OpticalOutputPort.PendingEqualTimesOnePerDeltaCycle": "PASS",
   "OpticalOutputPort.PendingQueueMatchesLinearScanQueue": "PASS",
   "OpticalOutputPort.PendingResetCancelsNotification": "PASS",
