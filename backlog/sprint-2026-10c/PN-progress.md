@@ -9,9 +9,9 @@ Base: `ws/timeorder` at ec05f36. Gates before any change: `pixi run test gcc` 17
 |---|---|---|---|---|
 | 0 | Base gates, base records (gcc stats; clang, asan-gcc outputs) | done | 560875c | base records in `/tmp/PN/rec-base-{clang,asan-gcc}` |
 | 1 | Equal-time order by wavelength (heap kept), prediction, re-record, pinning case, docs | done | f1b94ea (prediction), 2674103 | 6 of the 11 predicted cases changed, none outside |
-| 2 | Per-time-step (bucket) queue, bit-identical to step 1, timing | todo | | |
-| 3 | Docs (B-188, comments, CHANGELOG) | todo | | |
-| 4 | Acceptance gates, report | todo | | |
+| 2 | Per-time-step (bucket) queue, bit-identical to step 1, timing | done | 94ca1f3 | strict golden unchanged, stats 278 same; faster at every channel count |
+| 3 | Docs (B-188, comments, CHANGELOG) | done | 4ab8bf6 | B-188, B-015, B-198, backlog.md, CHANGELOG |
+| 4 | Acceptance gates, report | in progress | | |
 
 ## Step 1: prediction (written before the change)
 
@@ -61,3 +61,36 @@ channels identical. Recorded with `--repeat 3` (reproducible).
 CROW: e.g. couplers emitted 44085 -> 41640, coalesced 18644 -> 21094, waveguides coalesced 2445 -> 0),
 1 new (the pinning case). Gates after the re-record: `pixi run test gcc` 17/17, strict golden 279 passed,
 `pixi run test asan-clang` 17/17 (no sanitizer message in the test log).
+
+## Step 2: per-time-step queue (94ca1f3)
+
+Design: the entries sorted by (time, wavelength) in a power-of-2 ring buffer, so each time step is one
+contiguous run (bucket) in wavelength order; `write()` merges or adds in one call (append when later than the
+last entry; direct merge into the last entry; else a binary search, then merge or insert shifting the shorter
+side); `pop()` advances the head. No per-bucket allocation (a vector per bucket would cost an allocation or a
+pool and an indirection per access). Same total order as step 1, so the same pops: bit-identical by
+construction.
+
+Checks: strict golden 279 passed (no re-record), `stats-compare` step 1 vs step 2 278 same; CROW 3 rings 4
+channels with every net traced (61 MB VCD), 3 rings 64 channels traced (10.5 MB), 10 rings 16 channels: VCD,
+stdout (paths aside) and counters identical between the step-1 build (`/tmp/PN-wt/s1`, 2674103) and step 2.
+`pixi run test gcc` 17/17, `pixi run test asan-clang` 17/17 (no sanitizer message).
+
+Timing (idle host, no build running; `tests/bench/bench.py`'s `run_once`, `--no-trace` and for C-notrace also
+`-o`; user time of the child, median of 3, N = 30 of 5; step 1 and step 2 interleaved), ns per processed event:
+
+| case | processed | step 1 | step 2 | ratio |
+|---|---|---|---|---|
+| N=3, 1 ch | 718030 | 119.8 | 115.6 | 0.965 |
+| N=3, 4 ch | 2856510 | 116.2 | 102.6 | 0.883 |
+| N=3, 16 ch | 11783441 | 132.1 | 106.8 | 0.808 |
+| N=3, 64 ch | 45317350 | 157.6 | 117.7 | 0.747 |
+| N=10, 1 ch | 8394360 | 128.9 | 122.9 | 0.954 |
+| N=10, 4 ch | 33568262 | 146.2 | 130.7 | 0.894 |
+| N=10, 16 ch | 134057535 | 188.9 | 139.6 | 0.739 |
+| C-notrace N=30 (`--no-trace`) | 12289043 | 151.9 | 140.3 | 0.923 |
+| C-notrace N=30 (`-o`) | 12289043 | 150.0 | 140.0 | 0.933 |
+
+Single channel faster, not slower. Profile after (perf, N = 10): `emit_due_entry()` 16.5 % (1 ch), 19.8 % (16 ch);
+PM measured 17 % / 34 % with the heap. B-015 delay line (8 x 10 cm, 20000 values 1 ps apart through a value
+file; 1230 entries pending per port on average): 0.10 s -> 0.09 s user, VCD identical.
