@@ -11,7 +11,7 @@ Base: `ws/timeorder` at ec05f36. Gates before any change: `pixi run test gcc` 17
 | 1 | Equal-time order by wavelength (heap kept), prediction, re-record, pinning case, docs | done | f1b94ea (prediction), 2674103 | 6 of the 11 predicted cases changed, none outside |
 | 2 | Per-time-step (bucket) queue, bit-identical to step 1, timing | done | 94ca1f3 | strict golden unchanged, stats 278 same; faster at every channel count |
 | 3 | Docs (B-188, comments, CHANGELOG) | done | 4ab8bf6 | B-188, B-015, B-198, backlog.md, CHANGELOG |
-| 4 | Acceptance gates, report | in progress | | |
+| 4 | Acceptance gates, report | done | (report commit) | `PN-REPORT.md`; heartbeat 8b9a9f97 deleted after it |
 
 ## Step 1: prediction (written before the change)
 
@@ -94,3 +94,11 @@ Timing (idle host, no build running; `tests/bench/bench.py`'s `run_once`, `--no-
 Single channel faster, not slower. Profile after (perf, N = 10): `emit_due_entry()` 16.5 % (1 ch), 19.8 % (16 ch);
 PM measured 17 % / 34 % with the heap. B-015 delay line (8 x 10 cm, 20000 values 1 ps apart through a value
 file; 1230 entries pending per port on average): 0.10 s -> 0.09 s user, VCD identical.
+
+## Acceptance gates (tip 14862ed, code of 94ca1f3)
+- `pixi run test gcc`, `clang`, `asan-gcc`, `asan-clang`: 17/17 each; no sanitizer message in the asan logs.
+- Strict golden (gcc): 279 passed, 0 failed/new/missing.
+- clang and asan-gcc, base vs tip (`compare --rtol 0 --atol 0 --print-slack 0`): 271 passed, 7 failed (the 6
+  cases + gtest), 1 new (the pinning case): the same set as gcc.
+- Scratch worktrees left in place (not merged): `/tmp/PN-wt/instr` (branch `PN-wip/instr`, uncommitted
+  instrumentation of the base), `/tmp/PN-wt/s1` (branch `PN-wip/s1` at 2674103, the step-1 timing build).
