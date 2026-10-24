@@ -12,6 +12,11 @@
   step"). Golden cases re-recorded: `tb/lambda`, `b001-fd-multilambda-stale`, `f15-stats-file-print`,
   `f15-wdm-crow-mlprobe`, `b184-mlprobe-tran-start-multilambda`, `b062-mlprobe-computed-wavelength`; new
   pinning case `pn-wdm-crow-equal-time-order`
+* Performance (B-188): the pending entries of an output port are a per-time-step queue (sorted by time, then
+  wavelength, in a ring buffer) instead of a heap: O(1) pops and appends. CROW benchmark, ns per processed
+  event against the heap with the same order: 1 channel -3 to -8 %, 4 channels -11 %, 16 channels -19 to
+  -26 %, 64 channels -25 %; the cost at 16 or 64 channels is now within 14 % of the single-channel cost.
+  Outputs and counters identical to the heap with the wavelength order
 
 ## [0.4.0] - 2026-10-24
 

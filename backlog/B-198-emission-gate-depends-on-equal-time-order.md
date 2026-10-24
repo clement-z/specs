@@ -10,6 +10,11 @@ value (within tolerance). Which half-updated value appears depends on the order 
 their equal-time entries (|E| order before phase N, wavelength order after). PD2 measured it on a 4-channel CROW at
 default tolerances: per-wavelength values differ by up to 8.4e-4 relative (about 8x reltol) between two orders;
 identical at abstol = reltol = 0 (`backlog/sprint-2026-10c/PD2-REPORT.md`, item 3).
+Phase N (2674103) switched from the |E| order to the wavelength order: on the 4-channel CROW of the pinning case
+`regress/pn-wdm-crow-equal-time-order` (MLPROBEs on through, inside ring 2 and at the drop), one channel
+(1551.2 nm) moved by up to 9.0e-5 of its peak, the other three were identical; `regress/f15-wdm-crow-mlprobe`
+4.1e-5 at the drop. The order is now fixed by the keys (time, wavelength), so the results no longer depend on
+the heap layout or the standard library, but they still depend on the order itself.
 
 ## Expected
 Per-wavelength results independent of the equal-time order (and of the standard library's heap algorithm).

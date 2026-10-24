@@ -38,3 +38,9 @@ gone; the next notification is the queue's earliest entry. Same heap, same order
 and counters identical.
 Measured: a chain of 8 waveguides of 10 cm fed by 20000 values 1 ps apart (1230 entries in flight per port on
 average, 1435 at most; ad hoc netlist, not committed): 0.17 s -> 0.05 s user, same VCD.
+
+## Phase N (2026-10-24)
+94ca1f3 replaces the heap and the per-wavelength index by a queue sorted by (time, wavelength) in a ring buffer
+(B-188): a write later than the last pending entry is appended, a merge into the last entry is direct, any other
+write is a binary search (merge or insertion, shifting the entries on the shorter side). The delay line above:
+0.10 s -> 0.09 s user against the heap with the wavelength order (2674103), same VCD.
