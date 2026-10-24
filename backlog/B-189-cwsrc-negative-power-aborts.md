@@ -1,5 +1,5 @@
 # B-189: A CW source with a negative power aborts instead of reporting an error
-severity: low | category: bug | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: open
+severity: low | category: bug | effort: S | fix-class: easy-unattended | verdict: CONFIRMED | status: fixed in 634c886 (sprint 2026-10c PK)
 location: src/devices/cw_source.h (`setPower`), CWSRC creation in src/parser/parse_element.cpp
 
 ## Problem

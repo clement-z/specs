@@ -2,6 +2,8 @@
 
 ## [unreleased]
 
+## [0.4.0] - 2026-10-24
+
 ### New
 
 * Accuracy suite (`tests/bench/`, F-06): SPECS's `.dc` and `.tran` results against closed forms, as the Meson
@@ -9,8 +11,8 @@
   lengths (Poon transfer matrices), complex through/drop responses within 1e-5; each check also proves that
   three injected physics errors (k read as a power ratio, no dispersion slope, a real cross coupling) would
   fail it. The CROW generator (`crow_gen.py`, from the feature scout) gains CW and `.dc` forms and a
-  `crow_tb` preset that reproduces `specs -t ac_crow` (same event times, powers within 1e-12 W, checked by
-  the suite)
+  `crow_tb` preset that reproduces the former `specs -t ac_crow` (same event times, powers within 1e-12 W;
+  see Removed)
 * Benchmark (`tests/bench/bench.py`): the CROW case matrix with per-run user time, peak RSS, VCD size and
   `--stats` counters, appended to a local `tests/bench/history.jsonl` (not versioned); the Meson suite
   `bench` checks only ratios (event plateau from 30 to 300 rings, WDM linearity, and the user-time plateau on
@@ -58,6 +60,11 @@
 * Run manifest (`<trace>.manifest.json`, `--print-manifest`) and run table manifest (`table.manifest.json`):
   `format_version` 2, with a `data_files` list (path and SHA-256 of each `SPAR` S-parameter file and
   `VLSRC`/`EVLSRC` value file read), so a `.step`/`.mc` plan is not resumed against a changed data file (F-01)
+* `VLSRC`/`EVLSRC` value files are looked up as `.include` and `SPAR` files: next to the netlist file that names
+  them first (for an element in a `.subckt` body, the file that defines the subcircuit), then in the working
+  directory. A netlist that names a file relative to the working directory keeps working, but **a file of the same
+  name next to the netlist now wins** (with the warning of `.include` when the two differ). The run manifest's
+  `data_files` give the path opened (B-192)
 * `.options seed` is applied when its line is read (so that the random functions after it use it); a seed that
   changes after a random function drew is an error (F-02)
 * MLPROBE: the wavelengths a probe does not list are reported in one warning per probe on stderr at the end of
@@ -79,9 +86,29 @@
   that is not swept reaches the nets and probes after it at every point (before, at the first point only); a
   PROBE on such a net now has a sample at every point. More events per point in such circuits (`--stats`);
   `.op` and `.tran` are unchanged (B-185)
+* Performance: the cost per event depends much less on the number of WDM channels (B-188, B-015). On the CROW
+  benchmark (`tests/bench/crow_gen.py`, 3 rings, no trace, gcc release), 4 channels 180 -> 125 ns per event,
+  16 channels 325 -> 157 ns, 64 channels 504 -> 200 ns; one channel 132 -> 124 ns (30 rings: 160 -> 150 ns).
+  The output port orders the pending entries of equal time without computing their magnitudes where their
+  squared norms decide, skips the search for a pending entry to merge into when the new value is later than
+  all of its wavelength, takes the next notification from its queue instead of a second heap, and the
+  per-wavelength memories of the ports and devices are vectors indexed by the wavelength id instead of maps.
+  Outputs and `--stats` counters are bit-identical
+
+### Removed
+
+* The legacy CROW testbench `specs -t ac_crow` (`src/tb/crow_tb.cpp`) and its option `--nrings_crow`: its circuit,
+  with any number of rings, is written as a netlist by `tests/bench/crow_gen.py N --preset crow_tb` (same event
+  times, powers within 7e-13 W), which the golden cases `regress/crow-tb-preset-n3` and
+  `regress/crow-tb-preset-n8-vci` run. The `CROW` class stays. The accuracy suite's `--legacy-tb` comparison is
+  removed with it
 
 ### Fixed
 
+* `.dc`: an MLPROBE records each sweep point (B-186; before, it declared its VCD signals but recorded no value
+  in a `.dc`): the converged value of each listed wavelength at each point, in the VCD and in the CSV/npz
+  tables, and 0 for a listed wavelength that its net does not carry at that point. A PROBE still follows the
+  swept wavelength of a wavelength or frequency sweep; an MLPROBE records its fixed listed wavelengths
 * `.dc`: a sweep point whose output falls below `abstol` (e.g. a null of an MZI) is written (0 after the snap)
   instead of keeping the previous point's value and wavelength (B-003)
 * Parse errors inside a `.subckt` body (also a nested one) give the file that defines the subcircuit and the line
@@ -90,6 +117,15 @@
   host with googletest installed (e.g. Arch Linux's `gtest`): the environment's pkg-config found the host's
   `gtest.pc`. The pixi builds now use the googletest wrap; remove a `build-pixi/<toolchain>` directory configured
   before this fix
+* `CWSRC`: a negative power is an error when the element is created (`Error (...): power must be >= 0 and finite`,
+  exit 1); it aborted in `std::polar` (builds with `_GLIBCXX_ASSERTIONS`, e.g. pixi) or gave a NaN field, and a
+  `.step`/`.mc` run was recorded `crashed` instead of `failed` with the message (B-189)
+* The run-table test (`tests/tools/test_run_table.py`, `pyspecs/runtable.py`) was always skipped in the pixi builds
+  and in CI: numpy and pandas are now in pixi's default environment and installed in the CI jobs that run
+  `meson test`; it still skips (exit 77) where they are missing (B-193)
+* A netlist line longer than flex's buffer (16 KB, e.g. a `VLSRC` with 700 or more inline values) failed with
+  `input buffer overflow, can't enlarge buffer because scanner uses REJECT` (exit 2). The scanner no longer uses
+  flex's REJECT, so lines of any length parse; the tokens and error messages are otherwise unchanged (B-191)
 
 ## [0.3.0] - 2026-10-23
 

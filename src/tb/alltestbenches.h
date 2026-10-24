@@ -10,7 +10,6 @@
 #include "tb/mzi_tb.h"
 #include "tb/ring_tb.h"
 #include "tb/freqsweep_tb.h"
-#include "tb/crow_tb.h"
 #include "tb/lambda_tb.h"
 #include "tb/phase_shifter_tb.h"
 #include "tb/mesh_tb.h"

@@ -1,0 +1,74 @@
+╔═══════════════════╗
+║  PARSING CIRCUIT  ║
+╚═══════════════════╝
+Recorded sweep order for WL(CWSRC1) (2points)
+-----------
+2 global assignments
+ - c (DOUBLE) = 2.99792e+08
+ - pi (DOUBLE) = 3.14159
+-----------
+0 local assignments
+-----------
+6 elements
+ - ROOT/CWSRC1 (CW SOURCE) ROOT/a {} {power (DOUBLE) = 0.001, wl (DOUBLE) = 1.548e-06, }
+ - ROOT/CWSRC2 (CW SOURCE) ROOT/b {} {power (DOUBLE) = 0.002, wl (DOUBLE) = 1.55e-06, }
+ - ROOT/MERGER1 (MERGER) ROOT/a ROOT/b ROOT/c {} {}
+ - ROOT/WG1 (WAVEGUIDE (bidir)) ROOT/c ROOT/d {} {length (DOUBLE) = 1e-05, }
+ - ROOT/PROBE1 (PROBE) ROOT/d {} {}
+ - ROOT/MLPROBE1 (MULTIWAVELENGTH PROBE) ROOT/d {} {wl (LIST) = [{"type":"DOUBLE","value":1.548000e-06}, {"type":"DOUBLE","value":1.549000e-06}, {"type":"DOUBLE","value":1.550000e-06}], }
+-----------
+4 named nets
+ - ROOT/a: OANALOG<1>u (1|1)
+ - ROOT/b: OANALOG<1>u (1|1)
+ - ROOT/c: OANALOG<1>u (1|1)
+ - ROOT/d: OANALOG<1>u (1|2)
+-----------
+0 directives
+-----------
+0 subcircuits
+-----------
+1 analyses
+ - ANALYSIS[DC] {} {}
+╔══════════════════════╗
+║   BUILDING CIRCUIT   ║
+╚══════════════════════╝
+Flattening...
+Flattening ROOT
+Done (flattening)
+Done with bidirectional nets
+Elaborating network of ROOT/a...
+Creating ROOT/CWSRC1 (reason: connection to unidir net)
+Done creating ROOT/CWSRC1
+Creating ROOT/MERGER1 (reason: unidir backlog)
+Done creating ROOT/MERGER1
+Creating ROOT/CWSRC2 (reason: unidir backlog)
+Done creating ROOT/CWSRC2
+Creating ROOT/WG1 (reason: unidir backlog)
+Done creating ROOT/WG1
+Creating ROOT/PROBE1 (reason: unidir backlog)
+Done creating ROOT/PROBE1
+Creating ROOT/MLPROBE1 (reason: unidir backlog)
+Done creating ROOT/MLPROBE1
+Done (elaborating network of ROOT/a)
+╔══════════════════════╗
+║      SIMULATION      ║
+╚══════════════════════╝
+Current SPECS config:
+- simulation mode: Event-driven frequency-domain
+- analysis type: CW SWEEP
+- engine timescale (log10 of s): -13
+- abstol: 1e-08
+- default reltol: 0.0001
+- resolution multiplier: 1
+- trace all optical nets: 0
+
+Info: (I703) tracing timescale unit set: 100 fs (traces/delete_me.vcd)
+Starting sweep on WL(ROOT/CWSRC1) (2 points)
+ROOT/CWSRC1 emitted: @ 1548 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC2 emitted: @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+ROOT/CWSRC1 emitted: @ 1549 nm (0.031623 √W, 0.001000 W, 0.0000 rad)
+ROOT/CWSRC2 emitted: @ 1550 nm (0.044721 √W, 0.002000 W, 0.0000 rad)
+╔═══════════════════╗
+║        DONE       ║
+╚═══════════════════╝
+

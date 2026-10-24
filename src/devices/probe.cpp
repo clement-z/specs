@@ -256,6 +256,21 @@ void MLambdaProbe::on_port_in_changed()
             continue;
         }
 
+        // .dc point (B-186): keep the last value of each listed wavelength, traced by tracePoint().
+        // Only the events of this point: every wavelength of the net is written again at each point (B-185)
+        if (m_per_point)
+        {
+            if (p_in->event() && !isDefaultSignal(s))
+            {
+                const double listed_m = listedWavelength(s);
+                if (!isnan(listed_m))
+                    m_point_samples[listed_m] = s;
+                else
+                    m_ignored_wavelengths_m.insert(s.getWavelength());
+            }
+            continue;
+        }
+
         // Sampled because the probe was enabled (the net did not change in this delta) and the
         // net was never written: nothing to trace or to report (B-048)
         const bool sampled = p_in->event() || !isDefaultSignal(s);
@@ -323,6 +338,29 @@ void MLambdaProbe::traceSample(const OpticalSignal &s, double listed_m)
     }
     if (m_table)
         m_table->append(sc_time_stamp().to_seconds(), m_table_signal, s);
+}
+
+void MLambdaProbe::tracePoint()
+{
+    for (const double listed_m : m_lambdas)
+    {
+        const auto sample = m_point_samples.find(listed_m);
+        if (sample != m_point_samples.end())
+        {
+            traceSample(sample->second, listed_m);
+            continue;
+        }
+        // Not carried at this point: 0, at the listed wavelength (which need not be registered)
+        auto search = m_lambda_signals.find(listed_m);
+        if (search != m_lambda_signals.end())
+        {
+            for (auto &signal : search->second)
+                signal->write(0.0);
+        }
+        if (m_table)
+            m_table->appendZero(sc_time_stamp().to_seconds(), m_table_signal, listed_m);
+    }
+    m_point_samples.clear();
 }
 
 void MLambdaProbe::reportIgnoredWavelengths()

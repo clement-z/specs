@@ -1,0 +1,99 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaaaq  abstol       $end
+$var real    1  aaaar  reltol       $end
+$var wire   32  aaaas  resolution_multiplier [31:0]  $end
+$var wire   32  aaaat  engine_timescale [31:0]  $end
+$var wire   32  aaaau  simulation_mode [31:0]  $end
+$var wire   32  aaaav  analysis_type [31:0]  $end
+$var wire    1  aaaaw  trace_all_optical_nets       $end
+$var wire    1  aaaax  verbose_component_initialization       $end
+$scope module ROOT/MLPROBE_DROP $end
+$var real    1  aaaae  power@1550_000000       $end
+$var real    1  aaaaf  abs@1550_000000       $end
+$var real    1  aaaag  phase@1550_000000       $end
+$var real    1  aaaah  power@1552_000000       $end
+$var real    1  aaaai  abs@1552_000000       $end
+$var real    1  aaaaj  phase@1552_000000       $end
+$upscope $end
+$scope module ROOT/MLPROBE_OUT $end
+$var real    1  aaaak  power@1550_000000       $end
+$var real    1  aaaal  abs@1550_000000       $end
+$var real    1  aaaam  phase@1550_000000       $end
+$var real    1  aaaan  power@1552_000000       $end
+$var real    1  aaaao  abs@1552_000000       $end
+$var real    1  aaaap  phase@1552_000000       $end
+$upscope $end
+$scope module ROOT/PROBE1 $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.0004971158059451234 aaaaa
+r0.02229609396161407 aaaab
+r-3.141592653589624 aaaac
+r1.55e-06 aaaad
+r0.0004971158059451234 aaaae
+r0.02229609396161407 aaaaf
+r-3.141592653589624 aaaag
+r0.0001598259910751372 aaaah
+r0.01264223046282329 aaaai
+r1.594521751931979 aaaaj
+r2.747441466592782e-09 aaaak
+r5.24160420729454e-05 aaaal
+r-5.935125584249677e-11 aaaam
+r0.0003393033383045097 aaaan
+r0.01842018833520737 aaaao
+r0.02370734316452249 aaaap
+r1e-08 aaaaq
+r0.0001 aaaar
+b1 aaaas
+b11111111111111111111111111110011 aaaat
+b11 aaaau
+b1 aaaav
+0aaaaw
+0aaaax
+$end
+
+#1
+r0.0009942170411950371 aaaaa
+r0.03153120741733556 aaaab
+r0.0009942170411950371 aaaae
+r0.03153120741733556 aaaaf
+r0.0001598367922194429 aaaah
+r0.01264265764067994 aaaai
+r1.594549550567443 aaaaj
+r5.512914106421209e-09 aaaak
+r7.424900070991669e-05 aaaal
+r-5.925710306825116e-11 aaaam
+r0.0003392724140553793 aaaan
+r0.01841934890421969 aaaao
+r0.0236729433883476 aaaap
+
+#2
+r0.001491471772593446 aaaaa
+r0.03861957758175828 aaaab
+r0.001491471772593446 aaaae
+r0.03861957758175828 aaaaf
+r0.0001598340204227484 aaaah
+r0.01264254801939658 aaaai
+r1.594541105517068 aaaaj
+r8.089282805890252e-09 aaaak
+r8.99404403251966e-05 aaaal
+r-5.992877828040097e-11 aaaam
+r0.0003392803980494002 aaaan
+r0.01841956563139859 aaaao
+r0.02368348141006761 aaaap
+

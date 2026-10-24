@@ -6,6 +6,7 @@
 #include "devices/spx_module.h"
 #include "optical_output_port.h"
 #include "optical_signal.h"
+#include "utils/wavelength_map.h"
 #include "utils/transmission_cache.h"
 
 /** An electrically-controllable phase shifter. */
@@ -55,7 +56,7 @@ public:
     OpticalOutputPort m_out_writer;
 
     /** Memory of the current input value for all wavelengths. */
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_in;
+    WavelengthMap<OpticalSignal::field_type> m_memory_in;
 
     /** F-15: polar() only when the phase changes (on_port_in_changed()) */
     PolarCache m_in_transmission;
@@ -133,8 +134,8 @@ public:
     OpticalOutputPort m_p1_writer;
 
     /** Memory of the current input value for all wavelengths. */
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_p0;
-    std::map<uint32_t,OpticalSignal::field_type> m_memory_p1;
+    WavelengthMap<OpticalSignal::field_type> m_memory_p0;
+    WavelengthMap<OpticalSignal::field_type> m_memory_p1;
 
     /** F-15: polar() only when the phase changes (on_p0_in_changed(), on_p1_in_changed()) */
     PolarCache m_p0_transmission;

@@ -275,25 +275,21 @@ void OpticalOutputPort::emit_due_entry()
 }
 
 // F-15: an entry pending in delay (sc_event_queue::notify(): the event is notified only when
-// the entry is earlier than all the pending ones)
+// the entry is earlier than all the pending ones). Called before the entry is pushed (B-188)
 void OpticalOutputPort::notify_pending(const sc_time &delay)
 {
-    const sc_time t = sc_time_stamp() + delay;
-    if (m_pending_times.empty() || t < m_pending_times.top())
+    if (m_queue.empty() || sc_time_stamp() + delay < m_queue.top().first)
         m_pending_event.notify(delay);
-    m_pending_times.push(t);
 }
 
-// F-15: m_pending_event fired (sc_event_queue::fire_event()): one entry is due now, notify the
-// next one
+// F-15: m_pending_event fired (sc_event_queue::fire_event()): one entry was due now (taken by
+// emit_due_entry()), notify the next one
 void OpticalOutputPort::fire_pending()
 {
-    // cancelled (drop_queue())
-    if (m_pending_times.empty())
+    // none left, or cancelled (drop_queue())
+    if (m_queue.empty())
         return;
-    m_pending_times.pop();
-    if (!m_pending_times.empty())
-        m_pending_event.notify(m_pending_times.top() - sc_time_stamp());
+    m_pending_event.notify(m_queue.top().first - sc_time_stamp());
 }
 
 sc_time OpticalOutputPort::snap_to_next_valid_time(const sc_time &t, const unsigned int resolution_multiplier)
@@ -334,17 +330,15 @@ void OpticalOutputPort::delayedWriteEventDriven(const OpticalSignal &value, cons
         t = snap_to_next_valid_time(t, resolution_multiplier);
     }
 
-    // find first scheduled signal with this timestamp and this lambda
-    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&t](const auto &x) {
-            return t == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
-            });
-    const bool coalesced = it != m_queue.cend();
+    // find the scheduled signal with this timestamp and this lambda (B-015: no scan for most writes)
+    auto *it = m_queue.find(t, value.m_wavelength_id);
+    const bool coalesced = it != nullptr;
 
     // check if an event was already scheduled for the same timestamp
-    if (it == m_queue.cend()) {
+    if (!it) {
         // if not, just schedule the new event
-        m_queue.push(std::make_pair(t, value));
         notify_pending(t - sc_time_stamp());
+        m_queue.push(std::make_pair(t, value));
     }
     else {
         // if yes, just replace the old one
@@ -385,15 +379,13 @@ void OpticalOutputPort::immediateWriteFrequencyDomain(const OpticalSignal &value
 
     // find a scheduled signal with this timestamp and this lambda anywhere in
     // the queue, not only at its top: another wavelength can be on top (B-001)
-    auto it = std::find_if(m_queue.begin(), m_queue.end(), [&value,&now](const auto &x) {
-            return now == x.first && value.m_wavelength_id == x.second.m_wavelength_id;
-            });
-    const bool coalesced = it != m_queue.end();
+    auto *it = m_queue.find(now, value.m_wavelength_id);
+    const bool coalesced = it != nullptr;
 
-    if (it == m_queue.end()) {
+    if (!it) {
         // if not, schedule the signal for the current time
-        m_queue.push(make_pair(now, value));
         notify_pending(SC_ZERO_TIME);
+        m_queue.push(make_pair(now, value));
     }
     else {
         // if yes, just replace the old one

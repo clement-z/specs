@@ -1,5 +1,5 @@
 project('specs', 'cpp',
-  version: '0.3.0',
+  version: '0.4.0',
   license: 'LGPL-3.0-or-later',
   meson_version: '>=1.3.0',
   default_options: [
@@ -193,8 +193,8 @@ subdir('src/test')
 if get_option('old_tb')
   # One smoke test per testbench, as in the old `make test`. `specs -t` exits 0 even when a
   # testbench prints "Failure!", so these only catch crashes and errors.
-  # Disabled in `make test` too: ring, ac_add_drop, ac_crow. (mesh was disabled there because it
-  # segfaulted; it runs since B-047.)
+  # Disabled in `make test` too: ring, ac_add_drop. (mesh was disabled there because it segfaulted;
+  # it runs since B-047. ac_crow was removed: tests/bench/crow_gen.py --preset crow_tb writes its circuit.)
   sh = find_program('sh')
   foreach tb : ['waveguide', 'splitter', 'merger', 'detector', 'directional_coupler',
                 'phaseshifter', 'mzi', 'pcm', 'mesh']

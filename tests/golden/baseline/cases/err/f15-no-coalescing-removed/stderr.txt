@@ -90,7 +90,6 @@ Flag could not be matched: no-coalescing
                                         default 0: no cap); a .tran ends there
                                         with a warning, an .op/.dc stops with an
                                         error; overrides .options maxevents
-      --nrings_crow=[set_nrings_crow]   temporary
       --vci, --verbose_ci               Print components detail before starting
                                         simulation
       -p, --list-testbenches            List available testbenches

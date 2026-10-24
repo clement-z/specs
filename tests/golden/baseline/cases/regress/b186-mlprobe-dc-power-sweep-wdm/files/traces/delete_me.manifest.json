@@ -1,0 +1,13 @@
+{
+  "format": "specs-run-manifest",
+  "format_version": 2,
+  "specs_version": "<VERSION>",
+  "systemc_version": "3.0.2-Accellera",
+  "seed": 0,
+  "command_line": ["specs", "--format", "vcd", "--format", "csv", "-f", "tests/golden/netlists/b186-mlprobe-dc-power-sweep-wdm.cir"],
+  "netlist_files": [
+    {"path": "tests/golden/netlists/b186-mlprobe-dc-power-sweep-wdm.cir", "sha256": "63e365c12e3f4295622e080b9a3b6a1414760675861609f113ef0371bd0bd551"}
+  ],
+  "data_files": [],
+  "trace_file": "traces/delete_me.vcd"
+}

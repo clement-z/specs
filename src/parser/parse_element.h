@@ -92,6 +92,10 @@ struct VLSourceElement : public ParseElement {
 
     const size_t n_nets = 1;
 
+    // Directory of the netlist file that contains the element: a relative value file is looked up
+    // there first, then in the working directory (as .include and SPAR files, B-192)
+    string include_dir;
+
     using ParseElement::ParseElement;
 
     virtual ParseElement *clone() const
@@ -108,6 +112,10 @@ struct EVLSourceElement : public ParseElement {
     typedef EVLSource element_type_uni;
 
     const size_t n_nets = 1;
+
+    // Directory of the netlist file that contains the element: a relative value file is looked up
+    // there first, then in the working directory (as .include and SPAR files, B-192)
+    string include_dir;
 
     using ParseElement::ParseElement;
 

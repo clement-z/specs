@@ -18,3 +18,5 @@ B-124, B-019, B-137.
 - Review ids: F-A5-20.
 ## Verification
 Read the monitors; mzi values from the output of `specs -t mzi`; add-drop numbers from B-137. PLAUSIBLE because the mzi table was not turned into code.
+
+Note (sprint 2026-10c, PK): `ac_crow` was removed (its circuit is a netlist case now).

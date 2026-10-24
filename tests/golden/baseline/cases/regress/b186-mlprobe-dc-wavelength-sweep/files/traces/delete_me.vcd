@@ -1,0 +1,72 @@
+$timescale
+     100 fs
+$end
+
+$scope module SystemC $end
+$var real    1  aaaan  abstol       $end
+$var real    1  aaaao  reltol       $end
+$var wire   32  aaaap  resolution_multiplier [31:0]  $end
+$var wire   32  aaaaq  engine_timescale [31:0]  $end
+$var wire   32  aaaar  simulation_mode [31:0]  $end
+$var wire   32  aaaas  analysis_type [31:0]  $end
+$var wire    1  aaaat  trace_all_optical_nets       $end
+$var wire    1  aaaau  verbose_component_initialization       $end
+$scope module ROOT/MLPROBE1 $end
+$var real    1  aaaae  power@1548_000000       $end
+$var real    1  aaaaf  abs@1548_000000       $end
+$var real    1  aaaag  phase@1548_000000       $end
+$var real    1  aaaah  power@1549_000000       $end
+$var real    1  aaaai  abs@1549_000000       $end
+$var real    1  aaaaj  phase@1549_000000       $end
+$var real    1  aaaak  power@1550_000000       $end
+$var real    1  aaaal  abs@1550_000000       $end
+$var real    1  aaaam  phase@1550_000000       $end
+$upscope $end
+$scope module ROOT/PROBE1 $end
+$var real    1  aaaaa  power       $end
+$var real    1  aaaab  abs       $end
+$var real    1  aaaac  phase       $end
+$var real    1  aaaad  wavelength       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+r0.0004999999999999999 aaaaa
+r0.02236067977499789 aaaab
+r1.784614217393323 aaaac
+r1.548e-06 aaaad
+r0.0004999999999999999 aaaae
+r0.02236067977499789 aaaaf
+r1.784614217393323 aaaag
+r0 aaaah
+r0 aaaai
+r0 aaaaj
+r0.0009999999999999998 aaaak
+r0.03162277660168379 aaaal
+r1.666057523387632 aaaam
+r1e-08 aaaan
+r0.0001 aaaao
+b1 aaaap
+b11111111111111111111111111110011 aaaaq
+b11 aaaar
+b1 aaaas
+0aaaat
+0aaaau
+$end
+
+#1
+r0.0004999999999999998 aaaaa
+r1.725297601606098 aaaac
+r1.549e-06 aaaad
+r0 aaaae
+r0 aaaaf
+r0 aaaag
+r0.0004999999999999998 aaaah
+r0.02236067977499789 aaaai
+r1.725297601606098 aaaaj
+

@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b192-value-files/b192-value-files.cir",
+  "-o",
+  "traces/out"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/out.manifest.json": {
+   "bytes": 1100,
+   "kind": "json",
+   "sha256": "f8dc4acddb7d63d3746172871ed98d2a24ce4100c9c08b85f4d9feaa89f5f074",
+   "stored": "files/traces/out.manifest.json"
+  },
+  "traces/out.vcd": {
+   "bytes": 1451,
+   "kind": "vcd",
+   "sha256": "41e9d95ce42f8cdc19f4d37c3f22cde3bf1f86199ad439de92485625fbbe4965",
+   "stored": "files/traces/out.vcd"
+  }
+ },
+ "id": "regress/b192-value-files-next-to-netlist"
+}

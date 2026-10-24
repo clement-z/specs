@@ -1,0 +1,24 @@
+{
+ "args": [
+  "-f",
+  "tests/golden/netlists/b191-long-line-vlsrc.cir",
+  "-o",
+  "traces/out"
+ ],
+ "exit": 0,
+ "files": {
+  "traces/out.manifest.json": {
+   "bytes": 471,
+   "kind": "json",
+   "sha256": "0b2171b48c0d34e5850bc46fe8c0f7910ab8d814519bfa00b0e824e9cf3fd877",
+   "stored": "files/traces/out.manifest.json"
+  },
+  "traces/out.vcd": {
+   "bytes": 113897,
+   "kind": "vcd",
+   "sha256": "30d340d1f85bf3e3786e93bcbbff98b7816a93f19cd7a0482e7dc4a667886e6f",
+   "stored": "files/traces/out.vcd"
+  }
+ },
+ "id": "regress/b191-long-line-vlsrc"
+}

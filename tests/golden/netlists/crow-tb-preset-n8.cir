@@ -1,0 +1,34 @@
+* Replaces the legacy testbench `specs -t ac_crow` (src/tb/crow_tb.cpp, removed in v0.4.0): its circuit with 8
+* rings, written by `python3 -I tests/bench/crow_gen.py 8 --preset crow_tb`. The preset gave the testbench's
+* event times and powers within 7e-13 W for 3 and 2 rings (PF06). Do not edit by hand: regenerate.
+* CROW with 8 rings, preset crow_tb; seed=1 nwl=1 source=pulses analysis=tran
+VLSRC1 in values=[[0,1,1.553e-06],[1e-09,0,1.553e-06],[2e-09,1,1.553e-06],[3e-09,0,1.553e-06],[4e-09,1,1.553e-06],[5e-09,0,1.553e-06],[6e-09,1,1.553e-06],[7e-09,0,1.553e-06]]
+COUPLER0 in r1b_out through r1a_in kp=0.2
+COUPLER1 r1a_out r2b_out r1b_in r2a_in kp=0.2
+COUPLER2 r2a_out r3b_out r2b_in r3a_in kp=0.2
+COUPLER3 r3a_out r4b_out r3b_in r4a_in kp=0.2
+COUPLER4 r4a_out r5b_out r4b_in r5a_in kp=0.2
+COUPLER5 r5a_out r6b_out r5b_in r6a_in kp=0.2
+COUPLER6 r6a_out r7b_out r6b_in r7a_in kp=0.2
+COUPLER7 r7a_out r8b_out r7b_in r8a_in kp=0.2
+COUPLER8 r8a_out add r8b_in drop kp=0.2
+WG1a r1a_in r1a_out L=0.0003878875 att=2 neff=1 ng=2
+WG1b r1b_in r1b_out L=0.0003878875 att=2 neff=1 ng=2
+WG2a r2a_in r2a_out L=0.0003878875 att=2 neff=1 ng=2
+WG2b r2b_in r2b_out L=0.0003878875 att=2 neff=1 ng=2
+WG3a r3a_in r3a_out L=0.0003878875 att=2 neff=1 ng=2
+WG3b r3b_in r3b_out L=0.0003878875 att=2 neff=1 ng=2
+WG4a r4a_in r4a_out L=0.0003878875 att=2 neff=1 ng=2
+WG4b r4b_in r4b_out L=0.0003878875 att=2 neff=1 ng=2
+WG5a r5a_in r5a_out L=0.0003878875 att=2 neff=1 ng=2
+WG5b r5b_in r5b_out L=0.0003878875 att=2 neff=1 ng=2
+WG6a r6a_in r6a_out L=0.0003878875 att=2 neff=1 ng=2
+WG6b r6b_in r6b_out L=0.0003878875 att=2 neff=1 ng=2
+WG7a r7a_in r7a_out L=0.0003878875 att=2 neff=1 ng=2
+WG7b r7b_in r7b_out L=0.0003878875 att=2 neff=1 ng=2
+WG8a r8a_in r8a_out L=0.0003878875 att=2 neff=1 ng=2
+WG8b r8b_in r8b_out L=0.0003878875 att=2 neff=1 ng=2
+PROBE1 through
+PROBE2 drop
+.options abstol=1e-08 reltol=0.0001 timescale=-13 traceall=0
+.tran 5e-08

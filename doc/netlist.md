@@ -358,8 +358,8 @@ Where, with `-o name` (default `traces/delete_me`) and `--format` (default `vcd`
   VCD), one row per **time step, probe and wavelength**, holding the last sample of that wavelength in that time
   step: the delta cycles of one time step (the iterations of a `.op`/`.dc` fixed point, zero-delay propagation)
   are not physical time, and the VCD also only shows the end of a time step. A `.dc` sweep gives one row per
-  point and probe (the converged value). Rows in time order; within a time step, in the order of the first
-  sample of each (probe, wavelength). Columns:
+  point and probe (the converged value; an MLPROBE, one per listed wavelength, B-186). Rows in time order;
+  within a time step, in the order of the first sample of each (probe, wavelength). Columns:
 
   | column | unit | content |
   | --- | --- | --- |
@@ -371,7 +371,9 @@ Where, with `-o name` (default `traces/delete_me`) and `--format` (default `vcd`
 
   Numbers are written in the shortest form that reads back to the same double (more precise than the VCD). A
   probe has no row before its first sample (the VCD shows 0 there), and an MLPROBE only has rows at its listed
-  wavelengths. `.save` quantities only select VCD variables: the table always has every column.
+  wavelengths. In a `.dc`, an MLPROBE's rows of a point come after the other probes' rows of that point, in
+  wavelength order, and a listed wavelength its net does not carry at that point has a row of zeros at the
+  listed wavelength. `.save` quantities only select VCD variables: the table always has every column.
 - `npz`: `<name>.npz`, the same rows as a NumPy archive (written without any dependency, not compressed): one
   array per column, `time_s`, `wavelength_m`, `power_W`, `field_re`, `field_im` (float64) and `signal` (int32, an
   index into `signal_names`, a unicode array of every probe). With NumPy and pandas:
@@ -477,7 +479,7 @@ Continuous-wave optical source: `CWSRC<name> <out> [wl [power [phi]]] [keyword=v
   more is an error.
 - Keywords (case-insensitive): `WL` (alias `WAVELENGTH`), `POWER`, `PHI`. A keyword overrides the
   positional value; `PHI` is applied after `POWER`.
-- Required: none. `power` defaults to 0 W; always give `wl`.
+- Required: none. `power` defaults to 0 W; always give `wl`. A negative power is an error.
 - Example: `cwsrc1 in 1.55e-6 1e-3 0.5` is `cwsrc1 in wl=1.55e-6 power=1e-3 phi=0.5`.
 
 ## VLSRC
@@ -485,8 +487,10 @@ Continuous-wave optical source: `CWSRC<name> <out> [wl [power [phi]]] [keyword=v
 Optical value-list source: `VLSRC<name> <out> [file] [VALUES=...]`
 
 - Nets: `out`, optical output.
-- Positional arguments: `file` (string, path relative to the working directory). At most 1; more is
-  an error.
+- Positional arguments: `file` (string). At most 1; more is an error. A relative path (here and in
+  `VALUES=`) is looked up next to the netlist file that contains the element first (for an element in a
+  `.subckt` body, the file that defines the subcircuit), then in the working directory, as `.include`
+  (same warning when both exist and differ).
 - Keywords (case-insensitive): `VALUES`, either a file name (string) or a list
   `[[t0, p0, wl0], [t1, p1, wl1], ...]` (s, W, m). `FILE` and `SCALE` are reserved: they give a
   "not implemented" error.
@@ -507,8 +511,10 @@ Optical value-list source: `VLSRC<name> <out> [file] [VALUES=...]`
 Electrical value-list source: `EVLSRC<name> <out> [file] [VALUES=...]`
 
 - Nets: `out`, electrical output.
-- Positional arguments: `file` (string, path relative to the working directory). At most 1; more is
-  an error.
+- Positional arguments: `file` (string). At most 1; more is an error. A relative path (here and in
+  `VALUES=`) is looked up next to the netlist file that contains the element first (for an element in a
+  `.subckt` body, the file that defines the subcircuit), then in the working directory, as `.include`
+  (same warning when both exist and differ).
 - Keywords (case-insensitive): `VALUES`, either a file name (string) or a list `[[t0, V0], [t1, V1], ...]`
   (s, V). `FILE` and `SCALE` are reserved: they give a "not implemented" error.
 - File format: one `t,voltage` line per value (s, V). The first line of the file is always skipped
@@ -675,6 +681,15 @@ or several, use MLPROBE (`wl=[...]`, matched within a relative 1e-12); a PROBE h
 
 Use MLPROBE for per-wavelength values. The `-t` testbenches run no netlist analysis: their probes trace every
 event of their net.
+
+**MLPROBE in `.dc`** (B-186; before, an MLPROBE recorded nothing in a `.dc`): at each point, an MLPROBE records
+the converged value of each of its listed wavelengths, in the VCD and in the CSV/npz tables (one row per point
+and listed wavelength). A listed wavelength that its net does not carry at that point records 0 (power, modulus
+and phase; in the tables, a row of zeros at the listed wavelength): each point is a fresh steady state, so a
+value from an earlier point is not kept. In a wavelength or frequency sweep, the roles differ: a PROBE follows
+the swept wavelength (see above), an MLPROBE records its fixed listed wavelengths, e.g. the swept one at the point
+where it passes a listed wavelength, and 0 elsewhere. In any other sweep (a power, e.g. `.dc P(cwsrc1) ...`), an
+MLPROBE records each listed channel of a WDM circuit at every point (in name order of the MLPROBEs).
 
 In `.tran`, the probes are disabled during the operating point. When the transient starts, after the operating
 point (`.nodeset` included) and after any initial conditions, every probe samples its net (B-048, sprint

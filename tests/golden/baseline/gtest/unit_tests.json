@@ -49,6 +49,7 @@
   "IntegerLiterals.VariableStores64Bits": "PASS",
   "IntegerLiteralsDeathTest.AsIntegerOfDoubleOutOfRange": "PASS",
   "IntegerLiteralsDeathTest.LexerRejectsBeyond64Bits": "PASS",
+  "MLambdaProbe.DcPointTracesEveryListedWavelengthOrZero": "PASS",
   "MLambdaProbe.ReportsIgnoredWavelengthsOnce": "PASS",
   "MLambdaProbe.SamplesEventReceivedWhileDisabledWhenEnabled": "PASS",
   "MLambdaProbe.SamplesUnchangedNetWhenEnabled": "PASS",
@@ -64,7 +65,9 @@
   "OpticalOutputPort.FrequencyDomainWriteMergesBehindQueueTop": "PASS",
   "OpticalOutputPort.KeepsValueQueuedBeforeThreadStart": "PASS",
   "OpticalOutputPort.PendingEarlierWriteIsTakenFirst": "PASS",
+  "OpticalOutputPort.PendingEntryOrderMatchesPairComparison": "PASS",
   "OpticalOutputPort.PendingEqualTimesOnePerDeltaCycle": "PASS",
+  "OpticalOutputPort.PendingQueueMatchesLinearScanQueue": "PASS",
   "OpticalOutputPort.PendingResetCancelsNotification": "PASS",
   "OpticalOutputPort.PendingSameTimeAndWavelengthMerges": "PASS",
   "OpticalOutputPort.SnapFactorFromConfig": "PASS",
@@ -77,6 +80,7 @@
   "ParserState.ResolveIncludeFileThenWorkingDir": "PASS",
   "ParserState.ResolveIncludeSingleCandidate": "PASS",
   "ParserStateDeathTest.ResolveIncludeBothExist": "PASS",
+  "ParserStateDeathTest.ValueFilesResolvedAsIncludes": "PASS",
   "Probe.LatchOnceAtEnableTakesTheSmallestWavelengthReceivedWhileDisabled": "PASS",
   "Probe.LatchOnceKeepsTheSmallestWavelengthOfTheFirstTimeStep": "PASS",
   "Probe.LatchPerTimeStepPrefersTheSweptWavelengthOfADcPoint": "PASS",
@@ -164,6 +168,7 @@
   "WaveguideDeathTest.DelayRoundingToZeroIsAnErrorOnlyForNetlistWaveguides": "PASS",
   "WaveguideModel.GroupDelay": "PASS",
   "WaveguideModel.LossAndPhaseZeroSlope": "PASS",
+  "WavelengthMap.BehavesAsStdMap": "PASS",
   "WavelengthMatching.RegistryGivesTheIdOfTheFirstMatchingWavelength": "PASS",
   "WavelengthMatching.SameWavelengthIsRelativeWithinTheTolerance": "PASS"
  }

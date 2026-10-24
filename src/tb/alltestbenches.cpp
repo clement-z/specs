@@ -17,7 +17,6 @@ std::map<std::string, tb_func_t> tb_map = {
     { "mzi", MZI_tb_run },
     { "ring", Ring_tb_run },
     { "ac_add_drop", freqsweep_tb_run_add_drop },
-    { "ac_crow", crow_tb_run },
     { "lambda", lambda_tb_run },
     { "phaseshifter", ps_tb_run },
     { "ps", ps_tb_run },

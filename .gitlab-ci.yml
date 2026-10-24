@@ -57,6 +57,8 @@ test:
     stage: test
     needs: [build]
     script:
+        # numpy and pandas: tests/tools/test_run_table.py (skipped without them, B-193)
+        - /opt/meson/bin/pip install numpy pandas
         - meson setup build -Dnative=false
         - meson test -C build --print-errorlogs
     artifacts:
