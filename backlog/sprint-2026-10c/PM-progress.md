@@ -1,0 +1,77 @@
+# PM progress: B-188, per-event cost vs WDM channel count (branch `ws/wdmcost`)
+
+Heartbeat: `71e81c94` (PM-heartbeat, every 5 min, expires 48 h).
+Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc` 17/17 OK; strict golden
+(`--rtol 0 --atol 0 --print-slack 0`) 278 passed, 0 failed/new/missing; counters recorded with the base build
+(`stats-record`, 277 cases, 161 with statistics) for the later `stats-compare`.
+
+| # | Item | Status | Commit | Notes |
+|---|---|---|---|---|
+| 1 | Profile 1/4/16/64 channels | done | (this commit) | findings below |
+| 2a | Pending-queue order without `abs()` | todo | | |
+| 2b | Pending-entry index (B-015) | todo | | |
+| 2c | Per-wavelength containers indexed by id | todo | | |
+| 3 | Measure after | todo | | |
+| 4 | Docs | todo | | |
+
+## Item 1: profile (gcc release, no trace)
+
+Method. Circuit: `tests/bench/crow_gen.py N --traceall 0 --probes 0 --nwl W` (the paper's CROW, ten 1 ns pulses,
+all W channels pulsed together on a 100 GHz grid), run with `specs -f crow.cir --no-trace`. Times: user time of the
+child (`os.wait4`, `tests/bench/bench.py`'s `run_once`), median of 3 runs, idle host; per-event cost = user time /
+processed pending entries (`--stats`). Profiles: `perf record -e cycles:u` (flat, 2 kHz) and `--call-graph dwarf`
+on the same release build and on a copy configured with `-Ddebug=true` (release `-O3` code plus debug info, for
+inlined frames and source lines; same code generation).
+
+### Per-event cost (base build d86b816)
+| N | channels | processed | user s | ns / event |
+|---|---|---|---|---|
+| 3 | 1 | 718030 | 0.096 | 134 |
+| 3 | 4 | 2918458 | 0.528 | 181 |
+| 3 | 16 | 12471311 | 4.020 | 322 |
+| 3 | 64 | 48008518 | 24.39 | 508 |
+| 10 | 1 | 8394360 | 1.158 | 138 |
+| 10 | 4 | 34976897 | 8.813 | 252 |
+| 10 | 16 | 148242888 | 71.83 | 485 |
+| 30 (C-notrace) | 1 | 12289043 | 1.958 (median of 5) | 159 |
+
+Pending entries per output port when a value is written (`--stats` `pending_mean` / `pending_max`, N = 3):
+1.3 / 2 (1 channel), 3.4 / 8 (4), 10.8 / 34 (16), 41.6 / 143 (64): the queue of a port grows linearly with the
+channel count (every channel has its own entries in flight, at the same times: the channels share the delays).
+
+### Flat profile, share of user cycles (N = 3)
+| Function (self) | 1 ch | 4 ch | 16 ch | 64 ch |
+|---|---|---|---|---|
+| `__hypot_finite` + `hypotf32x` (complex `abs()`) | 0 % | 21.5 % | 25.7 % | 26.5 % |
+| `OpticalOutputPort::emit_due_entry()` | 17.6 % | 20.8 % | 23.7 % | 22.0 % |
+| `OpticalOutputPort::delayedWriteEventDriven()` | 14.5 % | 10.8 % | 11.6 % | 13.9 % |
+| `DirectionalCouplerUni::on_port_in{1,2}_changed()` | ~4 % | 7.8 % | 11.4 % | 17.2 % |
+| `OpticalOutputPort::fire_pending()` | <1 % | 2.6 % | 3.8 % | 4.0 % |
+| SystemC kernel (`sc_event::trigger`, `crunch`, `sc_ppq_base`, signal write/update) | ~40 % | ~25 % | ~15 % | ~10 % |
+
+Since the per-event cost grows 3.8x from 1 to 64 channels while the kernel's share falls, every row above but
+the kernel grows in absolute cost per event. Attribution (call graphs with inlined frames, source lines, 16 and
+64 channels):
+
+1. **Pending-queue comparisons compute `abs()`** (about 25 % of the time from 4 channels on, 0 % with one):
+   all `__hypot_finite` samples come from the heap operations of `m_queue` (`PQueue<pair<sc_time,
+   OpticalSignal>>` with `std::greater`): 17 % from `pop()` in `emit_due_entry()`, 7 % from `push()` in
+   `delayedWriteEventDriven()` (16 channels). The C++20 `pair` comparison compares the times, then, **when the
+   times are equal**, the signals with `OpticalSignal::operator<`, which compares `modulus()` (`std::abs`,
+   `hypot`) of both, in both directions (`__synth3way`): up to four `hypot` per comparison and O(log n)
+   comparisons per push and pop. With one channel two entries never share a time (same time and wavelength are
+   merged), so the second key is never reached; with W channels the W entries of a time step all tie on time.
+2. **Linear scan of the pending entries** (B-015): `find_if` over `m_queue` in `delayedWriteEventDriven()`
+   (`optical_output_port.cpp:339` and the loop in `stl_algobase.h`: 9.3 % at 64 channels): O(pending) per
+   written value, and pending grows linearly with the channels (above).
+3. **`std::map` per wavelength**: `m_emitted_fields` in `emit_due_entry()` (`try_emplace`: `stl_tree.h` lines,
+   about 15 of its 22 % at 64 channels) and the coupler memories `m_memory_in1/2` in
+   `DirectionalCouplerUni::on_port_in*_changed()` (`operator[]`: `stl_tree.h`/`stl_map.h`, about 12 of its 17 %):
+   O(log W) tree walks with a cache miss per level, several per event.
+4. **`m_pending_times` heap** (`fire_pending()`, `stl_heap.h`): O(log pending) per event; inherent to a heap
+   of pending times, grows slowly (log W). Not changed.
+
+Plan (each change bit-identical by construction, measured on its own): (2a) compare equal-time entries on their
+magnitudes without `hypot` where the result is certain (exactly the same comparison results, so the same heap
+and the same emission order); (2b) an index of the pending entries by (time, wavelength id) for the merge
+lookup; (2c) per-wavelength containers indexed by the (dense) wavelength id in the output port and the devices.
