@@ -10,7 +10,6 @@
 
 #include "optical_output_port.h"
 #include "specs.h"
-#include "utils/pqueue.h"
 
 #include "test/utils.h"
 
@@ -561,12 +560,14 @@ TEST(OpticalOutputPort, PendingEqualTimesBySmallestWavelength)
     SPECS_TEST_FOOTER();
 }
 
-// B-015, B-188: OpticalPendingQueue against a reference (a vector of the entries, merges found by a
-// linear scan of all entries, the next entry the minimum of (time, wavelength) over all of them):
-// random writes (merged into the pending entry of the same time and wavelength, else pushed), at a
-// few times and wavelengths (ids registered in another order than the wavelengths), with equal and
-// near-equal magnitudes, and pops; the same next entry, size and lookups after every step, and
-// across clear()
+// B-015, B-188, phase N: OpticalPendingQueue (entries in order in a ring buffer) against a reference
+// (a vector of the entries, merges found by a linear scan of all entries, the next entry the minimum
+// of (time, wavelength) over all of them): random writes (merged into the pending entry of the same
+// time and wavelength, else new), through write() or through find() and push(), at a few times and
+// wavelengths (ids registered in another order than the wavelengths, so insertions in the middle on
+// both sides, wrap-around and growth of the ring), with equal and near-equal magnitudes, and pops;
+// the same next entry, size and lookups after every step, every entry found regularly, and across
+// clear()
 TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
 {
     SPECS_TEST_HEADER()
@@ -616,6 +617,7 @@ TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
         sc_time::value_type now = 0;
         size_t merged = 0;
         size_t popped = 0;
+        size_t max_size = 0;
         for (int step = 0; step < 50000; ++step)
         {
             if (step == 30000)
@@ -632,19 +634,34 @@ TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
                 auto it = std::find_if(former.begin(), former.end(), [&](const Entry &x) {
                     return x.first == t && x.second.m_wavelength_id == v.m_wavelength_id;
                 });
-                Entry *e = queue.find(t, v.m_wavelength_id);
-                ASSERT_EQ(e != nullptr, it != former.end()) << "step " << step;
-                if (e)
+                if (step % 2 == 0)
                 {
-                    ASSERT_TRUE(same(*e, *it)) << "step " << step;
-                    e->second = v;
-                    it->second = v;
-                    ++merged;
+                    // as the port writes
+                    ASSERT_EQ(queue.write(t, v), it != former.end()) << "step " << step;
+                    if (it != former.end())
+                    {
+                        it->second = v;
+                        ++merged;
+                    }
+                    else
+                        former.push(Entry(t, v));
                 }
                 else
                 {
-                    former.push(Entry(t, v));
-                    queue.push(Entry(t, v));
+                    Entry *e = queue.find(t, v.m_wavelength_id);
+                    ASSERT_EQ(e != nullptr, it != former.end()) << "step " << step;
+                    if (e)
+                    {
+                        ASSERT_TRUE(same(*e, *it)) << "step " << step;
+                        e->second = v;
+                        it->second = v;
+                        ++merged;
+                    }
+                    else
+                    {
+                        former.push(Entry(t, v));
+                        queue.push(Entry(t, v));
+                    }
                 }
             }
             else
@@ -658,8 +675,21 @@ TEST(OpticalOutputPort, PendingQueueMatchesLinearScanQueue)
             ASSERT_EQ(queue.size(), former.size()) << "step " << step;
             ASSERT_EQ(queue.empty(), former.empty());
             if (!former.empty())
+            {
                 ASSERT_TRUE(same(queue.top(), former.top())) << "step " << step;
+            }
+            if (step % 97 == 0)
+            {
+                for (const Entry &x : former.entries)
+                {
+                    const Entry *e = queue.find(x.first, x.second.m_wavelength_id);
+                    ASSERT_NE(e, nullptr) << "step " << step;
+                    ASSERT_TRUE(same(*e, x)) << "step " << step;
+                }
+            }
+            max_size = std::max(max_size, queue.size());
         }
+        EXPECT_GT(max_size, 16u);
         EXPECT_GT(merged, 5000u);
         EXPECT_GT(popped, 10000u);
     }
