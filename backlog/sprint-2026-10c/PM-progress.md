@@ -13,7 +13,7 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 | 2c | Per-wavelength containers indexed by id | done | 782d85b | 16 ch 225 -> 175, 64 ch 346 -> 223 ns/event; 1 ch unchanged |
 | 2d | Next notification from the queue (no second heap) | done | 70db0e1 | all channel counts faster; C-notrace N=30 158 -> 148 ns/event |
 | 3 | Measure after | done | 94b6319 | table below |
-| 4 | Docs | done | (docs commit) | B-188, B-015, `backlog.md` rows, CHANGELOG `[unreleased]` Changed |
+| 4 | Docs | done | 5b6b9d7, 1477ebc | B-188, B-015, `backlog.md` rows, CHANGELOG `[unreleased]` Changed |
 | 5 | Acceptance gates | done | | see below |
 
 ## Item 1: profile (gcc release, no trace)
@@ -223,3 +223,5 @@ emissions of some cases: an engine-semantics change, not done here (see the repo
 - `stats-compare` (gcc) base vs after: 277 same, 0 differ.
 - B-015 delay-line check (8 x 10 cm waveguides, 20000 values; about 1230 entries pending per port):
   0.17 s -> 0.05 s user, VCD identical.
+
+Report: `PM-REPORT.md`. Heartbeat 71e81c94 deleted after the report commit.
