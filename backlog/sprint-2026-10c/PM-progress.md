@@ -11,8 +11,8 @@ Base: `sprint/2026-10c` at d86b816. Gates before any change: `pixi run test gcc`
 | 2a | Pending-queue order without `abs()` | done | c9c6a33 | 4 ch 181 -> 143, 16 ch 324 -> 246, 64 ch 507 -> 391 ns/event (N = 3) |
 | 2b | Pending-entry lookup (B-015) | done | 27c9189 | 16 ch 246 -> 224, 64 ch 389 -> 343 ns/event; 1 ch within noise (+1 %) |
 | 2c | Per-wavelength containers indexed by id | done | 782d85b | 16 ch 225 -> 175, 64 ch 346 -> 223 ns/event; 1 ch unchanged |
-| 2d | Next notification from the queue (no second heap) | done | (2d commit) | all channel counts faster; C-notrace N=30 158 -> 148 ns/event |
-| 3 | Measure after | todo | | |
+| 2d | Next notification from the queue (no second heap) | done | 70db0e1 | all channel counts faster; C-notrace N=30 158 -> 148 ns/event |
+| 3 | Measure after | done | (item 3 commit) | table below |
 | 4 | Docs | todo | | |
 
 ## Item 1: profile (gcc release, no trace)
@@ -180,3 +180,34 @@ passed; `stats-compare` vs base: 277 same.
 | base (same session) | | | | | 158.1 |
 | 2c | 128.1 | 132.9 | 175.8 | 223.4 | 160.5 |
 | 2d | 122.6 | 125.1 | 161.7 | 199.8 | 148.1 |
+
+## Item 3: before / after (base d86b816 vs 70db0e1, same session, interleaved runs)
+
+CROW `crow_gen.py N --traceall 0 --probes 0 --nwl W`, `--no-trace` (C-notrace also with `-o`, as `bench.py`
+runs it), gcc release, user time of the child, median of 3 (N = 30: of 5), ns per processed event:
+
+| N | channels | before | after | after / before |
+|---|---|---|---|---|
+| 3 | 1 | 132.3 | 124.0 | 0.94 |
+| 3 | 4 | 180.2 | 125.1 | 0.69 |
+| 3 | 16 | 325.4 | 156.6 | 0.48 |
+| 3 | 64 | 504.3 | 200.4 | 0.40 |
+| 10 | 1 | 140.7 | 128.9 | 0.92 |
+| 10 | 4 | 252.9 | 172.7 | 0.68 |
+| 10 | 16 | 486.7 | 226.7 | 0.47 |
+| 30 (C-notrace, `--no-trace`) | 1 | 159.5 | 150.5 | 0.94 |
+| 30 (C-notrace, `-o traces/crow`) | 1 | 160.5 | 148.7 | 0.93 |
+
+Growth with the channel count (cost at W channels / cost at 1 channel): N = 3: before 1.36 (4), 2.46 (16),
+3.81 (64); after 1.01 (4), 1.26 (16), 1.62 (64). N = 10: before 1.80 (4), 3.46 (16); after 1.34 (4), 1.76 (16).
+Event counts unchanged (counters identical).
+
+What remains (perf, N = 10, 16 channels, after): `emit_due_entry()` 34 % (1 ch: 17 %), mostly the heap pop of
+`m_queue` (sift-down: moves of the 32-byte entries, `stl_pair.h:627`, `stl_iterator.h`; `PendingEntryLater` on
+equal times) and the first touch of the queue (`optical_output_port.cpp:157,167`); `delayedWriteEventDriven()`
+15 % (heap push, `stl_heap.h:215`); `fire_pending()` 6 %. The heap is O(log pending) per entry and the pending
+entries of a port grow linearly with the channels (N = 10: mean 2.3 with 1 channel, 7.7 with 4, 30.9 with 16;
+N = 3: 1.3, 3.4, 10.8, 41.6 with 64), so a log W term remains, plus a larger working set. Its layout fixes the
+emission order of equal-time entries (by magnitude, and after in-place merges, by where the merged entry sits),
+so a structure other than this heap (e.g. one bucket per time) would change the delta-cycle order of the
+emissions of some cases: an engine-semantics change, not done here (see the report).
